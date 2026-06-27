@@ -257,6 +257,7 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
     if (window.confirm('Hapus seluruh riwayat obrolan di layar?')) {
       setMessages([]);
       setIsFirstMessage(true);
+      setShowScrollBottom(false);
       if (isGenerating) {
         if (generateTimeoutRef.current) clearTimeout(generateTimeoutRef.current);
         setIsGenerating(false);
@@ -283,12 +284,16 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
           detectedLanguage={detectedLanguage}
         />
 
-        <button 
-          onClick={scrollToBottom}
-          className={`absolute bottom-[calc(9rem+env(safe-area-inset-bottom))] md:bottom-32 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all ${showScrollBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
-        >
-          <span className="material-symbols-outlined text-xl">arrow_downward</span>
-        </button>
+        {!isFirstMessage && messages.length > 0 && (
+          <button 
+            onClick={scrollToBottom}
+            className={`absolute bottom-[calc(12rem+env(safe-area-inset-bottom))] md:bottom-40 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all ${showScrollBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+            aria-label="Scroll to latest message"
+            title="Scroll to latest message"
+          >
+            <span className="material-symbols-outlined text-xl">arrow_downward</span>
+          </button>
+        )}
 
         <div ref={chatContainerRef} onScroll={handleScroll} className={`flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 transition-all duration-300 relative z-10 flex flex-col ${isFirstMessage ? 'pb-4 md:pb-6' : 'pb-[calc(10rem+env(safe-area-inset-bottom))] md:pb-32'}`}>
           
