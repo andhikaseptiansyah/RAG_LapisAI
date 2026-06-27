@@ -67,8 +67,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onSendMessage, onA
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto -mt-16 animate-fadeIn">
-      <div className="w-12 h-12 md:w-16 md:h-16 bg-primary-container/20 rounded-2xl flex items-center justify-center mb-6 border border-primary/30 shadow-[0_0_20px_rgba(77,142,255,0.2)] animate-[pulse_3s_ease-in-out_infinite]">
-        <span className="material-symbols-outlined text-primary text-3xl md:text-4xl icon-filled">psychology</span>
+      <div className="mb-6 flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite]">
+        <img
+          src="/assistant-logo.png"
+          alt="Lapis Logo"
+          className="w-24 md:w-32 h-auto object-contain"
+        />
       </div>
 
       <h1 className="text-[26px] md:text-4xl font-headline text-on-surface mb-8 text-center tracking-tight">Apa yang bisa saya bantu, Staff User?</h1>
