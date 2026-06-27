@@ -24,6 +24,22 @@ export const App: React.FC = () => {
   const generateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Fix real mobile browser height so the footer is not hidden behind the browser/navigation bar
+  useEffect(() => {
+    const setAppHeight = () => {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+
+    setAppHeight();
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('orientationchange', setAppHeight);
+
+    return () => {
+      window.removeEventListener('resize', setAppHeight);
+      window.removeEventListener('orientationchange', setAppHeight);
+    };
+  }, []);
+
   // Auto-scroll to bottom
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -253,12 +269,12 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
   };
 
   return (
-    <div className="flex h-screen relative bg-[#0b0d13]">
+    <div className="flex relative overflow-hidden bg-[#0b0d13]" style={{ height: 'var(--app-height)' }}>
       <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.doc,.docx,.txt,.csv" onChange={handleFileChange} />
       
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewChat={handleClearChat} />
 
-      <main className="flex-1 flex flex-col h-full w-full relative min-w-0">
+      <main className="flex-1 flex flex-col h-full w-full relative min-w-0 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none bg-body-gradient-subtle z-0"></div>
         
         <Header 
@@ -269,12 +285,12 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
 
         <button 
           onClick={scrollToBottom}
-          className={`absolute bottom-36 md:bottom-32 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all ${showScrollBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+          className={`absolute bottom-[calc(9rem+env(safe-area-inset-bottom))] md:bottom-32 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all ${showScrollBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
         >
           <span className="material-symbols-outlined text-xl">arrow_downward</span>
         </button>
 
-        <div ref={chatContainerRef} onScroll={handleScroll} className={`flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 transition-all duration-300 relative z-10 flex flex-col ${isFirstMessage ? 'pb-4 md:pb-6' : 'pb-40 md:pb-32'}`}>
+        <div ref={chatContainerRef} onScroll={handleScroll} className={`flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 transition-all duration-300 relative z-10 flex flex-col ${isFirstMessage ? 'pb-4 md:pb-6' : 'pb-[calc(10rem+env(safe-area-inset-bottom))] md:pb-32'}`}>
           
           {isFirstMessage ? (
             <WelcomeScreen onSendMessage={handleSendMessage} onAttachFileClick={handleAttachFileClick} onMicClick={handleMicClick} />
