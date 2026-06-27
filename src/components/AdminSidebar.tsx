@@ -37,7 +37,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
             <Link
               to="/"
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm transition-all duration-200 text-primary bg-secondary-container hover:bg-secondary-container/80"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm transition-all duration-200 text-[#0b1b35] bg-[#a8c7fa] hover:bg-[#b7d2ff] shadow-[0_8px_24px_rgba(168,199,250,0.18)]"
             >
               <span className="material-symbols-outlined icon-filled">chat</span>
               Knowledge Chat

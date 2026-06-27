@@ -7,6 +7,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
 
 type DetectedLanguage = 'ID' | 'EN';
+type UploadMode = 'photo' | 'file';
 
 export const App: React.FC = () => {
   const [isFirstMessage, setIsFirstMessage] = useState(true);
@@ -58,16 +59,51 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleAttachFileClick = () => {
-    fileInputRef.current?.click();
+  const handleAttachFileClick = (mode: UploadMode = 'file') => {
+    if (!fileInputRef.current) return;
+
+    fileInputRef.current.accept =
+      mode === 'photo'
+        ? 'image/png,image/jpeg,image/jpg,image/webp'
+        : '.pdf,.doc,.docx,.txt,.csv';
+
+    fileInputRef.current.dataset.uploadMode = mode;
+    fileInputRef.current.click();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).map(f => ({ name: f.name }));
-      setAttachedFiles(prev => [...prev, ...newFiles]);
-      if (isFirstMessage) setIsFirstMessage(false);
+    const selectedFiles = Array.from(e.target.files ?? []);
+    const uploadMode = (e.currentTarget.dataset.uploadMode as UploadMode) || 'file';
+
+    if (selectedFiles.length > 0) {
+      const allowedDocumentExtensions = ['pdf', 'doc', 'docx', 'txt', 'csv'];
+      const allowedPhotoTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+      const validFiles = selectedFiles.filter((file) => {
+        const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+        if (uploadMode === 'photo') {
+          return allowedPhotoTypes.includes(file.type);
+        }
+
+        return allowedDocumentExtensions.includes(extension);
+      });
+
+      if (validFiles.length !== selectedFiles.length) {
+        alert(
+          uploadMode === 'photo'
+            ? 'Upload Foto hanya menerima PNG, JPG, JPEG, atau WEBP.'
+            : 'Upload File hanya menerima PDF, DOC, DOCX, TXT, atau CSV.'
+        );
+      }
+
+      if (validFiles.length > 0) {
+        const newFiles = validFiles.map((file) => ({ name: file.name }));
+        setAttachedFiles((prev) => [...prev, ...newFiles]);
+        if (isFirstMessage) setIsFirstMessage(false);
+      }
     }
+
     e.target.value = '';
   };
 
@@ -271,7 +307,7 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
 
   return (
     <div className="flex relative overflow-hidden bg-[#0b0d13]" style={{ height: 'var(--app-height)' }}>
-      <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.doc,.docx,.txt,.csv" onChange={handleFileChange} />
+      <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.doc,.docx,.txt,.csv" data-upload-mode="file" onChange={handleFileChange} />
       
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewChat={handleClearChat} />
 

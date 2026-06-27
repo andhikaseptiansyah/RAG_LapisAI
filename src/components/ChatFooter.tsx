@@ -1,12 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { AttachedFile } from '../types';
+
+type UploadMode = 'photo' | 'file';
 
 interface ChatFooterProps {
   inputValue: string;
   setInputValue: (val: string) => void;
   attachedFiles: AttachedFile[];
   onRemoveAttachment: (index: number) => void;
-  onAttachFileClick: () => void;
+  onAttachFileClick: (mode: UploadMode) => void;
   onMicClick: () => void;
   isRecording: boolean;
   isGenerating: boolean;
@@ -18,6 +20,7 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
   inputValue, setInputValue, attachedFiles, onRemoveAttachment, onAttachFileClick, onMicClick, isRecording, isGenerating, onSendMessage
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
@@ -34,10 +37,15 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
     }
   };
 
+  const handleUploadOptionClick = (mode: UploadMode) => {
+    setAttachMenuOpen(false);
+    onAttachFileClick(mode);
+  };
+
   return (
     <footer className="p-3 md:p-6 bg-surface/90 backdrop-blur-md border-t border-outline-variant absolute bottom-0 left-0 right-0 z-20">
       <div className="max-w-4xl mx-auto flex flex-col gap-2 md:gap-3">
-        <div className="relative group bg-surface-container border border-outline-variant rounded-xl md:rounded-2xl focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all shadow-sm flex flex-col overflow-hidden">
+        <div className="relative group bg-surface-container border border-outline-variant rounded-xl md:rounded-2xl focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all shadow-sm flex flex-col overflow-visible">
           
           {attachedFiles.length > 0 && (
             <div className="w-full bg-surface-container-high border-b border-outline-variant px-3 py-2 flex gap-2 items-center overflow-x-auto custom-scrollbar">
@@ -57,22 +65,59 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
             <textarea 
               ref={textareaRef}
               rows={1} 
-              className="w-full bg-transparent border-none focus:ring-0 py-3 md:py-3.5 px-3 md:px-4 pr-[110px] md:pr-[120px] text-[13px] md:text-sm text-on-surface placeholder:text-outline/50 resize-none max-h-24 md:max-h-32 overflow-y-auto custom-scrollbar leading-relaxed outline-none" 
+              className="w-full bg-transparent border-none focus:ring-0 py-3 md:py-3.5 pl-[58px] md:pl-[62px] pr-[78px] md:pr-[86px] text-[13px] md:text-sm text-on-surface placeholder:text-outline/50 resize-none max-h-24 md:max-h-32 overflow-y-auto custom-scrollbar leading-relaxed outline-none" 
               placeholder={isRecording ? "Mendengarkan suara Anda..." : "Ketik pertanyaan..."}
               value={inputValue}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
             />
             
+            <div className="absolute left-1.5 bottom-[5px] md:bottom-[7px] flex items-center">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setAttachMenuOpen((prev) => !prev)}
+                  className="p-1.5 text-outline hover:text-primary hover:bg-surface-variant transition-colors rounded-lg flex items-center justify-center"
+                  title="Tambah lampiran"
+                >
+                  <span className="material-symbols-outlined text-[22px]">add</span>
+                </button>
+
+                {attachMenuOpen && (
+                  <div className="absolute left-0 bottom-full mb-3 w-56 bg-surface-container-high border border-outline-variant rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.45)] p-2 z-[999] animate-fadeIn">
+                    <button
+                      type="button"
+                      onClick={() => handleUploadOptionClick('photo')}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors text-left"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">add_photo_alternate</span>
+                      Upload Foto
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleUploadOptionClick('file')}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors text-left"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">description</span>
+                      Upload File
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="absolute right-1.5 bottom-[5px] md:bottom-[7px] flex items-center gap-1">
               <button onClick={onMicClick} className={`p-1.5 transition-colors rounded-lg flex items-center justify-center ${isRecording ? 'text-error recording' : 'text-outline hover:text-primary hover:bg-surface-variant'}`} title="Voice to Text">
-                <span className="material-symbols-outlined text-[20px] md:text-[22px]">mic</span>
+                <span className="flex items-center justify-center gap-[2px] w-5 h-5" aria-hidden="true">
+                  <span className="w-[2px] h-2.5 bg-current rounded-full"></span>
+                  <span className="w-[2px] h-4 bg-current rounded-full"></span>
+                  <span className="w-[2px] h-5 bg-current rounded-full"></span>
+                  <span className="w-[2px] h-4 bg-current rounded-full"></span>
+                  <span className="w-[2px] h-2.5 bg-current rounded-full"></span>
+                </span>
               </button>
-              
-              <button onClick={onAttachFileClick} className="p-1.5 text-outline hover:text-primary hover:bg-surface-variant transition-colors rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-[20px] md:text-[22px]">attach_file</span>
-              </button>
-              
+
               <button 
                 onClick={onSendMessage} 
                 className={`p-1.5 rounded-lg transition-all active:scale-95 flex items-center justify-center ${isGenerating ? 'bg-surface-variant hover:bg-outline-variant' : 'bg-primary hover:bg-primary-container'}`}

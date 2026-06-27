@@ -40,7 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) 
 
         {/* Menu Navigasi */}
         <nav className="flex flex-col gap-2 min-w-[200px] -mt-1">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm transition-all duration-200 text-primary bg-secondary-container whitespace-nowrap cursor-default">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm transition-all duration-200 text-[#0b1b35] bg-[#a8c7fa] shadow-[0_8px_24px_rgba(168,199,250,0.18)] whitespace-nowrap cursor-default">
             <span className="material-symbols-outlined icon-filled">chat</span>
             Knowledge Chat
           </div>
