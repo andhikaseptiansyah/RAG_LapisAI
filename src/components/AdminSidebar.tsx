@@ -20,23 +20,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         
         <div className="p-5 md:p-6 flex flex-col h-full overflow-y-auto custom-scrollbar">
           {/* Header Sidebar */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 md:w-10 md:h-10 bg-primary-container rounded flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-on-primary-container icon-filled">psychology</span>
-              </div>
-              <div>
-                <h1 className="font-headline text-lg md:text-xl font-bold text-primary leading-tight">Assistant</h1>
-                <p className="font-mono text-[10px] md:text-xs text-on-surface-variant tracking-wider uppercase">Enterprise AI</p>
-              </div>
-            </div>
+          <div className="flex items-center justify-center mb-1 relative">
+            <img
+              src="/assistant-logo.png"
+              alt="Lapis Logo"
+              className="w-28 md:w-36 h-auto object-contain shrink-0"
+            />
+
             {/* Tombol Tutup Sidebar di Mobile */}
-            <button onClick={onClose} className="md:hidden p-1 text-on-surface-variant hover:text-primary rounded-lg transition-colors shrink-0">
+            <button onClick={onClose} className="md:hidden absolute right-0 p-1 text-on-surface-variant hover:text-primary rounded-lg transition-colors shrink-0">
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
 
-          <nav className="flex-1 flex flex-col gap-2">
+          <nav className="flex-1 flex flex-col gap-2 -mt-1">
             <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high">
               <span className="material-symbols-outlined">chat</span>
               Knowledge Chat

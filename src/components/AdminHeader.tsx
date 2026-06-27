@@ -15,13 +15,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => 
         <h2 className="font-headline text-lg md:text-xl font-bold text-on-surface">Admin Dashboard</h2>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-3">
-        <div className="flex items-center gap-2 md:gap-3 cursor-pointer group">
-          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
-            <span className="material-symbols-outlined text-sm md:text-base text-on-surface-variant group-hover:text-primary transition-colors">admin_panel_settings</span>
-          </div>
-          <span className="text-xs md:text-sm font-semibold text-on-surface-variant group-hover:text-primary transition-colors hidden sm:block">System Admin</span>
-        </div>
+      <div className="flex items-center justify-end">
+        <img
+          src="/assistant-logo.png"
+          alt="Lapis Logo"
+          className="w-20 md:w-24 h-auto object-contain"
+        />
       </div>
     </header>
   );
