@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
@@ -14,6 +14,55 @@ interface RepositoryDocument {
   chunks: number;
   indexedStatus: 'Indexed' | 'Re-indexed' | 'Pending';
 }
+
+type ChatRange = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+interface ChatMetricPoint {
+  label: string;
+  totalChats: number;
+  uniqueUsers: number;
+}
+
+const chatAnalyticsData: Record<ChatRange, ChatMetricPoint[]> = {
+  daily: [
+    { label: '08:00', totalChats: 18, uniqueUsers: 7 },
+    { label: '10:00', totalChats: 34, uniqueUsers: 13 },
+    { label: '12:00', totalChats: 27, uniqueUsers: 11 },
+    { label: '14:00', totalChats: 46, uniqueUsers: 18 },
+    { label: '16:00', totalChats: 39, uniqueUsers: 16 },
+    { label: '18:00', totalChats: 24, uniqueUsers: 9 },
+  ],
+  weekly: [
+    { label: 'Mon', totalChats: 92, uniqueUsers: 31 },
+    { label: 'Tue', totalChats: 128, uniqueUsers: 42 },
+    { label: 'Wed', totalChats: 104, uniqueUsers: 38 },
+    { label: 'Thu', totalChats: 156, uniqueUsers: 51 },
+    { label: 'Fri', totalChats: 141, uniqueUsers: 47 },
+    { label: 'Sat', totalChats: 76, uniqueUsers: 26 },
+    { label: 'Sun', totalChats: 61, uniqueUsers: 19 },
+  ],
+  monthly: [
+    { label: 'Week 1', totalChats: 426, uniqueUsers: 132 },
+    { label: 'Week 2', totalChats: 518, uniqueUsers: 157 },
+    { label: 'Week 3', totalChats: 472, uniqueUsers: 146 },
+    { label: 'Week 4', totalChats: 603, uniqueUsers: 181 },
+  ],
+  yearly: [
+    { label: 'Jan', totalChats: 1680, uniqueUsers: 412 },
+    { label: 'Feb', totalChats: 1845, uniqueUsers: 438 },
+    { label: 'Mar', totalChats: 2130, uniqueUsers: 501 },
+    { label: 'Apr', totalChats: 2388, uniqueUsers: 544 },
+    { label: 'May', totalChats: 2514, uniqueUsers: 587 },
+    { label: 'Jun', totalChats: 2760, uniqueUsers: 621 },
+  ],
+};
+
+const rangeLabels: Record<ChatRange, string> = {
+  daily: 'Harian',
+  weekly: 'Mingguan',
+  monthly: 'Bulanan',
+  yearly: 'Tahunan',
+};
 
 const repositoryDocuments: RepositoryDocument[] = [
   {
@@ -61,6 +110,69 @@ const repositoryDocuments: RepositoryDocument[] = [
     chunks: 14,
     indexedStatus: 'Pending',
   },
+  {
+    id: 'DOC-006',
+    filename: 'SOP_Onboarding.pdf',
+    type: 'PDF',
+    size: '1.1 MB',
+    uploadDate: 'Apr 11, 2026',
+    chunks: 42,
+    indexedStatus: 'Indexed',
+  },
+  {
+    id: 'DOC-007',
+    filename: 'Policy_Employee_Benefit.pdf',
+    type: 'PDF',
+    size: '1.5 MB',
+    uploadDate: 'Apr 19, 2026',
+    chunks: 64,
+    indexedStatus: 'Indexed',
+  },
+  {
+    id: 'DOC-008',
+    filename: 'IT_Helpdesk_Guide.docx',
+    type: 'DOCX',
+    size: '720 KB',
+    uploadDate: 'May 03, 2026',
+    chunks: 29,
+    indexedStatus: 'Re-indexed',
+  },
+  {
+    id: 'DOC-009',
+    filename: 'Security_Access_FAQ.txt',
+    type: 'TXT',
+    size: '210 KB',
+    uploadDate: 'May 12, 2026',
+    chunks: 18,
+    indexedStatus: 'Indexed',
+  },
+  {
+    id: 'DOC-010',
+    filename: 'Operational_Report_Q2.pdf',
+    type: 'PDF',
+    size: '3.2 MB',
+    uploadDate: 'Jun 01, 2026',
+    chunks: 156,
+    indexedStatus: 'Indexed',
+  },
+  {
+    id: 'DOC-011',
+    filename: 'HR_Leave_Policy.docx',
+    type: 'DOCX',
+    size: '590 KB',
+    uploadDate: 'Jun 10, 2026',
+    chunks: 24,
+    indexedStatus: 'Pending',
+  },
+  {
+    id: 'DOC-012',
+    filename: 'Company_Profile.pdf',
+    type: 'PDF',
+    size: '840 KB',
+    uploadDate: 'Jun 18, 2026',
+    chunks: 33,
+    indexedStatus: 'Indexed',
+  },
 ];
 
 const getDocumentIcon = (type: DocumentType) => {
@@ -107,20 +219,22 @@ export const AdminDashboard: React.FC = () => {
   // State untuk Navigasi Mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [documentSearch, setDocumentSearch] = useState('');
+  const [chatRange, setChatRange] = useState<ChatRange>('daily');
+  const [documentPage, setDocumentPage] = useState(1);
 
-  // State Dropzone
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentChatData = chatAnalyticsData[chatRange];
 
-  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(true); };
-  const handleDragLeave = () => setIsDragOver(false);
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    setShowWarning(true);
-    setTimeout(() => setShowWarning(false), 4000);
-  };
+  const chatChartMax = Math.max(...currentChatData.map((item) => item.totalChats), 1);
+
+  const totalChatCount = currentChatData.reduce((sum, item) => sum + item.totalChats, 0);
+
+  const totalUniqueUsers = currentChatData.reduce((sum, item) => sum + item.uniqueUsers, 0);
+
+  const averageChatCount = Math.round(totalChatCount / currentChatData.length);
+
+  const peakChatPoint = currentChatData.reduce((maxItem, item) =>
+    item.totalChats > maxItem.totalChats ? item : maxItem
+  );
 
   const filteredDocuments = useMemo(() => {
     const keyword = documentSearch.trim().toLowerCase();
@@ -134,6 +248,14 @@ export const AdminDashboard: React.FC = () => {
         .includes(keyword)
     );
   }, [documentSearch]);
+
+  const documentsPerPage = 5;
+  const totalDocumentPages = Math.max(Math.ceil(filteredDocuments.length / documentsPerPage), 1);
+  const safeDocumentPage = Math.min(documentPage, totalDocumentPages);
+  const paginatedDocuments = filteredDocuments.slice(
+    (safeDocumentPage - 1) * documentsPerPage,
+    safeDocumentPage * documentsPerPage
+  );
 
   return (
     <div className="bg-background text-on-surface font-body overflow-hidden flex h-screen w-full relative">
@@ -175,35 +297,93 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Dropzone Upload */}
+            {/* User Chat Analytics */}
             <div className="lg:col-span-7 space-y-6">
-              <section className="bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 h-full flex flex-col">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
-                  <h2 className="font-headline text-lg md:text-xl font-bold">Ingest Knowledge</h2>
-                  <span className="font-mono text-[10px] md:text-xs px-2 md:px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center gap-2 w-fit">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Vector Sync Active
-                  </span>
-                </div>
-                
-                <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.txt,.docx" />
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed border-outline-variant hover:border-primary hover:bg-primary/5 transition-all rounded-xl p-6 md:p-10 text-center cursor-pointer group ${isDragOver ? 'border-primary bg-primary/5' : ''}`}
-                >
-                  <span className="material-symbols-outlined text-4xl md:text-5xl text-outline mb-3 md:mb-4 group-hover:text-primary transition-colors">cloud_upload</span>
-                  <p className="text-sm md:text-base text-on-surface mb-2">Drag & drop files here or <span className="text-primary font-semibold">Browse</span></p>
-                  <p className="text-outline text-xs md:text-sm">PDF, TXT, DOCX (Max 25MB)</p>
+              <section className="bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 h-[340px] flex flex-col">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="font-headline text-lg md:text-xl font-bold">User Chat Analytics</h2>
+                    <p className="text-outline text-xs md:text-sm mt-1">
+                      Diagram jumlah chat user berdasarkan periode harian, mingguan, bulanan, dan tahunan.
+                    </p>
+                  </div>
+
+                  <div className="w-full sm:w-[190px]">
+                    <label className="block font-mono text-[10px] text-outline uppercase tracking-wider mb-1.5">
+                      Periode
+                    </label>
+
+                    <div className="relative">
+                      <select
+                        value={chatRange}
+                        onChange={(e) => setChatRange(e.target.value as ChatRange)}
+                        className="w-full appearance-none bg-[#0b0d13] border border-outline-variant/50 rounded-xl py-2.5 pl-3 pr-10 font-mono text-xs md:text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/60 transition-all cursor-pointer"
+                      >
+                        {(Object.keys(rangeLabels) as ChatRange[]).map((range) => (
+                          <option key={range} value={range} className="bg-[#0b0d13] text-on-surface">
+                            {rangeLabels[range]}
+                          </option>
+                        ))}
+                      </select>
+
+                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-outline">
+                        <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {showWarning && (
-                  <div className="mt-4 p-4 bg-error-container/20 border border-error/30 rounded-lg flex items-center gap-3 animate-fadeIn">
-                    <span className="material-symbols-outlined text-error">warning</span>
-                    <p className="text-error text-sm">Warning: Duplicate file detected. System will re-index existing chunks.</p>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-3">
+                    <p className="font-mono text-[9px] md:text-[10px] text-outline uppercase tracking-wider mb-1">Total Chat</p>
+                    <p className="font-headline text-xl md:text-2xl font-bold text-on-surface">{totalChatCount.toLocaleString()}</p>
                   </div>
-                )}
+
+                  <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-3">
+                    <p className="font-mono text-[9px] md:text-[10px] text-outline uppercase tracking-wider mb-1">Unique Users</p>
+                    <p className="font-headline text-xl md:text-2xl font-bold text-on-surface">{totalUniqueUsers.toLocaleString()}</p>
+                  </div>
+
+                  <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-3">
+                    <p className="font-mono text-[9px] md:text-[10px] text-outline uppercase tracking-wider mb-1">Avg Chat</p>
+                    <p className="font-headline text-xl md:text-2xl font-bold text-on-surface">{averageChatCount.toLocaleString()}</p>
+                  </div>
+                </div>
+
+                <div className="flex-1 min-h-0 bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-4">
+                  <div className="h-full flex items-end gap-2 md:gap-3">
+                    {currentChatData.map((item) => {
+                      const barHeight = Math.max((item.totalChats / chatChartMax) * 100, 8);
+
+                      return (
+                        <div key={item.label} className="flex-1 h-full flex flex-col items-center justify-end gap-2 group">
+                          <div className="relative w-full flex-1 flex items-end justify-center">
+                            <div
+                              className="w-full max-w-[42px] rounded-t-xl bg-primary/80 hover:bg-primary transition-all shadow-[0_0_16px_rgba(77,142,255,0.18)]"
+                              style={{ height: `${barHeight}%` }}
+                              title={`${item.label}: ${item.totalChats} chats, ${item.uniqueUsers} users`}
+                            />
+
+                            <div className="absolute -top-2 translate-y-[-100%] hidden group-hover:block bg-surface-container-high border border-outline-variant rounded-lg px-2 py-1 shadow-lg whitespace-nowrap z-10">
+                              <p className="font-mono text-[10px] text-on-surface">{item.totalChats} chats</p>
+                              <p className="font-mono text-[10px] text-outline">{item.uniqueUsers} users</p>
+                            </div>
+                          </div>
+
+                          <div className="text-center">
+                            <p className="font-mono text-[10px] md:text-xs text-on-surface-variant">{item.label}</p>
+                            <p className="font-mono text-[9px] text-primary">{item.totalChats}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-3 text-[10px] md:text-xs font-mono text-outline">
+                  <span>Peak: <span className="text-primary">{peakChatPoint.label}</span> dengan {peakChatPoint.totalChats.toLocaleString()} chat</span>
+                  <span className="hidden sm:inline">Metric: total user messages</span>
+                </div>
               </section>
             </div>
 
@@ -286,7 +466,7 @@ export const AdminDashboard: React.FC = () => {
                       <input
                         type="text"
                         value={documentSearch}
-                        onChange={(e) => setDocumentSearch(e.target.value)}
+                        onChange={(e) => { setDocumentSearch(e.target.value); setDocumentPage(1); }}
                         className="w-full bg-[#0b0d13] border border-outline-variant rounded-xl py-2.5 pl-10 pr-10 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/60 transition-all shadow-inner"
                         placeholder="Search by filename, type, date, or status..."
                       />
@@ -294,7 +474,7 @@ export const AdminDashboard: React.FC = () => {
                       {documentSearch && (
                         <button
                           type="button"
-                          onClick={() => setDocumentSearch('')}
+                          onClick={() => { setDocumentSearch(''); setDocumentPage(1); }}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-error transition-colors"
                           title="Clear search"
                         >
@@ -306,7 +486,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
 
                 <div className="overflow-x-auto custom-scrollbar">
-                  <table className="w-full text-left border-collapse min-w-[760px]">
+                  <table className="w-full text-left border-collapse min-w-[680px]">
                     <thead className="bg-surface-container-high/50 text-outline font-mono text-[10px] md:text-xs uppercase tracking-wider">
                       <tr>
                         <th className="px-4 md:px-6 py-3 md:py-4 font-medium">Filename</th>
@@ -315,13 +495,12 @@ export const AdminDashboard: React.FC = () => {
                         <th className="px-4 md:px-6 py-3 md:py-4 font-medium">Size</th>
                         <th className="px-4 md:px-6 py-3 md:py-4 font-medium">Upload Date</th>
                         <th className="px-4 md:px-6 py-3 md:py-4 font-medium">Status</th>
-                        <th className="px-4 md:px-6 py-3 md:py-4 font-medium text-right">Action</th>
                       </tr>
                     </thead>
 
                     <tbody className="divide-y divide-outline-variant/30 text-[13px] md:text-sm">
                       {filteredDocuments.length > 0 ? (
-                        filteredDocuments.map((doc) => (
+                        paginatedDocuments.map((doc) => (
                           <tr key={doc.id} className="hover:bg-surface-container-high/50 transition-colors group">
                             <td className="px-4 md:px-6 py-3 md:py-4">
                               <div className="flex items-center gap-2 md:gap-3">
@@ -360,22 +539,11 @@ export const AdminDashboard: React.FC = () => {
                               </span>
                             </td>
 
-                            <td className="px-4 md:px-6 py-3 md:py-4 text-right">
-                              <div className="flex items-center justify-end gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                <button className="text-outline hover:text-primary transition-colors p-1.5 md:p-2 rounded-lg hover:bg-primary/10" title="View document detail">
-                                  <span className="material-symbols-outlined text-[18px] md:text-[20px]">visibility</span>
-                                </button>
-
-                                <button className="text-outline hover:text-error transition-colors p-1.5 md:p-2 rounded-lg hover:bg-error/10" title="Delete document">
-                                  <span className="material-symbols-outlined text-[18px] md:text-[20px]">delete</span>
-                                </button>
-                              </div>
-                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="px-4 md:px-6 py-10 text-center">
+                          <td colSpan={6} className="px-4 md:px-6 py-10 text-center">
                             <div className="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
                               <span className="material-symbols-outlined text-4xl text-outline">search_off</span>
                               <p className="font-semibold text-on-surface">No document found</p>
@@ -388,6 +556,32 @@ export const AdminDashboard: React.FC = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 md:px-6 py-4 border-t border-outline-variant bg-surface-container-high/20">
+                  <p className="font-mono text-[10px] md:text-xs text-outline">
+                    Showing {filteredDocuments.length === 0 ? 0 : (safeDocumentPage - 1) * documentsPerPage + 1}
+                    -{Math.min(safeDocumentPage * documentsPerPage, filteredDocuments.length)} of {filteredDocuments.length} files
+                  </p>
+
+                  {totalDocumentPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      {Array.from({ length: totalDocumentPages }, (_, index) => index + 1).map((page) => (
+                        <button
+                          key={page}
+                          type="button"
+                          onClick={() => setDocumentPage(page)}
+                          className={`w-8 h-8 rounded-lg border font-mono text-xs transition-all ${
+                            safeDocumentPage === page
+                              ? 'bg-primary text-on-primary-container border-primary'
+                              : 'bg-[#0b0d13] text-on-surface-variant border-outline-variant/50 hover:text-primary hover:border-primary/50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
             </div>
