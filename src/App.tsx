@@ -11,7 +11,7 @@ type DetectedLanguage = 'ID' | 'EN';
 export const App: React.FC = () => {
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isRecording, setIsRecording] = useState(false);
