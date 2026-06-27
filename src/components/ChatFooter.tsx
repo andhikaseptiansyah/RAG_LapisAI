@@ -15,7 +15,7 @@ interface ChatFooterProps {
 }
 
 export const ChatFooter: React.FC<ChatFooterProps> = ({
-  inputValue, setInputValue, attachedFiles, onRemoveAttachment, onAttachFileClick, onMicClick, isRecording, isGenerating, onSendMessage, onClearChat
+  inputValue, setInputValue, attachedFiles, onRemoveAttachment, onAttachFileClick, onMicClick, isRecording, isGenerating, onSendMessage
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
