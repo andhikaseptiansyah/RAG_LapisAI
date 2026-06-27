@@ -86,9 +86,6 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
         </div>
         
         <div className="flex justify-between items-center px-1 md:px-2 mt-1">
-          <button onClick={onClearChat} className="flex items-center gap-1 text-outline hover:text-error transition-colors font-mono text-[9px] md:text-[10px]">
-            <span className="material-symbols-outlined text-[12px] md:text-[14px]">delete</span> Hapus Obrolan
-          </button>
           <div className="flex gap-3 md:gap-4 text-[9px] md:text-[10px] font-mono text-outline">
             <span className="hidden sm:flex items-center gap-1"><span className="material-symbols-outlined text-[12px] md:text-[14px]">fact_check</span> Metadata & Markdown</span>
             <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[12px] md:text-[14px]">verified_user</span> Secure</span>
