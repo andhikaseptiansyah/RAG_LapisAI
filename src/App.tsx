@@ -5,11 +5,47 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
+import { IntroAnimation } from './components/IntroAnimation';
 
 type DetectedLanguage = 'ID' | 'EN';
 type UploadMode = 'photo' | 'file';
 
+const TypewriterMarkdown: React.FC<{ content: string; onTick?: () => void }> = ({ content, onTick }) => {
+  const [visibleText, setVisibleText] = useState('');
+  const [isDone, setIsDone] = useState(false);
+
+  useEffect(() => {
+    let index = 0;
+    setVisibleText('');
+    setIsDone(false);
+
+    const typingInterval = window.setInterval(() => {
+      index += 1;
+      setVisibleText(content.slice(0, index));
+      onTick?.();
+
+      if (index >= content.length) {
+        window.clearInterval(typingInterval);
+        setIsDone(true);
+      }
+    }, 6);
+
+    return () => window.clearInterval(typingInterval);
+  }, [content]);
+
+  return (
+    <>
+      <div
+        className="prose prose-sm prose-invert prose-custom max-w-none text-on-surface leading-relaxed text-[13px] md:text-sm"
+        dangerouslySetInnerHTML={{ __html: marked(visibleText) as string }}
+      />
+      {!isDone && <span className="inline-block w-1.5 h-4 ml-1 bg-primary/80 animate-pulse align-middle"></span>}
+    </>
+  );
+};
+
 export const App: React.FC = () => {
+  const [showIntro, setShowIntro] = useState(true);
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +59,7 @@ export const App: React.FC = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollButtonHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recognitionRef = useRef<any>(null);
 
   // Fix real mobile browser height so the footer is not hidden behind the browser/navigation bar
@@ -43,6 +80,12 @@ export const App: React.FC = () => {
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
+    if (scrollButtonHideTimeoutRef.current) {
+      clearTimeout(scrollButtonHideTimeoutRef.current);
+    }
+
+    setShowScrollBottom(false);
+
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
     }
@@ -55,9 +98,29 @@ export const App: React.FC = () => {
   const handleScroll = () => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      setShowScrollBottom(scrollHeight - scrollTop - clientHeight > 100);
+      const shouldShowButton = scrollHeight - scrollTop - clientHeight > 100;
+
+      setShowScrollBottom(shouldShowButton);
+
+      if (scrollButtonHideTimeoutRef.current) {
+        clearTimeout(scrollButtonHideTimeoutRef.current);
+      }
+
+      if (shouldShowButton) {
+        scrollButtonHideTimeoutRef.current = setTimeout(() => {
+          setShowScrollBottom(false);
+        }, 2500);
+      }
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (scrollButtonHideTimeoutRef.current) {
+        clearTimeout(scrollButtonHideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleAttachFileClick = (mode: UploadMode = 'file') => {
     if (!fileInputRef.current) return;
@@ -306,14 +369,20 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
   };
 
   return (
-    <div className="flex relative overflow-hidden bg-[#0b0d13]" style={{ height: 'var(--app-height)' }}>
+    <div className="flex relative overflow-hidden bg-[#000000]" style={{ height: 'var(--app-height)' }}>
+      {showIntro && <IntroAnimation onFinish={() => setShowIntro(false)} />}
+
       <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.doc,.docx,.txt,.csv" data-upload-mode="file" onChange={handleFileChange} />
       
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewChat={handleClearChat} />
 
-      <main className="flex-1 flex flex-col h-full w-full relative min-w-0 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none bg-body-gradient-subtle z-0"></div>
-        
+      <main className="flex-1 flex flex-col h-full w-full relative min-w-0 overflow-hidden bg-transparent">
+        <div
+          className={`absolute inset-0 pointer-events-none bg-body-gradient-subtle z-0 transition-opacity duration-[3500ms] ease-in-out ${
+            isFirstMessage ? 'opacity-100' : 'opacity-0'
+          }`}
+        ></div>
+
         <Header 
           isOpen={sidebarOpen} 
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -323,7 +392,7 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
         {!isFirstMessage && messages.length > 0 && (
           <button 
             onClick={scrollToBottom}
-            className={`absolute bottom-[calc(12rem+env(safe-area-inset-bottom))] md:bottom-40 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all ${showScrollBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+            className={`absolute bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-24 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all duration-300 ${showScrollBottom ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-95 pointer-events-none'}`}
             aria-label="Scroll to latest message"
             title="Scroll to latest message"
           >
@@ -336,7 +405,7 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
           {isFirstMessage ? (
             <WelcomeScreen onSendMessage={handleSendMessage} onAttachFileClick={handleAttachFileClick} onMicClick={handleMicClick} />
           ) : (
-            <div className="max-w-4xl mx-auto w-full flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">
+            <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                   {msg.role === 'system' ? (
@@ -358,27 +427,36 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
                       <div className="mt-1.5 md:mt-2 text-[9px] md:text-[10px] text-on-surface-variant text-right font-mono">{msg.time}</div>
                     </div>
                   ) : (
-                    <div className="max-w-[95%] sm:max-w-[85%] bg-gradient-to-br from-surface-container to-surface-container-low p-4 md:p-5 rounded-2xl rounded-tl-sm border border-primary/20 shadow-lg shadow-primary/5">
+                    <div className="max-w-[95%] sm:max-w-[82%] bg-transparent p-0 md:p-0 rounded-none border-none shadow-none">
                       <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
-                        <span className="material-symbols-outlined text-primary text-[14px] md:text-sm icon-filled">smart_toy</span>
-                        <span className="font-mono text-primary tracking-widest text-[9px] md:text-[10px] uppercase">Verified System Response</span>
+                        <img
+                          src="/assistant-logo.png"
+                          alt="Assistant Logo"
+                          className="h-20 md:h-24 w-auto object-contain"
+                        />
                       </div>
-                      <div className="prose prose-sm prose-invert prose-custom max-w-none text-on-surface leading-relaxed text-[13px] md:text-sm" dangerouslySetInnerHTML={{ __html: marked(msg.content) as string }} />
+                      <TypewriterMarkdown content={msg.content} onTick={scrollToBottom} />
                       
-                      <div className="mt-4 md:mt-5 pt-3 md:pt-4 border-t border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
-                        <div className="flex items-center gap-2 bg-surface-container-high px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-outline-variant self-start sm:self-auto">
-                          <span className="material-symbols-outlined text-[14px] md:text-[16px] text-primary">description</span>
-                          <span className="text-[10px] md:text-[11px] font-mono text-primary truncate max-w-[150px] md:max-w-full">{msg.source} <span className="text-on-surface-variant ml-1">• p. 12</span></span>
+                      <div className="mt-5 md:mt-6 pt-3 md:pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 text-white/70">
+                        <div className="flex items-center gap-2 self-start sm:self-auto min-w-0">
+                          <span className="material-symbols-outlined text-[14px] md:text-[16px] text-white/70">description</span>
+                          <span className="text-[10px] md:text-[11px] font-mono truncate max-w-[180px] md:max-w-full">
+                            {msg.source} <span className="text-white/45 ml-1">• p. 12</span>
+                          </span>
                         </div>
-                        
-                        <div className="flex items-center justify-between sm:justify-end gap-3 md:gap-4 w-full sm:w-auto">
-                          <div className="flex items-center gap-1.5 md:gap-2 px-1">
-                            <span className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${(msg.confidence || 0) > 95 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
-                            <span className="text-[10px] md:text-[11px] font-mono text-on-surface-variant">Similarity: <span className={`${(msg.confidence || 0) > 95 ? 'text-emerald-400' : 'text-amber-400'} font-bold`}>{msg.confidence}%</span></span>
-                          </div>
-                          <div className="flex items-center bg-surface-container-high rounded-lg p-1 border border-outline-variant">
-                            <button onClick={() => alert('Teks jawaban berhasil disalin!')} className="p-1 material-symbols-outlined text-[14px] md:text-[16px] text-outline hover:text-primary transition-colors rounded" title="Salin Teks">content_copy</button>
-                          </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-5 w-full sm:w-auto">
+                          <span className="text-[10px] md:text-[11px] font-mono text-white/65">
+                            Similarity: <span className="text-white font-semibold">{msg.confidence}%</span>
+                          </span>
+
+                          <button
+                            onClick={() => alert('Teks jawaban berhasil disalin!')}
+                            className="material-symbols-outlined text-[15px] md:text-[17px] text-white/55 hover:text-white transition-colors"
+                            title="Salin Teks"
+                          >
+                            content_copy
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -388,11 +466,9 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
               
               {isGenerating && (
                 <div className="flex justify-start animate-fadeIn">
-                  <div className="bg-surface-container p-3 md:p-4 rounded-2xl rounded-tl-sm border border-outline-variant flex gap-1 items-center h-10 md:h-12">
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full animate-typing" style={{ animationDelay: '-0.32s' }}></div>
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full animate-typing" style={{ animationDelay: '-0.16s' }}></div>
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full animate-typing"></div>
-                  </div>
+                  <p className="font-mono text-[11px] md:text-xs text-primary/80 tracking-wider animate-pulse">
+                    Berpikir...
+                  </p>
                 </div>
               )}
             </div>
