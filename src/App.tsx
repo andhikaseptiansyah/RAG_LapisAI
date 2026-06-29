@@ -53,7 +53,6 @@ const TypewriterMarkdown: React.FC<{
 };
 
 export const App: React.FC = () => {
-  const [showIntro, setShowIntro] = useState(true);
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -62,14 +61,16 @@ export const App: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
+
   const [detectedLanguage, setDetectedLanguage] =
     useState<DetectedLanguage>('ID');
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const generateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
+
+  const generateTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const scrollButtonHideTimeoutRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -90,7 +91,10 @@ export const App: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', setAppHeight);
-      window.removeEventListener('orientationchange', setAppHeight);
+      window.removeEventListener(
+        'orientationchange',
+        setAppHeight
+      );
     };
   }, []);
 
@@ -116,8 +120,11 @@ export const App: React.FC = () => {
   const handleScroll = () => {
     if (!chatContainerRef.current) return;
 
-    const { scrollTop, scrollHeight, clientHeight } =
-      chatContainerRef.current;
+    const {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+    } = chatContainerRef.current;
 
     const shouldShowButton =
       scrollHeight - scrollTop - clientHeight > 100;
@@ -129,21 +136,34 @@ export const App: React.FC = () => {
     }
 
     if (shouldShowButton) {
-      scrollButtonHideTimeoutRef.current = setTimeout(() => {
-        setShowScrollBottom(false);
-      }, 2500);
+      scrollButtonHideTimeoutRef.current =
+        setTimeout(() => {
+          setShowScrollBottom(false);
+        }, 2500);
     }
   };
 
   useEffect(() => {
     return () => {
       if (scrollButtonHideTimeoutRef.current) {
-        clearTimeout(scrollButtonHideTimeoutRef.current);
+        clearTimeout(
+          scrollButtonHideTimeoutRef.current
+        );
+      }
+
+      if (generateTimeoutRef.current) {
+        clearTimeout(generateTimeoutRef.current);
+      }
+
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
       }
     };
   }, []);
 
-  const handleAttachFileClick = (mode: UploadMode = 'file') => {
+  const handleAttachFileClick = (
+    mode: UploadMode = 'file'
+  ) => {
     if (!fileInputRef.current) return;
 
     fileInputRef.current.accept =
@@ -158,11 +178,13 @@ export const App: React.FC = () => {
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const selectedFiles = Array.from(event.target.files ?? []);
+    const selectedFiles = Array.from(
+      event.target.files ?? []
+    );
 
     const uploadMode =
-      (event.currentTarget.dataset.uploadMode as UploadMode) ||
-      'file';
+      (event.currentTarget.dataset
+        .uploadMode as UploadMode) || 'file';
 
     if (selectedFiles.length > 0) {
       const allowedDocumentExtensions = [
@@ -180,18 +202,29 @@ export const App: React.FC = () => {
         'image/webp',
       ];
 
-      const validFiles = selectedFiles.filter((file) => {
-        const extension =
-          file.name.split('.').pop()?.toLowerCase() ?? '';
+      const validFiles = selectedFiles.filter(
+        (file) => {
+          const extension =
+            file.name
+              .split('.')
+              .pop()
+              ?.toLowerCase() ?? '';
 
-        if (uploadMode === 'photo') {
-          return allowedPhotoTypes.includes(file.type);
+          if (uploadMode === 'photo') {
+            return allowedPhotoTypes.includes(
+              file.type
+            );
+          }
+
+          return allowedDocumentExtensions.includes(
+            extension
+          );
         }
+      );
 
-        return allowedDocumentExtensions.includes(extension);
-      });
-
-      if (validFiles.length !== selectedFiles.length) {
+      if (
+        validFiles.length !== selectedFiles.length
+      ) {
         alert(
           uploadMode === 'photo'
             ? 'Upload Foto hanya menerima PNG, JPG, JPEG, atau WEBP.'
@@ -200,9 +233,11 @@ export const App: React.FC = () => {
       }
 
       if (validFiles.length > 0) {
-        const newFiles = validFiles.map((file) => ({
-          name: file.name,
-        }));
+        const newFiles = validFiles.map(
+          (file) => ({
+            name: file.name,
+          })
+        );
 
         setAttachedFiles((previousFiles) => [
           ...previousFiles,
@@ -227,6 +262,7 @@ export const App: React.FC = () => {
       alert(
         'Maaf, browser Anda tidak mendukung fitur mikrofon. Harap gunakan Google Chrome atau Edge.'
       );
+
       return;
     }
 
@@ -248,7 +284,9 @@ export const App: React.FC = () => {
     const recognition = new SpeechRecognition();
 
     recognition.lang =
-      detectedLanguage === 'EN' ? 'en-US' : 'id-ID';
+      detectedLanguage === 'EN'
+        ? 'en-US'
+        : 'id-ID';
 
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -263,16 +301,23 @@ export const App: React.FC = () => {
         index < event.results.length;
         index += 1
       ) {
-        transcript += event.results[index][0].transcript;
+        transcript +=
+          event.results[index][0].transcript;
       }
 
       setInputValue(
-        baseText + (baseText ? ' ' : '') + transcript
+        baseText +
+          (baseText ? ' ' : '') +
+          transcript
       );
     };
 
     recognition.onerror = (event: any) => {
-      console.error('Error mikrofon:', event.error);
+      console.error(
+        'Error mikrofon:',
+        event.error
+      );
+
       setIsRecording(false);
     };
 
@@ -284,8 +329,12 @@ export const App: React.FC = () => {
     recognition.start();
   };
 
-  const detectLanguage = (text: string): DetectedLanguage => {
-    const normalizedText = text.toLowerCase().trim();
+  const detectLanguage = (
+    text: string
+  ): DetectedLanguage => {
+    const normalizedText = text
+      .toLowerCase()
+      .trim();
 
     if (!normalizedText) {
       return detectedLanguage;
@@ -301,7 +350,9 @@ export const App: React.FC = () => {
         /\b(hai|halo|apa|bagaimana|kenapa|tolong|bantu|buat|buatkan|rangkum|ringkas|laporan|berkas|dokumen|template|sistem|keuangan|jelaskan|berikan|tulis|saya|anda)\b/g
       )?.length ?? 0;
 
-    return englishMatches > indonesianMatches ? 'EN' : 'ID';
+    return englishMatches > indonesianMatches
+      ? 'EN'
+      : 'ID';
   };
 
   const startGenerating = (
@@ -321,8 +372,9 @@ export const App: React.FC = () => {
       );
 
     const wantsSummary =
-      /rangkum|ringkas|summarize|summary|sop/.test(lowerText) ||
-      files.length > 0;
+      /rangkum|ringkas|summarize|summary|sop/.test(
+        lowerText
+      ) || files.length > 0;
 
     let markdownRaw = '';
 
@@ -396,20 +448,21 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
       }
     }
 
-    generateTimeoutRef.current = setTimeout(() => {
-      setMessages((previousMessages) => [
-        ...previousMessages,
-        {
-          id: Date.now().toString(),
-          role: 'ai',
-          content: markdownRaw,
-          confidence,
-          source: 'SOP_HRD_2026.pdf',
-        },
-      ]);
+    generateTimeoutRef.current =
+      setTimeout(() => {
+        setMessages((previousMessages) => [
+          ...previousMessages,
+          {
+            id: Date.now().toString(),
+            role: 'ai',
+            content: markdownRaw,
+            confidence,
+            source: 'SOP_HRD_2026.pdf',
+          },
+        ]);
 
-      setIsGenerating(false);
-    }, 2500);
+        setIsGenerating(false);
+      }, 2500);
   };
 
   const handleSendMessage = (
@@ -418,7 +471,9 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
   ) => {
     if (isGenerating) {
       if (generateTimeoutRef.current) {
-        clearTimeout(generateTimeoutRef.current);
+        clearTimeout(
+          generateTimeoutRef.current
+        );
       }
 
       setMessages((previousMessages) => [
@@ -426,7 +481,8 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
         {
           id: Date.now().toString(),
           role: 'system',
-          content: '[ Generation Stopped by User ]',
+          content:
+            '[ Generation Stopped by User ]',
         },
       ]);
 
@@ -434,16 +490,22 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
       return;
     }
 
-    if (!text.trim() && files.length === 0) return;
+    if (
+      !text.trim() &&
+      files.length === 0
+    ) {
+      return;
+    }
 
     if (isFirstMessage) {
       setIsFirstMessage(false);
     }
 
-    const time = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    const time =
+      new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
 
     setMessages((previousMessages) => [
       ...previousMessages,
@@ -472,38 +534,50 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
     setDetectedLanguage(language);
     setIsGenerating(true);
 
-    startGenerating(text, files, language);
+    startGenerating(
+      text,
+      files,
+      language
+    );
   };
 
   const handleClearChat = () => {
+    const shouldClear = window.confirm(
+      'Hapus seluruh riwayat obrolan di layar?'
+    );
+
+    if (!shouldClear) return;
+
+    setMessages([]);
+    setIsFirstMessage(true);
+    setShowScrollBottom(false);
+
+    if (isGenerating) {
+      if (generateTimeoutRef.current) {
+        clearTimeout(
+          generateTimeoutRef.current
+        );
+      }
+
+      setIsGenerating(false);
+    }
+
     if (
-      window.confirm('Hapus seluruh riwayat obrolan di layar?')
+      isRecording &&
+      recognitionRef.current
     ) {
-      setMessages([]);
-      setIsFirstMessage(true);
-      setShowScrollBottom(false);
-
-      if (isGenerating) {
-        if (generateTimeoutRef.current) {
-          clearTimeout(generateTimeoutRef.current);
-        }
-
-        setIsGenerating(false);
-      }
-
-      if (isRecording && recognitionRef.current) {
-        recognitionRef.current.stop();
-        setIsRecording(false);
-      }
+      recognitionRef.current.stop();
+      setIsRecording(false);
     }
   };
 
   return (
     <div
       className="flex relative overflow-hidden bg-black"
-      style={{ height: 'var(--app-height)' }}
+      style={{
+        height: 'var(--app-height)',
+      }}
     >
-
       <input
         type="file"
         ref={fileInputRef}
@@ -516,15 +590,19 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
 
       <Sidebar
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={() =>
+          setSidebarOpen(false)
+        }
         onNewChat={handleClearChat}
       />
 
       <main className="flex-1 flex flex-col h-full w-full relative min-w-0 overflow-hidden bg-transparent">
-        {/* Background hitam dengan gradien biru kecil hanya di tengah */}
+        {/* Background hitam dengan gradien biru */}
         <div
           className={`absolute inset-0 pointer-events-none z-0 transition-opacity duration-[3500ms] ease-in-out ${
-            isFirstMessage ? 'opacity-100' : 'opacity-0'
+            isFirstMessage
+              ? 'opacity-100'
+              : 'opacity-0'
           }`}
           style={{
             background:
@@ -534,26 +612,35 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
 
         <Header
           isOpen={sidebarOpen}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          detectedLanguage={detectedLanguage}
+          onToggleSidebar={() =>
+            setSidebarOpen(
+              (previousState) =>
+                !previousState
+            )
+          }
+          detectedLanguage={
+            detectedLanguage
+          }
         />
 
-        {!isFirstMessage && messages.length > 0 && (
-          <button
-            onClick={scrollToBottom}
-            className={`absolute bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-24 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all duration-300 ${
-              showScrollBottom
-                ? 'opacity-100 translate-y-0 scale-100'
-                : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
-            }`}
-            aria-label="Scroll to latest message"
-            title="Scroll to latest message"
-          >
-            <span className="material-symbols-outlined text-xl">
-              arrow_downward
-            </span>
-          </button>
-        )}
+        {!isFirstMessage &&
+          messages.length > 0 && (
+            <button
+              type="button"
+              onClick={scrollToBottom}
+              className={`absolute bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-24 right-4 md:right-8 bg-surface-container-high border border-outline-variant rounded-full p-2 text-on-surface-variant hover:text-primary hover:bg-surface-variant shadow-lg z-30 transition-all duration-300 ${
+                showScrollBottom
+                  ? 'opacity-100 translate-y-0 scale-100'
+                  : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
+              }`}
+              aria-label="Scroll to latest message"
+              title="Scroll to latest message"
+            >
+              <span className="material-symbols-outlined text-xl">
+                arrow_downward
+              </span>
+            </button>
+          )}
 
         <div
           ref={chatContainerRef}
@@ -566,9 +653,15 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
         >
           {isFirstMessage ? (
             <WelcomeScreen
-              onSendMessage={handleSendMessage}
-              onAttachFileClick={handleAttachFileClick}
-              onMicClick={handleMicClick}
+              onSendMessage={
+                handleSendMessage
+              }
+              onAttachFileClick={
+                handleAttachFileClick
+              }
+              onMicClick={
+                handleMicClick
+              }
             />
           ) : (
             <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">
@@ -581,24 +674,31 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
                       : 'justify-start'
                   } animate-fadeIn`}
                 >
-                  {message.role === 'system' ? (
+                  {message.role ===
+                  'system' ? (
                     <div className="flex justify-center my-2 text-[9px] md:text-[10px] font-mono text-error/80 border border-error/20 bg-error/5 px-3 py-1 rounded-full mx-auto w-fit">
                       {message.content}
                     </div>
-                  ) : message.role === 'user' ? (
+                  ) : message.role ===
+                    'user' ? (
                     <div className="max-w-[90%] md:max-w-[80%] bg-surface-variant text-on-surface p-3 md:p-4 rounded-2xl rounded-tr-sm shadow-sm border border-outline-variant">
                       {message.attachments &&
-                        message.attachments.length > 0 && (
+                        message.attachments
+                          .length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {message.attachments.map(
-                              (file, index) => (
+                              (
+                                file,
+                                index
+                              ) => (
                                 <span
-                                  key={index}
+                                  key={`${file.name}-${index}`}
                                   className="bg-surface-container-high text-primary px-2 py-1 rounded text-[9px] md:text-[10px] font-mono border border-outline-variant flex items-center gap-1"
                                 >
                                   <span className="material-symbols-outlined text-[10px] md:text-[12px]">
                                     description
                                   </span>
+
                                   {file.name}
                                 </span>
                               )
@@ -625,8 +725,12 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
                       </div>
 
                       <TypewriterMarkdown
-                        content={message.content}
-                        onTick={scrollToBottom}
+                        content={
+                          message.content
+                        }
+                        onTick={
+                          scrollToBottom
+                        }
                       />
 
                       <div className="mt-5 md:mt-6 pt-3 md:pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 text-white/70">
@@ -637,6 +741,7 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
 
                           <span className="text-[10px] md:text-[11px] font-mono truncate max-w-[180px] md:max-w-full">
                             {message.source}
+
                             <span className="text-white/45 ml-1">
                               • p. 12
                             </span>
@@ -646,17 +751,25 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
                         <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-5 w-full sm:w-auto">
                           <span className="text-[10px] md:text-[11px] font-mono text-white/65">
                             Similarity:{' '}
+
                             <span className="text-white font-semibold">
-                              {message.confidence}%
+                              {
+                                message.confidence
+                              }
+                              %
                             </span>
                           </span>
 
                           <button
+                            type="button"
                             onClick={() =>
-                              alert('Teks jawaban berhasil disalin!')
+                              alert(
+                                'Teks jawaban berhasil disalin!'
+                              )
                             }
                             className="material-symbols-outlined text-[15px] md:text-[17px] text-white/55 hover:text-white transition-colors"
                             title="Salin Teks"
+                            aria-label="Salin teks"
                           >
                             content_copy
                           </button>
@@ -681,23 +794,47 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
         {!isFirstMessage && (
           <ChatFooter
             inputValue={inputValue}
-            setInputValue={setInputValue}
-            attachedFiles={attachedFiles}
-            onRemoveAttachment={(index) =>
-              setAttachedFiles((previousFiles) =>
-                previousFiles.filter(
-                  (_, fileIndex) => fileIndex !== index
-                )
+            setInputValue={
+              setInputValue
+            }
+            attachedFiles={
+              attachedFiles
+            }
+            onRemoveAttachment={(
+              index
+            ) =>
+              setAttachedFiles(
+                (previousFiles) =>
+                  previousFiles.filter(
+                    (
+                      _,
+                      fileIndex
+                    ) =>
+                      fileIndex !== index
+                  )
               )
             }
-            onAttachFileClick={handleAttachFileClick}
-            onMicClick={handleMicClick}
-            isRecording={isRecording}
-            isGenerating={isGenerating}
-            onSendMessage={() =>
-              handleSendMessage(inputValue, attachedFiles)
+            onAttachFileClick={
+              handleAttachFileClick
             }
-            onClearChat={handleClearChat}
+            onMicClick={
+              handleMicClick
+            }
+            isRecording={
+              isRecording
+            }
+            isGenerating={
+              isGenerating
+            }
+            onSendMessage={() =>
+              handleSendMessage(
+                inputValue,
+                attachedFiles
+              )
+            }
+            onClearChat={
+              handleClearChat
+            }
           />
         )}
       </main>
