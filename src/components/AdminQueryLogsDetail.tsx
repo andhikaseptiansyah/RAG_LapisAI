@@ -1,9 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
-
-type QueryLogStatus = 'ANSWERED' | 'NEED_REVIEW' | 'NOT_FOUND' | 'ERROR';
-type QueryRange = 'daily' | 'weekly' | 'monthly' | 'yearly';
+import {
+  getQueryLogsDashboard,
+  type QueryLog,
+  type QueryLogPerformance,
+  type QueryLogStatus,
+  type QueryRange,
+} from '../services/queryLogService';
+import { getFriendlyApiErrorMessage } from '../services/api';
 
 const queryRangeLabels: Record<QueryRange, string> = {
   daily: 'Harian',
@@ -11,87 +16,6 @@ const queryRangeLabels: Record<QueryRange, string> = {
   monthly: 'Bulanan',
   yearly: 'Tahunan',
 };
-
-const parseQueryDate = (timestamp: string) => new Date(timestamp.replace(' ', 'T'));
-
-interface RetrievedSource {
-  documentName: string;
-  page: string;
-  chunkId: string;
-  relevanceScore: number;
-}
-
-interface QueryLog {
-  queryId: string;
-  userName: string;
-  userQuestion: string;
-  timestamp: string;
-  retrievedDocuments: RetrievedSource[];
-  answerGenerated: string;
-  confidenceScore: number;
-  responseTime: string;
-  status: QueryLogStatus;
-}
-
-const queryLogs: QueryLog[] = [
-  {
-    queryId: 'QL-20260628-001',
-    userName: 'Staff User',
-    userQuestion: 'Bagaimana prosedur klaim medis rawat inap?',
-    timestamp: '2026-06-28 10:45:22',
-    retrievedDocuments: [
-      { documentName: 'SOP_Claim_Medical.pdf', page: 'p.7', chunkId: 'CHK-00071', relevanceScore: 0.94 },
-      { documentName: 'Policy_Employee_Benefit.pdf', page: 'p.3', chunkId: 'CHK-00119', relevanceScore: 0.88 },
-      { documentName: 'FAQ_HR_Benefit.docx', page: 'p.2', chunkId: 'CHK-00204', relevanceScore: 0.81 },
-    ],
-    answerGenerated:
-      'Prosedur klaim medis rawat inap dilakukan dengan mengisi formulir klaim, melampirkan kuitansi asli, surat keterangan rawat inap, dan ringkasan medis. Dokumen diserahkan ke HR maksimal 14 hari kerja setelah pasien keluar dari rumah sakit.',
-    confidenceScore: 0.91,
-    responseTime: '1.2s',
-    status: 'ANSWERED',
-  },
-  {
-    queryId: 'QL-20260628-002',
-    userName: 'Staff User',
-    userQuestion: 'Template laporan keuangan bulan ini',
-    timestamp: '2026-06-28 10:42:15',
-    retrievedDocuments: [
-      { documentName: 'Finance_Report_Template_2026.docx', page: 'p.1', chunkId: 'CHK-00321', relevanceScore: 0.86 },
-    ],
-    answerGenerated:
-      'Template laporan keuangan bulan ini menggunakan format Finance_Report_Template_2026.docx. Bagian yang wajib diisi meliputi ringkasan pendapatan, pengeluaran operasional, arus kas, dan catatan pembayaran tertunda.',
-    confidenceScore: 0.87,
-    responseTime: '0.8s',
-    status: 'ANSWERED',
-  },
-  {
-    queryId: 'QL-20260628-003',
-    userName: 'System Admin',
-    userQuestion: 'Siapa nama CEO perusahaan?',
-    timestamp: '2026-06-28 10:35:01',
-    retrievedDocuments: [],
-    answerGenerated:
-      'Saya belum menemukan informasi yang cukup pada dokumen yang tersedia. Silakan unggah dokumen perusahaan yang memuat struktur organisasi atau profil manajemen.',
-    confidenceScore: 0.22,
-    responseTime: '0.6s',
-    status: 'NOT_FOUND',
-  },
-  {
-    queryId: 'QL-20260628-004',
-    userName: 'Staff User',
-    userQuestion: 'Apa kebijakan work from home untuk karyawan baru?',
-    timestamp: '2026-06-28 10:31:47',
-    retrievedDocuments: [
-      { documentName: 'Policy_WFH.pdf', page: 'p.2', chunkId: 'CHK-00033', relevanceScore: 0.89 },
-      { documentName: 'SOP_Onboarding.pdf', page: 'p.5', chunkId: 'CHK-00012', relevanceScore: 0.76 },
-    ],
-    answerGenerated:
-      'Karyawan dapat melakukan work from home maksimal 2 hari per minggu setelah mendapat persetujuan manajer. Untuk karyawan baru, kebijakan ini menyesuaikan hasil evaluasi masa probation.',
-    confidenceScore: 0.74,
-    responseTime: '1.4s',
-    status: 'NEED_REVIEW',
-  },
-];
 
 const getStatusStyle = (status: QueryLogStatus) => {
   switch (status) {
@@ -108,66 +32,144 @@ const getStatusStyle = (status: QueryLogStatus) => {
   }
 };
 
+const formatLogTime = (timestamp: string): string => {
+  const normalized = timestamp?.includes('T')
+    ? timestamp
+    : timestamp?.replace(' ', 'T');
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) {
+    return timestamp?.split(' ')[1] ?? '-';
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+};
+
+const formatLogDateTime = (timestamp: string): string => {
+  const normalized = timestamp?.includes('T')
+    ? timestamp
+    : timestamp?.replace(' ', 'T');
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) {
+    return timestamp || '-';
+  }
+
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+};
+
+const formatPercent = (value: number): string => {
+  return `${Math.round((Number.isFinite(value) ? value : 0) * 100)}%`;
+};
+
+const parseResponseTimeSeconds = (value: string): number => {
+  const numeric = Number(String(value ?? '').replace('s', ''));
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
+const emptyPerformance: QueryLogPerformance = {
+  totalQueries: 0,
+  answered: 0,
+  notFound: 0,
+  needReview: 0,
+  errors: 0,
+  averageConfidence: 0,
+  averageResponseTime: 0,
+};
+
 export const AdminQueryLogsDetail: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedQueryId, setSelectedQueryId] = useState(queryLogs[0].queryId);
+  const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null);
   const [queryPage, setQueryPage] = useState(1);
   const [queryRange, setQueryRange] = useState<QueryRange>('daily');
-
-  const filteredQueryLogs = useMemo(() => {
-    if (queryLogs.length === 0) return [];
-
-    const latestTimestamp = Math.max(
-      ...queryLogs.map((log) => parseQueryDate(log.timestamp).getTime())
-    );
-    const latestDate = new Date(latestTimestamp);
-
-    return queryLogs.filter((log) => {
-      const logDate = parseQueryDate(log.timestamp);
-      const logTimestamp = logDate.getTime();
-      const diffDays = (latestTimestamp - logTimestamp) / (1000 * 60 * 60 * 24);
-
-      if (queryRange === 'daily') {
-        return logDate.toDateString() === latestDate.toDateString();
-      }
-
-      if (queryRange === 'weekly') {
-        return diffDays >= 0 && diffDays < 7;
-      }
-
-      if (queryRange === 'monthly') {
-        return (
-          logDate.getFullYear() === latestDate.getFullYear() &&
-          logDate.getMonth() === latestDate.getMonth()
-        );
-      }
-
-      return logDate.getFullYear() === latestDate.getFullYear();
-    });
-  }, [queryRange]);
-
-  const selectedLog = useMemo(
-    () =>
-      filteredQueryLogs.find((log) => log.queryId === selectedQueryId) ??
-      filteredQueryLogs[0] ??
-      queryLogs[0],
-    [filteredQueryLogs, selectedQueryId]
-  );
+  const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
+  const [performance, setPerformance] = useState<QueryLogPerformance>(emptyPerformance);
+  const [totalLogs, setTotalLogs] = useState(0);
+  const [totalQueryPages, setTotalQueryPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const queriesPerPage = 25;
-  const totalQueryPages = Math.max(Math.ceil(filteredQueryLogs.length / queriesPerPage), 1);
+
+  const loadQueryLogs = useCallback(async (signal?: AbortSignal) => {
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const response = await getQueryLogsDashboard(
+        {
+          range: queryRange,
+          page: queryPage,
+          limit: queriesPerPage,
+        },
+        signal
+      );
+
+      const logs = Array.isArray(response.logs) ? response.logs : [];
+      setQueryLogs(logs);
+      setPerformance(response.performance ?? emptyPerformance);
+      setTotalLogs(Number(response.total ?? logs.length));
+      setTotalQueryPages(Math.max(Number(response.totalPages ?? 1), 1));
+
+      setSelectedQueryId((currentId) => {
+        if (currentId && logs.some((log) => log.queryId === currentId)) {
+          return currentId;
+        }
+
+        return logs[0]?.queryId ?? null;
+      });
+    } catch (error) {
+      if (signal?.aborted) {
+        return;
+      }
+
+      setErrorMessage(getFriendlyApiErrorMessage(error));
+      setQueryLogs([]);
+      setPerformance(emptyPerformance);
+      setTotalLogs(0);
+      setTotalQueryPages(1);
+      setSelectedQueryId(null);
+    } finally {
+      if (!signal?.aborted) {
+        setIsLoading(false);
+      }
+    }
+  }, [queryPage, queryRange]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadQueryLogs(controller.signal);
+
+    return () => controller.abort();
+  }, [loadQueryLogs]);
+
+  const selectedLog = useMemo(() => {
+    return (
+      queryLogs.find((log) => log.queryId === selectedQueryId) ??
+      queryLogs[0] ??
+      null
+    );
+  }, [queryLogs, selectedQueryId]);
+
   const safeQueryPage = Math.min(queryPage, totalQueryPages);
-  const queryStartNumber =
-    filteredQueryLogs.length === 0 ? 0 : (safeQueryPage - 1) * queriesPerPage + 1;
-  const queryEndNumber = Math.min(safeQueryPage * queriesPerPage, filteredQueryLogs.length);
-  const paginatedQueryLogs = filteredQueryLogs.slice(
-    (safeQueryPage - 1) * queriesPerPage,
-    safeQueryPage * queriesPerPage
-  );
+  const queryStartNumber = totalLogs === 0 ? 0 : (safeQueryPage - 1) * queriesPerPage + 1;
+  const queryEndNumber = Math.min(safeQueryPage * queriesPerPage, totalLogs);
 
   const handleQueryRangeChange = (range: QueryRange) => {
     setQueryRange(range);
     setQueryPage(1);
+    setSelectedQueryId(null);
   };
 
   const rangeDropdown = (
@@ -196,35 +198,59 @@ export const AdminQueryLogsDetail: React.FC = () => {
     </div>
   );
 
+  const computedAverageResponseTime = useMemo(() => {
+    if (queryLogs.length === 0) return performance.averageResponseTime || 0;
+
+    const average = queryLogs.reduce(
+      (sum, log) => sum + parseResponseTimeSeconds(log.responseTime),
+      0
+    ) / queryLogs.length;
+
+    return Number.isFinite(average) ? average : 0;
+  }, [performance.averageResponseTime, queryLogs]);
+
   const performanceSummary = useMemo(() => {
-    const totalQueries = filteredQueryLogs.length;
-    const answered = filteredQueryLogs.filter((log) => log.status === 'ANSWERED').length;
-    const notFound = filteredQueryLogs.filter((log) => log.status === 'NOT_FOUND').length;
-    const avgConfidence =
-      totalQueries === 0
-        ? 0
-        : Math.round(
-            (filteredQueryLogs.reduce((sum, log) => sum + log.confidenceScore, 0) / totalQueries) *
-              100
-          );
-    const avgResponseTime =
-      totalQueries === 0
-        ? '0.0'
-        : (
-            filteredQueryLogs.reduce(
-              (sum, log) => sum + Number(log.responseTime.replace('s', '')),
-              0
-            ) / totalQueries
-          ).toFixed(1);
+    const avgConfidence = Math.round((performance.averageConfidence || 0) * 100);
+    const avgResponseTime = computedAverageResponseTime.toFixed(2);
 
     return [
-      { label: 'Total Queries', value: totalQueries.toString(), helper: `Pertanyaan pada periode ${queryRangeLabels[queryRange]}`, icon: 'manage_search', tone: 'text-primary' },
-      { label: 'Answered', value: answered.toString(), helper: 'Query berhasil dijawab dengan sumber', icon: 'check_circle', tone: 'text-emerald-400' },
-      { label: 'Not Found', value: notFound.toString(), helper: 'Tidak ada konteks relevan', icon: 'error', tone: 'text-error' },
-      { label: 'Avg Confidence', value: `${avgConfidence}%`, helper: 'Rata-rata keyakinan jawaban', icon: 'verified', tone: 'text-primary' },
-      { label: 'Avg Response', value: `${avgResponseTime}s`, helper: 'Rata-rata waktu respons sistem', icon: 'speed', tone: 'text-tertiary' },
+      {
+        label: 'Total Queries',
+        value: String(performance.totalQueries ?? totalLogs),
+        helper: `Pertanyaan pada periode ${queryRangeLabels[queryRange]}`,
+        icon: 'manage_search',
+        tone: 'text-primary',
+      },
+      {
+        label: 'Answered',
+        value: String(performance.answered ?? 0),
+        helper: 'Query berhasil dijawab dengan sumber',
+        icon: 'check_circle',
+        tone: 'text-emerald-400',
+      },
+      {
+        label: 'Not Found',
+        value: String(performance.notFound ?? 0),
+        helper: 'Tidak ada konteks relevan',
+        icon: 'error',
+        tone: 'text-error',
+      },
+      {
+        label: 'Avg Confidence',
+        value: `${avgConfidence}%`,
+        helper: 'Rata-rata keyakinan jawaban',
+        icon: 'verified',
+        tone: 'text-primary',
+      },
+      {
+        label: 'Avg Response',
+        value: `${avgResponseTime}s`,
+        helper: 'Rata-rata waktu respons sistem',
+        icon: 'speed',
+        tone: 'text-tertiary',
+      },
     ];
-  }, [filteredQueryLogs, queryRange]);
+  }, [computedAverageResponseTime, performance, queryRange, totalLogs]);
 
   return (
     <div className="bg-background text-on-surface font-body overflow-hidden flex h-screen w-full relative">
@@ -243,11 +269,19 @@ export const AdminQueryLogsDetail: React.FC = () => {
                 Query Logs Detail
               </h1>
               <p className="text-on-surface-variant text-sm md:text-base mt-2 max-w-3xl">
-                Halaman ini menampilkan riwayat pertanyaan, dokumen yang diambil sistem, skor keyakinan, status jawaban, dan jawaban yang dihasilkan sistem.
+                Halaman ini menampilkan riwayat pertanyaan real dari backend, dokumen yang diambil sistem, skor keyakinan, status jawaban, dan jawaban yang dihasilkan sistem.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void loadQueryLogs()}
+                disabled={isLoading}
+                className="px-4 py-2 rounded-xl border border-outline-variant/50 text-xs md:text-sm text-on-surface-variant hover:text-primary hover:border-primary/50 disabled:opacity-50 transition-colors"
+              >
+                {isLoading ? 'Loading...' : 'Refresh'}
+              </button>
 
               <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-[10px] md:text-xs w-fit">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
@@ -255,6 +289,12 @@ export const AdminQueryLogsDetail: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {errorMessage && (
+            <div className="mb-6 p-4 rounded-xl border border-error/30 bg-error-container/20 text-error text-sm">
+              {errorMessage}
+            </div>
+          )}
 
           <section className="h-auto lg:h-[50vh] min-h-[520px] bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 shadow-sm mb-6 flex flex-col">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -270,7 +310,7 @@ export const AdminQueryLogsDetail: React.FC = () => {
 
                 <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] md:text-xs rounded-md border border-emerald-500/20 font-mono w-fit sm:mb-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Live
+                  Backend API
                 </span>
               </div>
             </div>
@@ -290,8 +330,14 @@ export const AdminQueryLogsDetail: React.FC = () => {
                     </thead>
 
                     <tbody className="divide-y divide-outline-variant/30 font-mono text-[11px] md:text-[13px]">
-                      {paginatedQueryLogs.length > 0 ? (
-                        paginatedQueryLogs.map((log) => (
+                      {isLoading && queryLogs.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-10 text-center text-on-surface-variant">
+                            Loading query logs dari backend...
+                          </td>
+                        </tr>
+                      ) : queryLogs.length > 0 ? (
+                        queryLogs.map((log) => (
                           <tr
                             key={log.queryId}
                             onClick={() => setSelectedQueryId(log.queryId)}
@@ -301,34 +347,34 @@ export const AdminQueryLogsDetail: React.FC = () => {
                                 : 'hover:bg-surface-container-high/30'
                             }`}
                           >
-                          <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
-                            {log.timestamp.split(' ')[1]}
-                          </td>
-                          <td className="px-4 py-4 text-on-surface max-w-[280px]">
-                            <span className="block truncate">"{log.userQuestion}"</span>
-                            <span className="block text-outline text-[10px] mt-1">{log.queryId}</span>
-                          </td>
-                          <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
-                            {log.retrievedDocuments.length > 0
-                              ? `${log.retrievedDocuments.length} sources`
-                              : 'No source'}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-primary font-semibold">
-                              {Math.round(log.confidenceScore * 100)}%
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-md border text-[10px] ${getStatusStyle(log.status)}`}>
-                              {log.status}
-                            </span>
-                          </td>
+                            <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
+                              {formatLogTime(log.timestamp)}
+                            </td>
+                            <td className="px-4 py-4 text-on-surface max-w-[280px]">
+                              <span className="block truncate">&quot;{log.userQuestion}&quot;</span>
+                              <span className="block text-outline text-[10px] mt-1">{log.queryId}</span>
+                            </td>
+                            <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
+                              {log.retrievedDocuments.length > 0
+                                ? `${log.retrievedDocuments.length} sources`
+                                : 'No source'}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <span className="text-primary font-semibold">
+                                {formatPercent(log.confidenceScore)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <span className={`px-2 py-1 rounded-md border text-[10px] ${getStatusStyle(log.status)}`}>
+                                {log.status}
+                              </span>
+                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
                           <td colSpan={5} className="px-4 py-10 text-center text-on-surface-variant">
-                            No query logs found for this period.
+                            Belum ada query log real. Jalankan chat dulu agar log tersimpan.
                           </td>
                         </tr>
                       )}
@@ -338,7 +384,7 @@ export const AdminQueryLogsDetail: React.FC = () => {
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 px-3 py-3 bg-[#0b0d13] border border-outline-variant/50 rounded-xl">
                   <p className="font-mono text-[10px] md:text-xs text-outline">
-                    Showing {queryStartNumber}-{queryEndNumber} of {filteredQueryLogs.length} chats
+                    Showing {queryStartNumber}-{queryEndNumber} of {totalLogs} chats
                   </p>
 
                   {totalQueryPages > 1 && (
@@ -364,88 +410,99 @@ export const AdminQueryLogsDetail: React.FC = () => {
 
               <div className="xl:col-span-5 min-h-0">
                 <div className="h-full min-h-[320px] overflow-y-auto custom-scrollbar bg-surface-container-high/30 border border-outline-variant/50 rounded-xl p-4">
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div>
-                      <p className="font-mono text-[10px] text-outline uppercase tracking-wider mb-1">
-                        Selected Log
-                      </p>
-                      <h3 className="font-headline text-lg font-bold text-on-surface">
-                        {selectedLog.queryId}
-                      </h3>
-                    </div>
-
-                    <span className={`px-2 py-1 rounded-md border text-[10px] font-mono ${getStatusStyle(selectedLog.status)}`}>
-                      {selectedLog.status}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-1">User</p>
-                      <p className="text-sm text-on-surface">{selectedLog.userName}</p>
-                    </div>
-
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-1">Response Time</p>
-                      <p className="text-sm text-on-surface">{selectedLog.responseTime}</p>
-                    </div>
-
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-1">Confidence</p>
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 bg-surface-variant rounded-full overflow-hidden flex-1">
-                          <div
-                            className="h-full bg-primary rounded-full"
-                            style={{ width: `${selectedLog.confidenceScore * 100}%` }}
-                          />
+                  {selectedLog ? (
+                    <>
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div>
+                          <p className="font-mono text-[10px] text-outline uppercase tracking-wider mb-1">
+                            Selected Log
+                          </p>
+                          <h3 className="font-headline text-lg font-bold text-on-surface break-all">
+                            {selectedLog.queryId}
+                          </h3>
+                          <p className="font-mono text-[10px] text-outline mt-1">
+                            {formatLogDateTime(selectedLog.timestamp)}
+                          </p>
                         </div>
-                        <span className="font-mono text-xs text-primary">
-                          {Math.round(selectedLog.confidenceScore * 100)}%
+
+                        <span className={`px-2 py-1 rounded-md border text-[10px] font-mono ${getStatusStyle(selectedLog.status)}`}>
+                          {selectedLog.status}
                         </span>
                       </div>
-                    </div>
 
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-2">User Question</p>
-                      <p className="text-sm text-on-surface leading-relaxed">"{selectedLog.userQuestion}"</p>
-                    </div>
-
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-2">Retrieved Documents</p>
-
-                      {selectedLog.retrievedDocuments.length > 0 ? (
-                        <div className="space-y-2">
-                          {selectedLog.retrievedDocuments.map((source) => (
-                            <div
-                              key={`${source.documentName}-${source.chunkId}`}
-                              className="flex items-start justify-between gap-3 border-b border-outline-variant/30 pb-2 last:border-b-0 last:pb-0"
-                            >
-                              <div>
-                                <p className="text-sm text-on-surface">{source.documentName}</p>
-                                <p className="font-mono text-[10px] text-outline">
-                                  {source.page} • {source.chunkId}
-                                </p>
-                              </div>
-                              <span className="font-mono text-xs text-primary whitespace-nowrap">
-                                {Math.round(source.relevanceScore * 100)}%
-                              </span>
-                            </div>
-                          ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-1">User</p>
+                          <p className="text-sm text-on-surface">{selectedLog.userName}</p>
                         </div>
-                      ) : (
-                        <p className="text-sm text-error">No relevant context found in vector DB.</p>
-                      )}
-                    </div>
 
-                    <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                      <p className="text-outline font-mono text-[10px] uppercase mb-2">Generated Answer</p>
-                      <p className="text-sm text-on-surface-variant leading-relaxed">{selectedLog.answerGenerated}</p>
-                    </div>
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-1">Response Time</p>
+                          <p className="text-sm text-on-surface">{selectedLog.responseTime}</p>
+                        </div>
 
-                  </div>
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-1">Confidence</p>
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 bg-surface-variant rounded-full overflow-hidden flex-1">
+                              <div
+                                className="h-full bg-primary rounded-full"
+                                style={{ width: formatPercent(selectedLog.confidenceScore) }}
+                              />
+                            </div>
+                            <span className="font-mono text-xs text-primary">
+                              {formatPercent(selectedLog.confidenceScore)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-2">User Question</p>
+                          <p className="text-sm text-on-surface leading-relaxed">&quot;{selectedLog.userQuestion}&quot;</p>
+                        </div>
+
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-2">Retrieved Documents</p>
+
+                          {selectedLog.retrievedDocuments.length > 0 ? (
+                            <div className="space-y-2">
+                              {selectedLog.retrievedDocuments.map((source) => (
+                                <div
+                                  key={`${source.documentName}-${source.chunkId}`}
+                                  className="flex items-start justify-between gap-3 border-b border-outline-variant/30 pb-2 last:border-b-0 last:pb-0"
+                                >
+                                  <div>
+                                    <p className="text-sm text-on-surface">{source.documentName}</p>
+                                    <p className="font-mono text-[10px] text-outline">
+                                      p.{source.page} • {source.chunkId}
+                                    </p>
+                                  </div>
+                                  <span className="font-mono text-xs text-primary whitespace-nowrap">
+                                    {formatPercent(source.relevanceScore)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-error">No relevant context found in vector DB.</p>
+                          )}
+                        </div>
+
+                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
+                          <p className="text-outline font-mono text-[10px] uppercase mb-2">Generated Answer</p>
+                          <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap">
+                            {selectedLog.answerGenerated || 'Belum ada jawaban tersimpan untuk log ini.'}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-center text-sm text-on-surface-variant">
+                      Pilih log dari tabel, atau jalankan chat terlebih dahulu agar log muncul.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -457,7 +514,7 @@ export const AdminQueryLogsDetail: React.FC = () => {
                 <div>
                   <h2 className="font-headline text-lg md:text-xl font-bold">Query Performance Summary</h2>
                   <p className="text-outline text-sm mt-1">
-                    Ringkasan performa sistem berdasarkan status log, confidence score, dan response time.
+                    Ringkasan performa sistem berdasarkan status log, confidence score, dan response time dari backend.
                   </p>
                 </div>
 
@@ -465,7 +522,7 @@ export const AdminQueryLogsDetail: React.FC = () => {
                   {rangeDropdown}
 
                   <span className="font-mono text-[10px] md:text-xs px-2 md:px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full w-fit sm:mb-1.5">
-                    System Health
+                    Database Connected
                   </span>
                 </div>
               </div>

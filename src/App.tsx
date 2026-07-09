@@ -1,6 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { marked } from 'marked';
-import { Message, AttachedFile } from './types';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import type {
+  AttachedFile,
+} from './types';
+
+import { useChat } from './hooks/useChat';
+import { sanitizeMarkdown } from './utils/sanitizeMarkdown';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
@@ -11,37 +21,81 @@ type UploadMode = 'photo' | 'file';
 
 const TypewriterMarkdown: React.FC<{
   content: string;
+  animate?: boolean;
   onTick?: () => void;
-}> = ({ content, onTick }) => {
-  const [visibleText, setVisibleText] = useState('');
-  const [isDone, setIsDone] = useState(false);
+  onDone?: () => void;
+}> = ({
+  content,
+  animate = false,
+  onTick,
+  onDone,
+}) => {
+  const [visibleText, setVisibleText] =
+    useState(animate ? '' : content);
+
+  const [isDone, setIsDone] =
+    useState(!animate);
+
+  const onTickRef = useRef(onTick);
+  const onDoneRef = useRef(onDone);
 
   useEffect(() => {
+    onTickRef.current = onTick;
+  }, [onTick]);
+
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  }, [onDone]);
+
+  useEffect(() => {
+    if (!animate) {
+      setVisibleText(content);
+      setIsDone(true);
+      return;
+    }
+
     let index = 0;
+    let isCancelled = false;
 
     setVisibleText('');
     setIsDone(false);
 
-    const typingInterval = window.setInterval(() => {
-      index += 1;
-      setVisibleText(content.slice(0, index));
-      onTick?.();
+    const typingInterval =
+      window.setInterval(() => {
+        if (isCancelled) {
+          return;
+        }
 
-      if (index >= content.length) {
-        window.clearInterval(typingInterval);
-        setIsDone(true);
-      }
-    }, 6);
+        index += 1;
+        setVisibleText(
+          content.slice(0, index)
+        );
+        onTickRef.current?.();
 
-    return () => window.clearInterval(typingInterval);
-  }, [content]);
+        if (index >= content.length) {
+          window.clearInterval(
+            typingInterval
+          );
+          setIsDone(true);
+          onDoneRef.current?.();
+        }
+      }, 6);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(
+        typingInterval
+      );
+    };
+  }, [content, animate]);
 
   return (
     <>
       <div
         className="prose prose-sm prose-invert prose-custom max-w-none text-on-surface leading-relaxed text-[13px] md:text-sm"
         dangerouslySetInnerHTML={{
-          __html: marked(visibleText) as string,
+          __html:
+            sanitizeMarkdown(visibleText),
         }}
       />
 
@@ -53,28 +107,57 @@ const TypewriterMarkdown: React.FC<{
 };
 
 export const App: React.FC = () => {
-  const [isFirstMessage, setIsFirstMessage] = useState(true);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [isFirstMessage, setIsFirstMessage] =
+    useState(true);
 
-  const [detectedLanguage, setDetectedLanguage] =
-    useState<DetectedLanguage>('ID');
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] =
+    useState('');
 
-  const generateTimeoutRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [attachedFiles, setAttachedFiles] =
+    useState<AttachedFile[]>([]);
+
+  const [isRecording, setIsRecording] =
+    useState(false);
+
+  const [
+    showScrollBottom,
+    setShowScrollBottom,
+  ] = useState(false);
+
+  const {
+    messages,
+    setMessages,
+    isGenerating,
+    sendMessage,
+    loadConversation,
+    setLanguage,
+    stopGenerating,
+    clearChat,
+  } = useChat({
+    initialLanguage: 'ID',
+  });
+
+  const [
+    detectedLanguage,
+    setDetectedLanguage,
+  ] = useState<DetectedLanguage>('ID');
+
+  const chatContainerRef =
+    useRef<HTMLDivElement>(null);
+
+  const fileInputRef =
+    useRef<HTMLInputElement>(null);
 
   const scrollButtonHideTimeoutRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+    useRef<ReturnType<
+      typeof setTimeout
+    > | null>(null);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef =
+    useRef<any>(null);
 
   useEffect(() => {
     const setAppHeight = () => {
@@ -86,11 +169,22 @@ export const App: React.FC = () => {
 
     setAppHeight();
 
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
+    window.addEventListener(
+      'resize',
+      setAppHeight
+    );
+
+    window.addEventListener(
+      'orientationchange',
+      setAppHeight
+    );
 
     return () => {
-      window.removeEventListener('resize', setAppHeight);
+      window.removeEventListener(
+        'resize',
+        setAppHeight
+      );
+
       window.removeEventListener(
         'orientationchange',
         setAppHeight
@@ -98,27 +192,33 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (scrollButtonHideTimeoutRef.current) {
-      clearTimeout(scrollButtonHideTimeoutRef.current);
+      clearTimeout(
+        scrollButtonHideTimeoutRef.current
+      );
     }
 
     setShowScrollBottom(false);
 
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
+        top:
+          chatContainerRef.current
+            .scrollHeight,
         behavior: 'smooth',
       });
     }
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isGenerating]);
 
   const handleScroll = () => {
-    if (!chatContainerRef.current) return;
+    if (!chatContainerRef.current) {
+      return;
+    }
 
     const {
       scrollTop,
@@ -127,12 +227,19 @@ export const App: React.FC = () => {
     } = chatContainerRef.current;
 
     const shouldShowButton =
-      scrollHeight - scrollTop - clientHeight > 100;
+      scrollHeight -
+        scrollTop -
+        clientHeight >
+      100;
 
-    setShowScrollBottom(shouldShowButton);
+    setShowScrollBottom(
+      shouldShowButton
+    );
 
     if (scrollButtonHideTimeoutRef.current) {
-      clearTimeout(scrollButtonHideTimeoutRef.current);
+      clearTimeout(
+        scrollButtonHideTimeoutRef.current
+      );
     }
 
     if (shouldShowButton) {
@@ -145,14 +252,12 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      if (scrollButtonHideTimeoutRef.current) {
+      if (
+        scrollButtonHideTimeoutRef.current
+      ) {
         clearTimeout(
           scrollButtonHideTimeoutRef.current
         );
-      }
-
-      if (generateTimeoutRef.current) {
-        clearTimeout(generateTimeoutRef.current);
       }
 
       if (recognitionRef.current) {
@@ -164,14 +269,18 @@ export const App: React.FC = () => {
   const handleAttachFileClick = (
     mode: UploadMode = 'file'
   ) => {
-    if (!fileInputRef.current) return;
+    if (!fileInputRef.current) {
+      return;
+    }
 
     fileInputRef.current.accept =
       mode === 'photo'
         ? 'image/png,image/jpeg,image/jpg,image/webp'
         : '.pdf,.doc,.docx,.txt,.csv';
 
-    fileInputRef.current.dataset.uploadMode = mode;
+    fileInputRef.current.dataset.uploadMode =
+      mode;
+
     fileInputRef.current.click();
   };
 
@@ -184,7 +293,8 @@ export const App: React.FC = () => {
 
     const uploadMode =
       (event.currentTarget.dataset
-        .uploadMode as UploadMode) || 'file';
+        .uploadMode as UploadMode) ||
+      'file';
 
     if (selectedFiles.length > 0) {
       const allowedDocumentExtensions = [
@@ -202,8 +312,8 @@ export const App: React.FC = () => {
         'image/webp',
       ];
 
-      const validFiles = selectedFiles.filter(
-        (file) => {
+      const validFiles =
+        selectedFiles.filter((file) => {
           const extension =
             file.name
               .split('.')
@@ -219,11 +329,11 @@ export const App: React.FC = () => {
           return allowedDocumentExtensions.includes(
             extension
           );
-        }
-      );
+        });
 
       if (
-        validFiles.length !== selectedFiles.length
+        validFiles.length !==
+        selectedFiles.length
       ) {
         alert(
           uploadMode === 'photo'
@@ -233,16 +343,20 @@ export const App: React.FC = () => {
       }
 
       if (validFiles.length > 0) {
-        const newFiles = validFiles.map(
-          (file) => ({
+        const newFiles =
+          validFiles.map((file) => ({
             name: file.name,
-          })
-        );
+            size: file.size,
+            type: file.type,
+            file,
+          }));
 
-        setAttachedFiles((previousFiles) => [
-          ...previousFiles,
-          ...newFiles,
-        ]);
+        setAttachedFiles(
+          (previousFiles) => [
+            ...previousFiles,
+            ...newFiles,
+          ]
+        );
 
         if (isFirstMessage) {
           setIsFirstMessage(false);
@@ -256,7 +370,8 @@ export const App: React.FC = () => {
   const handleMicClick = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      (window as any)
+        .webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert(
@@ -267,10 +382,7 @@ export const App: React.FC = () => {
     }
 
     if (isRecording) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-
+      recognitionRef.current?.stop();
       setIsRecording(false);
       return;
     }
@@ -281,7 +393,8 @@ export const App: React.FC = () => {
       setIsFirstMessage(false);
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition =
+      new SpeechRecognition();
 
     recognition.lang =
       detectedLanguage === 'EN'
@@ -293,7 +406,9 @@ export const App: React.FC = () => {
 
     const baseText = inputValue;
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (
+      event: any
+    ) => {
       let transcript = '';
 
       for (
@@ -302,7 +417,8 @@ export const App: React.FC = () => {
         index += 1
       ) {
         transcript +=
-          event.results[index][0].transcript;
+          event.results[index][0]
+            .transcript;
       }
 
       setInputValue(
@@ -312,7 +428,9 @@ export const App: React.FC = () => {
       );
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (
+      event: any
+    ) => {
       console.error(
         'Error mikrofon:',
         event.error
@@ -325,168 +443,38 @@ export const App: React.FC = () => {
       setIsRecording(false);
     };
 
-    recognitionRef.current = recognition;
+    recognitionRef.current =
+      recognition;
+
     recognition.start();
   };
 
-  const detectLanguage = (
-    text: string
-  ): DetectedLanguage => {
-    const normalizedText = text
-      .toLowerCase()
-      .trim();
-
-    if (!normalizedText) {
-      return detectedLanguage;
-    }
-
-    const englishMatches =
-      normalizedText.match(
-        /\b(hello|hi|what|how|why|help|please|can|could|would|make|create|summarize|summary|report|file|document|template|system|finance|financial|explain|give|write)\b/g
-      )?.length ?? 0;
-
-    const indonesianMatches =
-      normalizedText.match(
-        /\b(hai|halo|apa|bagaimana|kenapa|tolong|bantu|buat|buatkan|rangkum|ringkas|laporan|berkas|dokumen|template|sistem|keuangan|jelaskan|berikan|tulis|saya|anda)\b/g
-      )?.length ?? 0;
-
-    return englishMatches > indonesianMatches
-      ? 'EN'
-      : 'ID';
-  };
-
-  const startGenerating = (
-    text: string,
-    files: AttachedFile[],
+  const handleLanguageChange = (
     language: DetectedLanguage
   ) => {
-    const confidence = Math.floor(
-      Math.random() * (99 - 90 + 1) + 90
-    );
-
-    const lowerText = text.toLowerCase();
-
-    const wantsReport =
-      /laporan|report|template|financial|finance|keuangan/.test(
-        lowerText
-      );
-
-    const wantsSummary =
-      /rangkum|ringkas|summarize|summary|sop/.test(
-        lowerText
-      ) || files.length > 0;
-
-    let markdownRaw = '';
-
-    if (language === 'EN') {
-      if (wantsReport) {
-        markdownRaw = `Here is your requested **Monthly Financial Report** draft based on the company system data:
-
-### 📊 Financial Report - Q2 2026
-This report includes a summary of cash flow and departmental operating expenses.
-
-| Expense Category | Budget (IDR) | Actual (IDR) | Status |
-|------------------|--------------|--------------|--------|
-| Marketing & Ads  | 50,000,000   | 45,000,000   | ✅ Safe |
-| Operations & IT  | 30,000,000   | 32,500,000   | ⚠️ *Overbudget* |
-| Salary & Benefits | 150,000,000 | 150,000,000  | ✅ Safe |
-
-**Recommended Actions:**
-* Reduce Operations & IT costs in the next quarter.
-* Allocate the remaining marketing budget to client retention programs.`;
-      } else if (wantsSummary) {
-        markdownRaw = `Based on the attached or requested document, here is the **Executive Summary**:
-
-### 📋 SLA 2026 Policy Summary
-The current procedure must follow the latest update standard.
-* Make sure **Form 1A** (Submission) and **Form 2B** (Claim) are completed properly.
-* All supporting documents must be scanned and converted into PDF format.
-
-| Operational Category | Old SLA | New SLA (2026) | Change |
-|----------------------|---------|----------------|--------|
-| Leave Request        | 3 Days  | **1 Day**      | Faster |
-| Medical Claim        | 5 Days  | **3 Days**     | Faster |
-
-> **Note:** This update is estimated to reduce administrative processing time by up to **40%**.`;
-      } else {
-        markdownRaw =
-          'Hello! I am ready to help. You can ask me to **summarize an attached document** or create a specific **report format**.';
-      }
-    } else {
-      if (wantsReport) {
-        markdownRaw = `Berikut adalah draf **Laporan Keuangan Bulanan** berdasarkan data sistem perusahaan:
-
-### 📊 Laporan Finansial - Q2 2026
-Laporan ini mencakup ringkasan arus kas dan pengeluaran operasional departemen.
-
-| Kategori Pengeluaran | Anggaran (IDR) | Realisasi (IDR) | Status |
-|----------------------|----------------|-----------------|--------|
-| Pemasaran & Iklan    | 50.000.000     | 45.000.000      | ✅ Aman |
-| Operasional & IT     | 30.000.000     | 32.500.000      | ⚠️ *Overbudget* |
-| Gaji & Tunjangan     | 150.000.000    | 150.000.000     | ✅ Aman |
-
-**Rekomendasi Tindakan:**
-* Segera lakukan efisiensi pada biaya Operasional & IT di kuartal berikutnya.
-* Distribusi sisa anggaran Pemasaran dapat dialokasikan ke program retensi klien.`;
-      } else if (wantsSummary) {
-        markdownRaw = `Berdasarkan dokumen yang dilampirkan/diminta, berikut adalah **Rangkuman Eksekutif**:
-
-### 📋 Ringkasan Ketentuan SLA 2026
-Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
-* Pastikan **Formulir 1A** (Pengajuan) dan **Formulir 2B** (Klaim) diisi lengkap.
-* Seluruh bukti pendukung wajib dipindai dan dikonversi ke format PDF.
-
-| Kategori Operasional | SLA Lama | SLA Baru (2026) | Perubahan |
-|----------------------|----------|-----------------|-----------|
-| Pengajuan Cuti       | 3 Hari   | **1 Hari**      | Lebih Cepat |
-| Klaim Medis          | 5 Hari   | **3 Hari**      | Lebih Cepat |
-
-> **Catatan:** Pembaruan ini diestimasi akan memangkas waktu birokrasi administratif hingga **40%**.`;
-      } else {
-        markdownRaw =
-          'Halo! Saya siap membantu. Anda bisa meminta saya untuk **merangkum dokumen** yang Anda lampirkan atau membuatkan **format laporan** tertentu.';
-      }
-    }
-
-    generateTimeoutRef.current =
-      setTimeout(() => {
-        setMessages((previousMessages) => [
-          ...previousMessages,
-          {
-            id: Date.now().toString(),
-            role: 'ai',
-            content: markdownRaw,
-            confidence,
-            source: 'SOP_HRD_2026.pdf',
-          },
-        ]);
-
-        setIsGenerating(false);
-      }, 2500);
+    setDetectedLanguage(language);
+    setLanguage(language);
   };
 
-  const handleSendMessage = (
+  const handleSendMessage = async (
     text = inputValue,
     files = attachedFiles
   ) => {
     if (isGenerating) {
-      if (generateTimeoutRef.current) {
-        clearTimeout(
-          generateTimeoutRef.current
-        );
-      }
+      stopGenerating();
 
-      setMessages((previousMessages) => [
-        ...previousMessages,
-        {
-          id: Date.now().toString(),
-          role: 'system',
-          content:
-            '[ Generation Stopped by User ]',
-        },
-      ]);
+      setMessages(
+        (previousMessages) => [
+          ...previousMessages,
+          {
+            id: `stopped-${Date.now()}`,
+            role: 'system',
+            content:
+              '[ Generation Stopped by User ]',
+          },
+        ]
+      );
 
-      setIsGenerating(false);
       return;
     }
 
@@ -501,66 +489,36 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
       setIsFirstMessage(false);
     }
 
-    const time =
-      new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-
-    setMessages((previousMessages) => [
-      ...previousMessages,
-      {
-        id: Date.now().toString(),
-        role: 'user',
-        content: text,
-        time,
-        attachments: files,
-      },
-    ]);
-
     setInputValue('');
     setAttachedFiles([]);
 
     if (isRecording) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-
+      recognitionRef.current?.stop();
       setIsRecording(false);
     }
 
-    const language = detectLanguage(text);
-
-    setDetectedLanguage(language);
-    setIsGenerating(true);
-
-    startGenerating(
+    await sendMessage(
       text,
       files,
-      language
+      detectedLanguage
     );
   };
 
   const handleClearChat = () => {
-    const shouldClear = window.confirm(
-      'Hapus seluruh riwayat obrolan di layar?'
-    );
+    const shouldClear =
+      window.confirm(
+        'Hapus seluruh riwayat obrolan di layar?'
+      );
 
-    if (!shouldClear) return;
+    if (!shouldClear) {
+      return;
+    }
 
-    setMessages([]);
+    clearChat();
+    setInputValue('');
+    setAttachedFiles([]);
     setIsFirstMessage(true);
     setShowScrollBottom(false);
-
-    if (isGenerating) {
-      if (generateTimeoutRef.current) {
-        clearTimeout(
-          generateTimeoutRef.current
-        );
-      }
-
-      setIsGenerating(false);
-    }
 
     if (
       isRecording &&
@@ -568,6 +526,112 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
     ) {
       recognitionRef.current.stop();
       setIsRecording(false);
+    }
+  };
+
+  const handleNewChat = () => {
+    clearChat();
+    setInputValue('');
+    setAttachedFiles([]);
+    setIsFirstMessage(true);
+    setShowScrollBottom(false);
+    setSidebarOpen(false);
+
+    if (
+      isRecording &&
+      recognitionRef.current
+    ) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleSelectConversation =
+    async (
+      selectedConversationId: string
+    ) => {
+      const normalizedConversationId =
+        selectedConversationId.trim();
+
+      if (!normalizedConversationId) {
+        setIsFirstMessage(false);
+        setSidebarOpen(false);
+
+        setMessages(
+          (previousMessages) => [
+            ...previousMessages,
+            {
+              id: `invalid-conversation-${Date.now()}`,
+              role: 'system',
+              content:
+                'ID percakapan tidak valid. Riwayat tidak bisa dibuka.',
+            },
+          ]
+        );
+
+        return;
+      }
+
+      setInputValue('');
+      setAttachedFiles([]);
+      setShowScrollBottom(false);
+      setSidebarOpen(false);
+      setIsFirstMessage(false);
+
+      if (
+        isRecording &&
+        recognitionRef.current
+      ) {
+        recognitionRef.current.stop();
+        setIsRecording(false);
+      }
+
+      const openedConversation =
+        await loadConversation(
+          normalizedConversationId
+        );
+
+      if (!openedConversation) {
+        setIsFirstMessage(false);
+
+        window.setTimeout(() => {
+          scrollToBottom();
+        }, 100);
+
+        return;
+      }
+
+      const conversationLanguage =
+        openedConversation.conversation.language;
+
+      if (
+        conversationLanguage === 'ID' ||
+        conversationLanguage === 'EN'
+      ) {
+        setDetectedLanguage(conversationLanguage);
+        setLanguage(conversationLanguage);
+      }
+
+      window.setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    };
+
+  const handleCopyMessage = async (
+    content: string
+  ) => {
+    try {
+      await navigator.clipboard.writeText(
+        content
+      );
+
+      window.alert(
+        'Teks jawaban berhasil disalin!'
+      );
+    } catch {
+      window.alert(
+        'Teks jawaban gagal disalin.'
+      );
     }
   };
 
@@ -593,11 +657,13 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
         onClose={() =>
           setSidebarOpen(false)
         }
-        onNewChat={handleClearChat}
+        onNewChat={handleNewChat}
+        onSelectConversation={
+          handleSelectConversation
+        }
       />
 
       <main className="flex-1 flex flex-col h-full w-full relative min-w-0 overflow-hidden bg-transparent">
-        {/* Background hitam dengan gradien biru */}
         <div
           className={`absolute inset-0 pointer-events-none z-0 transition-opacity duration-[3500ms] ease-in-out ${
             isFirstMessage
@@ -620,6 +686,9 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
           }
           detectedLanguage={
             detectedLanguage
+          }
+          onLanguageChange={
+            handleLanguageChange
           }
         />
 
@@ -665,120 +734,145 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
             />
           ) : (
             <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.role === 'user'
-                      ? 'justify-end'
-                      : 'justify-start'
-                  } animate-fadeIn`}
-                >
-                  {message.role ===
-                  'system' ? (
-                    <div className="flex justify-center my-2 text-[9px] md:text-[10px] font-mono text-error/80 border border-error/20 bg-error/5 px-3 py-1 rounded-full mx-auto w-fit">
-                      {message.content}
-                    </div>
-                  ) : message.role ===
-                    'user' ? (
-                    <div className="max-w-[90%] md:max-w-[80%] bg-surface-variant text-on-surface p-3 md:p-4 rounded-2xl rounded-tr-sm shadow-sm border border-outline-variant">
-                      {message.attachments &&
-                        message.attachments
-                          .length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {message.attachments.map(
-                              (
-                                file,
-                                index
-                              ) => (
-                                <span
-                                  key={`${file.name}-${index}`}
-                                  className="bg-surface-container-high text-primary px-2 py-1 rounded text-[9px] md:text-[10px] font-mono border border-outline-variant flex items-center gap-1"
-                                >
-                                  <span className="material-symbols-outlined text-[10px] md:text-[12px]">
-                                    description
-                                  </span>
-
-                                  {file.name}
-                                </span>
-                              )
-                            )}
-                          </div>
-                        )}
-
-                      <p className="text-[13px] md:text-sm whitespace-pre-wrap">
+              {messages.map(
+                (message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      message.role ===
+                      'user'
+                        ? 'justify-end'
+                        : 'justify-start'
+                    } animate-fadeIn`}
+                  >
+                    {message.role ===
+                    'system' ? (
+                      <div className="flex justify-center my-2 text-[9px] md:text-[10px] font-mono text-error/80 border border-error/20 bg-error/5 px-3 py-1 rounded-full mx-auto w-fit">
                         {message.content}
-                      </p>
-
-                      <div className="mt-1.5 md:mt-2 text-[9px] md:text-[10px] text-on-surface-variant text-right font-mono">
-                        {message.time}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="max-w-[95%] sm:max-w-[82%] bg-transparent p-0 rounded-none border-none shadow-none">
-                      <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
-                        <img
-                          src="/icon-ungu.png"
-                          alt="Assistant Logo"
-                          className="h-20 md:h-24 w-auto object-contain"
+                    ) : message.role ===
+                      'user' ? (
+                      <div className="max-w-[90%] md:max-w-[80%] bg-surface-variant text-on-surface p-3 md:p-4 rounded-2xl rounded-tr-sm shadow-sm border border-outline-variant">
+                        {message.attachments &&
+                          message.attachments
+                            .length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-2">
+                              {message.attachments.map(
+                                (
+                                  file,
+                                  index
+                                ) => (
+                                  <span
+                                    key={`${file.name}-${index}`}
+                                    className="bg-surface-container-high text-primary px-2 py-1 rounded text-[9px] md:text-[10px] font-mono border border-outline-variant flex items-center gap-1"
+                                  >
+                                    <span className="material-symbols-outlined text-[10px] md:text-[12px]">
+                                      description
+                                    </span>
+                                    {file.name}
+                                  </span>
+                                )
+                              )}
+                            </div>
+                          )}
+
+                        <p className="text-[13px] md:text-sm whitespace-pre-wrap">
+                          {message.content}
+                        </p>
+
+                        <div className="mt-1.5 md:mt-2 text-[9px] md:text-[10px] text-on-surface-variant text-right font-mono">
+                          {message.time}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="max-w-[95%] sm:max-w-[82%] bg-transparent p-0 rounded-none border-none shadow-none">
+                        <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
+                          <img
+                            src="/icon-ungu.png"
+                            alt="Assistant Logo"
+                            className="h-20 md:h-24 w-auto object-contain"
+                          />
+                        </div>
+
+                        <TypewriterMarkdown
+                          content={
+                            message.content
+                          }
+                          animate={
+                            message.shouldAnimate === true
+                          }
+                          onTick={
+                            scrollToBottom
+                          }
+                          onDone={() => {
+                            setMessages(
+                              (previousMessages) =>
+                                previousMessages.map(
+                                  (item) =>
+                                    item.id ===
+                                    message.id
+                                      ? {
+                                          ...item,
+                                          shouldAnimate:
+                                            false,
+                                        }
+                                      : item
+                                )
+                            );
+                          }}
                         />
-                      </div>
 
-                      <TypewriterMarkdown
-                        content={
-                          message.content
-                        }
-                        onTick={
-                          scrollToBottom
-                        }
-                      />
-
-                      <div className="mt-5 md:mt-6 pt-3 md:pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 text-white/70">
-                        <div className="flex items-center gap-2 self-start sm:self-auto min-w-0">
-                          <span className="material-symbols-outlined text-[14px] md:text-[16px] text-white/70">
-                            description
-                          </span>
-
-                          <span className="text-[10px] md:text-[11px] font-mono truncate max-w-[180px] md:max-w-full">
-                            {message.source}
-
-                            <span className="text-white/45 ml-1">
-                              • p. 12
+                        <div className="mt-5 md:mt-6 pt-3 md:pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 text-white/70">
+                          <div className="flex items-center gap-2 self-start sm:self-auto min-w-0">
+                            <span className="material-symbols-outlined text-[14px] md:text-[16px] text-white/70">
+                              description
                             </span>
-                          </span>
-                        </div>
 
-                        <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-5 w-full sm:w-auto">
-                          <span className="text-[10px] md:text-[11px] font-mono text-white/65">
-                            Similarity:{' '}
-
-                            <span className="text-white font-semibold">
+                            <span className="text-[10px] md:text-[11px] font-mono truncate max-w-[180px] md:max-w-full">
                               {
-                                message.confidence
+                                message.source
                               }
-                              %
-                            </span>
-                          </span>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              alert(
-                                'Teks jawaban berhasil disalin!'
-                              )
-                            }
-                            className="material-symbols-outlined text-[15px] md:text-[17px] text-white/55 hover:text-white transition-colors"
-                            title="Salin Teks"
-                            aria-label="Salin teks"
-                          >
-                            content_copy
-                          </button>
+                              <span className="text-white/45 ml-1">
+                                • p.{' '}
+                                {message.page ??
+                                  '-'}
+                              </span>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-5 w-full sm:w-auto">
+                            <span className="text-[10px] md:text-[11px] font-mono text-white/65">
+                              Similarity:{' '}
+
+                              <span className="text-white font-semibold">
+                                {
+                                  message.confidence
+                                }
+                                %
+                              </span>
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCopyMessage(
+                                  message.content
+                                )
+                              }
+                              className="material-symbols-outlined text-[15px] md:text-[17px] text-white/55 hover:text-white transition-colors"
+                              title="Salin Teks"
+                              aria-label="Salin teks"
+                            >
+                              content_copy
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                )
+              )}
 
               {isGenerating && (
                 <div className="flex justify-start animate-fadeIn">
@@ -810,7 +904,8 @@ Pelaksanaan prosedur saat ini harus mematuhi standar pembaruan terbaru.
                       _,
                       fileIndex
                     ) =>
-                      fileIndex !== index
+                      fileIndex !==
+                      index
                   )
               )
             }

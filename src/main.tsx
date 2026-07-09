@@ -2,14 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   BrowserRouter,
-  Routes,
   Route,
+  Routes,
 } from 'react-router-dom';
 
 import { App } from './App';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AdminQueryLogsDetail } from './components/AdminQueryLogsDetail';
 import { AdminUploadFile } from './components/AdminUploadFile';
+import { Intro } from './components/Intro';
+import { Login } from './components/Login';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './hooks/useAuth';
 
 import './globals.css';
 
@@ -18,29 +22,48 @@ ReactDOM.createRoot(
 ).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Routes>
-        {/* Jalur admin */}
-        <Route
-          path="/admin"
-          element={<AdminDashboard />}
-        />
+      <AuthProvider>
+        <Routes>
+          <Route path="/intro" element={<Intro />} />
+          <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/admin/logs"
-          element={<AdminQueryLogsDetail />}
-        />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/upload"
-          element={<AdminUploadFile />}
-        />
+          <Route
+            path="/admin/logs"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminQueryLogsDetail />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Jalur user dan conversation search */}
-        <Route
-          path="/*"
-          element={<App />}
-        />
-      </Routes>
+          <Route
+            path="/admin/upload"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminUploadFile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <App />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
