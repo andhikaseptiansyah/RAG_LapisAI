@@ -14,6 +14,7 @@ import type {
   DashboardChatSummary,
   DashboardResponse,
   DashboardSummary,
+  RagSystemConfig,
 } from '../services/dashboardService';
 
 import type {
@@ -72,6 +73,9 @@ export const useDashboard = (
   const [documents, setDocuments] =
     useState<RepositoryDocument[]>([]);
 
+  const [ragConfig, setRagConfig] =
+    useState<RagSystemConfig | null>(null);
+
   const [isLoading, setIsLoading] =
     useState(false);
 
@@ -91,6 +95,7 @@ export const useDashboard = (
         );
         setAnalytics(result.analytics);
         setDocuments(result.documents);
+        setRagConfig(result.ragConfig);
       },
       []
     );
@@ -180,6 +185,7 @@ export const useDashboard = (
     chatSummary,
     analytics,
     documents,
+    ragConfig,
 
     range,
     documentSearch,

@@ -35,11 +35,22 @@ export interface DashboardChatSummary {
   peakTotalChats: number;
 }
 
+
+export interface RagSystemConfig {
+  collection: string;
+  embeddingModel: string;
+  minimumResultScore: number;
+  rerankerEnabled: boolean;
+  rerankerModel: string;
+  evidenceVerificationEnabled: boolean;
+}
+
 export interface DashboardResponse {
   summary: DashboardSummary;
   chatSummary: DashboardChatSummary;
   analytics: ChatMetricPoint[];
   documents: RepositoryDocument[];
+  ragConfig: RagSystemConfig;
 }
 
 export interface DashboardParams {

@@ -39,13 +39,13 @@ interface MenuPosition {
 
 const toDateLabel = (value?: string): string => {
   if (!value) {
-    return 'Terbaru';
+    return 'Latest';
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return 'Terbaru';
+    return 'Latest';
   }
 
   const now = new Date();
@@ -65,10 +65,10 @@ const toDateLabel = (value?: string): string => {
     diffMs / (1000 * 60 * 60 * 24)
   );
 
-  if (diffDays === 0) return 'Hari ini';
-  if (diffDays === 1) return 'Kemarin';
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
 
-  return date.toLocaleDateString('id-ID', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
   });
@@ -84,7 +84,7 @@ const normalizeConversationTitle = (
     return '';
   }
 
-  if (title.toLowerCase() === 'percakapan baru') {
+  if (title.toLowerCase() === 'new conversation') {
     return '';
   }
 
@@ -116,7 +116,7 @@ const buildConversationDisplayTitle = (
     return lastMessage;
   }
 
-  return 'Percakapan Baru';
+  return 'New Conversation';
 };
 
 const mapConversationToRecentChat = (
@@ -136,7 +136,7 @@ const mapConversationToRecentChat = (
       conversation.is_pinned ?? conversation.pinned
     ),
     dateLabel: toDateLabel(dateValue),
-    group: 'Terbaru',
+    group: 'Latest',
     lastMessage: conversation.last_message,
     lastUserMessage: conversation.last_user_message,
   };
@@ -188,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal memuat riwayat percakapan.';
+          : 'Failed to load conversation history.';
 
       setHistoryError(message);
       setRecentChats([]);
@@ -362,11 +362,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       );
 
       window.alert(
-        'Link percakapan berhasil disalin.'
+        'Conversation link copied successfully.'
       );
     } catch {
       window.alert(
-        `Bagikan percakapan: ${chat.title}`
+        `Share conversation: ${chat.title}`
       );
     }
   };
@@ -399,7 +399,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal menyimpan status sematan.';
+          : 'Failed to update pin status.';
 
       window.alert(message);
     }
@@ -409,7 +409,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const newTitle = window.prompt(
-      'Ganti nama percakapan',
+      'Rename conversation',
       chat.title
     );
 
@@ -440,7 +440,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal menyimpan nama percakapan.';
+          : 'Failed to save conversation name.';
 
       window.alert(message);
     }
@@ -450,7 +450,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const shouldDelete = window.confirm(
-      `Hapus percakapan "${chat.title}"?`
+      `Delete conversation "${chat.title}"?`
     );
 
     if (!shouldDelete) {
@@ -472,7 +472,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal menghapus percakapan.';
+          : 'Failed to delete conversation.';
 
       window.alert(message);
     }
@@ -585,8 +585,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onClose}
             className="absolute right-0 p-1 text-white/60 transition-colors hover:text-white md:hidden"
-            aria-label="Tutup sidebar"
-            title="Tutup sidebar"
+            aria-label="Close sidebar"
+            title="Close sidebar"
           >
             <span className="material-symbols-outlined">
               close
@@ -604,7 +604,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               edit_square
             </span>
 
-            Obrolan Baru
+            New Chat
           </button>
 
           <button
@@ -616,7 +616,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               search
             </span>
 
-            Cari Obrolan
+            Search Chats
           </button>
 
           {isAdmin && (
@@ -655,7 +655,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="flex flex-col gap-1">
                 {isLoadingChats ? (
                   <p className="py-2 text-xs text-white/40">
-                    Memuat riwayat...
+                    Loading history...
                   </p>
                 ) : historyError ? (
                   <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
@@ -692,7 +692,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         {chat.pinned && (
                           <span
                             className="material-symbols-outlined shrink-0 text-[15px] text-primary"
-                            title="Percakapan disematkan"
+                            title="Pinned conversation"
                           >
                             push_pin
                           </span>
@@ -721,8 +721,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               : 'text-white/50 hover:bg-white/5 hover:text-white'
                           }
                         `}
-                        aria-label={`Menu percakapan ${chat.title}`}
-                        title="Menu percakapan"
+                        aria-label={`Conversation menu ${chat.title}`}
+                        title="Conversation menu"
                       >
                         <span className="material-symbols-outlined text-[20px]">
                           more_horiz
@@ -751,7 +751,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 share
                               </span>
 
-                              Bagikan percakapan
+                              Share conversation
                             </button>
 
                             <button
@@ -766,8 +766,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               </span>
 
                               {chat.pinned
-                                ? 'Lepas sematan'
-                                : 'Sematkan'}
+                                ? 'Unpin'
+                                : 'Pin'}
                             </button>
 
                             <button
@@ -781,7 +781,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 edit
                               </span>
 
-                              Ganti nama
+                              Rename
                             </button>
 
                             <div className="my-1 border-t border-white/10" />
@@ -797,7 +797,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 delete
                               </span>
 
-                              Hapus
+                              Delete
                             </button>
                           </div>,
                           document.body
@@ -806,7 +806,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ))
                 ) : (
                   <p className="py-2 text-xs text-white/40">
-                    Belum ada percakapan.
+                    No conversations yet.
                   </p>
                 )}
               </div>

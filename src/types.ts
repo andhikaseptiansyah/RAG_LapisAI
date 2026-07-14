@@ -7,9 +7,17 @@ export interface AttachedFile {
 
 export interface MessageSource {
   documentName: string;
+  documentType?: 'pdf' | 'docx' | 'txt' | string;
   page?: string | number;
-  chunkId?: string;
+  pageIsReliable?: boolean;
   relevanceScore?: number;
+  excerpt?: string;
+  chapter?: string;
+  section?: string;
+  paragraphStart?: number;
+  paragraphEnd?: number;
+  lineStart?: number;
+  lineEnd?: number;
 }
 
 export interface Message {
@@ -22,6 +30,7 @@ export interface Message {
   source?: string;
   page?: string | number;
   sources?: MessageSource[];
+  responseTimeMs?: number;
+  followUpQuestion?: string;
   shouldAnimate?: boolean;
 }
-

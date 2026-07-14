@@ -20,6 +20,12 @@ export interface RetrievedSource {
   page: string;
   chunkId: string;
   relevanceScore: number;
+  excerpt?: string;
+  section?: string;
+  paragraphStart?: number;
+  paragraphEnd?: number;
+  lineStart?: number;
+  lineEnd?: number;
 }
 
 export interface QueryLog {

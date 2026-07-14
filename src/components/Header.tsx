@@ -22,15 +22,15 @@ const LANGUAGE_OPTIONS: Array<{
 }> = [
   {
     value: 'ID',
-    label: 'Indonesia',
+    label: 'Indonesian',
     nativeLabel: 'Bahasa Indonesia',
-    description: 'Chatbot wajib menjawab dalam Bahasa Indonesia.',
+    description: 'Answer in Indonesian.',
   },
   {
     value: 'EN',
     label: 'English',
     nativeLabel: 'English',
-    description: 'Chatbot will answer in English.',
+    description: 'Answer in English.',
   },
 ];
 
@@ -110,9 +110,9 @@ export const Header: React.FC<HeaderProps> = ({
         type="button"
         onClick={onToggleSidebar}
         className="flex h-12 w-12 items-center justify-center text-white/80 transition-all hover:text-white active:scale-95 md:h-14 md:w-14"
-        title={isOpen ? 'Tutup sidebar' : 'Buka sidebar'}
+        title={isOpen ? 'Close sidebar' : 'Open sidebar'}
         aria-label={
-          isOpen ? 'Tutup sidebar' : 'Buka sidebar'
+          isOpen ? 'Close sidebar' : 'Open sidebar'
         }
       >
         {isOpen ? (
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
         ) : (
           <img
             src="/icon.png"
-            alt="Buka menu"
+            alt="Open menu"
             className="pointer-events-none h-9 w-9 object-contain md:h-10 md:w-10"
           />
         )}
@@ -140,9 +140,9 @@ export const Header: React.FC<HeaderProps> = ({
             )
           }
           className="
-            group flex h-11 min-w-[178px] items-center gap-3
+            group flex h-10 min-w-[88px] items-center justify-center gap-2
             rounded-2xl border border-white/10
-            bg-white/[0.07] px-3
+            bg-white/[0.07] px-2.5
             text-left text-white
             shadow-[0_10px_30px_rgba(0,0,0,0.28)]
             backdrop-blur-xl
@@ -153,32 +153,28 @@ export const Header: React.FC<HeaderProps> = ({
             focus:outline-none
             focus:ring-2
             focus:ring-primary/20
-            md:h-12
-            md:min-w-[210px]
-            md:px-4
+            md:h-11
+            md:min-w-[96px]
+            md:px-3
           "
-          aria-label="Pilih bahasa jawaban chatbot"
+          aria-label="Choose chatbot response language"
           aria-expanded={isLanguageOpen}
           aria-haspopup="listbox"
+          title={`Language: ${selectedLanguage.nativeLabel}`}
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-            <span className="material-symbols-outlined text-[19px]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary md:h-8 md:w-8">
+            <span className="material-symbols-outlined text-[18px] md:text-[19px]">
               translate
             </span>
           </span>
 
-          <span className="min-w-0 flex-1">
-            <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
-              Language
-            </span>
-            <span className="block truncate text-sm font-medium text-white">
-              {selectedLanguage.nativeLabel}
-            </span>
+          <span className="font-mono text-sm font-bold tracking-[0.08em] text-white md:text-[15px]">
+            {selectedLanguage.value}
           </span>
 
           <span
             className={`
-              material-symbols-outlined shrink-0 text-[20px]
+              material-symbols-outlined shrink-0 text-[18px]
               text-white/50 transition-transform
               group-hover:text-white/80
               ${
@@ -195,14 +191,14 @@ export const Header: React.FC<HeaderProps> = ({
         {isLanguageOpen && (
           <div
             className="
-              animate-fadeIn absolute right-0 mt-3 w-[260px]
+              animate-fadeIn absolute right-0 mt-3 w-[230px]
               overflow-hidden rounded-3xl border border-white/10
               bg-[#111111]/95 p-2
               shadow-[0_24px_70px_rgba(0,0,0,0.72)]
               backdrop-blur-2xl
             "
             role="listbox"
-            aria-label="Daftar bahasa chatbot"
+            aria-label="Chatbot language list"
           >
             <div className="px-3 pb-2 pt-2">
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
@@ -239,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <span
                       className={`
                         mt-0.5 flex h-8 w-8 shrink-0 items-center
-                        justify-center rounded-xl font-mono text-xs
+                        justify-center rounded-xl font-mono text-xs font-bold
                         ${
                           isSelected
                             ? 'bg-primary text-black'
@@ -252,7 +248,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold">
-                        {option.nativeLabel}
+                        {option.label}
                       </span>
                       <span className="mt-0.5 block text-xs leading-relaxed text-white/45">
                         {option.description}
@@ -274,3 +270,5 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+export default Header;

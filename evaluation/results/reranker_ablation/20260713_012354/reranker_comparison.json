@@ -1,0 +1,40 @@
+{
+  "split": "test",
+  "candidate_k_per_retriever": 20,
+  "minimum_score": 0.3,
+  "reranker_model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+  "reranker_weight": 0.25,
+  "ranking_strategy": "blended_hybrid_plus_cross_encoder",
+  "without_reranker": {
+    "page_mrr": 0.933333,
+    "page_hit_at_1": 0.933333,
+    "page_recall_at_5": 0.9,
+    "false_positive_rate": 0.0,
+    "mean_latency_ms": 293.888
+  },
+  "with_reranker": {
+    "page_mrr": 1.0,
+    "page_hit_at_1": 1.0,
+    "page_recall_at_5": 0.966667,
+    "false_positive_rate": 0.2,
+    "mean_latency_ms": 1355.304
+  },
+  "delta": {
+    "page_mrr": 0.066667,
+    "page_hit_at_1": 0.066667,
+    "page_recall_at_5": 0.066667,
+    "false_positive_rate": 0.2,
+    "mean_latency_ms": 1061.416
+  },
+  "unanswerable_counts": {
+    "total": 5,
+    "without_reranker": {
+      "correctly_rejected": 5,
+      "false_positives": 0
+    },
+    "with_reranker": {
+      "correctly_rejected": 4,
+      "false_positives": 1
+    }
+  }
+}

@@ -1,0 +1,3461 @@
+[
+  {
+    "id": "3575d386-7843-49e4-b422-ab66d848c1a2",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "HAI",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d2f037a0-dce1-4f59-a2ac-6be1c79ab37a",
+        "conversation_id": "3575d386-7843-49e4-b422-ab66d848c1a2",
+        "role": "user",
+        "content": "HAI",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:49:04.883706+00:00"
+      },
+      {
+        "id": "8120069b-668f-48b8-b5f1-bab37cc7a12f",
+        "conversation_id": "3575d386-7843-49e4-b422-ab66d848c1a2",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:49:04.883706+00:00"
+      },
+      {
+        "id": "fff0b050-550c-4239-9be4-9348a7c24c71",
+        "conversation_id": "3575d386-7843-49e4-b422-ab66d848c1a2",
+        "role": "user",
+        "content": "apa itu SOP",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:49:46.975190+00:00"
+      },
+      {
+        "id": "f09fac84-f4e4-4fdf-8baa-a49431c05b9a",
+        "conversation_id": "3575d386-7843-49e4-b422-ab66d848c1a2",
+        "role": "assistant",
+        "content": "SOP adalah singkatan dari Standard Operating Procedure, yang merupakan panduan langkah-langkah standar yang harus diikuti dalam melakukan suatu proses atau aktivitas di sebuah organisasi. Berdasarkan konteks dokumen, SOP mencakup berbagai prosedur seperti pengajuan akses sistem, pengembalian aset saat offboarding, pemesanan perjalanan bisnis, dan jadwal backup data. Setiap SOP memiliki aturan dan ketentuan yang jelas, seperti pengajuan akses sistem harus melalui IT Service Desk dan disetujui oleh pemilik sistem, serta akses sistem direview setiap 6 bulan.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "page": 1,
+              "score": 0.895,
+              "excerpt": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner."
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.8788,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day."
+            },
+            {
+              "document_name": "SOP_Travel_Booking.pdf",
+              "page": 1,
+              "score": 0.8689,
+              "excerpt": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.8679,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours."
+            },
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "page": 1,
+              "score": 0.8629,
+              "excerpt": "Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation."
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": "Apa empat tingkat sensitivitas data yang diakui oleh organisasi perusahaan?",
+          "followUpQuestion": "Apa empat tingkat sensitivitas data yang diakui oleh organisasi perusahaan?"
+        },
+        "created_at": "2026-07-12T20:49:46.975190+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:49:04.883706+00:00",
+    "updated_at": "2026-07-12T20:49:46.975190+00:00",
+    "last_message": "SOP adalah singkatan dari Standard Operating Procedure, yang merupakan panduan langkah-langkah standar yang harus diikuti dalam melakukan suatu proses atau aktivitas di sebuah organisasi. Berdasarkan konteks dokumen, SOP mencakup berbagai prosedur seperti pengajuan akses sistem, pengembalian aset saat offboarding, pemesanan perjalanan bisnis, dan jadwal backup data. Setiap SOP memiliki aturan dan ketentuan yang jelas, seperti pengajuan akses sistem harus melalui IT Service Desk dan disetujui oleh pemilik sistem, serta akses sistem direview setiap 6 bulan.",
+    "last_user_message": "apa itu SOP",
+    "last_message_at": "2026-07-12T20:49:46.975190+00:00"
+  },
+  {
+    "id": "a8112ee2-fd9b-4a48-a3f7-b1ce7e7b5913",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "hello",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "18570cf9-0c95-4412-9f84-6233f6d4ec07",
+        "conversation_id": "a8112ee2-fd9b-4a48-a3f7-b1ce7e7b5913",
+        "role": "user",
+        "content": "hello",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:47:43.536876+00:00"
+      },
+      {
+        "id": "ecbeb53c-cb1b-4c8f-a3a9-eb625ba362ab",
+        "conversation_id": "a8112ee2-fd9b-4a48-a3f7-b1ce7e7b5913",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:47:43.536876+00:00"
+      },
+      {
+        "id": "cbca9476-d07a-49fe-a018-41a0cfe6d819",
+        "conversation_id": "a8112ee2-fd9b-4a48-a3f7-b1ce7e7b5913",
+        "role": "user",
+        "content": "what is SOP",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:48:27.670043+00:00"
+      },
+      {
+        "id": "68299a82-1dd0-48ca-8c3e-c3124342c687",
+        "conversation_id": "a8112ee2-fd9b-4a48-a3f7-b1ce7e7b5913",
+        "role": "assistant",
+        "content": "SOP stands for Standard Operating Procedure. It is a set of guidelines that outline how specific tasks or processes should be carried out. Based on the provided context, the following SOPs are mentioned:\n- **Access Provisioning**: Access to internal systems is requested via the IT Service Desk and approved by the system owner. Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n- **Employee Offboarding**: Departing employees must return all company assets on their last working day. IT revokes all system access within 2 hours of the employee's exit time.\n- **Business Travel Booking**: Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Economy class is standard for all domestic travel. Business class requires Director approval.\n- **Data Backup**: Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months. A restore test is performed quarterly.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "page": 1,
+              "score": 0.9213,
+              "excerpt": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner."
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.9101,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day."
+            },
+            {
+              "document_name": "SOP_Travel_Booking.pdf",
+              "page": 1,
+              "score": 0.906,
+              "excerpt": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.9041,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours."
+            },
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "page": 1,
+              "score": 0.8991,
+              "excerpt": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day."
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": "If I need to fly from Jakarta to Bali for a conference on the 20th of the month, by what date must I finalize the reservation?",
+          "followUpQuestion": "If I need to fly from Jakarta to Bali for a conference on the 20th of the month, by what date must I finalize the reservation?"
+        },
+        "created_at": "2026-07-12T20:48:27.670043+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:47:43.536876+00:00",
+    "updated_at": "2026-07-12T20:48:27.670043+00:00",
+    "last_message": "SOP stands for Standard Operating Procedure. It is a set of guidelines that outline how specific tasks or processes should be carried out. Based on the provided context, the following SOPs are mentioned:\n- **Access Provisioning**: Access to internal systems is requested via the IT Service Desk and approved by the system owner. Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n- **Employee Offboarding**: Departing employees must return all company assets on their last working day. IT revokes all system access within 2 hours of the employee's exit time.\n- **Business Travel Booking**: Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Economy class is standard for all domestic travel. Business class requires Director approval.\n- **Data Backup**: Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months. A restore test is performed quarterly.",
+    "last_user_message": "what is SOP",
+    "last_message_at": "2026-07-12T20:48:27.670043+00:00"
+  },
+  {
+    "id": "aa25f043-ce20-4462-8738-0461c0776212",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f42cdd3a-e70a-4554-a3e4-7332154bb9a2",
+        "conversation_id": "aa25f043-ce20-4462-8738-0461c0776212",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:45:39.010398+00:00"
+      },
+      {
+        "id": "b733e139-5a84-40f9-89fa-c2d78b9eb075",
+        "conversation_id": "aa25f043-ce20-4462-8738-0461c0776212",
+        "role": "assistant",
+        "content": "The maximum reimbursement from the company for a desk priced at Rp2.000.000 is Rp1.500.000, as original receipts are required for any single expense above IDR 150,000, and the reimbursement is limited to that amount. The original invoice must be attached.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.761,
+              "excerpt": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval."
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-12T20:45:39.010398+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:45:39.010398+00:00",
+    "updated_at": "2026-07-12T20:45:39.010398+00:00",
+    "last_message": "The maximum reimbursement from the company for a desk priced at Rp2.000.000 is Rp1.500.000, as original receipts are required for any single expense above IDR 150,000, and the reimbursement is limited to that amount. The original invoice must be attached.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-12T20:45:39.010398+00:00"
+  },
+  {
+    "id": "23a27a28-53f6-4452-b2ab-ab8959540139",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bc4dafd1-b1fc-4f1e-8188-9d5bc8dcdd96",
+        "conversation_id": "23a27a28-53f6-4452-b2ab-ab8959540139",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:45:13.701789+00:00"
+      },
+      {
+        "id": "4eaf5d07-5356-48eb-bd15-2e2417c3f4c1",
+        "conversation_id": "23a27a28-53f6-4452-b2ab-ab8959540139",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8915,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.8483,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.6201,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:45:13.701789+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:45:13.701789+00:00",
+    "updated_at": "2026-07-12T20:45:13.701789+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T20:45:13.701789+00:00"
+  },
+  {
+    "id": "af1cc7ce-4ebd-45c6-a58a-127a7a23db64",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "0a2000a2-fc2a-4e6a-88fc-10b35bd58739",
+        "conversation_id": "af1cc7ce-4ebd-45c6-a58a-127a7a23db64",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:44:51.482663+00:00"
+      },
+      {
+        "id": "68901725-40b4-4c96-9454-0d767248df5d",
+        "conversation_id": "af1cc7ce-4ebd-45c6-a58a-127a7a23db64",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8915,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.8483,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.6201,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:44:51.482663+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:44:51.482663+00:00",
+    "updated_at": "2026-07-12T20:44:51.482663+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T20:44:51.482663+00:00"
+  },
+  {
+    "id": "86b90924-5190-416a-9bb4-acd144605923",
+    "user_id": "dev-staff",
+    "user_name": "Staff User",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ee20b1fd-920e-4f45-9d09-07a4d2ad47d3",
+        "conversation_id": "86b90924-5190-416a-9bb4-acd144605923",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User"
+        },
+        "created_at": "2026-07-12T20:41:17.341037+00:00"
+      },
+      {
+        "id": "93fef43b-cf79-4a47-82a3-4616e9e8621f",
+        "conversation_id": "86b90924-5190-416a-9bb4-acd144605923",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:41:17.341037+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:41:17.341037+00:00",
+    "updated_at": "2026-07-12T20:41:17.341037+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T20:41:17.341037+00:00"
+  },
+  {
+    "id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+    "user_id": "dev-staff",
+    "user_name": "Staff User",
+    "title": "halo",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "1ef079d4-7dd7-4467-8879-fb40ee7bbf9e",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User"
+        },
+        "created_at": "2026-07-12T20:07:28.899299+00:00"
+      },
+      {
+        "id": "d26a8a70-df48-404c-b65b-77a8c28f53a3",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:07:28.899299+00:00"
+      },
+      {
+        "id": "589e1c8f-da0e-40e7-b2ba-3633dd4eadb4",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "user",
+        "content": "hai",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User"
+        },
+        "created_at": "2026-07-12T20:07:39.612722+00:00"
+      },
+      {
+        "id": "74535abe-c8fc-4ea4-a052-1cc76ce67300",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:07:39.612722+00:00"
+      },
+      {
+        "id": "5bf462c4-2869-4beb-aa78-eaeffcfef096",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "user",
+        "content": "apa itu sop",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User"
+        },
+        "created_at": "2026-07-12T20:08:06.131267+00:00"
+      },
+      {
+        "id": "88cb2801-f010-4332-9bb1-3c0f74d64c66",
+        "conversation_id": "38c4b11d-fafc-4716-a0ca-9fb57a723060",
+        "role": "assistant",
+        "content": "SOP adalah singkatan dari Standard Operating Procedure, yang merupakan panduan langkah-langkah standar yang harus diikuti dalam melakukan suatu proses atau aktivitas di perusahaan. Berdasarkan konteks yang diberikan, SOP mencakup berbagai prosedur seperti pengajuan akses sistem, pengembalian aset saat karyawan keluar, pemesanan perjalanan bisnis, dan jadwal backup data. Setiap SOP memiliki tujuan dan aturan yang jelas untuk memastikan kepatuhan, efisiensi, dan keamanan dalam operasional perusahaan.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "page": 1,
+              "score": 0.895,
+              "excerpt": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner."
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.8844,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day."
+            },
+            {
+              "document_name": "SOP_Travel_Booking.pdf",
+              "page": 1,
+              "score": 0.8711,
+              "excerpt": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.8619,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours."
+            },
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "page": 1,
+              "score": 0.859,
+              "excerpt": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day."
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+          "followUpQuestion": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?"
+        },
+        "created_at": "2026-07-12T20:08:06.131267+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:07:28.899299+00:00",
+    "updated_at": "2026-07-12T20:08:06.131267+00:00",
+    "last_message": "SOP adalah singkatan dari Standard Operating Procedure, yang merupakan panduan langkah-langkah standar yang harus diikuti dalam melakukan suatu proses atau aktivitas di perusahaan. Berdasarkan konteks yang diberikan, SOP mencakup berbagai prosedur seperti pengajuan akses sistem, pengembalian aset saat karyawan keluar, pemesanan perjalanan bisnis, dan jadwal backup data. Setiap SOP memiliki tujuan dan aturan yang jelas untuk memastikan kepatuhan, efisiensi, dan keamanan dalam operasional perusahaan.",
+    "last_user_message": "apa itu sop",
+    "last_message_at": "2026-07-12T20:08:06.131267+00:00"
+  },
+  {
+    "id": "d7e195ef-9f62-4e6a-8313-a0d6bb66623b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "dc76b1df-1dba-4b2d-a580-742b90434db4",
+        "conversation_id": "d7e195ef-9f62-4e6a-8313-a0d6bb66623b",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:05:25.239479+00:00"
+      },
+      {
+        "id": "8924016c-00ea-4dcf-8487-c65b6493e919",
+        "conversation_id": "d7e195ef-9f62-4e6a-8313-a0d6bb66623b",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8915,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.8483,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.6201,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:05:25.239479+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:05:25.239479+00:00",
+    "updated_at": "2026-07-12T20:05:25.239479+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T20:05:25.239479+00:00"
+  },
+  {
+    "id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "51bc5fde-8511-4e41-9cd2-d6e92b1117c5",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:03:00.009855+00:00"
+      },
+      {
+        "id": "56fb4e12-5d35-4fe3-afe5-ad0ba4eeb918",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "assistant",
+        "content": "Untuk mengakses jaringan perusahaan, perangkat lunak VPN yang wajib digunakan adalah WireGuard. Saat login, lapisan keamanan tambahan yang diaktifkan adalah multi-factor authentication (MFA).",
+        "attachments": [],
+        "confidence": 0.826,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_VPN_Setup.txt",
+              "page": null,
+              "score": 0.8242,
+              "excerpt": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "page": null,
+              "score": 0.5074,
+              "excerpt": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+              "section": "Password Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.3569,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_BYOD.docx",
+              "page": null,
+              "score": 0.3445,
+              "excerpt": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+              "section": "Bring Your Own Device (BYOD) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Information_Classification.docx",
+              "page": null,
+              "score": 0.3266,
+              "excerpt": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+              "section": "Information Classification Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "TECH_VPN_Setup.txt",
+          "page": null,
+          "follow_up_question": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+          "followUpQuestion": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?"
+        },
+        "created_at": "2026-07-12T20:03:00.009855+00:00"
+      },
+      {
+        "id": "6a721f62-1452-4865-bfbf-9e32b6711c4b",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "user",
+        "content": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?\n\nSumber",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:03:25.947881+00:00"
+      },
+      {
+        "id": "8d10ef93-53ed-4d0a-807e-f557a6139b56",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "assistant",
+        "content": "Laporan pelanggaran data harus dikirimkan ke alamat email security@nusantaradynamics.co.id dalam waktu maksimal 1 jam setelah insiden terjadi, yaitu pada jam 15:00. Tidak ada informasi tentang durasi atau jumlah data yang terlibat dalam konteks dokumen.",
+        "attachments": [],
+        "confidence": 0.698,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.6553,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "page": null,
+              "score": 0.6049,
+              "excerpt": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.4873,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.4803,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB."
+            },
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.4302,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": null,
+          "follow_up_question": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+          "followUpQuestion": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?"
+        },
+        "created_at": "2026-07-12T20:03:25.947881+00:00"
+      },
+      {
+        "id": "3d492189-d903-418d-8c95-61a1815ed9b4",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "user",
+        "content": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:04:09.631961+00:00"
+      },
+      {
+        "id": "aa773043-460c-4fc4-9f75-c6e5ebacdb96",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "assistant",
+        "content": "Laporan pelanggaran data harus dikirimkan ke alamat email security@nusantaradynamics.co.id dalam waktu maksimal 1 jam setelah insiden terjadi, yaitu sebelum pukul 15:00. Tidak ada informasi dalam konteks yang menyebutkan durasi atau jumlah waktu maksimal untuk pengiriman laporan setelah batas waktu 1 jam.",
+        "attachments": [],
+        "confidence": 0.6931,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.6502,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "page": null,
+              "score": 0.5848,
+              "excerpt": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.4733,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.4694,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB."
+            },
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.4345,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": null,
+          "follow_up_question": "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?",
+          "followUpQuestion": "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?"
+        },
+        "created_at": "2026-07-12T20:04:09.631961+00:00"
+      },
+      {
+        "id": "0cfb4129-926b-447a-a158-7f05ac21f199",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "user",
+        "content": "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:04:44.751978+00:00"
+      },
+      {
+        "id": "b14c35be-3461-461a-82fd-b8649ad22074",
+        "conversation_id": "01a0d9a4-f833-4380-8d2d-41d601acfb49",
+        "role": "assistant",
+        "content": "Layanan mikro tersebut melakukan 120 panggilan dalam 60 detik, yang melebihi batas kecepatan default sebesar 100 permintaan per menit per klien, sehingga akan menimbulkan kesalahan keamanan berupa pelanggaran batas kecepatan. Selain itu, token otentikasi yang dibuat dua jam lalu telah kedaluwarsa karena token hanya berlaku selama 60 menit, sehingga akan menimbulkan kesalahan keamanan berupa penggunaan token yang kedaluwarsa.",
+        "attachments": [],
+        "confidence": 0.7115,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_Internal_API_Guide.txt",
+              "page": null,
+              "score": 0.7032,
+              "excerpt": "Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "page": 1,
+              "score": 0.3514,
+              "excerpt": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours."
+            }
+          ],
+          "source": "TECH_Internal_API_Guide.txt",
+          "page": null,
+          "follow_up_question": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+          "followUpQuestion": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?"
+        },
+        "created_at": "2026-07-12T20:04:44.751978+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:03:00.009855+00:00",
+    "updated_at": "2026-07-12T20:04:44.751978+00:00",
+    "last_message": "Layanan mikro tersebut melakukan 120 panggilan dalam 60 detik, yang melebihi batas kecepatan default sebesar 100 permintaan per menit per klien, sehingga akan menimbulkan kesalahan keamanan berupa pelanggaran batas kecepatan. Selain itu, token otentikasi yang dibuat dua jam lalu telah kedaluwarsa karena token hanya berlaku selama 60 menit, sehingga akan menimbulkan kesalahan keamanan berupa penggunaan token yang kedaluwarsa.",
+    "last_user_message": "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?",
+    "last_message_at": "2026-07-12T20:04:44.751978+00:00"
+  },
+  {
+    "id": "318586d7-5e1e-4884-adde-05c897f305f6",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b37b36e6-db4d-4c1e-b35f-90bd55eb5da7",
+        "conversation_id": "318586d7-5e1e-4884-adde-05c897f305f6",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T20:02:22.136888+00:00"
+      },
+      {
+        "id": "3ff0d8cc-d9ed-4504-aa55-fe6b5c8a60ea",
+        "conversation_id": "318586d7-5e1e-4884-adde-05c897f305f6",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T20:02:22.136888+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T20:02:22.136888+00:00",
+    "updated_at": "2026-07-12T20:02:22.136888+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T20:02:22.136888+00:00"
+  },
+  {
+    "id": "f33a2a61-f742-416e-b605-f7b5504bd4d9",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "70fb3c6e-87dd-4ba0-9d02-ae63161c6832",
+        "conversation_id": "f33a2a61-f742-416e-b605-f7b5504bd4d9",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:55:44.300489+00:00"
+      },
+      {
+        "id": "dbe2fb38-5fdd-4535-9604-ad74cf50c87a",
+        "conversation_id": "f33a2a61-f742-416e-b605-f7b5504bd4d9",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-12T19:55:44.300489+00:00"
+      },
+      {
+        "id": "e3ca5f3a-34cf-4fa2-ae29-c3d763a5e6b9",
+        "conversation_id": "f33a2a61-f742-416e-b605-f7b5504bd4d9",
+        "role": "user",
+        "content": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:55:56.249774+00:00"
+      },
+      {
+        "id": "538a4d83-7e73-45a2-b31b-a2a0eaa3983d",
+        "conversation_id": "f33a2a61-f742-416e-b605-f7b5504bd4d9",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:55:56.249774+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:55:44.300489+00:00",
+    "updated_at": "2026-07-12T19:55:56.249774+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+    "last_message_at": "2026-07-12T19:55:56.249774+00:00"
+  },
+  {
+    "id": "073a200d-ffad-4690-ba6d-8e38626c5681",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "3c5d82a6-4265-4f67-a49f-9e19784d3240",
+        "conversation_id": "073a200d-ffad-4690-ba6d-8e38626c5681",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:54:44.301493+00:00"
+      },
+      {
+        "id": "78e43956-e356-460c-9027-97c193f19920",
+        "conversation_id": "073a200d-ffad-4690-ba6d-8e38626c5681",
+        "role": "assistant",
+        "content": "Maksimal reimbursement yang dapat diterima adalah Rp2.000.000, karena nilai meja ergonomis tidak melebihi batas maksimal yang tidak disebutkan dalam dokumen. Nota asli wajib dilampirkan karena nilai pembelian melebihi Rp150.000. Reimbursement akan dibayarkan dalam siklus gaji berikutnya, pada tanggal 25 setiap bulan. Klaim harus diserahkan dalam 30 hari setelah tanggal pengeluaran. Jika klaim melebihi 30 hari, dibutuhkan persetujuan Manajer Keuangan.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.761,
+              "excerpt": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval."
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+          "followUpQuestion": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?"
+        },
+        "created_at": "2026-07-12T19:54:44.301493+00:00"
+      },
+      {
+        "id": "72225a68-5091-4034-88be-108037fe3d61",
+        "conversation_id": "073a200d-ffad-4690-ba6d-8e38626c5681",
+        "role": "user",
+        "content": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:55:19.680579+00:00"
+      },
+      {
+        "id": "bec5d299-9d6e-4c23-a348-a1b4e623fffd",
+        "conversation_id": "073a200d-ffad-4690-ba6d-8e38626c5681",
+        "role": "assistant",
+        "content": "Berdasarkan kebijakan kerja dari rumah, desainer yang bekerja secara remote tetap diwajibkan online di aplikasi tim selama jam 10:00-16:00 WIB, termasuk jam 14:00 WIB, meskipun jadwal kerjanya jatuh pada libur nasional. Kebijakan ini berlaku untuk semua karyawan yang memenuhi syarat dan mendapatkan persetujuan dari atasan. Namun, kebijakan tersebut tidak menyebutkan pengecualian khusus untuk libur nasional.",
+        "attachments": [],
+        "confidence": 0.8295,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "page": null,
+              "score": 0.8068,
+              "excerpt": "Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+              "section": "Remote Work (Work From Home) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "FAQ_Remote_Work.txt",
+              "page": null,
+              "score": 0.5602,
+              "excerpt": "A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment?",
+              "line_start": 1,
+              "line_end": 11
+            },
+            {
+              "document_name": "Policy_BYOD.docx",
+              "page": null,
+              "score": 0.3626,
+              "excerpt": "Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.",
+              "section": "Bring Your Own Device (BYOD) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Report_Sustainability_2025.pdf",
+              "page": 1,
+              "score": 0.346,
+              "excerpt": "Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025."
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:55:19.680579+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:54:44.301493+00:00",
+    "updated_at": "2026-07-12T19:55:19.680579+00:00",
+    "last_message": "Berdasarkan kebijakan kerja dari rumah, desainer yang bekerja secara remote tetap diwajibkan online di aplikasi tim selama jam 10:00-16:00 WIB, termasuk jam 14:00 WIB, meskipun jadwal kerjanya jatuh pada libur nasional. Kebijakan ini berlaku untuk semua karyawan yang memenuhi syarat dan mendapatkan persetujuan dari atasan. Namun, kebijakan tersebut tidak menyebutkan pengecualian khusus untuk libur nasional.",
+    "last_user_message": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+    "last_message_at": "2026-07-12T19:55:19.680579+00:00"
+  },
+  {
+    "id": "f60c06bc-b097-436e-a4a4-5c88f3a20ce6",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e0deb8e5-0a4c-4676-b021-7200448c4a28",
+        "conversation_id": "f60c06bc-b097-436e-a4a4-5c88f3a20ce6",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:53:44.397501+00:00"
+      },
+      {
+        "id": "52e76bf2-6dae-4adf-af4f-62e3e7bbcdf4",
+        "conversation_id": "f60c06bc-b097-436e-a4a4-5c88f3a20ce6",
+        "role": "assistant",
+        "content": "Untuk mengakses jaringan perusahaan, perangkat lunak VPN yang wajib digunakan adalah WireGuard. Saat login, lapisan keamanan tambahan yang diaktifkan adalah multi-factor authentication (MFA).",
+        "attachments": [],
+        "confidence": 0.826,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_VPN_Setup.txt",
+              "page": null,
+              "score": 0.8242,
+              "excerpt": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "page": null,
+              "score": 0.5074,
+              "excerpt": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+              "section": "Password Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.3569,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_BYOD.docx",
+              "page": null,
+              "score": 0.3445,
+              "excerpt": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+              "section": "Bring Your Own Device (BYOD) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Information_Classification.docx",
+              "page": null,
+              "score": 0.3266,
+              "excerpt": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+              "section": "Information Classification Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "TECH_VPN_Setup.txt",
+          "page": null,
+          "follow_up_question": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+          "followUpQuestion": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?"
+        },
+        "created_at": "2026-07-12T19:53:44.397501+00:00"
+      },
+      {
+        "id": "eb655511-ed95-4f9f-b27e-5dbb22946a80",
+        "conversation_id": "f60c06bc-b097-436e-a4a4-5c88f3a20ce6",
+        "role": "user",
+        "content": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:53:57.726459+00:00"
+      },
+      {
+        "id": "484d973b-b851-4102-9dda-e4dab9ca330b",
+        "conversation_id": "f60c06bc-b097-436e-a4a4-5c88f3a20ce6",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:53:57.726459+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:53:44.397501+00:00",
+    "updated_at": "2026-07-12T19:53:57.726459+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T19:53:57.726459+00:00"
+  },
+  {
+    "id": "f94352e9-c5bf-4719-8974-1d582a4c2d60",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e964683f-f4d9-47a6-bc74-b4f9e3005873",
+        "conversation_id": "f94352e9-c5bf-4719-8974-1d582a4c2d60",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:52:59.114714+00:00"
+      },
+      {
+        "id": "6d4dc764-575b-4981-b901-75005a99d386",
+        "conversation_id": "f94352e9-c5bf-4719-8974-1d582a4c2d60",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8915,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.8483,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.6201,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:52:59.114714+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:52:59.114714+00:00",
+    "updated_at": "2026-07-12T19:52:59.114714+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T19:52:59.114714+00:00"
+  },
+  {
+    "id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b82f39a5-ef1d-434a-9e03-dbc996a6703f",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:51:24.796736+00:00"
+      },
+      {
+        "id": "cde43e5e-8ee6-4096-8a2b-4be18f243481",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "assistant",
+        "content": "The maximum reimbursement from the company for a desk costing Rp2.000.000 is Rp2.000.000, as there is no mention of a cap in the context. An original receipt is required, as the policy states original receipts are needed for any single expense above IDR 150,000. The reimbursement will be paid in the next payroll cycle on the 25th of each month. The claim must be submitted within 30 days of the expense date. If the claim is older than 30 days, Finance Manager approval is required.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.761,
+              "excerpt": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval."
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-12T19:51:24.796736+00:00"
+      },
+      {
+        "id": "38c938d6-410c-415d-94bd-7952483f6085",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "user",
+        "content": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:51:48.513466+00:00"
+      },
+      {
+        "id": "1bc13fa2-1f78-41ec-9232-28621eb57a6b",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "assistant",
+        "content": "The maximum reimbursement amount for an ergonomic desk costing IDR 2,000,000 is IDR 2,000,000, as there is no mention of a cap in the provided context. You must attach the original receipt since the expense exceeds IDR 150,000.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.7777,
+              "excerpt": "Receipts Original receipts are required for any single expense above IDR 150,000."
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?",
+          "followUpQuestion": "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?"
+        },
+        "created_at": "2026-07-12T19:51:48.513466+00:00"
+      },
+      {
+        "id": "9f5ac0b3-522b-4353-aa4b-d2e0f573d87e",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "user",
+        "content": "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:52:19.602481+00:00"
+      },
+      {
+        "id": "2d0ff0da-e6bc-4e6d-921c-8a23d0bfc774",
+        "conversation_id": "9e124875-f579-4f89-9f0a-ff39a01f7880",
+        "role": "assistant",
+        "content": "- You are not permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp.\n- The policy requires original receipts for any single expense above IDR 150,000.\n- A digital photo of the receipt is not considered an acceptable form of documentation.\n- The expense amount of IDR 120,000 exceeds the IDR 150,000 threshold, which necessitates an original receipt.\n- The method of submission via WhatsApp does not meet the required documentation standards.",
+        "attachments": [],
+        "confidence": 0.646,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.5944,
+              "excerpt": "Receipts Original receipts are required for any single expense above IDR 150,000."
+            },
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "page": null,
+              "score": 0.5332,
+              "excerpt": "Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.",
+              "section": "Travel & Expense Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "page": 1,
+              "score": 0.3204,
+              "excerpt": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations."
+            },
+            {
+              "document_name": "Policy_Procurement_Threshold.docx",
+              "page": null,
+              "score": 0.3105,
+              "excerpt": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head.",
+              "section": "Procurement Approval Threshold Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-12T19:52:19.602481+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:51:24.796736+00:00",
+    "updated_at": "2026-07-12T19:52:19.602481+00:00",
+    "last_message": "- You are not permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp.\n- The policy requires original receipts for any single expense above IDR 150,000.\n- A digital photo of the receipt is not considered an acceptable form of documentation.\n- The expense amount of IDR 120,000 exceeds the IDR 150,000 threshold, which necessitates an original receipt.\n- The method of submission via WhatsApp does not meet the required documentation standards.",
+    "last_user_message": "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?",
+    "last_message_at": "2026-07-12T19:52:19.602481+00:00"
+  },
+  {
+    "id": "96a32228-1d06-44f1-8f4c-7211408e5d7f",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membuat kredensial akun sepanjang 10 karakter, men...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5e89fc30-82b7-4e2d-8423-73919264bea8",
+        "conversation_id": "96a32228-1d06-44f1-8f4c-7211408e5d7f",
+        "role": "user",
+        "content": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:48:31.132699+00:00"
+      },
+      {
+        "id": "fd5bdc29-c0eb-47fc-b089-ebf01bdc03ca",
+        "conversation_id": "96a32228-1d06-44f1-8f4c-7211408e5d7f",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:48:31.132699+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:48:31.132699+00:00",
+    "updated_at": "2026-07-12T19:48:31.132699+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+    "last_message_at": "2026-07-12T19:48:31.132699+00:00"
+  },
+  {
+    "id": "bc30f26d-38fc-4321-8601-9b39be3149c4",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "c81e3b0a-a467-4aef-9dd7-181a88bc9c2d",
+        "conversation_id": "bc30f26d-38fc-4321-8601-9b39be3149c4",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:46:59.943833+00:00"
+      },
+      {
+        "id": "4a5ba0ed-fafc-427d-9fcf-2605d53c85d2",
+        "conversation_id": "bc30f26d-38fc-4321-8601-9b39be3149c4",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-12T19:46:59.943833+00:00"
+      },
+      {
+        "id": "6ea08d5e-d641-46da-b77a-b9ce6ced3031",
+        "conversation_id": "bc30f26d-38fc-4321-8601-9b39be3149c4",
+        "role": "user",
+        "content": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:47:41.954418+00:00"
+      },
+      {
+        "id": "2ba0e6c1-a209-4822-b18b-8d59727e10b0",
+        "conversation_id": "bc30f26d-38fc-4321-8601-9b39be3149c4",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-12T19:47:41.954418+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:46:59.943833+00:00",
+    "updated_at": "2026-07-12T19:47:41.954418+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+    "last_message_at": "2026-07-12T19:47:41.954418+00:00"
+  },
+  {
+    "id": "8780bcd2-9482-4c67-8c49-7674f980398d",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "47150a7f-fcc3-4641-8e3c-867b7efaa3d5",
+        "conversation_id": "8780bcd2-9482-4c67-8c49-7674f980398d",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T19:25:38.004896+00:00"
+      },
+      {
+        "id": "1292e90e-3ea2-45de-bc05-e1cc6d5762b4",
+        "conversation_id": "8780bcd2-9482-4c67-8c49-7674f980398d",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika tanggal 25 Desember adalah Hari Raya Natal, pada hari apa karyawan akan menerima upah bulanan mereka?",
+          "followUpQuestion": "Jika tanggal 25 Desember adalah Hari Raya Natal, pada hari apa karyawan akan menerima upah bulanan mereka?"
+        },
+        "created_at": "2026-07-12T19:25:38.004896+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T19:25:38.004896+00:00",
+    "updated_at": "2026-07-12T19:25:38.004896+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T19:25:38.004896+00:00"
+  },
+  {
+    "id": "7ad5c765-c979-45fb-a1c9-569b67c17dae",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "1f8d1cb7-b962-45fc-855d-8777c7214b62",
+        "conversation_id": "7ad5c765-c979-45fb-a1c9-569b67c17dae",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:57:59.417333+00:00"
+      },
+      {
+        "id": "c7be80f6-0b58-4cea-ac36-b3564ee8eec2",
+        "conversation_id": "7ad5c765-c979-45fb-a1c9-569b67c17dae",
+        "role": "assistant",
+        "content": "The required VPN software is WireGuard, as specified in the TECH_VPN_Setup.txt document. Multi-factor authentication (MFA) is the additional security layer activated during login, as mandated by the Policy_Password.docx document.",
+        "attachments": [],
+        "confidence": 0.826,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_VPN_Setup.txt",
+              "page": null,
+              "score": 0.8242,
+              "excerpt": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "page": null,
+              "score": 0.5074,
+              "excerpt": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+              "section": "Password Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.3569,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_BYOD.docx",
+              "page": null,
+              "score": 0.3445,
+              "excerpt": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+              "section": "Bring Your Own Device (BYOD) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Information_Classification.docx",
+              "page": null,
+              "score": 0.3266,
+              "excerpt": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+              "section": "Information Classification Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "TECH_VPN_Setup.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T18:57:59.417333+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:57:59.417333+00:00",
+    "updated_at": "2026-07-12T18:57:59.417333+00:00",
+    "last_message": "The required VPN software is WireGuard, as specified in the TECH_VPN_Setup.txt document. Multi-factor authentication (MFA) is the additional security layer activated during login, as mandated by the Policy_Password.docx document.",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T18:57:59.417333+00:00"
+  },
+  {
+    "id": "09bec286-c042-412a-8e23-3848bc174051",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa masa probation karyawan baru?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "96630f1f-f09a-4b95-ac87-e66650ae06ac",
+        "conversation_id": "09bec286-c042-412a-8e23-3848bc174051",
+        "role": "user",
+        "content": "Berapa masa probation karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:57:36.754572+00:00"
+      },
+      {
+        "id": "dbbfe89e-94fe-4d32-9769-2be17222398e",
+        "conversation_id": "09bec286-c042-412a-8e23-3848bc174051",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 of the probation period.",
+        "attachments": [],
+        "confidence": 0.822,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "page": 1,
+              "score": 0.7425,
+              "excerpt": "Probation New employees serve a probation period of 3 months."
+            },
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "page": null,
+              "score": 0.6289,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "page": null,
+              "score": 0.317,
+              "excerpt": "Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "section": "Leave Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T18:57:36.754572+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:57:36.754572+00:00",
+    "updated_at": "2026-07-12T18:57:36.754572+00:00",
+    "last_message": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 of the probation period.",
+    "last_user_message": "Berapa masa probation karyawan baru?",
+    "last_message_at": "2026-07-12T18:57:36.754572+00:00"
+  },
+  {
+    "id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b95a4e32-b357-4f93-a2e7-5e655aee544c",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:52:45.168781+00:00"
+      },
+      {
+        "id": "4e3f0183-aa72-42e1-9c8a-be81ddd9b4c4",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T18:52:45.168781+00:00"
+      },
+      {
+        "id": "364e9c0d-e168-4828-9262-a801fef81cbb",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "user",
+        "content": "Bagaimana prosedur reset password?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:53:48.449753+00:00"
+      },
+      {
+        "id": "33a48bc4-126c-467c-95f8-a6ec1040966c",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "assistant",
+        "content": "Untuk mereset password, pengguna harus mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu 1x24 jam.",
+        "attachments": [],
+        "confidence": 0.8881,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8234,
+              "excerpt": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T18:53:48.449753+00:00"
+      },
+      {
+        "id": "21da12b0-521a-4d9b-b450-95ec4f804f53",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "user",
+        "content": "Berapa masa probation karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:54:27.284011+00:00"
+      },
+      {
+        "id": "03df43fc-6b25-4fd6-b8a6-0c5a026931f0",
+        "conversation_id": "1b070f16-3588-4310-bdb3-0cf3075430f4",
+        "role": "assistant",
+        "content": "Masa probation karyawan baru adalah 3 bulan. Evaluasi formal dilakukan pada minggu ke-12 sebelum konfirmasi. Karyawan baru diberikan laptop dan akses credentials pada hari pertama. Permintaan harus diajukan oleh manajer perekrut minimal 3 hari kerja sebelum tanggal mulai. Setiap karyawan baru ditemani oleh buddy selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.822,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "page": 1,
+              "score": 0.7425,
+              "excerpt": "Probation New employees serve a probation period of 3 months."
+            },
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "page": null,
+              "score": 0.6289,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "page": null,
+              "score": 0.317,
+              "excerpt": "Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "section": "Leave Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T18:54:27.284011+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:52:45.168781+00:00",
+    "updated_at": "2026-07-12T18:54:27.284011+00:00",
+    "last_message": "Masa probation karyawan baru adalah 3 bulan. Evaluasi formal dilakukan pada minggu ke-12 sebelum konfirmasi. Karyawan baru diberikan laptop dan akses credentials pada hari pertama. Permintaan harus diajukan oleh manajer perekrut minimal 3 hari kerja sebelum tanggal mulai. Setiap karyawan baru ditemani oleh buddy selama 30 hari pertama.",
+    "last_user_message": "Berapa masa probation karyawan baru?",
+    "last_message_at": "2026-07-12T18:54:27.284011+00:00"
+  },
+  {
+    "id": "eef3b09e-fe1b-45fb-87ba-7b4f416b3656",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "hello",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "567402ca-3ded-4741-ac51-5b042225c8c5",
+        "conversation_id": "eef3b09e-fe1b-45fb-87ba-7b4f416b3656",
+        "role": "user",
+        "content": "hello",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:08:18.786264+00:00"
+      },
+      {
+        "id": "0dd03770-621a-4567-a889-0a7beedcb36a",
+        "conversation_id": "eef3b09e-fe1b-45fb-87ba-7b4f416b3656",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T18:08:18.786264+00:00"
+      },
+      {
+        "id": "3a155e11-6017-4d3a-9f57-d31814963820",
+        "conversation_id": "eef3b09e-fe1b-45fb-87ba-7b4f416b3656",
+        "role": "user",
+        "content": "what is sop",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:08:54.320898+00:00"
+      },
+      {
+        "id": "3e61dbc5-8aad-4668-aea4-97ea0d95fccc",
+        "conversation_id": "eef3b09e-fe1b-45fb-87ba-7b4f416b3656",
+        "role": "assistant",
+        "content": "SOP stands for Standard Operating Procedure. It is a set of guidelines that outline how specific tasks or processes should be carried out. Based on the provided context, the following SOPs are mentioned:\n- **Access Provisioning**: Request access to internal systems via the IT Service Desk and approved by the system owner. Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n- **Employee Offboarding**: Departing employees must return all company assets on their last working day. IT revokes all system access within 2 hours of the employee's exit time.\n- **Business Travel Booking**: Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Economy class is standard for all domestic travel. Business class requires Director approval.\n- **Data Backup**: Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months. A restore test is performed quarterly.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "page": 1,
+              "score": 0.9213,
+              "excerpt": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner."
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "page": 1,
+              "score": 0.9153,
+              "excerpt": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day."
+            },
+            {
+              "document_name": "SOP_Travel_Booking.pdf",
+              "page": 1,
+              "score": 0.9074,
+              "excerpt": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent."
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "page": 1,
+              "score": 0.9019,
+              "excerpt": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours."
+            },
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "page": 1,
+              "score": 0.8956,
+              "excerpt": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day."
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T18:08:54.320898+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:08:18.786264+00:00",
+    "updated_at": "2026-07-12T18:08:54.320898+00:00",
+    "last_message": "SOP stands for Standard Operating Procedure. It is a set of guidelines that outline how specific tasks or processes should be carried out. Based on the provided context, the following SOPs are mentioned:\n- **Access Provisioning**: Request access to internal systems via the IT Service Desk and approved by the system owner. Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n- **Employee Offboarding**: Departing employees must return all company assets on their last working day. IT revokes all system access within 2 hours of the employee's exit time.\n- **Business Travel Booking**: Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Economy class is standard for all domestic travel. Business class requires Director approval.\n- **Data Backup**: Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months. A restore test is performed quarterly.",
+    "last_user_message": "what is sop",
+    "last_message_at": "2026-07-12T18:08:54.320898+00:00"
+  },
+  {
+    "id": "bc24db62-4039-46a6-aa3b-114ede947a25",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4766e7c8-daac-4dba-b597-5b10247beb76",
+        "conversation_id": "bc24db62-4039-46a6-aa3b-114ede947a25",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:08:03.481250+00:00"
+      },
+      {
+        "id": "30678fbc-83e8-4446-b474-7181951bd9a0",
+        "conversation_id": "bc24db62-4039-46a6-aa3b-114ede947a25",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8915,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.8483,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.6201,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T18:08:03.481250+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:08:03.481250+00:00",
+    "updated_at": "2026-07-12T18:08:03.481250+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T18:08:03.481250+00:00"
+  },
+  {
+    "id": "3bc81305-4faa-4f0b-81f7-00dbf7a9ca5e",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "74f8c78e-1867-492f-893d-ef6c413d603c",
+        "conversation_id": "3bc81305-4faa-4f0b-81f7-00dbf7a9ca5e",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:07:04.617275+00:00"
+      },
+      {
+        "id": "40338449-f256-42ff-96a9-d0ae77d8a202",
+        "conversation_id": "3bc81305-4faa-4f0b-81f7-00dbf7a9ca5e",
+        "role": "assistant",
+        "content": "Untuk mengakses jaringan perusahaan, perangkat lunak VPN yang wajib digunakan adalah WireGuard. Saat login, lapisan keamanan tambahan yang diaktifkan adalah multi-factor authentication (MFA).",
+        "attachments": [],
+        "confidence": 0.826,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_VPN_Setup.txt",
+              "page": null,
+              "score": 0.8242,
+              "excerpt": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "page": null,
+              "score": 0.5074,
+              "excerpt": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+              "section": "Password Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "page": null,
+              "score": 0.3569,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "section": "Data Security Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_BYOD.docx",
+              "page": null,
+              "score": 0.3445,
+              "excerpt": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+              "section": "Bring Your Own Device (BYOD) Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Information_Classification.docx",
+              "page": null,
+              "score": 0.3266,
+              "excerpt": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+              "section": "Information Classification Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "TECH_VPN_Setup.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T18:07:04.617275+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:07:04.617275+00:00",
+    "updated_at": "2026-07-12T18:07:04.617275+00:00",
+    "last_message": "Untuk mengakses jaringan perusahaan, perangkat lunak VPN yang wajib digunakan adalah WireGuard. Saat login, lapisan keamanan tambahan yang diaktifkan adalah multi-factor authentication (MFA).",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T18:07:04.617275+00:00"
+  },
+  {
+    "id": "06ba55fa-c6c2-4b06-bd38-1223a5fdc451",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ffd2b453-ac6d-40a3-a39c-6992ee3176f6",
+        "conversation_id": "06ba55fa-c6c2-4b06-bd38-1223a5fdc451",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T18:06:23.948350+00:00"
+      },
+      {
+        "id": "30a4225a-cac3-4f3a-8288-ac2d70bbe4c6",
+        "conversation_id": "06ba55fa-c6c2-4b06-bd38-1223a5fdc451",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.827,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.8019,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T18:06:23.948350+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T18:06:23.948350+00:00",
+    "updated_at": "2026-07-12T18:06:23.948350+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T18:06:23.948350+00:00"
+  },
+  {
+    "id": "e9678bbb-1bd7-4e61-82f3-6a19041077cf",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "fc723769-99bd-49b6-b7e8-0d60f0966a86",
+        "conversation_id": "e9678bbb-1bd7-4e61-82f3-6a19041077cf",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T17:08:56.754024+00:00"
+      },
+      {
+        "id": "4fa8659c-6a26-42d2-87e2-904b143a8453",
+        "conversation_id": "e9678bbb-1bd7-4e61-82f3-6a19041077cf",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+        "attachments": [],
+        "confidence": 0.7465,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.4011,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T17:08:56.754024+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T17:08:56.754024+00:00",
+    "updated_at": "2026-07-12T17:08:56.754024+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1 hari 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T17:08:56.754024+00:00"
+  },
+  {
+    "id": "1ce20ff9-6494-4810-9237-57ca7275fa31",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6e467f55-20b8-4d3d-a1b3-2c1c4be4683a",
+        "conversation_id": "1ce20ff9-6494-4810-9237-57ca7275fa31",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:58:35.102767+00:00"
+      },
+      {
+        "id": "ed03fef1-8812-4e83-9f93-284a723c6078",
+        "conversation_id": "1ce20ff9-6494-4810-9237-57ca7275fa31",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.8011,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.4248,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.3501,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T16:58:35.102767+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:58:35.102767+00:00",
+    "updated_at": "2026-07-12T16:58:35.102767+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T16:58:35.102767+00:00"
+  },
+  {
+    "id": "d4262652-3cc8-4c2c-9714-242b310d4a75",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "7d07c597-a8e3-408a-ba6f-4fca80a0e224",
+        "conversation_id": "d4262652-3cc8-4c2c-9714-242b310d4a75",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:47:38.232190+00:00"
+      },
+      {
+        "id": "c55b79ba-c292-45b8-9e0d-ccb079c287b4",
+        "conversation_id": "d4262652-3cc8-4c2c-9714-242b310d4a75",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T16:47:38.232190+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:47:38.232190+00:00",
+    "updated_at": "2026-07-12T16:47:38.232190+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T16:47:38.232190+00:00"
+  },
+  {
+    "id": "1af18d94-23f0-4127-a8aa-7ce54bb24c26",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "56c19a1b-6678-48ff-84f3-c94e79f5e52a",
+        "conversation_id": "1af18d94-23f0-4127-a8aa-7ce54bb24c26",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:46:07.388839+00:00"
+      },
+      {
+        "id": "32de5bfb-c4fe-461d-8cb4-fb66b247b587",
+        "conversation_id": "1af18d94-23f0-4127-a8aa-7ce54bb24c26",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah",
+        "attachments": [],
+        "confidence": 0.8011,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.4248,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.3501,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T16:46:07.388839+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:46:07.388839+00:00",
+    "updated_at": "2026-07-12T16:46:07.388839+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T16:46:07.388839+00:00"
+  },
+  {
+    "id": "4bd2b0b9-c241-4afc-b104-69aa5296929b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "a01d076d-601e-43d7-b983-6010de15533d",
+        "conversation_id": "4bd2b0b9-c241-4afc-b104-69aa5296929b",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:44:30.491392+00:00"
+      },
+      {
+        "id": "e9192b8f-f28c-4955-af94-6fc66029e491",
+        "conversation_id": "4bd2b0b9-c241-4afc-b104-69aa5296929b",
+        "role": "assistant",
+        "content": "Maksimal reimbursement tidak disebutkan dalam konteks, tetapi nota asli wajib dilampirkan karena nilai pengeluaran melebihi IDR 150.000. Klaim harus diserahkan dalam 30 hari dari tanggal pengeluaran, dan pembayaran dilakukan pada 25 setiap bulan setelah disetujui.",
+        "attachments": [],
+        "confidence": 0.724,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "page": 1,
+              "score": 0.3811,
+              "excerpt": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval."
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T16:44:30.491392+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:44:30.491392+00:00",
+    "updated_at": "2026-07-12T16:44:30.491392+00:00",
+    "last_message": "Maksimal reimbursement tidak disebutkan dalam konteks, tetapi nota asli wajib dilampirkan karena nilai pengeluaran melebihi IDR 150.000. Klaim harus diserahkan dalam 30 hari dari tanggal pengeluaran, dan pembayaran dilakukan pada 25 setiap bulan setelah disetujui.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-12T16:44:30.491392+00:00"
+  },
+  {
+    "id": "3f3aa537-204d-42ce-9564-1c436bc60591",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e337223b-d975-4df3-9a54-cb50f31e43a5",
+        "conversation_id": "3f3aa537-204d-42ce-9564-1c436bc60591",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:43:46.642135+00:00"
+      },
+      {
+        "id": "af22fcb3-4aa2-4d2d-b0f8-11d8cfd489b4",
+        "conversation_id": "3f3aa537-204d-42ce-9564-1c436bc60591",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T16:43:46.642135+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:43:46.642135+00:00",
+    "updated_at": "2026-07-12T16:43:46.642135+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T16:43:46.642135+00:00"
+  },
+  {
+    "id": "62f2f8d8-0ae1-4556-9fb5-b59e817c9ed8",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "8bfda8fd-033e-4e37-adca-66d24a3bd945",
+        "conversation_id": "62f2f8d8-0ae1-4556-9fb5-b59e817c9ed8",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:43:37.261290+00:00"
+      },
+      {
+        "id": "d0b7e3c8-c1e6-4fe6-93ca-b4e076b84f6f",
+        "conversation_id": "62f2f8d8-0ae1-4556-9fb5-b59e817c9ed8",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T16:43:37.261290+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:43:37.261290+00:00",
+    "updated_at": "2026-07-12T16:43:37.261290+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T16:43:37.261290+00:00"
+  },
+  {
+    "id": "e550ce2e-b0a6-4cd0-aeed-602f273862ec",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6416958f-d5be-4690-9fa2-0523581986a3",
+        "conversation_id": "e550ce2e-b0a6-4cd0-aeed-602f273862ec",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:41:38.559509+00:00"
+      },
+      {
+        "id": "f40e61e8-f317-404e-b5ba-4f0b4ffa80ce",
+        "conversation_id": "e550ce2e-b0a6-4cd0-aeed-602f273862ec",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan",
+        "attachments": [],
+        "confidence": 0.8011,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "page": 1,
+              "score": 0.4248,
+              "excerpt": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "page": 1,
+              "score": 0.3501,
+              "excerpt": "Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214."
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1
+        },
+        "created_at": "2026-07-12T16:41:38.559509+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:41:38.559509+00:00",
+    "updated_at": "2026-07-12T16:41:38.559509+00:00",
+    "last_message": "Total pendapatan perusahaan",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T16:41:38.559509+00:00"
+  },
+  {
+    "id": "19183395-e6a0-49e9-b676-3a64827d8b36",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e3616c3b-7ed0-4bc2-97f5-06acf88ff0c5",
+        "conversation_id": "19183395-e6a0-49e9-b676-3a64827d8b36",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:40:13.277074+00:00"
+      },
+      {
+        "id": "3cda64c4-fe7e-40e3-8b83-a57648a967df",
+        "conversation_id": "19183395-e6a0-49e9-b676-3a64827d8b36",
+        "role": "assistant",
+        "content": "To reset your password, raise a ticket with the IT Helpdesk via the portal. The maximum processing time is 24 hours.",
+        "attachments": [],
+        "confidence": 0.7465,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.4011,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T16:40:13.277074+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:40:13.277074+00:00",
+    "updated_at": "2026-07-12T16:40:13.277074+00:00",
+    "last_message": "To reset your password, raise a ticket with the IT Helpdesk via the portal. The maximum processing time is 24 hours.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T16:40:13.277074+00:00"
+  },
+  {
+    "id": "706d8fea-65cf-42bb-a4a8-08cc56d0bc92",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6c524774-f578-47df-9d36-5c2caf95aed9",
+        "conversation_id": "706d8fea-65cf-42bb-a4a8-08cc56d0bc92",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:36:07.117665+00:00"
+      },
+      {
+        "id": "671eb95f-4422-4ce7-a408-5fbbe921393d",
+        "conversation_id": "706d8fea-65cf-42bb-a4a8-08cc56d0bc92",
+        "role": "assistant",
+        "content": "Untuk mereset password sistem internal, Anda perlu mengajukan tiket ke IT Helpdesk melalui portal. Proses reset akan diproses maksimal dalam 24 jam.",
+        "attachments": [],
+        "confidence": 0.7465,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.4011,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T16:36:07.117665+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:36:07.117665+00:00",
+    "updated_at": "2026-07-12T16:36:07.117665+00:00",
+    "last_message": "Untuk mereset password sistem internal, Anda perlu mengajukan tiket ke IT Helpdesk melalui portal. Proses reset akan diproses maksimal dalam 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T16:36:07.117665+00:00"
+  },
+  {
+    "id": "354fda5c-c5c6-4624-9f41-299a09bd42b3",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "0275b1e2-0d2d-4405-adaf-ce4b897e6217",
+        "conversation_id": "354fda5c-c5c6-4624-9f41-299a09bd42b3",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T16:35:29.330229+00:00"
+      },
+      {
+        "id": "0f4a3352-4592-447c-a464-cd129f6e4392",
+        "conversation_id": "354fda5c-c5c6-4624-9f41-299a09bd42b3",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T16:35:29.330229+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T16:35:29.330229+00:00",
+    "updated_at": "2026-07-12T16:35:29.330229+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-12T16:35:29.330229+00:00"
+  },
+  {
+    "id": "b02bbcb9-de04-4723-a4c1-7fbf7a65e314",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4aa47d01-2396-4ffc-9f2d-b7c80a7832a1",
+        "conversation_id": "b02bbcb9-de04-4723-a4c1-7fbf7a65e314",
+        "role": "user",
+        "content": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:45:38.526857+00:00"
+      },
+      {
+        "id": "617179f5-b2a4-4457-93ee-9cb65636d354",
+        "conversation_id": "b02bbcb9-de04-4723-a4c1-7fbf7a65e314",
+        "role": "assistant",
+        "content": "Perangkat lunak VPN yang wajib digunakan adalah **WireGuard**, sebagaimana diatur dalam dokumen TECH_VPN_Setup.txt. Lapisan keamanan tambahan yang diaktifkan saat login adalah **Multi-Factor Authentication (MFA)**, yang merupakan persyaratan wajib untuk akses VPN dan email, sesuai dengan kebijakan di Policy_Password.docx.",
+        "attachments": [],
+        "confidence": 0.5861,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_VPN_Setup.txt",
+              "page": null,
+              "score": 0.5844,
+              "line_start": 1,
+              "line_end": 10
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "page": null,
+              "score": 0.3235,
+              "section": "Password Policy",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "TECH_VPN_Setup.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T15:45:38.526857+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:45:38.526857+00:00",
+    "updated_at": "2026-07-12T15:45:38.526857+00:00",
+    "last_message": "Perangkat lunak VPN yang wajib digunakan adalah **WireGuard**, sebagaimana diatur dalam dokumen TECH_VPN_Setup.txt. Lapisan keamanan tambahan yang diaktifkan saat login adalah **Multi-Factor Authentication (MFA)**, yang merupakan persyaratan wajib untuk akses VPN dan email, sesuai dengan kebijakan di Policy_Password.docx.",
+    "last_user_message": "Perangkat lunak VPN apa yang wajib digunakan untuk mengakses jaringan perusahaan, dan lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "last_message_at": "2026-07-12T15:45:38.526857+00:00"
+  },
+  {
+    "id": "bd6ead13-11ac-4db4-988e-b96c4b9a20c2",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "835b4b6f-bed9-4e56-af42-9b223da3fdeb",
+        "conversation_id": "bd6ead13-11ac-4db4-988e-b96c4b9a20c2",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:42:43.225426+00:00"
+      },
+      {
+        "id": "a3564af2-13db-43f8-9377-d14947704e7c",
+        "conversation_id": "bd6ead13-11ac-4db4-988e-b96c4b9a20c2",
+        "role": "assistant",
+        "content": "To reset a forgotten password, raise a ticket with the IT Helpdesk via the portal. The reset process is completed within 24 hours. No additional steps or outcomes are specified in the context.",
+        "attachments": [],
+        "confidence": 0.7854,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.6172,
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T15:42:43.225426+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:42:43.225426+00:00",
+    "updated_at": "2026-07-12T15:42:43.225426+00:00",
+    "last_message": "To reset a forgotten password, raise a ticket with the IT Helpdesk via the portal. The reset process is completed within 24 hours. No additional steps or outcomes are specified in the context.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T15:42:43.225426+00:00"
+  },
+  {
+    "id": "8c045a28-7f0a-4b89-b13a-9356bbda3411",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "7993f7da-b0d4-447b-b8fc-1ef0e3869a18",
+        "conversation_id": "8c045a28-7f0a-4b89-b13a-9356bbda3411",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:41:16.932010+00:00"
+      },
+      {
+        "id": "dd5d6c01-63c5-4d18-be72-79b89e8011ca",
+        "conversation_id": "8c045a28-7f0a-4b89-b13a-9356bbda3411",
+        "role": "assistant",
+        "content": "Jika lupa password sistem internal, prosedur reset adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset maksimal memakan waktu 24 jam.",
+        "attachments": [],
+        "confidence": 0.7854,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "score": 0.6172,
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T15:41:16.932010+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:41:16.932010+00:00",
+    "updated_at": "2026-07-12T15:41:16.932010+00:00",
+    "last_message": "Jika lupa password sistem internal, prosedur reset adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset maksimal memakan waktu 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T15:41:16.932010+00:00"
+  },
+  {
+    "id": "505d4479-931d-4624-8000-590e764ae55c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "dbdc57f1-1fb8-4579-9f73-510cd7894b3f",
+        "conversation_id": "505d4479-931d-4624-8000-590e764ae55c",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:34:27.367087+00:00"
+      },
+      {
+        "id": "98e1f612-7684-4dd8-88ff-0791557c10fb",
+        "conversation_id": "505d4479-931d-4624-8000-590e764ae55c",
+        "role": "assistant",
+        "content": "Jika lupa password sistem internal, prosedur reset adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset maksimal memakan waktu 24 jam.",
+        "attachments": [],
+        "confidence": 0.7854,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "page": null,
+              "excerpt": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+              "score": 0.6172,
+              "line_start": 1,
+              "line_end": 12
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null
+        },
+        "created_at": "2026-07-12T15:34:27.367087+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:34:27.367087+00:00",
+    "updated_at": "2026-07-12T15:34:27.367087+00:00",
+    "last_message": "Jika lupa password sistem internal, prosedur reset adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset maksimal memakan waktu 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T15:34:27.367087+00:00"
+  },
+  {
+    "id": "2e99a483-5600-4360-9db9-942c35314b12",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f566468f-d33e-4633-978f-ee478db783c3",
+        "conversation_id": "2e99a483-5600-4360-9db9-942c35314b12",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:07:31.816833+00:00"
+      },
+      {
+        "id": "e776a55c-7956-4e62-afa7-56a34be4441a",
+        "conversation_id": "2e99a483-5600-4360-9db9-942c35314b12",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T15:07:31.816833+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:07:31.816833+00:00",
+    "updated_at": "2026-07-12T15:07:31.816833+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T15:07:31.816833+00:00"
+  },
+  {
+    "id": "70961af1-5b9f-44a8-8c07-c164c326fd3d",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f96460df-6b18-4a84-a32e-9511bfe198be",
+        "conversation_id": "70961af1-5b9f-44a8-8c07-c164c326fd3d",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T15:05:16.447159+00:00"
+      },
+      {
+        "id": "db645886-3012-4b21-8dff-095c99a3ee8d",
+        "conversation_id": "70961af1-5b9f-44a8-8c07-c164c326fd3d",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T15:05:16.447159+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T15:05:16.447159+00:00",
+    "updated_at": "2026-07-12T15:05:16.447159+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T15:05:16.447159+00:00"
+  },
+  {
+    "id": "a2f5c49f-07d1-49ac-9a77-1d4e4fcb5c1d",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5b0f0bf9-c7d9-4012-8e4f-26823493c83a",
+        "conversation_id": "a2f5c49f-07d1-49ac-9a77-1d4e4fcb5c1d",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T14:01:54.769930+00:00"
+      },
+      {
+        "id": "8558e7f1-826e-4264-9502-3ea2290887ee",
+        "conversation_id": "a2f5c49f-07d1-49ac-9a77-1d4e4fcb5c1d",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T14:01:54.769930+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T14:01:54.769930+00:00",
+    "updated_at": "2026-07-12T14:01:54.769930+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T14:01:54.769930+00:00"
+  },
+  {
+    "id": "06bebab6-4d18-4196-a40e-8a78ba224334",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "035371b4-49eb-4675-873e-b0c07b0fa2cf",
+        "conversation_id": "06bebab6-4d18-4196-a40e-8a78ba224334",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T14:01:43.779200+00:00"
+      },
+      {
+        "id": "9e35a9f5-a205-449a-91d9-9b820447bbd0",
+        "conversation_id": "06bebab6-4d18-4196-a40e-8a78ba224334",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T14:01:43.779200+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T14:01:43.779200+00:00",
+    "updated_at": "2026-07-12T14:01:43.779200+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-12T14:01:43.779200+00:00"
+  },
+  {
+    "id": "3d25281d-ee85-458a-aa60-b143e1b40a64",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "2bff848c-1ad7-4d56-b4fc-1dc56ea6aa6e",
+        "conversation_id": "3d25281d-ee85-458a-aa60-b143e1b40a64",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-12T13:58:01.658435+00:00"
+      },
+      {
+        "id": "4ffbd95f-f735-41b0-9d9c-e7701af21a1a",
+        "conversation_id": "3d25281d-ee85-458a-aa60-b143e1b40a64",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null
+        },
+        "created_at": "2026-07-12T13:58:01.658435+00:00"
+      }
+    ],
+    "created_at": "2026-07-12T13:58:01.658435+00:00",
+    "updated_at": "2026-07-12T13:58:01.658435+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-12T13:58:01.658435+00:00"
+  }
+]

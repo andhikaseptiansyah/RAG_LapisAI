@@ -12,6 +12,7 @@ import type {
 
 import {
   convertChatResponseToMessage,
+  normalizeMessageSources,
   sendChatMessage,
 } from '../services/chatService';
 
@@ -130,6 +131,41 @@ function mapConversationMessageToMessage(
         hour12: false,
       }).format(createdAt);
 
+  const source =
+    typeof message.metadata?.source === 'string'
+      ? message.metadata.source
+      : undefined;
+
+  const page =
+    typeof message.metadata?.page === 'string' ||
+    typeof message.metadata?.page === 'number'
+      ? message.metadata.page
+      : undefined;
+
+  const normalizedSources =
+    normalizeMessageSources(
+      message.metadata?.sources
+    );
+
+  const sources =
+    normalizedSources.length > 0
+      ? normalizedSources
+      : source
+        ? [
+            {
+              documentName: source,
+              page,
+            },
+          ]
+        : undefined;
+
+  const followUpQuestion =
+    typeof message.metadata?.follow_up_question === 'string'
+      ? message.metadata.follow_up_question
+      : typeof message.metadata?.followUpQuestion === 'string'
+        ? message.metadata.followUpQuestion
+        : undefined;
+
   return {
     id: message.id,
     role,
@@ -137,15 +173,10 @@ function mapConversationMessageToMessage(
     time,
     confidence:
       toDisplayConfidence(message.confidence),
-    source:
-      typeof message.metadata?.source === 'string'
-        ? message.metadata.source
-        : undefined,
-    page:
-      typeof message.metadata?.page === 'string' ||
-      typeof message.metadata?.page === 'number'
-        ? message.metadata.page
-        : undefined,
+    source,
+    page,
+    sources,
+    followUpQuestion,
     shouldAnimate: false,
   };
 }

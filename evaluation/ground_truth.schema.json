@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lapisai.local/schemas/ground-truth.schema.json",
+  "title": "LapisAI RAG Ground-Truth Dataset",
+  "type": "object",
+  "required": [
+    "dataset_name",
+    "version",
+    "created_at",
+    "description",
+    "corpus",
+    "evaluation_policy",
+    "statistics",
+    "items"
+  ],
+  "properties": {
+    "dataset_name": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "created_at": {"type": "string", "format": "date"},
+    "description": {"type": "string", "minLength": 1},
+    "corpus": {
+      "type": "object",
+      "required": ["document_directory", "document_count", "included_prefixes", "excluded_content"],
+      "properties": {
+        "document_directory": {"type": "string", "minLength": 1},
+        "document_count": {"type": "integer", "minimum": 1},
+        "included_prefixes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "excluded_content": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "evaluation_policy": {"type": "object"},
+    "statistics": {
+      "type": "object",
+      "required": [
+        "total_questions",
+        "answerable_questions",
+        "unanswerable_questions",
+        "development_questions",
+        "test_questions",
+        "english_questions",
+        "indonesian_questions"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "split",
+          "category",
+          "language",
+          "difficulty",
+          "question_type",
+          "question",
+          "answerable",
+          "expected_answer",
+          "expected_answer_keywords",
+          "references",
+          "notes"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z]+-[0-9]{3}$"},
+          "split": {"enum": ["development", "test"]},
+          "category": {"enum": ["faq", "policy", "report", "sop", "technical", "negative"]},
+          "language": {"enum": ["en", "id"]},
+          "difficulty": {"enum": ["easy", "medium", "hard"]},
+          "question_type": {"type": "string", "minLength": 1},
+          "question": {"type": "string", "minLength": 1},
+          "answerable": {"type": "boolean"},
+          "expected_answer": {"type": "string", "minLength": 1},
+          "expected_answer_keywords": {"type": "array", "items": {"type": "string"}},
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["document", "page", "source_excerpt"],
+              "properties": {
+                "document": {"type": "string", "minLength": 1},
+                "page": {"type": "integer", "minimum": 1},
+                "source_excerpt": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          },
+          "notes": {"type": "string"}
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {"properties": {"answerable": {"const": true}}},
+            "then": {
+              "properties": {
+                "references": {"minItems": 1},
+                "expected_answer_keywords": {"minItems": 1}
+              }
+            }
+          },
+          {
+            "if": {"properties": {"answerable": {"const": false}}},
+            "then": {
+              "properties": {
+                "references": {"maxItems": 0},
+                "expected_answer_keywords": {"maxItems": 0}
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from rag_pipeline import store
+from rag_pipeline import DEFAULT_MIN_SCORE, store
 
 
 class IndexRequest(BaseModel):
@@ -18,7 +18,7 @@ class IndexRequest(BaseModel):
 class RetrieveRequest(BaseModel):
     query: str
     top_k: int = Field(default=5, alias="topK")
-    min_score: float = Field(default=0.0, alias="minScore")
+    min_score: float = Field(default=DEFAULT_MIN_SCORE, alias="minScore")
 
 
 app = FastAPI(title="LapisAI Python RAG Service", version="1.0.0")
@@ -29,6 +29,9 @@ def health() -> Dict[str, Any]:
     return {
         "status": "ok",
         "service": "lapisai-python-rag",
+        "collection": store.collection.name,
+        "embeddingModel": store.embedding_provider.model_name,
+        "minimumResultScore": DEFAULT_MIN_SCORE,
     }
 
 

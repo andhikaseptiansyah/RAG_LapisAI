@@ -7,6 +7,8 @@ import React, {
 
 import type {
   AttachedFile,
+  Message,
+  MessageSource,
 } from './types';
 
 import { useChat } from './hooks/useChat';
@@ -16,6 +18,7 @@ import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
 
+// UI VERSION: ANSWER + STRUCTURED CITATIONS + CONFIDENCE
 type DetectedLanguage = 'ID' | 'EN';
 type UploadMode = 'photo' | 'file';
 
@@ -92,7 +95,7 @@ const TypewriterMarkdown: React.FC<{
   return (
     <>
       <div
-        className="prose prose-sm prose-invert prose-custom max-w-none text-on-surface leading-relaxed text-[13px] md:text-sm"
+        className="prose prose-invert prose-custom max-w-none text-white text-[15px] md:text-[17px] leading-[1.75] tracking-[0.005em] [&_p]:text-white [&_li]:text-white [&_strong]:text-white [&_em]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white [&_blockquote]:text-white [&_code]:text-white"
         dangerouslySetInnerHTML={{
           __html:
             sanitizeMarkdown(visibleText),
@@ -100,9 +103,517 @@ const TypewriterMarkdown: React.FC<{
       />
 
       {!isDone && (
-        <span className="inline-block w-1.5 h-4 ml-1 bg-primary/80 animate-pulse align-middle" />
+        <span className="inline-block w-1.5 h-5 ml-1 bg-white/80 animate-pulse align-middle" />
       )}
     </>
+  );
+};
+
+
+const toPercent = (
+  value?: number
+): number | undefined => {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value)
+  ) {
+    return undefined;
+  }
+
+  const percent =
+    value <= 1
+      ? value * 100
+      : value;
+
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(percent)
+    )
+  );
+};
+
+const getSourceLocationLabels = (
+  source: MessageSource
+): string[] => {
+  const labels: string[] = [];
+  const documentType = (
+    source.documentType ??
+    source.documentName.split('.').pop() ??
+    ''
+  ).toLowerCase();
+
+  const mayShowPage =
+    documentType === 'pdf' ||
+    (documentType === 'docx' &&
+      source.pageIsReliable === true) ||
+    !['pdf', 'docx', 'txt'].includes(
+      documentType
+    );
+
+  if (
+    mayShowPage &&
+    source.page !== undefined &&
+    source.page !== null &&
+    String(source.page).trim() !== ''
+  ) {
+    labels.push(`Page ${source.page}`);
+  }
+
+  const chapter =
+    source.chapter ?? source.section;
+  if (chapter) {
+    labels.push(`Chapter: ${chapter}`);
+  }
+
+  if (
+    source.paragraphStart !== undefined
+  ) {
+    const paragraphEnd =
+      source.paragraphEnd ??
+      source.paragraphStart;
+
+    labels.push(
+      paragraphEnd ===
+        source.paragraphStart
+        ? `Paragraph ${source.paragraphStart}`
+        : `Paragraphs ${source.paragraphStart}–${paragraphEnd}`
+    );
+  }
+
+  return labels;
+};
+
+const getConfidenceLevel = (
+  confidence?: number
+): 'High' | 'Medium' | 'Low' | undefined => {
+  if (confidence === undefined) {
+    return undefined;
+  }
+
+  if (confidence >= 85) {
+    return 'High';
+  }
+
+  if (confidence >= 60) {
+    return 'Medium';
+  }
+
+  return 'Low';
+};
+
+const CitationPanel: React.FC<{
+  message: Message;
+}> = ({
+  message,
+}) => {
+  const [expandedSources, setExpandedSources] =
+    useState<Set<number>>(() => new Set());
+
+  const fallbackSource:
+    | MessageSource
+    | undefined =
+    message.source
+      ? {
+          documentName:
+            message.source,
+          page: message.page,
+        }
+      : undefined;
+
+  const sources =
+    message.sources &&
+    message.sources.length > 0
+      ? message.sources
+      : fallbackSource
+        ? [fallbackSource]
+        : [];
+
+  // Retrieval may use more candidates, but the chat UI intentionally
+  // shows no more than two citations so the answer remains compact.
+  const visibleSources = [...sources]
+    .sort(
+      (first, second) =>
+        (second.relevanceScore ?? 0) -
+        (first.relevanceScore ?? 0)
+    )
+    .slice(0, 2);
+
+  if (visibleSources.length === 0) {
+    return null;
+  }
+
+  const confidence =
+    toPercent(message.confidence);
+
+  const confidenceLevel =
+    getConfidenceLevel(confidence);
+
+  const toggleSource = (index: number) => {
+    setExpandedSources((current) => {
+      const next = new Set(current);
+
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+
+      return next;
+    });
+  };
+
+  return (
+    <section
+      className="mt-5 pt-2 text-white"
+      aria-label="Answer sources"
+    >
+      <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white md:text-[13px]">
+        Sources
+      </p>
+
+      <div className="mt-3 grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        {visibleSources.map(
+          (source, index) => {
+            const locationLabels =
+              getSourceLocationLabels(
+                source
+              );
+            const sourceMatch =
+              toPercent(
+                source.relevanceScore
+              );
+            const isExpanded =
+              expandedSources.has(index);
+            const hasExcerpt = Boolean(
+              source.excerpt?.trim()
+            );
+
+            return (
+              <article
+                key={`${source.documentName}-${source.page ?? 'no-page'}-${index}`}
+                className="min-w-0"
+              >
+                <button
+                  type="button"
+                  className="flex w-full items-start justify-between gap-3 text-left"
+                  onClick={() =>
+                    hasExcerpt &&
+                    toggleSource(index)
+                  }
+                  aria-expanded={
+                    hasExcerpt
+                      ? isExpanded
+                      : undefined
+                  }
+                  aria-controls={
+                    hasExcerpt
+                      ? `source-excerpt-${index}`
+                      : undefined
+                  }
+                  disabled={!hasExcerpt}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block break-words text-[13px] font-semibold leading-relaxed text-white md:text-[14px]">
+                      {visibleSources.length > 1
+                        ? `${index + 1}. ${source.documentName}`
+                        : source.documentName}
+                    </span>
+
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] leading-relaxed text-white/70 md:text-[12px]">
+                      {locationLabels.length > 0 && (
+                        <span>
+                          {locationLabels.join(' · ')}
+                        </span>
+                      )}
+
+                      {sourceMatch !== undefined && (
+                        <span className="font-medium text-[#AFC7FF]">
+                          Relevance {sourceMatch}%
+                        </span>
+                      )}
+                    </span>
+                  </span>
+
+                  {hasExcerpt && (
+                    <svg
+                      className={`mt-0.5 h-5 w-5 shrink-0 text-white/75 transition-transform duration-200 ${
+                        isExpanded
+                          ? 'rotate-180'
+                          : ''
+                      }`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  )}
+                </button>
+
+                {hasExcerpt && isExpanded && (
+                  <p
+                    id={`source-excerpt-${index}`}
+                    className="mt-2 whitespace-pre-line text-[12px] italic leading-relaxed text-white/85 md:text-[13px]"
+                  >
+                    “{source.excerpt}”
+                  </p>
+                )}
+              </article>
+            );
+          }
+        )}
+      </div>
+
+      {confidence !== undefined &&
+        confidenceLevel && (
+          <p className="mt-4 text-[12px] font-medium text-white md:text-[13px]">
+            Confidence: {confidenceLevel} ({confidence}%)
+          </p>
+        )}
+    </section>
+  );
+};
+
+
+const GENERAL_THINKING_PHRASES = [
+  'Understanding your question...',
+  'Reviewing the context...',
+  'Preparing the answer...',
+];
+
+const DOCUMENT_THINKING_PHRASES = [
+  'Reading the document...',
+  'Finding the relevant section...',
+  'Preparing the answer...',
+];
+
+const getCommonPrefixLength = (
+  firstText: string,
+  secondText: string
+) => {
+  let prefixLength = 0;
+
+  while (
+    prefixLength < firstText.length &&
+    prefixLength < secondText.length &&
+    firstText[prefixLength] ===
+      secondText[prefixLength]
+  ) {
+    prefixLength += 1;
+  }
+
+  return prefixLength;
+};
+
+const getTypingDelay = (
+  nextCharacter: string,
+  isDeleting: boolean
+) => {
+  if (isDeleting) {
+    return 20 + Math.floor(Math.random() * 18);
+  }
+
+  if (
+    nextCharacter === '.' ||
+    nextCharacter === ','
+  ) {
+    return 120 + Math.floor(Math.random() * 90);
+  }
+
+  return 30 + Math.floor(Math.random() * 36);
+};
+
+const ThinkingIndicator: React.FC<{
+  active: boolean;
+  hasAttachments?: boolean;
+}> = ({
+  active,
+  hasAttachments = false,
+}) => {
+  const phrases = hasAttachments
+    ? DOCUMENT_THINKING_PHRASES
+    : GENERAL_THINKING_PHRASES;
+
+  const [phraseIndex, setPhraseIndex] =
+    useState(0);
+
+  const [visibleText, setVisibleText] =
+    useState('');
+
+  const [isDeleting, setIsDeleting] =
+    useState(false);
+
+  const [isMounted, setIsMounted] =
+    useState(active);
+
+  const [isFadingOut, setIsFadingOut] =
+    useState(false);
+
+  const previousActiveRef =
+    useRef(active);
+
+  useEffect(() => {
+    if (
+      active &&
+      !previousActiveRef.current
+    ) {
+      setPhraseIndex(0);
+      setVisibleText('');
+      setIsDeleting(false);
+    }
+
+    previousActiveRef.current = active;
+  }, [active]);
+
+  useEffect(() => {
+    if (active) {
+      setIsMounted(true);
+      setIsFadingOut(false);
+      return;
+    }
+
+    if (!isMounted) {
+      return;
+    }
+
+    setIsFadingOut(true);
+
+    const hideTimeout = window.setTimeout(
+      () => {
+        setIsMounted(false);
+        setIsFadingOut(false);
+      },
+      220
+    );
+
+    return () => {
+      window.clearTimeout(hideTimeout);
+    };
+  }, [active, isMounted]);
+
+  useEffect(() => {
+    setPhraseIndex(0);
+    setVisibleText('');
+    setIsDeleting(false);
+  }, [hasAttachments]);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    const currentPhrase =
+      phrases[phraseIndex];
+
+    const nextPhraseIndex =
+      (phraseIndex + 1) % phrases.length;
+
+    const nextPhrase =
+      phrases[nextPhraseIndex];
+
+    const retainedPrefixLength =
+      getCommonPrefixLength(
+        currentPhrase,
+        nextPhrase
+      );
+
+    const isTypingComplete =
+      visibleText === currentPhrase;
+
+    const isDeletionComplete =
+      isDeleting &&
+      visibleText.length <=
+        retainedPrefixLength;
+
+    let delay = getTypingDelay(
+      currentPhrase[visibleText.length] ?? '',
+      isDeleting
+    );
+
+    if (!isDeleting && isTypingComplete) {
+      delay = 760 + Math.floor(
+        Math.random() * 420
+      );
+    }
+
+    if (isDeletionComplete) {
+      delay = 120;
+    }
+
+    const animationTimeout =
+      window.setTimeout(() => {
+        if (
+          !isDeleting &&
+          isTypingComplete
+        ) {
+          setIsDeleting(true);
+          return;
+        }
+
+        if (isDeletionComplete) {
+          setPhraseIndex(nextPhraseIndex);
+          setIsDeleting(false);
+          return;
+        }
+
+        setVisibleText((previousText) => {
+          if (isDeleting) {
+            return currentPhrase.slice(
+              0,
+              Math.max(
+                previousText.length - 1,
+                retainedPrefixLength
+              )
+            );
+          }
+
+          return currentPhrase.slice(
+            0,
+            previousText.length + 1
+          );
+        });
+      }, delay);
+
+    return () => {
+      window.clearTimeout(
+        animationTimeout
+      );
+    };
+  }, [
+    active,
+    isDeleting,
+    phraseIndex,
+    phrases,
+    visibleText,
+  ]);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`flex justify-start px-1 md:px-2 transition-all duration-200 ease-out ${
+        isFadingOut
+          ? 'opacity-0 translate-y-1'
+          : 'opacity-100 translate-y-0'
+      }`}
+      aria-live="polite"
+      aria-label="AI is preparing an answer"
+    >
+      <div className="inline-flex min-h-6 max-w-full items-center text-[15px] md:text-[16px] leading-relaxed tracking-[0.005em] text-zinc-500">
+        <span className="block max-w-[86vw] overflow-hidden text-ellipsis whitespace-nowrap md:max-w-[720px]">
+          {visibleText}
+          <span className="ml-1 inline-block h-[1.05em] w-[6px] rounded-[1px] bg-zinc-600/80 align-[-2px] animate-pulse" />
+        </span>
+      </div>
+    </div>
   );
 };
 
@@ -785,74 +1296,73 @@ export const App: React.FC = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="max-w-[95%] sm:max-w-[82%] bg-transparent p-0 rounded-none border-none shadow-none">
-                        <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3">
+                      <div className="w-full max-w-[96%] sm:max-w-[90%] lg:max-w-[92%]">
+                        <div className="flex items-center gap-2 mb-3 md:mb-4 px-1">
                           <img
                             src="/icon-ungu.png"
                             alt="Assistant Logo"
-                            className="h-20 md:h-24 w-auto object-contain"
+                            className="h-16 md:h-20 w-auto object-contain"
                           />
                         </div>
 
-                        <TypewriterMarkdown
-                          content={
-                            message.content
-                          }
-                          animate={
-                            message.shouldAnimate === true
-                          }
-                          onTick={
-                            scrollToBottom
-                          }
-                          onDone={() => {
-                            setMessages(
-                              (previousMessages) =>
-                                previousMessages.map(
-                                  (item) =>
-                                    item.id ===
-                                    message.id
-                                      ? {
-                                          ...item,
-                                          shouldAnimate:
-                                            false,
-                                        }
-                                      : item
-                                )
-                            );
-                          }}
-                        />
+                        <div className="relative px-1 md:px-2">
+                          <TypewriterMarkdown
+                            content={
+                              message.content
+                            }
+                            animate={
+                              message.shouldAnimate === true
+                            }
+                            onTick={
+                              scrollToBottom
+                            }
+                            onDone={() => {
+                              setMessages(
+                                (previousMessages) =>
+                                  previousMessages.map(
+                                    (item) =>
+                                      item.id ===
+                                      message.id
+                                        ? {
+                                            ...item,
+                                            shouldAnimate:
+                                              false,
+                                          }
+                                        : item
+                                  )
+                              );
+                            }}
+                          />
 
-                        <div className="mt-5 md:mt-6 pt-3 md:pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 text-white/70">
-                          <div className="flex items-center gap-2 self-start sm:self-auto min-w-0">
-                            <span className="material-symbols-outlined text-[14px] md:text-[16px] text-white/70">
-                              description
-                            </span>
+                          {message.shouldAnimate !== true &&
+                            (message.sources?.length ?? 0) > 0 &&
+                            (message.confidence ?? 0) > 0 && (
+                              <p className="mt-3 text-[13px] leading-relaxed text-white/70 md:text-sm">
+                                {message.followUpQuestion ? (
+                                  <>
+                                    <span className="font-medium text-white/85">
+                                      {detectedLanguage === 'EN'
+                                        ? 'Related question: '
+                                        : 'Pertanyaan terkait: '}
+                                    </span>
+                                    {message.followUpQuestion}
+                                  </>
+                                ) : detectedLanguage === 'EN' ? (
+                                  'I hope this information helps. Please ask another question related to the available company documents.'
+                                ) : (
+                                  'Semoga informasi ini membantu. Silakan ajukan pertanyaan lain yang berkaitan dengan dokumen perusahaan.'
+                                )}
+                              </p>
+                            )}
 
-                            <span className="text-[10px] md:text-[11px] font-mono truncate max-w-[180px] md:max-w-full">
-                              {
-                                message.source
-                              }
+                          {message.shouldAnimate !==
+                            true && (
+                            <CitationPanel
+                              message={message}
+                            />
+                          )}
 
-                              <span className="text-white/45 ml-1">
-                                • p.{' '}
-                                {message.page ??
-                                  '-'}
-                              </span>
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-5 w-full sm:w-auto">
-                            <span className="text-[10px] md:text-[11px] font-mono text-white/65">
-                              Similarity:{' '}
-
-                              <span className="text-white font-semibold">
-                                {
-                                  message.confidence
-                                }
-                                %
-                              </span>
-                            </span>
-
+                          <div className="mt-3 flex justify-end">
                             <button
                               type="button"
                               onClick={() =>
@@ -860,7 +1370,7 @@ export const App: React.FC = () => {
                                   message.content
                                 )
                               }
-                              className="material-symbols-outlined text-[15px] md:text-[17px] text-white/55 hover:text-white transition-colors"
+                              className="material-symbols-outlined p-0 text-[19px] text-white/60 transition-colors hover:text-white"
                               title="Salin Teks"
                               aria-label="Salin teks"
                             >
@@ -874,13 +1384,17 @@ export const App: React.FC = () => {
                 )
               )}
 
-              {isGenerating && (
-                <div className="flex justify-start animate-fadeIn">
-                  <p className="font-mono text-[11px] md:text-xs text-primary/80 tracking-wider animate-pulse">
-                    Berpikir...
-                  </p>
-                </div>
-              )}
+              <ThinkingIndicator
+                active={isGenerating}
+                hasAttachments={Boolean(
+                  [...messages]
+                    .reverse()
+                    .find(
+                      (message) =>
+                        message.role === 'user'
+                    )?.attachments?.length
+                )}
+              />
             </div>
           )}
         </div>

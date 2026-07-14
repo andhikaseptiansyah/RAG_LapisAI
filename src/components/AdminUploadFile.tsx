@@ -1,109 +1,182 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { useDocuments } from '../hooks/useDocuments';
 import type {
   DocumentType,
-  TrainedDocument,
   UploadItem,
   UploadStatus,
-  VectorStatus,
 } from '../services/documentService';
 
 const maxFileSize = 25 * 1024 * 1024;
 const acceptedExtensions = ['pdf', 'docx', 'txt'];
+const itemsPerPage = 5;
 
+// Only use these three single-color tones for every button state.
+const buttonTone = {
+  cyan: 'border-cyan-400 bg-cyan-400 text-slate-950 hover:border-cyan-300 hover:bg-cyan-300 hover:text-slate-950 focus-visible:ring-cyan-400',
+  yellow: 'border-yellow-400 bg-yellow-400 text-slate-950 hover:border-yellow-300 hover:bg-yellow-300 hover:text-slate-950 focus-visible:ring-yellow-400',
+  pink: 'border-pink-400 bg-pink-400 text-slate-950 hover:border-pink-300 hover:bg-pink-300 hover:text-slate-950 focus-visible:ring-pink-400',
+} as const;
+
+const baseButtonClass =
+  'border font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05070d] disabled:opacity-100 disabled:brightness-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed';
+
+// --- SVG ILLUSTRATIONS ---
+const svgToDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+const metricImages = {
+  documents: svgToDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
+      <defs>
+        <linearGradient id="folder" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+        <linearGradient id="sheet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c4b5fd"/></linearGradient>
+      </defs>
+      <ellipse cx="112" cy="132" rx="72" ry="15" fill="#0f172a" opacity=".22"/>
+      <path d="M42 58c0-8 6-14 14-14h35l14 17h62c8 0 14 6 14 14v43c0 8-6 14-14 14H56c-8 0-14-6-14-14V58z" fill="url(#folder)"/>
+      <rect x="68" y="29" width="83" height="87" rx="12" fill="url(#sheet)" opacity=".92"/>
+      <rect x="84" y="51" width="50" height="7" rx="3.5" fill="#6366f1" opacity=".55"/>
+      <rect x="84" y="69" width="36" height="7" rx="3.5" fill="#06b6d4" opacity=".55"/>
+    </svg>
+  `),
+  chunks: svgToDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
+      <defs>
+        <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+        <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+      </defs>
+      <ellipse cx="110" cy="134" rx="77" ry="13" fill="#0f172a" opacity=".18"/>
+      <rect x="44" y="83" width="42" height="42" rx="10" fill="url(#a)"/>
+      <rect x="90" y="55" width="42" height="70" rx="10" fill="url(#b)"/>
+      <rect x="136" y="30" width="42" height="95" rx="10" fill="#f59e0b"/>
+      <circle cx="67" cy="65" r="16" fill="#fff" opacity=".42"/>
+      <circle cx="113" cy="37" r="16" fill="#fff" opacity=".42"/>
+      <circle cx="159" cy="15" r="16" fill="#fff" opacity=".42"/>
+      <path d="M64 66l49-28 46-22" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+    </svg>
+  `),
+  indexed: svgToDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
+      <defs>
+        <linearGradient id="folder2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86efac"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+        <linearGradient id="sheet2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bfdbfe"/></linearGradient>
+      </defs>
+      <ellipse cx="112" cy="132" rx="72" ry="15" fill="#0f172a" opacity=".22"/>
+      <path d="M42 58c0-8 6-14 14-14h35l14 17h62c8 0 14 6 14 14v43c0 8-6 14-14 14H56c-8 0-14-6-14-14V58z" fill="url(#folder2)"/>
+      <rect x="68" y="29" width="83" height="87" rx="12" fill="url(#sheet2)" opacity=".92"/>
+      <rect x="84" y="51" width="50" height="7" rx="3.5" fill="#10b981" opacity=".55"/>
+      <rect x="84" y="69" width="36" height="7" rx="3.5" fill="#3b82f6" opacity=".55"/>
+      <circle cx="160" cy="45" r="23" fill="#22c55e"/>
+      <path d="M149 45l8 8 15-17" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `),
+  failed: svgToDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160">
+      <defs>
+        <linearGradient id="folderRed" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fca5a5"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
+        <linearGradient id="sheetRed" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#fecdd3"/></linearGradient>
+      </defs>
+      <ellipse cx="112" cy="132" rx="72" ry="15" fill="#0f172a" opacity=".22"/>
+      <path d="M42 58c0-8 6-14 14-14h35l14 17h62c8 0 14 6 14 14v43c0 8-6 14-14 14H56c-8 0-14-6-14-14V58z" fill="url(#folderRed)"/>
+      <rect x="68" y="29" width="83" height="87" rx="12" fill="url(#sheetRed)" opacity=".92"/>
+      <rect x="84" y="51" width="50" height="7" rx="3.5" fill="#e11d48" opacity=".45"/>
+      <rect x="84" y="69" width="36" height="7" rx="3.5" fill="#fb7185" opacity=".45"/>
+      <circle cx="160" cy="45" r="23" fill="#ef4444"/>
+      <path d="M152 37l16 16M168 37l-16 16" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  `),
+};
+
+// --- HELPERS ---
 const getFileExtension = (filename: string) => {
   return filename.split('.').pop()?.toLowerCase() ?? '';
 };
 
+const getDocTypeFromFile = (file: File): DocumentType => {
+  const ext = getFileExtension(file.name);
+  if (ext === 'pdf') return 'PDF';
+  if (ext === 'docx') return 'DOCX';
+  if (ext === 'txt') return 'TXT';
+  return 'Others' as DocumentType;
+};
+
+const formatBytes = (bytes: number): string => {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
 const formatDateTime = (value: string) => {
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleString([], {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString([], { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
 const getDocumentIcon = (type: DocumentType) => {
   switch (type) {
-    case 'PDF':
-      return 'picture_as_pdf';
-    case 'DOCX':
-      return 'article';
-    case 'TXT':
-      return 'text_snippet';
-    default:
-      return 'description';
+    case 'PDF': return 'picture_as_pdf';
+    case 'DOCX': return 'article';
+    case 'TXT': return 'text_snippet';
+    default: return 'description';
   }
 };
 
 const getDocumentIconStyle = (type: DocumentType) => {
   switch (type) {
-    case 'PDF':
-      return 'text-error bg-error/10';
-    case 'DOCX':
-      return 'text-primary bg-primary/10';
-    case 'TXT':
-      return 'text-secondary bg-secondary/10';
-    default:
-      return 'text-outline bg-surface-variant';
+    case 'PDF': return 'text-slate-950 bg-pink-400 border-pink-400';
+    case 'DOCX': return 'text-slate-950 bg-cyan-400 border-cyan-400';
+    case 'TXT': return 'text-slate-950 bg-yellow-400 border-yellow-400';
+    default: return 'text-slate-950 bg-cyan-400 border-cyan-400';
   }
 };
 
-const getUploadStatusStyle = (status: UploadStatus) => {
+const getUploadStatusStyle = (status: UploadStatus | 'Waiting' | 'Indexing') => {
   switch (status) {
     case 'Ready':
-      return 'bg-surface-variant text-on-surface-variant border-outline-variant';
+    case 'Waiting': return 'bg-yellow-400 text-slate-950 border-yellow-400';
     case 'Parsing':
-      return 'bg-primary/10 text-primary border-primary/20';
     case 'Chunking':
-      return 'bg-secondary/10 text-secondary border-secondary/20';
     case 'Embedding':
-      return 'bg-tertiary/10 text-tertiary border-tertiary/20';
-    case 'Indexed':
-      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    case 'Indexing': return 'bg-cyan-400 text-slate-950 border-cyan-400';
+    case 'Indexed': return 'bg-cyan-400 text-slate-950 border-cyan-400';
     case 'Rejected':
-    case 'Failed':
-      return 'bg-error-container/20 text-error border-error/30';
-    default:
-      return 'bg-surface-variant text-on-surface-variant border-outline-variant';
+    case 'Failed': return 'bg-pink-400 text-slate-950 border-pink-400';
+    default: return 'bg-cyan-400 text-slate-950 border-cyan-400';
   }
 };
 
-const getVectorStatusStyle = (status: VectorStatus) => {
-  switch (status) {
-    case 'Active':
-      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-    case 'Removed':
-      return 'bg-error-container/20 text-error border-error/30';
-    case 'Pending':
-    default:
-      return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-  }
+const getPaginationNumbers = (totalPages: number, currentPage: number) => {
+  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, index) => index + 1);
+  if (currentPage <= 3) return [1, 2, 3, 4, 5];
+  if (currentPage >= totalPages - 2) return [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  return [currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2];
 };
 
-const isProcessable = (item: UploadItem) => {
-  return item.status === 'Ready' || item.status === 'Failed';
+const paginateItems = <T,>(items: T[], page: number) => {
+  const start = (page - 1) * itemsPerPage;
+  return items.slice(start, start + itemsPerPage);
 };
 
 export const AdminUploadFile: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+  
+  // STATE: Penampung lokal untuk file sebelum dikirim
+  const [stagedFiles, setStagedFiles] = useState<File[]>([]);
+  
+  const [repositoryPage, setRepositoryPage] = useState(1);
+  const [queuePage, setQueuePage] = useState(1);
+  
+  const [locallyMovedIds, setLocallyMovedIds] = useState<Set<string>>(new Set());
+  const [forcedWaitingIds, setForcedWaitingIds] = useState<Set<string>>(new Set());
+  
+  const pendingUploadNamesRef = useRef<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     uploadItems,
-    trainedDocuments,
     isLoading,
     isUploading,
     isIndexing,
@@ -111,360 +184,480 @@ export const AdminUploadFile: React.FC = () => {
     clearError,
     uploadFiles,
     startIndexing,
-    reindex,
     removeDocument,
     refreshAll,
-  } = useDocuments({ initialLimit: 8 });
+  } = useDocuments({ initialLimit: 1000 });
 
-  const totalFiles = uploadItems.length;
-  const indexedFiles = uploadItems.filter((item) => item.status === 'Indexed').length;
-  const processingFiles = uploadItems.filter((item) =>
-    ['Parsing', 'Chunking', 'Embedding'].includes(item.status)
-  ).length;
-  const failedFiles = uploadItems.filter((item) => ['Failed', 'Rejected'].includes(item.status)).length;
-  const activeTrainedDocuments = trainedDocuments.filter((document) => document.vectorStatus === 'Active');
+  // Filter 1: File dari database yang statusnya Ready/Waiting
+  const dbWaitingItems = useMemo(() => {
+    return uploadItems.filter((item) => {
+      if (locallyMovedIds.has(item.id)) return false;
+      return item.status === 'Ready' || forcedWaitingIds.has(item.id);
+    });
+  }, [forcedWaitingIds, locallyMovedIds, uploadItems]);
+
+  // Filter 2: Gabungan file lokal (staged) + file dari database (Dengan perbaikan TS)
+  const waitingRepositoryItems = useMemo(() => {
+    const stagedAsItems = stagedFiles.map((file, index) => ({
+      id: `staged-${index}-${file.name}`,
+      filename: file.name,
+      type: getDocTypeFromFile(file),
+      size: formatBytes(file.size),
+      uploadedAt: new Date().toISOString(),
+      status: 'Waiting' as any, // Perbaikan TS agar tipe status diterima
+      progress: 0,
+      chunks: 0,
+      note: 'Waiting in local repository.',
+    } as UploadItem));
+
+    return [...stagedAsItems, ...dbWaitingItems];
+  }, [stagedFiles, dbWaitingItems]);
+
+  // Antrean pipeline dari database
+  const uploadQueueItems = useMemo(() => {
+    return uploadItems.filter((item) => {
+      if (locallyMovedIds.has(item.id)) return true;
+      if (forcedWaitingIds.has(item.id)) return false;
+      return item.status !== 'Ready';
+    });
+  }, [forcedWaitingIds, locallyMovedIds, uploadItems]);
+
+  const totalRepositoryPages = Math.max(1, Math.ceil(waitingRepositoryItems.length / itemsPerPage));
+  const totalQueuePages = Math.max(1, Math.ceil(uploadQueueItems.length / itemsPerPage));
+
+  const repositoryPageItems = useMemo(() => paginateItems(waitingRepositoryItems, repositoryPage), [repositoryPage, waitingRepositoryItems]);
+  const queuePageItems = useMemo(() => paginateItems(uploadQueueItems, queuePage), [queuePage, uploadQueueItems]);
+
+  const totalFiles = waitingRepositoryItems.length + uploadQueueItems.length;
+  const waitingFiles = waitingRepositoryItems.length;
+  const pipelineFiles = uploadQueueItems.length;
+  const indexedFiles = uploadQueueItems.filter((item) => item.status === 'Indexed').length;
+  const failedFiles = uploadQueueItems.filter((item) => ['Failed', 'Rejected'].includes(item.status)).length;
+
+  useEffect(() => { setRepositoryPage((current) => Math.min(current, totalRepositoryPages)); }, [totalRepositoryPages]);
+  useEffect(() => { setQueuePage((current) => Math.min(current, totalQueuePages)); }, [totalQueuePages]);
+
+  useEffect(() => {
+    setLocallyMovedIds((current) => {
+      if (current.size === 0) return current;
+      const next = new Set(current);
+      uploadItems.forEach((item) => { if (item.status !== 'Ready') next.delete(item.id); });
+      return next.size === current.size ? current : next;
+    });
+  }, [uploadItems]);
+
+  useEffect(() => {
+    const pendingNames = pendingUploadNamesRef.current;
+    if (pendingNames.length === 0 || uploadItems.length === 0) return;
+
+    const remainingNames = [...pendingNames];
+    const matchedIds: string[] = [];
+
+    const newestFirst = [...uploadItems].sort((a, b) => {
+      const timeA = new Date(a.uploadedAt).getTime();
+      const timeB = new Date(b.uploadedAt).getTime();
+      return (Number.isNaN(timeB) ? 0 : timeB) - (Number.isNaN(timeA) ? 0 : timeA);
+    });
+
+    newestFirst.forEach((item) => {
+      const index = remainingNames.findIndex((name) => name === item.filename);
+      if (index >= 0) {
+        matchedIds.push(item.id);
+        remainingNames.splice(index, 1);
+      }
+    });
+
+    if (matchedIds.length === 0) return;
+
+    setForcedWaitingIds((current) => {
+      const next = new Set(current);
+      matchedIds.forEach((id) => next.add(id));
+      return next;
+    });
+
+    pendingUploadNamesRef.current = remainingNames;
+    setRepositoryPage(1);
+  }, [uploadItems]);
 
   const validateFiles = (files: File[]) => {
     const accepted: File[] = [];
     const rejected: string[] = [];
-
     for (const file of files) {
       const extension = getFileExtension(file.name);
-
-      if (!acceptedExtensions.includes(extension)) {
-        rejected.push(`${file.name}: hanya PDF, DOCX, dan TXT yang didukung.`);
-        continue;
-      }
-
-      if (file.size > maxFileSize) {
-        rejected.push(`${file.name}: ukuran maksimal 25 MB.`);
-        continue;
-      }
-
+      if (!acceptedExtensions.includes(extension)) { rejected.push(`${file.name}: only PDF, DOCX, TXT supported.`); continue; }
+      if (file.size > maxFileSize) { rejected.push(`${file.name}: max file size 25 MB.`); continue; }
       accepted.push(file);
     }
-
     return { accepted, rejected };
   };
 
-  const handleFiles = async (files: File[]) => {
+  const handleFiles = (files: File[]) => {
     if (files.length === 0) return;
-
     const { accepted, rejected } = validateFiles(files);
-
+    
     if (rejected.length > 0) {
       setWarningMessage(rejected.join(' '));
       window.setTimeout(() => setWarningMessage(''), 6000);
     }
-
-    if (accepted.length === 0) return;
-
-    const success = await uploadFiles(accepted);
-
-    if (success) {
-      await refreshAll();
+    
+    if (accepted.length > 0) {
+      setStagedFiles((prev) => [...prev, ...accepted]);
+      setRepositoryPage(1);
     }
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await handleFiles(Array.from(event.target.files ?? []));
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleFiles(Array.from(event.target.files ?? []));
     event.target.value = '';
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => { event.preventDefault(); setIsDragOver(true); };
+  const handleDragLeave = () => { setIsDragOver(false); };
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragOver(false);
-    await handleFiles(Array.from(event.dataTransfer.files));
+    handleFiles(Array.from(event.dataTransfer.files));
   };
 
   const handleStartAllIndexing = async () => {
-    const documentIds = uploadItems
-      .filter(isProcessable)
-      .map((item) => item.id);
+    const documentIds = dbWaitingItems.map((item) => item.id);
+    if (stagedFiles.length === 0 && documentIds.length === 0) return;
 
-    const success = await startIndexing(documentIds.length > 0 ? documentIds : undefined);
+    let shouldRefresh = false;
 
-    if (success) {
+    if (stagedFiles.length > 0) {
+      const uploadedNames = stagedFiles.map(f => f.name);
+      const success = await uploadFiles(stagedFiles);
+      if (success) {
+        pendingUploadNamesRef.current = [...pendingUploadNamesRef.current, ...uploadedNames];
+        setStagedFiles([]); 
+        shouldRefresh = true;
+      }
+    }
+
+    if (documentIds.length > 0) {
+      setForcedWaitingIds((current) => { const next = new Set(current); documentIds.forEach((id) => next.delete(id)); return next; });
+      setLocallyMovedIds((current) => { const next = new Set(current); documentIds.forEach((id) => next.add(id)); return next; });
+      setQueuePage(1);
+
+      const success = await startIndexing(documentIds);
+      if (success) {
+        shouldRefresh = true;
+      } else {
+        setLocallyMovedIds((current) => { const next = new Set(current); documentIds.forEach((id) => next.delete(id)); return next; });
+        setForcedWaitingIds((current) => { const next = new Set(current); documentIds.forEach((id) => next.add(id)); return next; });
+      }
+    }
+
+    if (shouldRefresh) {
       await refreshAll();
     }
   };
 
-  const handleStartOneIndexing = async (id: string) => {
+  const handleRetryIndexing = async (id: string) => {
+    setLocallyMovedIds((current) => { const next = new Set(current); next.add(id); return next; });
     const success = await startIndexing([id]);
-
-    if (success) {
-      await refreshAll();
-    }
-  };
-
-  const handleReindex = async (id: string) => {
-    const success = await reindex(id);
-
-    if (success) {
-      await refreshAll();
-    }
+    if (success) { await refreshAll(); } else { setLocallyMovedIds((current) => { const next = new Set(current); next.delete(id); return next; }); }
   };
 
   const handleRemove = async (id: string) => {
-    if (!window.confirm('Hapus dokumen ini dari database dan admin panel?')) return;
+    if (id.startsWith('staged-')) {
+      const index = parseInt(id.split('-')[1], 10);
+      setStagedFiles((prev) => prev.filter((_, i) => i !== index));
+      return;
+    }
 
+    if (!window.confirm('Remove this document from the database and admin panel?')) return;
     const success = await removeDocument(id);
-
     if (success) {
+      setLocallyMovedIds((current) => { const next = new Set(current); next.delete(id); return next; });
+      setForcedWaitingIds((current) => { const next = new Set(current); next.delete(id); return next; });
       await refreshAll();
     }
   };
 
-  const renderUploadRow = (item: UploadItem) => (
-    <tr key={item.id} className="border-b border-outline-variant/40 last:border-b-0">
-      <td className="py-4 pr-4 min-w-[260px]">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getDocumentIconStyle(item.type)}`}>
-            <span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-on-surface line-clamp-1">{item.filename}</p>
-            <p className="text-xs text-outline font-mono">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
-          </div>
-        </div>
-      </td>
-      <td className="py-4 px-4">
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(item.status)}`}>
-          {item.status}
-        </span>
-      </td>
-      <td className="py-4 px-4 min-w-[180px]">
-        <div className="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-          <div className="h-full bg-primary transition-all" style={{ width: `${item.progress}%` }} />
-        </div>
-        <p className="text-[10px] text-outline font-mono mt-1">{item.progress}% · {item.chunks} chunks</p>
-      </td>
-      <td className="py-4 px-4 text-xs text-on-surface-variant min-w-[260px]">{item.note}</td>
-      <td className="py-4 pl-4">
-        <div className="flex items-center justify-end gap-2">
-          {item.status === 'Indexed' ? (
-            <button
-              type="button"
-              onClick={() => void handleReindex(item.id)}
-              disabled={isIndexing}
-              className="px-3 py-1.5 rounded-lg border border-outline-variant text-xs text-on-surface-variant hover:text-primary hover:border-primary/50 disabled:opacity-50 transition-colors"
-            >
-              Re-index
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => void handleStartOneIndexing(item.id)}
-              disabled={isIndexing || item.status === 'Rejected'}
-              className="px-3 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold disabled:opacity-50 transition-colors"
-            >
-              Index
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => void handleRemove(item.id)}
-            className="w-8 h-8 rounded-lg border border-outline-variant text-outline hover:text-error hover:border-error/50 transition-colors flex items-center justify-center"
-            aria-label={`Hapus ${item.filename}`}
-          >
-            <span className="material-symbols-outlined text-[18px]">delete</span>
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
+  const renderPagination = (totalItems: number, totalPages: number, page: number, setPage: React.Dispatch<React.SetStateAction<number>>) => {
+    if (totalItems <= itemsPerPage) return null;
+    const pageNumbers = getPaginationNumbers(totalPages, page);
 
-  const renderTrainedDocument = (document: TrainedDocument) => (
-    <div key={document.id} className="p-4 rounded-xl border border-outline-variant/60 bg-[#0b0d13] flex items-start justify-between gap-4">
-      <div className="flex items-start gap-3 min-w-0">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${getDocumentIconStyle(document.type)}`}>
-          <span className="material-symbols-outlined text-[22px]">{getDocumentIcon(document.type)}</span>
-        </div>
+    return (
+      <div className="flex flex-wrap items-center justify-end gap-1.5 pt-4 text-xs">
+        <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>Prev</button>
+        {pageNumbers[0] > 1 && (<><button type="button" onClick={() => setPage(1)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>1</button><span className="px-1 text-slate-600">...</span></>)}
+        {pageNumbers.map((pageNumber) => (
+          <button key={pageNumber} type="button" onClick={() => setPage(pageNumber)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${page === pageNumber ? buttonTone.yellow : buttonTone.cyan}`}>{pageNumber}</button>
+        ))}
+        {pageNumbers[pageNumbers.length - 1] < totalPages && (<><span className="px-1 text-slate-600">...</span><button type="button" onClick={() => setPage(totalPages)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>{totalPages}</button></>)}
+        <button type="button" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>Next</button>
+      </div>
+    );
+  };
+
+  const renderRepositoryItem = (item: UploadItem) => (
+    <div key={item.id} className="grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-3 md:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-on-surface truncate">{document.filename}</p>
-          <p className="text-xs text-outline font-mono mt-1">{document.size} · {document.chunks} chunks · {formatDateTime(document.indexedAt)}</p>
+          <p className="text-sm font-semibold text-slate-100 truncate">{item.filename}</p>
+          <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
         </div>
       </div>
-      <span className={`shrink-0 inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getVectorStatusStyle(document.vectorStatus)}`}>
-        {document.vectorStatus}
-      </span>
+      <div className="md:text-left"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle('Waiting')}`}>Waiting</span></div>
+      <p className="text-xs text-slate-500 line-clamp-2">{item.note || 'Waiting for batch indexing.'}</p>
+      <div className="flex md:justify-end">
+        <button type="button" onClick={() => void handleRemove(item.id)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+      </div>
     </div>
   );
 
+  const renderQueueItem = (item: UploadItem) => {
+    const wasMovedLocally = locallyMovedIds.has(item.id) && item.status === 'Ready';
+    const visibleStatus = wasMovedLocally ? 'Indexing' : item.status;
+    const progress = wasMovedLocally ? Math.max(item.progress, 5) : item.progress;
+
+    return (
+      <div key={item.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-3 lg:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-100 truncate">{item.filename}</p>
+            <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
+          </div>
+        </div>
+        <div><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(visibleStatus)}`}>{visibleStatus}</span></div>
+        <div className="min-w-0">
+          <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden"><div className="h-full bg-cyan-400 transition-all" style={{ width: `${progress}%` }} /></div>
+          <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{progress}% · {item.chunks} chunks</p>
+        </div>
+        <p className="text-xs text-slate-500 line-clamp-2">{wasMovedLocally ? 'Moved to indexing queue.' : item.note}</p>
+        <div className="flex lg:justify-end gap-2">
+          {item.status === 'Failed' && (<button type="button" onClick={() => void handleRetryIndexing(item.id)} disabled={isIndexing} className={`h-8 px-3 rounded-lg text-[11px] ${baseButtonClass} ${buttonTone.yellow}`}>Retry</button>)}
+          <button type="button" onClick={() => void handleRemove(item.id)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+        </div>
+      </div>
+    );
+  };
+
+  const summaryCards = [
+    {
+      label: 'Total Files',
+      value: totalFiles,
+      icon: 'folder_open',
+      image: metricImages.documents,
+      gradient: 'from-cyan-300 via-teal-300 to-cyan-500',
+    },
+    {
+      label: 'Waiting',
+      value: waitingFiles,
+      icon: 'hourglass_top',
+      image: metricImages.chunks,
+      gradient: 'from-amber-200 via-yellow-300 to-orange-400',
+    },
+    {
+      label: 'Indexed',
+      value: indexedFiles,
+      icon: 'task_alt',
+      image: metricImages.indexed,
+      gradient: 'from-emerald-300 via-green-300 to-emerald-500',
+    },
+    {
+      label: 'Failed',
+      value: failedFiles,
+      icon: 'report',
+      image: metricImages.failed,
+      gradient: 'from-rose-300 via-pink-300 to-rose-500',
+    },
+  ];
+
   return (
-    <div className="bg-background text-on-surface font-body overflow-hidden flex h-screen w-full relative">
+    <div className="bg-[#05070d] text-white font-body overflow-hidden flex h-screen w-full relative">
+      <style>{`
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      `}</style>
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 flex flex-col h-full relative min-w-0">
+      <main className="flex-1 flex flex-col h-full relative min-w-0 bg-[#05070d] overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(34,211,238,0.06),transparent_40%),radial-gradient(ellipse_at_bottom_right,rgba(168,85,247,0.06),transparent_40%)] pointer-events-none" />
         <AdminHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <p className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-outline mb-2">
-                Python RAG Pipeline
-              </p>
-              <h1 className="font-headline text-2xl md:text-3xl font-bold text-on-surface">
-                Upload & Index Knowledge Base
-              </h1>
-              <p className="text-on-surface-variant text-sm md:text-base mt-2 max-w-3xl">
-                Upload dokumen ke database admin, lalu jalankan pipeline Python untuk parsing, chunking, embedding, dan simpan vector ke ChromaDB.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => void refreshAll()}
-                disabled={isLoading}
-                className="px-4 py-2.5 rounded-xl border border-outline-variant text-sm text-on-surface-variant hover:text-primary hover:border-primary/50 disabled:opacity-50 transition-colors"
-              >
-                Refresh
-              </button>
-              <button
-                type="button"
-                onClick={handleStartAllIndexing}
-                disabled={isIndexing || uploadItems.length === 0}
-                className="px-4 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold disabled:opacity-50 transition-colors"
-              >
-                {isIndexing ? 'Indexing...' : 'Start Python Indexing'}
-              </button>
-            </div>
-          </div>
-
-          {(warningMessage || error) && (
-            <div className="mb-6 p-4 rounded-xl border border-error/30 bg-error-container/20 text-error text-sm flex items-start justify-between gap-4">
-              <span>{warningMessage || error}</span>
-              {error && (
-                <button type="button" onClick={clearError} className="text-xs underline">
-                  Tutup
-                </button>
-              )}
-            </div>
-          )}
-
-          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {[
-              { label: 'Total Upload', value: totalFiles, icon: 'folder_open' },
-              { label: 'Indexed', value: indexedFiles, icon: 'check_circle' },
-              { label: 'Processing', value: processingFiles, icon: 'sync' },
-              { label: 'Failed', value: failedFiles, icon: 'error' },
-            ].map((card) => (
-              <div key={card.label} className="bg-surface-container-low border border-outline-variant rounded-2xl p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs text-outline font-mono uppercase tracking-wider">{card.label}</p>
-                  <span className="material-symbols-outlined text-primary text-[22px]">{card.icon}</span>
-                </div>
-                <p className="text-2xl font-headline font-bold mt-3">{card.value}</p>
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-12 relative z-10">
+          <div className="max-w-[1720px] mx-auto w-full">
+            
+            <div className="shrink-0 flex flex-col md:flex-row md:items-center justify-between mb-4 animate-fade-in-up gap-4">
+              <div>
+                <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.28em] text-slate-500 mb-1">
+                  Python RAG Pipeline
+                </p>
+                <h1 className="font-headline text-2xl md:text-3xl font-bold tracking-tight text-white">
+                  Upload & Index <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">Knowledge Base</span>
+                </h1>
+                <p className="text-slate-400 text-xs md:text-sm mt-1.5 max-w-2xl">
+                  Upload files first. They will wait in the Trained Repository until you run batch indexing.
+                </p>
               </div>
-            ))}
-          </section>
+              <div className="flex items-center gap-2">
+                {isUploading && <span className="text-xs text-cyan-300 font-mono animate-pulse mr-2">Uploading...</span>}
+                {isIndexing && <span className="text-xs text-violet-300 font-mono animate-pulse mr-2">Indexing...</span>}
+              </div>
+            </div>
 
-          <section className="grid grid-cols-1 xl:grid-cols-[1.3fr_0.7fr] gap-6">
-            <div className="space-y-6">
+            {(warningMessage || error) && (
+              <div className="mb-6 p-4 rounded-xl border border-rose-400/30 bg-rose-500/10 text-rose-200 text-sm flex items-start justify-between gap-4">
+                <span>{warningMessage || error}</span>
+                {error && (
+                  <button type="button" onClick={clearError} className={`h-8 px-3 rounded-lg text-xs ${baseButtonClass} ${buttonTone.pink}`}>
+                    Close
+                  </button>
+                )}
+              </div>
+            )}
+
+            <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 shrink-0 mb-6">
+              {summaryCards.map((card, index) => (
+                <div
+                  key={card.label}
+                  className={`animate-fade-in-up relative overflow-hidden rounded-[1.2rem] bg-gradient-to-br ${card.gradient} p-4 min-h-[110px] text-slate-950 shadow-[0_15px_40px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-transform`}
+                  style={{ animationDelay: `${0.1 + (index * 0.1)}s` }}
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.55),transparent_35%)]" />
+                  <div className="absolute -right-2 bottom-0 w-24 opacity-95 pointer-events-none">
+                    <img src={card.image} alt="" className="w-full h-auto" />
+                  </div>
+                  <div className="relative z-10 pr-16">
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[14px]">{card.icon}</span>
+                      <p className="text-xs font-semibold">{card.label}</p>
+                    </div>
+                    <p className="text-2xl font-headline font-black mt-2 tracking-tight">{card.value}</p>
+                  </div>
+                </div>
+              ))}
+            </section>
+
+            <section className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8 items-stretch">
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                onDrop={(event) => void handleDrop(event)}
-                className={`border-2 border-dashed rounded-3xl p-8 md:p-10 bg-surface-container-low transition-all ${
-                  isDragOver ? 'border-primary bg-primary/5' : 'border-outline-variant'
+                onDrop={handleDrop}
+                className={`min-h-[360px] flex flex-col justify-center border border-dashed rounded-[1.2rem] p-6 md:p-8 bg-transparent transition-all animate-fade-in-up ${
+                  isDragOver
+                    ? 'border-cyan-400/60 bg-cyan-500/5 shadow-[0_0_35px_rgba(34,211,238,0.12)]'
+                    : 'border-white/10 hover:border-cyan-400/25'
                 }`}
+                style={{ animationDelay: '0.4s' }}
               >
                 <input
                   ref={fileInputRef}
                   type="file"
                   multiple
                   accept=".pdf,.docx,.txt"
-                  onChange={(event) => void handleFileChange(event)}
+                  onChange={handleFileChange}
                   className="hidden"
                 />
 
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-2xl bg-cyan-400 text-slate-950 border border-cyan-300 flex items-center justify-center mb-4 shadow-[0_10px_30px_rgba(34,211,238,0.22)]">
                     <span className="material-symbols-outlined text-[34px]">cloud_upload</span>
                   </div>
-                  <h2 className="font-headline text-xl font-bold text-on-surface mb-2">
-                    Drop PDF, DOCX, atau TXT di sini
+                  <h2 className="font-headline text-xl font-bold text-white mb-2">
+                    Upload Files
                   </h2>
-                  <p className="text-sm text-on-surface-variant max-w-xl mb-5">
-                    File disimpan dulu ke database lewat backend. Setelah itu klik tombol indexing supaya Python service menjalankan pipeline RAG.
+                  <p className="text-sm text-slate-400 max-w-xl mb-5">
+                    Add PDF, DOCX, or TXT files. Uploaded files will stay in the waiting repository and will not be indexed automatically.
                   </p>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold disabled:opacity-50 transition-colors"
+                    className={`px-5 py-2.5 rounded-xl text-sm ${baseButtonClass} ${buttonTone.cyan}`}
                   >
                     {isUploading ? 'Uploading...' : 'Choose Files'}
                   </button>
                 </div>
               </div>
 
-              <div className="bg-surface-container-low border border-outline-variant rounded-2xl overflow-hidden">
-                <div className="p-4 md:p-5 border-b border-outline-variant flex items-center justify-between gap-3">
+              <div className="min-h-[360px] flex flex-col bg-transparent border border-white/10 rounded-[1.2rem] p-5 md:p-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/5">
                   <div>
-                    <h2 className="font-headline text-lg font-bold">Upload Queue dari Database</h2>
-                    <p className="text-xs text-outline mt-1">Data ini diambil dari tabel documents, bukan dummy state.</p>
+                    <h2 className="font-headline text-lg font-bold text-slate-100">Trained Repository</h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Waiting files before batch indexing.
+                    </p>
                   </div>
-                  {isLoading && <span className="text-xs text-outline font-mono">Loading...</span>}
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
+                      {waitingRepositoryItems.length} waiting files
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleStartAllIndexing()}
+                      disabled={isIndexing || waitingRepositoryItems.length === 0}
+                      className={`px-4 py-2 rounded-xl text-sm ${baseButtonClass} ${buttonTone.yellow}`}
+                    >
+                      {isIndexing ? 'Indexing...' : 'Index All'}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead className="bg-[#0b0d13] text-outline text-[10px] uppercase tracking-wider font-mono">
-                      <tr>
-                        <th className="py-3 px-4">Document</th>
-                        <th className="py-3 px-4">Status</th>
-                        <th className="py-3 px-4">Progress</th>
-                        <th className="py-3 px-4">Pipeline Note</th>
-                        <th className="py-3 px-4 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {uploadItems.length > 0 ? (
-                        uploadItems.map(renderUploadRow)
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-10 text-center text-sm text-outline">
-                            Belum ada dokumen. Upload dulu, baru jalankan Python indexing.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                <div className="hidden md:grid grid-cols-[minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+                  <span>Document</span>
+                  <span>Status</span>
+                  <span>Repository Note</span>
+                  <span className="text-right">Action</span>
                 </div>
+
+                <div className="flex-1 min-h-0">
+                  {repositoryPageItems.length > 0 ? (
+                    repositoryPageItems.map(renderRepositoryItem)
+                  ) : (
+                    <div className="h-full min-h-[190px] flex items-center justify-center text-center text-sm text-slate-500 px-6">
+                      No waiting files yet. Upload files first, then they will appear here before indexing.
+                    </div>
+                  )}
+                </div>
+
+                {renderPagination(waitingRepositoryItems.length, totalRepositoryPages, repositoryPage, setRepositoryPage)}
               </div>
-            </div>
+            </section>
 
-            <aside className="bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-5 h-fit">
-              <div className="flex items-center justify-between gap-3 mb-4">
+            <section className="bg-transparent border border-white/10 rounded-[1.2rem] p-5 md:p-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-white/5">
                 <div>
-                  <h2 className="font-headline text-lg font-bold">Trained Repository</h2>
-                  <p className="text-xs text-outline mt-1">{activeTrainedDocuments.length} dokumen aktif di vector store.</p>
+                  <h2 className="font-headline text-lg font-bold text-slate-100">Upload Queue from Database</h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Files move here only after you click Index All. Indexed means the pipeline has finished.
+                  </p>
                 </div>
-                <span className="material-symbols-outlined text-primary">database</span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center rounded-full border border-cyan-400 bg-cyan-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
+                    {pipelineFiles} pipeline files
+                  </span>
+                  {isLoading && <span className="text-xs text-cyan-300 font-mono animate-pulse">Loading...</span>}
+                </div>
               </div>
 
-              <div className="space-y-3 max-h-[620px] overflow-y-auto custom-scrollbar pr-1">
-                {trainedDocuments.length > 0 ? (
-                  trainedDocuments.map(renderTrainedDocument)
+              <div className="hidden lg:grid grid-cols-[minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+                <span>Document</span>
+                <span>Status</span>
+                <span>Progress</span>
+                <span>Pipeline Note</span>
+                <span className="text-right">Action</span>
+              </div>
+
+              <div>
+                {queuePageItems.length > 0 ? (
+                  queuePageItems.map(renderQueueItem)
                 ) : (
-                  <div className="p-6 rounded-xl border border-outline-variant/60 text-center text-sm text-outline">
-                    Belum ada dokumen yang selesai di-index.
+                  <div className="min-h-[170px] flex items-center justify-center text-center text-sm text-slate-500 px-6">
+                    No pipeline files yet. Start batch indexing from the Trained Repository.
                   </div>
                 )}
               </div>
-            </aside>
-          </section>
+
+              {renderPagination(uploadQueueItems.length, totalQueuePages, queuePage, setQueuePage)}
+            </section>
+          </div>
         </div>
       </main>
     </div>

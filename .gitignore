@@ -1,5 +1,11 @@
-node_modules
-dist
+node_modules/
+dist/
 .env
 .env.local
 .DS_Store
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/chroma_db/*
+!backend/chroma_db/.gitkeep

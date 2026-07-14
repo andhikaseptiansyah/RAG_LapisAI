@@ -15,6 +15,32 @@ export interface SendChatPayload {
   attachments?: AttachedFile[];
 }
 
+type RawMessageSource = {
+  document_name?: unknown;
+  documentName?: unknown;
+  document_type?: unknown;
+  documentType?: unknown;
+  page?: unknown;
+  page_is_reliable?: unknown;
+  pageIsReliable?: unknown;
+  score?: unknown;
+  relevanceScore?: unknown;
+  relevance_score?: unknown;
+  excerpt?: unknown;
+  evidence_text?: unknown;
+  evidenceText?: unknown;
+  chapter?: unknown;
+  section?: unknown;
+  paragraph_start?: unknown;
+  paragraphStart?: unknown;
+  paragraph_end?: unknown;
+  paragraphEnd?: unknown;
+  line_start?: unknown;
+  lineStart?: unknown;
+  line_end?: unknown;
+  lineEnd?: unknown;
+};
+
 export interface ChatApiResponse {
   conversationId: string;
   messageId: string;
@@ -22,7 +48,11 @@ export interface ChatApiResponse {
   confidence?: number;
   source?: string;
   page?: string | number;
-  sources?: MessageSource[];
+  sources?: RawMessageSource[];
+  follow_up_question?: string | null;
+  followUpQuestion?: string | null;
+  response_time_ms?: number;
+  responseTimeMs?: number;
   createdAt?: string;
   language?: ChatLanguage;
 }
@@ -187,30 +217,248 @@ export const deleteConversation =
     );
   };
 
+const toFiniteNumber = (
+  value: unknown
+): number | undefined => {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value)
+  ) {
+    return undefined;
+  }
+
+  return value;
+};
+
+const toOptionalText = (
+  value: unknown
+): string | undefined => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  return normalized || undefined;
+};
+
+const toOptionalLocation = (
+  value: unknown
+): string | number | undefined => {
+  if (
+    typeof value === 'number' &&
+    Number.isFinite(value)
+  ) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim();
+
+    if (
+      normalized &&
+      normalized !== '-' &&
+      normalized.toLowerCase() !== 'none'
+    ) {
+      return normalized;
+    }
+  }
+
+  return undefined;
+};
+
+const normalizeScore = (
+  value: unknown
+): number | undefined => {
+  const numericValue = toFiniteNumber(value);
+
+  if (numericValue === undefined) {
+    return undefined;
+  }
+
+  const normalized =
+    numericValue > 1
+      ? numericValue / 100
+      : numericValue;
+
+  return Math.max(
+    0,
+    Math.min(1, normalized)
+  );
+};
+
+export const normalizeMessageSources = (
+  value: unknown
+): MessageSource[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const uniqueSources =
+    new Map<string, MessageSource>();
+
+  value.forEach((rawValue) => {
+    if (
+      typeof rawValue !== 'object' ||
+      rawValue === null
+    ) {
+      return;
+    }
+
+    const raw =
+      rawValue as RawMessageSource;
+
+    const documentName =
+      toOptionalText(raw.document_name) ??
+      toOptionalText(raw.documentName);
+
+    if (!documentName) {
+      return;
+    }
+
+    const documentType = (
+      toOptionalText(
+        raw.document_type ??
+        raw.documentType
+      ) ??
+      documentName.split('.').pop() ??
+      ''
+    ).toLowerCase();
+
+    const legacyLineStart = toFiniteNumber(
+      raw.line_start ?? raw.lineStart
+    );
+    const legacyLineEnd = toFiniteNumber(
+      raw.line_end ?? raw.lineEnd
+    );
+    const paragraphStart =
+      toFiniteNumber(
+        raw.paragraph_start ??
+        raw.paragraphStart
+      ) ??
+      (documentType === 'txt'
+        ? legacyLineStart
+        : undefined);
+    const paragraphEnd =
+      toFiniteNumber(
+        raw.paragraph_end ??
+        raw.paragraphEnd
+      ) ??
+      (documentType === 'txt'
+        ? legacyLineEnd
+        : undefined);
+
+    const rawPageReliability =
+      raw.page_is_reliable ??
+      raw.pageIsReliable;
+    const pageIsReliable =
+      typeof rawPageReliability === 'boolean'
+        ? rawPageReliability
+        : documentType === 'pdf';
+
+    const source: MessageSource = {
+      documentName,
+      documentType,
+      page:
+        documentType === 'txt' ||
+        (documentType === 'docx' &&
+          !pageIsReliable)
+          ? undefined
+          : toOptionalLocation(raw.page),
+      pageIsReliable,
+      relevanceScore: normalizeScore(
+        raw.relevance_score ??
+        raw.score ??
+        raw.relevanceScore
+      ),
+      excerpt: toOptionalText(
+        raw.excerpt ??
+        raw.evidence_text ??
+        raw.evidenceText
+      ),
+      chapter: toOptionalText(raw.chapter),
+      section: toOptionalText(raw.section),
+      paragraphStart,
+      paragraphEnd,
+      lineStart: legacyLineStart,
+      lineEnd: legacyLineEnd,
+    };
+
+    const dedupeKey = [
+      source.documentName.toLowerCase(),
+      String(source.documentType ?? ''),
+      String(source.page ?? ''),
+      String(source.chapter ?? source.section ?? ''),
+      String(source.paragraphStart ?? ''),
+      String(source.lineStart ?? ''),
+    ].join('|');
+
+    const existing =
+      uniqueSources.get(dedupeKey);
+
+    if (
+      !existing ||
+      (source.relevanceScore ?? 0) >
+        (existing.relevanceScore ?? 0)
+    ) {
+      uniqueSources.set(
+        dedupeKey,
+        source
+      );
+    }
+  });
+
+  return Array.from(
+    uniqueSources.values()
+  ).sort(
+    (first, second) =>
+      (second.relevanceScore ?? 0) -
+      (first.relevanceScore ?? 0)
+  );
+};
 
 const toDisplayConfidence = (
   value?: number | null
 ): number | undefined => {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value)
+  ) {
     return undefined;
   }
 
-  const percent = value <= 1 ? value * 100 : value;
-  return Math.max(0, Math.min(100, Math.round(percent)));
+  const percent =
+    value <= 1
+      ? value * 100
+      : value;
+
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(percent)
+    )
+  );
 };
 
 export const convertChatResponseToMessage = (
   response: ChatApiResponse
 ): Message => {
+  const sources =
+    normalizeMessageSources(
+      response.sources
+    );
+
   const primarySource =
-    response.sources?.[0];
+    sources[0];
 
   return {
     id: response.messageId,
     role: 'ai',
     content: response.answer,
     confidence:
-      toDisplayConfidence(response.confidence),
+      toDisplayConfidence(
+        response.confidence
+      ),
     source:
       response.source ??
       primarySource?.documentName,
@@ -218,6 +466,18 @@ export const convertChatResponseToMessage = (
       response.page ??
       primarySource?.page,
     sources:
-      response.sources,
+      sources.length > 0
+        ? sources
+        : undefined,
+    responseTimeMs:
+      toFiniteNumber(
+        response.response_time_ms ??
+        response.responseTimeMs
+      ),
+    followUpQuestion:
+      toOptionalText(
+        response.follow_up_question ??
+        response.followUpQuestion
+      ),
   };
 };

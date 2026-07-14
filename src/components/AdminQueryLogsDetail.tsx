@@ -5,44 +5,51 @@ import {
   getQueryLogsDashboard,
   type QueryLog,
   type QueryLogPerformance,
+  type RetrievedSource,
   type QueryLogStatus,
   type QueryRange,
 } from '../services/queryLogService';
 import { getFriendlyApiErrorMessage } from '../services/api';
 
 const queryRangeLabels: Record<QueryRange, string> = {
-  daily: 'Harian',
-  weekly: 'Mingguan',
-  monthly: 'Bulanan',
-  yearly: 'Tahunan',
+  daily: 'Today',
+  weekly: 'This Week',
+  monthly: 'This Month',
+  yearly: 'This Year',
 };
 
-const getStatusStyle = (status: QueryLogStatus) => {
+const queryRangeOptions: QueryRange[] = ['daily', 'weekly', 'monthly', 'yearly'];
+
+const getStatusStyle = (status: QueryLogStatus): string => {
   switch (status) {
     case 'ANSWERED':
-      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400';
     case 'NEED_REVIEW':
-      return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      return 'border-amber-500/20 bg-amber-500/10 text-amber-400';
     case 'NOT_FOUND':
-      return 'bg-error-container/20 text-error border-error/30';
+      return 'border-rose-500/20 bg-rose-500/10 text-rose-400';
     case 'ERROR':
-      return 'bg-error-container/20 text-error border-error/30';
+      return 'border-rose-500/20 bg-rose-500/10 text-rose-400';
     default:
-      return 'bg-surface-variant text-on-surface-variant border-outline-variant';
+      return 'border-slate-700 bg-slate-800 text-slate-300';
   }
+};
+
+const normalizeTimestamp = (timestamp: string): string => {
+  return timestamp?.includes('T') ? timestamp : timestamp?.replace(' ', 'T');
+};
+
+const parseTimestampToDate = (timestamp: string): Date | null => {
+  if (!timestamp) return null;
+  const date = new Date(normalizeTimestamp(timestamp));
+  return Number.isNaN(date.getTime()) ? null : date;
 };
 
 const formatLogTime = (timestamp: string): string => {
-  const normalized = timestamp?.includes('T')
-    ? timestamp
-    : timestamp?.replace(' ', 'T');
-  const date = new Date(normalized);
-
-  if (Number.isNaN(date.getTime())) {
-    return timestamp?.split(' ')[1] ?? '-';
-  }
-
-  return date.toLocaleTimeString([], {
+  const date = parseTimestampToDate(timestamp);
+  if (!date) return timestamp?.split(' ')[1] ?? '-';
+  return date.toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -50,16 +57,10 @@ const formatLogTime = (timestamp: string): string => {
 };
 
 const formatLogDateTime = (timestamp: string): string => {
-  const normalized = timestamp?.includes('T')
-    ? timestamp
-    : timestamp?.replace(' ', 'T');
-  const date = new Date(normalized);
-
-  if (Number.isNaN(date.getTime())) {
-    return timestamp || '-';
-  }
-
-  return date.toLocaleString([], {
+  const date = parseTimestampToDate(timestamp);
+  if (!date) return timestamp || '-';
+  return date.toLocaleString('en-US', {
+    timeZone: 'Asia/Jakarta',
     year: 'numeric',
     month: 'short',
     day: '2-digit',
@@ -69,100 +70,230 @@ const formatLogDateTime = (timestamp: string): string => {
   });
 };
 
+const getJakartaDateKey = (date: Date): string => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === 'year')?.value ?? '0000';
+  const month = parts.find((part) => part.type === 'month')?.value ?? '01';
+  const day = parts.find((part) => part.type === 'day')?.value ?? '01';
+  return `${year}-${month}-${day}`;
+};
+
+const parseDateKeyAsUtcDate = (dateKey: string): Date => {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day));
+};
+
+const getWeekStartKey = (dateKey: string): string => {
+  const date = parseDateKeyAsUtcDate(dateKey);
+  const day = date.getUTCDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  date.setUTCDate(date.getUTCDate() + diffToMonday);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const dayOfMonth = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${dayOfMonth}`;
+};
+
+const getLogDateKey = (log: QueryLog): string | null => {
+  const date = parseTimestampToDate(log.timestamp);
+  return date ? getJakartaDateKey(date) : null;
+};
+
+const filterLogsByRange = (logs: QueryLog[], range: QueryRange): QueryLog[] => {
+  const todayKey = getJakartaDateKey(new Date());
+  const currentWeekStart = getWeekStartKey(todayKey);
+  const currentMonthKey = todayKey.slice(0, 7);
+  const currentYearKey = todayKey.slice(0, 4);
+
+  return logs.filter((log) => {
+    const logDateKey = getLogDateKey(log);
+    if (!logDateKey) return false;
+    switch (range) {
+      case 'daily': return logDateKey === todayKey;
+      case 'weekly': return getWeekStartKey(logDateKey) === currentWeekStart;
+      case 'monthly': return logDateKey.slice(0, 7) === currentMonthKey;
+      case 'yearly': return logDateKey.slice(0, 4) === currentYearKey;
+      default: return true;
+    }
+  });
+};
+
 const formatPercent = (value: number): string => {
   return `${Math.round((Number.isFinite(value) ? value : 0) * 100)}%`;
 };
 
-const parseResponseTimeSeconds = (value: string): number => {
-  const numeric = Number(String(value ?? '').replace('s', ''));
-  return Number.isFinite(numeric) ? numeric : 0;
+const formatSourceLocation = (source: RetrievedSource): string => {
+  const labels: string[] = [];
+
+  if (source.page?.trim()) {
+    labels.push(`Halaman ${source.page}`);
+  }
+  if (source.section?.trim()) {
+    labels.push(`Bagian: ${source.section}`);
+  }
+  if (source.paragraphStart !== undefined) {
+    const end = source.paragraphEnd ?? source.paragraphStart;
+    labels.push(
+      end === source.paragraphStart
+        ? `Paragraf ${source.paragraphStart}`
+        : `Paragraf ${source.paragraphStart}-${end}`
+    );
+  }
+  if (source.lineStart !== undefined) {
+    const end = source.lineEnd ?? source.lineStart;
+    labels.push(
+      end === source.lineStart
+        ? `Baris ${source.lineStart}`
+        : `Baris ${source.lineStart}-${end}`
+    );
+  }
+
+  return labels.join(' • ') || 'Lokasi sumber tidak tersedia';
 };
 
-const emptyPerformance: QueryLogPerformance = {
-  totalQueries: 0,
-  answered: 0,
-  notFound: 0,
-  needReview: 0,
-  errors: 0,
-  averageConfidence: 0,
-  averageResponseTime: 0,
+const normalizeConfidenceScore = (value: unknown): number => {
+  const numeric = Number(value ?? 0);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 0;
+  return numeric > 1 ? numeric / 100 : numeric;
 };
 
-export const AdminQueryLogsDetail: React.FC = () => {
+const parseResponseTimeSeconds = (value: unknown): number => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const text = String(value ?? '').trim().toLowerCase();
+  if (!text) return 0;
+  const numeric = Number(text.replace(',', '.').replace(/[^0-9.-]/g, ''));
+  if (!Number.isFinite(numeric)) return 0;
+  if (text.includes('ms')) return numeric / 1000;
+  return numeric;
+};
+
+const calculatePerformanceFromLogs = (logs: QueryLog[]): QueryLogPerformance => {
+  const totalQueries = logs.length;
+  const answered = logs.filter((log) => log.status === 'ANSWERED').length;
+  const notFound = logs.filter((log) => log.status === 'NOT_FOUND').length;
+  const needReview = logs.filter((log) => log.status === 'NEED_REVIEW').length;
+  const errors = logs.filter((log) => log.status === 'ERROR').length;
+
+  const confidenceValues = logs
+    .map((log) => normalizeConfidenceScore(log.confidenceScore))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  const responseTimeValues = logs
+    .map((log) => parseResponseTimeSeconds(log.responseTime))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  const averageConfidence = confidenceValues.length > 0
+    ? confidenceValues.reduce((sum, value) => sum + value, 0) / confidenceValues.length
+    : 0;
+
+  const averageResponseTime = responseTimeValues.length > 0
+    ? responseTimeValues.reduce((sum, value) => sum + value, 0) / responseTimeValues.length
+    : 0;
+
+  return { totalQueries, answered, notFound, needReview, errors, averageConfidence, averageResponseTime };
+};
+
+type MetricTone = 'cyan' | 'green' | 'pink' | 'yellow' | 'purple';
+
+type PerformanceMetric = {
+  label: string;
+  value: string;
+  icon: string;
+  tone: MetricTone;
+  decoIcon: string;
+};
+
+// Pemetaan gaya gradient dan warna teks seperti referensi gambar
+const metricStyles: Record<MetricTone, { bg: string, text: string }> = {
+  cyan: {
+    bg: 'bg-[linear-gradient(135deg,#7bf5dc_0%,#31c8e6_100%)]',
+    text: 'text-slate-900',
+  },
+  yellow: {
+    bg: 'bg-[linear-gradient(135deg,#ffe47c_0%,#ff9915_100%)]',
+    text: 'text-slate-900',
+  },
+  green: {
+    bg: 'bg-[linear-gradient(135deg,#95f8c3_0%,#46d787_100%)]',
+    text: 'text-slate-900',
+  },
+  pink: {
+    bg: 'bg-[linear-gradient(135deg,#ffb7cc_0%,#fa4e74_100%)]',
+    text: 'text-slate-900',
+  },
+  purple: {
+    bg: 'bg-[linear-gradient(135deg,#dcbbf9_0%,#9862ed_100%)]',
+    text: 'text-slate-900',
+  },
+};
+
+const AdminQueryLogsDetail: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null);
   const [queryPage, setQueryPage] = useState(1);
   const [queryRange, setQueryRange] = useState<QueryRange>('daily');
-  const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
-  const [performance, setPerformance] = useState<QueryLogPerformance>(emptyPerformance);
-  const [totalLogs, setTotalLogs] = useState(0);
-  const [totalQueryPages, setTotalQueryPages] = useState(1);
+  const [allQueryLogs, setAllQueryLogs] = useState<QueryLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const queriesPerPage = 25;
+  const queriesPerPage = 8;
 
   const loadQueryLogs = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setErrorMessage('');
-
     try {
-      const response = await getQueryLogsDashboard(
-        {
-          range: queryRange,
-          page: queryPage,
-          limit: queriesPerPage,
-        },
-        signal
-      );
-
+      const response = await getQueryLogsDashboard({ range: 'yearly', page: 1, limit: 5000 }, signal);
       const logs = Array.isArray(response.logs) ? response.logs : [];
-      setQueryLogs(logs);
-      setPerformance(response.performance ?? emptyPerformance);
-      setTotalLogs(Number(response.total ?? logs.length));
-      setTotalQueryPages(Math.max(Number(response.totalPages ?? 1), 1));
-
-      setSelectedQueryId((currentId) => {
-        if (currentId && logs.some((log) => log.queryId === currentId)) {
-          return currentId;
-        }
-
-        return logs[0]?.queryId ?? null;
+      const sortedLogs = [...logs].sort((a, b) => {
+        const first = parseTimestampToDate(a.timestamp)?.getTime() ?? 0;
+        const second = parseTimestampToDate(b.timestamp)?.getTime() ?? 0;
+        return second - first;
       });
+      setAllQueryLogs(sortedLogs);
     } catch (error) {
-      if (signal?.aborted) {
-        return;
-      }
-
+      if (signal?.aborted) return;
       setErrorMessage(getFriendlyApiErrorMessage(error));
-      setQueryLogs([]);
-      setPerformance(emptyPerformance);
-      setTotalLogs(0);
-      setTotalQueryPages(1);
+      setAllQueryLogs([]);
       setSelectedQueryId(null);
     } finally {
-      if (!signal?.aborted) {
-        setIsLoading(false);
-      }
+      if (!signal?.aborted) setIsLoading(false);
     }
-  }, [queryPage, queryRange]);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     void loadQueryLogs(controller.signal);
-
     return () => controller.abort();
   }, [loadQueryLogs]);
 
-  const selectedLog = useMemo(() => {
-    return (
-      queryLogs.find((log) => log.queryId === selectedQueryId) ??
-      queryLogs[0] ??
-      null
-    );
-  }, [queryLogs, selectedQueryId]);
+  const filteredQueryLogs = useMemo(() => filterLogsByRange(allQueryLogs, queryRange), [allQueryLogs, queryRange]);
+  const performance = useMemo(() => calculatePerformanceFromLogs(filteredQueryLogs), [filteredQueryLogs]);
 
+  const totalLogs = filteredQueryLogs.length;
+  const totalQueryPages = Math.max(Math.ceil(totalLogs / queriesPerPage), 1);
   const safeQueryPage = Math.min(queryPage, totalQueryPages);
+
+  const queryLogs = useMemo(() => {
+    const startIndex = (safeQueryPage - 1) * queriesPerPage;
+    return filteredQueryLogs.slice(startIndex, startIndex + queriesPerPage);
+  }, [filteredQueryLogs, safeQueryPage]);
+
+  useEffect(() => {
+    setSelectedQueryId((currentId) => {
+      if (currentId && filteredQueryLogs.some((log) => log.queryId === currentId)) return currentId;
+      return queryLogs[0]?.queryId ?? null;
+    });
+  }, [filteredQueryLogs, queryLogs]);
+
+  const selectedLog = useMemo(() => {
+    return filteredQueryLogs.find((log) => log.queryId === selectedQueryId) ?? queryLogs[0] ?? null;
+  }, [filteredQueryLogs, queryLogs, selectedQueryId]);
+
   const queryStartNumber = totalLogs === 0 ? 0 : (safeQueryPage - 1) * queriesPerPage + 1;
   const queryEndNumber = Math.min(safeQueryPage * queriesPerPage, totalLogs);
 
@@ -172,460 +303,280 @@ export const AdminQueryLogsDetail: React.FC = () => {
     setSelectedQueryId(null);
   };
 
-  const rangeDropdown = (
-    <div className="w-full sm:w-[180px]">
-      <label className="block font-mono text-[10px] text-outline uppercase tracking-wider mb-1.5">
-        Periode
-      </label>
-
-      <div className="relative">
-        <select
-          value={queryRange}
-          onChange={(event) => handleQueryRangeChange(event.target.value as QueryRange)}
-          className="w-full appearance-none bg-[#0b0d13] border border-outline-variant/50 rounded-xl py-2.5 pl-3 pr-10 font-mono text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/60 transition-all cursor-pointer"
-        >
-          {(Object.keys(queryRangeLabels) as QueryRange[]).map((range) => (
-            <option key={range} value={range} className="bg-[#0b0d13] text-on-surface">
-              {queryRangeLabels[range]}
-            </option>
-          ))}
-        </select>
-
-        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-outline">
-          <span className="material-symbols-outlined text-[18px]">expand_more</span>
-        </span>
-      </div>
-    </div>
-  );
-
-  const computedAverageResponseTime = useMemo(() => {
-    if (queryLogs.length === 0) return performance.averageResponseTime || 0;
-
-    const average = queryLogs.reduce(
-      (sum, log) => sum + parseResponseTimeSeconds(log.responseTime),
-      0
-    ) / queryLogs.length;
-
-    return Number.isFinite(average) ? average : 0;
-  }, [performance.averageResponseTime, queryLogs]);
-
-  const performanceSummary = useMemo(() => {
-    const avgConfidence = Math.round((performance.averageConfidence || 0) * 100);
-    const avgResponseTime = computedAverageResponseTime.toFixed(2);
-
-    return [
-      {
-        label: 'Total Queries',
-        value: String(performance.totalQueries ?? totalLogs),
-        helper: `Pertanyaan pada periode ${queryRangeLabels[queryRange]}`,
-        icon: 'manage_search',
-        tone: 'text-primary',
-      },
-      {
-        label: 'Answered',
-        value: String(performance.answered ?? 0),
-        helper: 'Query berhasil dijawab dengan sumber',
-        icon: 'check_circle',
-        tone: 'text-emerald-400',
-      },
-      {
-        label: 'Not Found',
-        value: String(performance.notFound ?? 0),
-        helper: 'Tidak ada konteks relevan',
-        icon: 'error',
-        tone: 'text-error',
-      },
-      {
-        label: 'Avg Confidence',
-        value: `${avgConfidence}%`,
-        helper: 'Rata-rata keyakinan jawaban',
-        icon: 'verified',
-        tone: 'text-primary',
-      },
-      {
-        label: 'Avg Response',
-        value: `${avgResponseTime}s`,
-        helper: 'Rata-rata waktu respons sistem',
-        icon: 'speed',
-        tone: 'text-tertiary',
-      },
-    ];
-  }, [computedAverageResponseTime, performance, queryRange, totalLogs]);
+  // Metrik dikonfigurasi mengikuti palet warna gambar referensi
+  const performanceSummary = useMemo<PerformanceMetric[]>(() => [
+    { label: 'Total Queries', value: String(performance.totalQueries ?? totalLogs), icon: 'folder', decoIcon: 'folder', tone: 'cyan' },
+    { label: 'Answered', value: String(performance.answered ?? 0), icon: 'check_circle', decoIcon: 'fact_check', tone: 'green' },
+    { label: 'Not Found', value: String(performance.notFound ?? 0), icon: 'error', decoIcon: 'folder_off', tone: 'pink' },
+    { label: 'Avg Confidence', value: `${Math.round((performance.averageConfidence || 0) * 100)}%`, icon: 'bar_chart', decoIcon: 'insert_chart', tone: 'yellow' },
+    { label: 'Avg Response', value: `${(performance.averageResponseTime || 0).toFixed(2)}s`, icon: 'speed', decoIcon: 'speed', tone: 'purple' },
+  ], [performance, totalLogs]);
 
   return (
-    <div className="bg-background text-on-surface font-body overflow-hidden flex h-screen w-full relative">
+    <div className="bg-slate-950 text-slate-200 font-sans flex h-screen w-full selection:bg-blue-500/30 overflow-hidden">
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .sleek-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .sleek-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sleek-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .sleek-scroll::-webkit-scrollbar-thumb:hover { background: #475569; }
+      `}} />
+
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 flex flex-col h-full relative min-w-0">
+      <main className="flex-1 flex flex-col h-full overflow-y-auto sleek-scroll relative">
         <AdminHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="p-4 md:p-6 lg:p-8 pb-12 w-full max-w-[1720px] mx-auto space-y-6 md:space-y-8">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-outline mb-2">
-                Admin Monitoring
-              </p>
-              <h1 className="font-headline text-2xl md:text-3xl font-bold text-on-surface">
-                Query Logs Detail
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+                Query Logs
               </h1>
-              <p className="text-on-surface-variant text-sm md:text-base mt-2 max-w-3xl">
-                Halaman ini menampilkan riwayat pertanyaan real dari backend, dokumen yang diambil sistem, skor keyakinan, status jawaban, dan jawaban yang dihasilkan sistem.
+              <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
+                Monitor pertanyaan pengguna, dokumen sumber yang diambil, dan performa respon sistem.
               </p>
             </div>
-
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => void loadQueryLogs()}
                 disabled={isLoading}
-                className="px-4 py-2 rounded-xl border border-outline-variant/50 text-xs md:text-sm text-on-surface-variant hover:text-primary hover:border-primary/50 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-800 bg-slate-900 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-50 transition-colors shadow-sm"
               >
-                {isLoading ? 'Loading...' : 'Refresh'}
+                <span className="material-symbols-outlined text-[18px]">refresh</span>
+                {isLoading ? 'Refreshing...' : 'Refresh'}
               </button>
-
-              <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-[10px] md:text-xs w-fit">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                Live Query Trace
-              </div>
             </div>
           </div>
 
           {errorMessage && (
-            <div className="mb-6 p-4 rounded-xl border border-error/30 bg-error-container/20 text-error text-sm">
+            <div className="p-4 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-400 text-sm">
               {errorMessage}
             </div>
           )}
 
-          <section className="h-auto lg:h-[50vh] min-h-[520px] bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 shadow-sm mb-6 flex flex-col">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-              <div>
-                <h2 className="font-headline text-lg md:text-xl font-bold">Query Logs</h2>
-                <p className="text-outline text-xs md:text-sm mt-1">
-                  Klik salah satu log untuk melihat detail lengkapnya.
-                </p>
-              </div>
+          {/* DESAIN CARD METRICS BARU MENGIKUTI GAMBAR */}
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {performanceSummary.map((metric) => {
+              const style = metricStyles[metric.tone];
+              
+              return (
+                <div 
+                  key={metric.label} 
+                  className={`relative overflow-hidden rounded-[24px] p-5 md:p-6 shadow-md transition-transform hover:-translate-y-1 ${style.bg}`}
+                >
+                  {/* Top: Header Card (Icon + Title) */}
+                  <div className={`flex items-center gap-2 ${style.text} opacity-90`}>
+                    <span className="material-symbols-outlined text-[18px] font-bold">{metric.icon}</span>
+                    <p className="text-sm font-bold">{metric.label}</p>
+                  </div>
+                  
+                  {/* Bottom: Besar Value */}
+                  <div className={`mt-6 ${style.text}`}>
+                    <h4 className="text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm">
+                      {metric.value}
+                    </h4>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-                {rangeDropdown}
-
-                <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] md:text-xs rounded-md border border-emerald-500/20 font-mono w-fit sm:mb-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Backend API
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 min-h-0 flex-1">
-              <div className="xl:col-span-7 min-h-0">
-                <div className="h-full min-h-[260px] overflow-y-auto custom-scrollbar bg-[#0b0d13] border border-outline-variant/50 rounded-xl">
-                  <table className="w-full text-left border-collapse min-w-[720px]">
-                    <thead className="sticky top-0 bg-[#0b0d13] text-outline font-mono text-[10px] md:text-xs uppercase tracking-wider border-b border-outline-variant/40">
-                      <tr>
-                        <th className="px-4 py-3 font-medium">Time</th>
-                        <th className="px-4 py-3 font-medium">Question</th>
-                        <th className="px-4 py-3 font-medium">Sources</th>
-                        <th className="px-4 py-3 font-medium">Confidence</th>
-                        <th className="px-4 py-3 font-medium">Status</th>
-                      </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-outline-variant/30 font-mono text-[11px] md:text-[13px]">
-                      {isLoading && queryLogs.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-10 text-center text-on-surface-variant">
-                            Loading query logs dari backend...
-                          </td>
-                        </tr>
-                      ) : queryLogs.length > 0 ? (
-                        queryLogs.map((log) => (
-                          <tr
-                            key={log.queryId}
-                            onClick={() => setSelectedQueryId(log.queryId)}
-                            className={`cursor-pointer transition-colors ${
-                              selectedQueryId === log.queryId
-                                ? 'bg-primary/10'
-                                : 'hover:bg-surface-container-high/30'
-                            }`}
-                          >
-                            <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
-                              {formatLogTime(log.timestamp)}
-                            </td>
-                            <td className="px-4 py-4 text-on-surface max-w-[280px]">
-                              <span className="block truncate">&quot;{log.userQuestion}&quot;</span>
-                              <span className="block text-outline text-[10px] mt-1">{log.queryId}</span>
-                            </td>
-                            <td className="px-4 py-4 text-on-surface-variant whitespace-nowrap">
-                              {log.retrievedDocuments.length > 0
-                                ? `${log.retrievedDocuments.length} sources`
-                                : 'No source'}
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <span className="text-primary font-semibold">
-                                {formatPercent(log.confidenceScore)}
-                              </span>
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 rounded-md border text-[10px] ${getStatusStyle(log.status)}`}>
-                                {log.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-10 text-center text-on-surface-variant">
-                            Belum ada query log real. Jalankan chat dulu agar log tersimpan.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                  {/* Dekorasi Pojok Kanan Bawah */}
+                  <div className={`absolute -bottom-4 -right-2 text-[90px] opacity-15 rotate-[-5deg] ${style.text} mix-blend-color-burn pointer-events-none`}>
+                    <span className="material-symbols-outlined !text-[90px]">{metric.decoIcon}</span>
+                  </div>
                 </div>
+              );
+            })}
+          </section>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 px-3 py-3 bg-[#0b0d13] border border-outline-variant/50 rounded-xl">
-                  <p className="font-mono text-[10px] md:text-xs text-outline">
-                    Showing {queryStartNumber}-{queryEndNumber} of {totalLogs} chats
-                  </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-2 md:p-3 rounded-xl shadow-sm">
+            <div className="inline-flex flex-wrap rounded-lg bg-slate-950 p-1">
+              {queryRangeOptions.map((range) => {
+                const isActive = queryRange === range;
+                return (
+                  <button
+                    key={range}
+                    type="button"
+                    onClick={() => handleQueryRangeChange(range)}
+                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      isActive ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {queryRangeLabels[range]}
+                  </button>
+                );
+              })}
+            </div>
+            <span className="text-xs font-medium text-slate-400 px-2">Total: {totalLogs} logs</span>
+          </div>
 
-                  {totalQueryPages > 1 && (
-                    <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
-                      {Array.from({ length: totalQueryPages }, (_, index) => index + 1).map((page) => (
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start relative">
+            
+            <div className="lg:col-span-5 flex flex-col gap-4">
+              <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm flex flex-col">
+                <div className="flex-1 divide-y divide-slate-800/50">
+                  {isLoading && queryLogs.length === 0 ? (
+                    <div className="p-8 text-center text-sm text-slate-500">Memuat log pertanyaan...</div>
+                  ) : queryLogs.length > 0 ? (
+                    queryLogs.map((log) => {
+                      const isSelected = selectedQueryId === log.queryId;
+                      return (
                         <button
-                          key={page}
+                          key={log.queryId}
                           type="button"
-                          onClick={() => setQueryPage(page)}
-                          className={`w-8 h-8 rounded-lg border font-mono text-xs transition-all shrink-0 ${
-                            safeQueryPage === page
-                              ? 'bg-primary text-on-primary-container border-primary'
-                              : 'bg-surface-container-high text-on-surface-variant border-outline-variant/50 hover:text-primary hover:border-primary/50'
+                          onClick={() => setSelectedQueryId(log.queryId)}
+                          className={`w-full text-left p-4 transition-colors relative ${
+                            isSelected ? 'bg-blue-500/10' : 'hover:bg-slate-800/50'
                           }`}
                         >
-                          {page}
+                          {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />}
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <p className="text-sm font-medium text-slate-200 line-clamp-2">"{log.userQuestion}"</p>
+                            <span className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-medium border ${getStatusStyle(log.status)}`}>
+                              {log.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-slate-500">
+                            <span>{formatLogTime(log.timestamp)}</span>
+                            <span>{formatPercent(log.confidenceScore)} confidence</span>
+                          </div>
                         </button>
-                      ))}
+                      );
+                    })
+                  ) : (
+                    <div className="p-8 text-center text-sm text-slate-500">Tidak ada log untuk periode ini.</div>
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
+                  <span>Menampilkan {queryStartNumber}-{queryEndNumber} dari {totalLogs} log</span>
+                  
+                  {totalQueryPages > 1 && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setQueryPage(p => Math.max(1, p - 1))}
+                        disabled={safeQueryPage === 1}
+                        className="px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors flex items-center"
+                      >
+                        Prev
+                      </button>
+                      
+                      <span className="font-medium text-slate-300">
+                        {safeQueryPage} / {totalQueryPages}
+                      </span>
+                      
+                      <button
+                        onClick={() => setQueryPage(p => Math.min(totalQueryPages, p + 1))}
+                        disabled={safeQueryPage === totalQueryPages}
+                        className="px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors flex items-center"
+                      >
+                        Next
+                      </button>
                     </div>
                   )}
                 </div>
               </div>
+            </div>
 
-              <div className="xl:col-span-5 min-h-0">
-                <div className="h-full min-h-[320px] overflow-y-auto custom-scrollbar bg-surface-container-high/30 border border-outline-variant/50 rounded-xl p-4">
-                  {selectedLog ? (
-                    <>
-                      <div className="flex items-start justify-between gap-3 mb-4">
-                        <div>
-                          <p className="font-mono text-[10px] text-outline uppercase tracking-wider mb-1">
-                            Selected Log
-                          </p>
-                          <h3 className="font-headline text-lg font-bold text-on-surface break-all">
-                            {selectedLog.queryId}
-                          </h3>
-                          <p className="font-mono text-[10px] text-outline mt-1">
-                            {formatLogDateTime(selectedLog.timestamp)}
-                          </p>
+            <div className="lg:col-span-7 sticky top-6 rounded-xl border border-slate-800 bg-slate-900 shadow-sm max-h-[calc(100vh-3rem)] overflow-y-auto sleek-scroll flex flex-col">
+              {selectedLog ? (
+                <>
+                  <div className="p-5 md:p-6 border-b border-slate-800 sticky top-0 bg-slate-900/95 backdrop-blur z-10">
+                    <div className="flex flex-wrap items-center gap-3 mb-1.5">
+                      <h2 className="text-lg font-semibold text-white">Detail Log</h2>
+                      <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-medium border ${getStatusStyle(selectedLog.status)}`}>
+                        {selectedLog.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 font-mono truncate">ID: {selectedLog.queryId} • {formatLogDateTime(selectedLog.timestamp)}</p>
+                  </div>
+
+                  <div className="p-5 md:p-6 space-y-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                      <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800">
+                        <p className="text-xs font-medium text-slate-500 mb-1">User</p>
+                        <p className="text-sm font-medium text-slate-200 truncate">{selectedLog.userName}</p>
+                      </div>
+                      <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800">
+                        <p className="text-xs font-medium text-slate-500 mb-1">Waktu Respon</p>
+                        <p className="text-sm font-medium text-slate-200">{selectedLog.responseTime}</p>
+                      </div>
+                      <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800 hidden md:block">
+                        <p className="text-xs font-medium text-slate-500 mb-1">Confidence</p>
+                        <p className="text-sm font-medium text-slate-200">{formatPercent(selectedLog.confidenceScore)}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px]">help</span> Pertanyaan User
+                        </h3>
+                        <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-200">
+                          {selectedLog.userQuestion}
                         </div>
+                      </div>
 
-                        <span className={`px-2 py-1 rounded-md border text-[10px] font-mono ${getStatusStyle(selectedLog.status)}`}>
-                          {selectedLog.status}
+                      <div>
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px]">smart_toy</span> Jawaban Sistem
+                        </h3>
+                        <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+                          {selectedLog.answerGenerated || 'Tidak ada jawaban yang dihasilkan.'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px]">description</span> Sumber Terambil
+                        </h3>
+                        <span className="text-xs text-slate-500 bg-slate-950 border border-slate-800 px-2 py-1 rounded-md">
+                          {(selectedLog.retrievedDocuments ?? []).length} dokumen
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-1">User</p>
-                          <p className="text-sm text-on-surface">{selectedLog.userName}</p>
-                        </div>
-
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-1">Response Time</p>
-                          <p className="text-sm text-on-surface">{selectedLog.responseTime}</p>
-                        </div>
-
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-1">Confidence</p>
-                          <div className="flex items-center gap-2">
-                            <div className="h-2 bg-surface-variant rounded-full overflow-hidden flex-1">
-                              <div
-                                className="h-full bg-primary rounded-full"
-                                style={{ width: formatPercent(selectedLog.confidenceScore) }}
-                              />
+                      {(selectedLog.retrievedDocuments ?? []).length > 0 ? (
+                        <div className="space-y-2">
+                          {(selectedLog.retrievedDocuments ?? []).map((source) => (
+                            <div key={`${source.documentName}-${source.chunkId}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-slate-800 bg-slate-950">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-slate-200 truncate">{source.documentName}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">{formatSourceLocation(source)} • Chunk {source.chunkId}</p>
+                                {source.excerpt && (
+                                  <blockquote className="mt-2 rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs italic leading-relaxed text-slate-400">
+                                    “{source.excerpt}”
+                                  </blockquote>
+                                )}
+                              </div>
+                              <span className="w-fit text-xs font-medium text-blue-400 bg-blue-500/10 px-2.5 py-1.5 rounded-md">
+                                {formatPercent(source.relevanceScore)} relevan
+                              </span>
                             </div>
-                            <span className="font-mono text-xs text-primary">
-                              {formatPercent(selectedLog.confidenceScore)}
-                            </span>
-                          </div>
+                          ))}
                         </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-2">User Question</p>
-                          <p className="text-sm text-on-surface leading-relaxed">&quot;{selectedLog.userQuestion}&quot;</p>
-                        </div>
-
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-2">Retrieved Documents</p>
-
-                          {selectedLog.retrievedDocuments.length > 0 ? (
-                            <div className="space-y-2">
-                              {selectedLog.retrievedDocuments.map((source) => (
-                                <div
-                                  key={`${source.documentName}-${source.chunkId}`}
-                                  className="flex items-start justify-between gap-3 border-b border-outline-variant/30 pb-2 last:border-b-0 last:pb-0"
-                                >
-                                  <div>
-                                    <p className="text-sm text-on-surface">{source.documentName}</p>
-                                    <p className="font-mono text-[10px] text-outline">
-                                      p.{source.page} • {source.chunkId}
-                                    </p>
-                                  </div>
-                                  <span className="font-mono text-xs text-primary whitespace-nowrap">
-                                    {formatPercent(source.relevanceScore)}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-error">No relevant context found in vector DB.</p>
-                          )}
-                        </div>
-
-                        <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-lg p-3">
-                          <p className="text-outline font-mono text-[10px] uppercase mb-2">Generated Answer</p>
-                          <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap">
-                            {selectedLog.answerGenerated || 'Belum ada jawaban tersimpan untuk log ini.'}
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-center text-sm text-on-surface-variant">
-                      Pilih log dari tabel, atau jalankan chat terlebih dahulu agar log muncul.
+                      ) : (
+                        <p className="text-sm text-slate-500 p-4 rounded-lg border border-slate-800 border-dashed text-center">
+                          Tidak ada dokumen referensi yang ditemukan pada vektor DB.
+                        </p>
+                      )}
                     </div>
-                  )}
+                  </div>
+                </>
+              ) : (
+                <div className="h-[400px] flex items-center justify-center text-sm text-slate-500 p-6">
+                  Pilih log dari daftar di sebelah kiri untuk melihat detail.
                 </div>
-              </div>
+              )}
             </div>
+
           </section>
-
-          <div className="grid grid-cols-1 2xl:grid-cols-12 gap-6">
-            <section className="2xl:col-span-5 bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
-                <div>
-                  <h2 className="font-headline text-lg md:text-xl font-bold">Query Performance Summary</h2>
-                  <p className="text-outline text-sm mt-1">
-                    Ringkasan performa sistem berdasarkan status log, confidence score, dan response time dari backend.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-                  {rangeDropdown}
-
-                  <span className="font-mono text-[10px] md:text-xs px-2 md:px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full w-fit sm:mb-1.5">
-                    Database Connected
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {performanceSummary.map((metric) => (
-                  <div
-                    key={metric.label}
-                    className="bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-4 hover:border-primary/50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-3 mb-3">
-                      <p className="text-outline font-mono text-[10px] uppercase tracking-wider">
-                        {metric.label}
-                      </p>
-                      <span className={`material-symbols-outlined text-[18px] ${metric.tone}`}>
-                        {metric.icon}
-                      </span>
-                    </div>
-
-                    <p className="font-headline text-2xl md:text-3xl font-bold text-on-surface mb-1">
-                      {metric.value}
-                    </p>
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
-                      {metric.helper}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="2xl:col-span-7 bg-surface-container-low border border-outline-variant rounded-2xl p-4 md:p-6 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
-                <div>
-                  <h2 className="font-headline text-lg md:text-xl font-bold">Query Logs Explanation</h2>
-                  <p className="text-outline text-sm mt-1">
-                    Penjelasan singkat tentang cara membaca data query logs dan performa sistem RAG.
-                  </p>
-                </div>
-
-                <span className="font-mono text-[10px] md:text-xs px-2 md:px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full w-fit">
-                  Guide
-                </span>
-              </div>
-
-              <div className="bg-[#0b0d13] border border-outline-variant/50 rounded-xl p-4 md:p-5 space-y-4">
-                <div className="flex gap-3">
-                  <span className="material-symbols-outlined text-primary text-[22px] shrink-0">manage_search</span>
-                  <div>
-                    <h3 className="font-headline text-base font-bold text-on-surface mb-1">
-                      Fungsi Query Logs
-                    </h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Query Logs digunakan untuk melihat riwayat pertanyaan user, waktu pertanyaan dikirim,
-                      dokumen yang berhasil diambil sistem, confidence score, response time, dan status jawaban.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <span className="material-symbols-outlined text-emerald-400 text-[22px] shrink-0">source</span>
-                  <div>
-                    <h3 className="font-headline text-base font-bold text-on-surface mb-1">
-                      Fungsi Retrieved Documents
-                    </h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Retrieved Documents menunjukkan sumber dokumen yang dipakai chatbot untuk menjawab pertanyaan.
-                      Semakin tinggi relevance score, semakin kuat hubungan dokumen tersebut dengan pertanyaan user.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <span className="material-symbols-outlined text-secondary text-[22px] shrink-0">verified</span>
-                  <div>
-                    <h3 className="font-headline text-base font-bold text-on-surface mb-1">
-                      Fungsi Query Performance Summary
-                    </h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Query Performance Summary membantu admin membaca performa sistem berdasarkan total query,
-                      jumlah pertanyaan yang berhasil dijawab, query yang tidak ditemukan, rata-rata confidence,
-                      dan rata-rata waktu respons pada periode harian, mingguan, bulanan, atau tahunan.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <span className="material-symbols-outlined text-amber-400 text-[22px] shrink-0">tips_and_updates</span>
-                  <div>
-                    <h3 className="font-headline text-base font-bold text-on-surface mb-1">
-                      Cara Membaca Status
-                    </h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Status ANSWERED berarti sistem menemukan konteks yang cukup. NOT_FOUND berarti sistem belum
-                      menemukan dokumen yang relevan. NEED_REVIEW berarti jawaban masih perlu dicek kembali karena
-                      confidence atau konteks dokumennya belum sepenuhnya kuat.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
         </div>
       </main>
     </div>
   );
 };
+
+export { AdminQueryLogsDetail };
+export default AdminQueryLogsDetail;

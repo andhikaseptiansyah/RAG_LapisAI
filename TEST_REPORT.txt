@@ -1,0 +1,26 @@
+RAG LapisAI Fixed - Test Report
+===============================
+
+Executed successfully:
+
+1. PYTHONPATH=backend python evaluation/test_retrieval_metrics.py
+   Result: Retrieval metric tests passed.
+
+2. PYTHONPATH=backend python evaluation/test_retrieval_improvements.py
+   Result: Retrieval improvement tests passed.
+
+3. PYTHONPATH=backend python evaluation/test_evidence_ground_truth.py
+   Result: Evidence verifier did not hard-reject any answerable ground-truth source set.
+
+4. PYTHONPATH=backend python evaluation/test_indonesian_answer_gate.py
+   Result: Indonesian password-reset answer gate passed.
+   Confidence: 0.7603
+   Source: FAQ_IT_Support.txt
+
+5. python -m compileall -q backend evaluation
+   Result: Python syntax compilation passed.
+
+Note:
+The full live ChromaDB/Ollama integration was not executed in this environment because
+sentence-transformers, ChromaDB, and the local Ollama model are not installed here.
+Run reindex_corpus.py on the target machine before the first retrieval test.

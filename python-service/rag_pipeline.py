@@ -4,6 +4,7 @@ import hashlib
 import math
 import os
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -20,12 +21,23 @@ except Exception:  # pragma: no cover - fallback saat dependency belum siap
     SentenceTransformer = None  # type: ignore
 
 
-DEFAULT_COLLECTION_NAME = os.getenv("CHROMA_COLLECTION", "lapisai_documents")
-DEFAULT_CHROMA_DIR = os.getenv("CHROMA_DIR", "./chroma_db")
-DEFAULT_EMBEDDING_MODEL = os.getenv(
-    "PYTHON_EMBEDDING_MODEL",
-    "sentence-transformers/all-MiniLM-L6-v2",
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+BACKEND_DIR = PROJECT_ROOT / "backend"
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
+# Import the same settings used by the main FastAPI backend and evaluation suite.
+from uploads.config import (  # noqa: E402
+    CHROMA_PATH,
+    COLLECTION_NAME,
+    EMBEDDING_MODEL,
+    MIN_RESULT_SCORE,
 )
+
+DEFAULT_COLLECTION_NAME = COLLECTION_NAME
+DEFAULT_CHROMA_DIR = CHROMA_PATH
+DEFAULT_EMBEDDING_MODEL = EMBEDDING_MODEL
+DEFAULT_MIN_SCORE = MIN_RESULT_SCORE
 DEFAULT_CHUNK_SIZE = int(os.getenv("RAG_CHUNK_SIZE_WORDS", "700"))
 DEFAULT_CHUNK_OVERLAP = int(os.getenv("RAG_CHUNK_OVERLAP_WORDS", "100"))
 FALLBACK_DIMENSION = int(os.getenv("FALLBACK_EMBEDDING_DIMENSION", "384"))
@@ -267,7 +279,7 @@ class LapisRagStore:
         self,
         query: str,
         top_k: int = 5,
-        min_score: float = 0.0,
+        min_score: float = DEFAULT_MIN_SCORE,
     ) -> List[Dict[str, Any]]:
         clean_query = normalize_whitespace(query)
         if not clean_query:
