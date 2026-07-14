@@ -43,6 +43,7 @@ class EvidenceDecision:
 HARD_CONCEPTS = {
     "password_reset",
     "maternity_leave",
+    "paternity_leave",
     "annual_leave",
     "carryover",
     "original_receipt",
@@ -54,6 +55,9 @@ HARD_CONCEPTS = {
     "subsidy",
     "canteen",
     "macos",
+    "windows",
+    "android",
+    "ios",
     "minimum_version",
     "data_breach",
     "information_classification",
@@ -64,6 +68,17 @@ HARD_CONCEPTS = {
 }
 
 # Generic concepts help scoring but should not independently reject a candidate.
+# Concepts in one group are mutually exclusive subjects. A candidate that
+# explicitly discusses a different member of the group is contradictory, while
+# a candidate that simply omits the requested member can still participate in a
+# multi-document evidence bundle.
+EXCLUSIVE_CONCEPT_GROUPS = (
+    {"water", "electricity"},
+    {"annual_leave", "maternity_leave", "paternity_leave"},
+    {"macos", "windows", "android", "ios"},
+)
+
+
 SOFT_CONCEPTS = {
     "office",
     "supported",
@@ -229,6 +244,13 @@ def _concept_match(canonical: str, content: str) -> bool:
     return contains_alias(content, CONCEPT_ALIASES[canonical])
 
 
+def concept_matches_text(canonical: str, content: str) -> bool:
+    """Public wrapper used by bundle-level answerability checks."""
+    if canonical not in CONCEPT_ALIASES:
+        return False
+    return _concept_match(canonical, content)
+
+
 def _lexical_coverage(question: str, content: str) -> float:
     query_tokens = _tokenize(question)
     if not query_tokens:
@@ -297,30 +319,28 @@ def verify_evidence(
 
     question_years = _years(question_text)
     content_years = _years(content_text)
-    for year in sorted(question_years):
-        if year not in content_years:
-            hard_failures.append(f"missing_year:{year}")
+    # A missing year in one chunk is not a contradiction because another chunk
+    # can provide the requested period. An explicit different year is a hard
+    # mismatch and should not be included in the answer bundle.
+    if question_years and content_years and not question_years.intersection(content_years):
+        hard_failures.append(
+            "year_mismatch:" + ",".join(sorted(content_years))
+        )
 
-    for canonical in missing:
-        if canonical in HARD_CONCEPTS:
-            hard_failures.append(f"missing_concept:{canonical}")
+    required_set = set(required)
+    content_concepts = set(concepts_in_text(content_text))
+    for group in EXCLUSIVE_CONCEPT_GROUPS:
+        requested_members = required_set.intersection(group)
+        conflicting_members = content_concepts.intersection(group) - requested_members
+        if requested_members and conflicting_members and not content_concepts.intersection(requested_members):
+            hard_failures.append(
+                "subject_mismatch:" + ",".join(sorted(conflicting_members))
+            )
 
-    if _duration_requested(question_text) and not TIME_PATTERN.search(content_text):
-        hard_failures.append("missing_duration_value")
-
-    if _amount_requested(question_text) and not NUMBER_PATTERN.search(content_text):
-        hard_failures.append("missing_numeric_value")
-
-    if _percent_requested(question_text):
-        normalized_content = normalize_text(content_text)
-        if "%" not in content_text and "percent" not in normalized_content and "persen" not in normalized_content:
-            hard_failures.append("missing_percentage")
-
-    if "minimum_version" in required and not VERSION_PATTERN.search(content_text):
-        hard_failures.append("missing_version_value")
-
-    # Numeric questions need an explicit numeric or time expression. This keeps a
-    # broadly related policy from being treated as evidence for a precise answer.
+    # Missing precision values reduce the candidate score but are not hard
+    # failures per chunk. Multi-hop questions often obtain the subject from one
+    # document and the amount/deadline from another. The answerability gate later
+    # verifies the complete top-k bundle before generation is allowed.
     numeric_support = 1.0
     if _numeric_answer_requested(question_text):
         numeric_support = 1.0 if (
@@ -347,9 +367,20 @@ def verify_evidence(
     )
     score = max(0.0, min(float(score), 1.0))
 
-    supported = not hard_failures and (score + 1e-9) >= minimum_score
+    hard_required = set(required).intersection(HARD_CONCEPTS)
+    hard_concept_complete = hard_required.issubset(set(matched))
+    supported = (
+        not hard_failures
+        and hard_concept_complete
+        and (score + 1e-9) >= minimum_score
+    )
     if hard_failures:
-        reason = "Evidence is missing a subject-defining constraint: " + ", ".join(hard_failures)
+        reason = "Evidence contradicts a subject-defining constraint: " + ", ".join(hard_failures)
+    elif not hard_concept_complete:
+        reason = (
+            "Candidate is only partial evidence; missing subject concepts: "
+            + ", ".join(sorted(hard_required - set(matched)))
+        )
     elif supported:
         reason = "Candidate contains sufficient concepts and explicit evidence."
     else:

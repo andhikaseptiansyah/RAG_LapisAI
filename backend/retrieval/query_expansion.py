@@ -60,11 +60,16 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "maternity_leave": (
         "maternity leave",
-        "parental leave",
         "cuti melahirkan",
         "cuti bersalin",
-        "melahirkan",
-        "bersalin",
+        "female employee childbirth leave",
+    ),
+    "paternity_leave": (
+        "paternity leave",
+        "father leave",
+        "cuti ayah",
+        "karyawan pria ketika pasangan melahirkan",
+        "male employee spouse gives birth",
     ),
     "carryover": (
         "carryover",
@@ -176,6 +181,17 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "mac os",
         "os x",
     ),
+    "windows": (
+        "windows",
+        "microsoft windows",
+    ),
+    "android": (
+        "android",
+    ),
+    "ios": (
+        "ios",
+        "iphone os",
+    ),
     "minimum_version": (
         "minimum version",
         "minimum supported version",
@@ -240,9 +256,15 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "data_breach": (
         "data breach",
+        "data breaches",
         "security breach",
+        "security breaches",
+        "suspected data breach",
+        "suspected data breaches",
         "kebocoran data",
+        "dugaan kebocoran data",
         "insiden data",
+        "insiden keamanan data",
     ),
     "information_classification": (
         "information classification",

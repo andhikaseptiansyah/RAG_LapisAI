@@ -1,5 +1,821 @@
 [
   {
+    "id": "0a74d193-6966-4105-9925-a1263c4c7880",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "cara kerja wfh?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "c0d69d92-35ef-4c05-9fe1-1e7542d5643c",
+        "conversation_id": "0a74d193-6966-4105-9925-a1263c4c7880",
+        "role": "user",
+        "content": "cara kerja wfh?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T14:19:58.200159+00:00"
+      },
+      {
+        "id": "59e3b67e-1209-43ac-a062-a28c79fc372f",
+        "conversation_id": "0a74d193-6966-4105-9925-a1263c4c7880",
+        "role": "assistant",
+        "content": "- Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n- Nusantara…\n- Remote Work (Work From Home) Policy\n- Limit Employees may work from home a maximum of 2 days per week, with manager approval.",
+        "attachments": [],
+        "confidence": 0.6025,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5353,
+              "relevance_score": 0.5353,
+              "excerpt": "Remote workers must be available during core hours of 10:00-16:00 WIB.",
+              "chapter": "Core Hours",
+              "section": "Core Hours",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5336,
+              "relevance_score": 0.5336,
+              "excerpt": "Nusantara Dynamics",
+              "paragraph_start": 1,
+              "paragraph_end": 1
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4233,
+              "relevance_score": 0.4233,
+              "excerpt": "Remote Work (Work From Home) Policy",
+              "chapter": "Remote Work (Work From Home) Policy",
+              "section": "Remote Work (Work From Home) Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3893,
+              "relevance_score": 0.3893,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T14:19:58.200159+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T14:19:58.200159+00:00",
+    "updated_at": "2026-07-14T14:19:58.200159+00:00",
+    "last_message": "- Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n- Nusantara…\n- Remote Work (Work From Home) Policy\n- Limit Employees may work from home a maximum of 2 days per week, with manager approval.",
+    "last_user_message": "cara kerja wfh?",
+    "last_message_at": "2026-07-14T14:19:58.200159+00:00"
+  },
+  {
+    "id": "7064db41-f2e6-4bb1-9e62-4e2379469f33",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "hello",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ff456062-d961-48b9-a2ed-9c3fb753577c",
+        "conversation_id": "7064db41-f2e6-4bb1-9e62-4e2379469f33",
+        "role": "user",
+        "content": "hello",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T14:12:38.294160+00:00"
+      },
+      {
+        "id": "a03e20ec-5e88-4920-a8dc-515d26661e40",
+        "conversation_id": "7064db41-f2e6-4bb1-9e62-4e2379469f33",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T14:12:38.294160+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T14:12:38.294160+00:00",
+    "updated_at": "2026-07-14T14:12:38.294160+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "hello",
+    "last_message_at": "2026-07-14T14:12:38.294160+00:00"
+  },
+  {
+    "id": "16b66299-1b72-49ab-817c-60826bcf220b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How many new enterprise customers were added in Q3 2025?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e97304b7-8b41-4094-b501-d0d6a1761f55",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:43:01.447294+00:00"
+      },
+      {
+        "id": "56c84e76-bd48-451d-bc01-a73dda83b44e",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "Dalam Q3 2025, Nusantara Dynamics menambahkan 18 new enterprise customers, sehingga total jumlah enterprise customers menjadi 214. Tidak ada informasi tambahan mengenai jumlah enterprise customers sebelumnya atau detail lain terkait penambahan pelanggan baru dalam periode tersebut.",
+        "attachments": [],
+        "confidence": 0.9812,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8762,
+              "relevance_score": 0.8762,
+              "excerpt": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Report_CSAT_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3865,
+              "relevance_score": 0.3865,
+              "excerpt": "The overall CSAT score for 2025 was 87%, up from 83% in 2024.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:43:01.447294+00:00"
+      },
+      {
+        "id": "92f22b85-a1ad-4795-92e2-e06018d7ff72",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "What is the replacement fee for an access card?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:43:44.297049+00:00"
+      },
+      {
+        "id": "3f440fcf-6e7f-4cc1-ad12-d23d84c8b9dc",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "Replacement fee untuk kartu akses adalah IDR 50.000. Biaya ini dikenakan ketika pengguna meminta penggantian kartu akses. Penggantian kartu akses dapat dilakukan di meja depan. Dokumen tidak menyebutkan tanggal, durasi, atau kondisi tambahan terkait biaya penggantian kartu akses.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Facilities.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5289,
+              "relevance_score": 0.5289,
+              "excerpt": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "FAQ_Facilities.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:43:44.297049+00:00"
+      },
+      {
+        "id": "ba866d87-920d-4ba1-a6ce-60a02cf445bd",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "What is the mailbox size limit?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:44:21.380099+00:00"
+      },
+      {
+        "id": "f01e6a30-132f-49a4-8aa4-770b0b1f0088",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "Berdasarkan konteks yang diberikan, ukuran kotak masuk (mailbox size limit) standar adalah 50 GB. Tidak ada informasi tambahan yang disebutkan mengenai batas ukuran kotak masuk dalam konteks lain.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Email_Calendar.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "A: Use the calendar sharing option and grant the relevant colleague view access.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3746,
+              "relevance_score": 0.3746,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "FAQ_Email_Calendar.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:44:21.380099+00:00"
+      },
+      {
+        "id": "3bc71e84-7bbc-47e4-beb4-055edb2f0204",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "How do I reset my password?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:44:57.374360+00:00"
+      },
+      {
+        "id": "d0c5d8f1-396e-4fc6-896d-a7d44e3e810f",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:44:57.374360+00:00"
+      },
+      {
+        "id": "633e4625-064f-462b-be87-312408a7ba8e",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "What is the API availability SLO?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:45:46.347990+00:00"
+      },
+      {
+        "id": "6d93821e-3fcc-430c-bd36-93505ab76ccf",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "API availability SLO adalah 99.9% per bulan.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_Monitoring_Guide.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "## Tools Metrics are collected with Prometheus and visualized in Grafana.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "TECH_Internal_API_Guide.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.3852,
+              "relevance_score": 0.3852,
+              "excerpt": "Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "TECH_Monitoring_Guide.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:45:46.347990+00:00"
+      },
+      {
+        "id": "3e807555-5cc3-4a40-9702-ce756cf20b6a",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "user",
+        "content": "What database does the platform use?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:46:29.341122+00:00"
+      },
+      {
+        "id": "7a3a0417-af0f-4323-b20e-4155b214d433",
+        "conversation_id": "16b66299-1b72-49ab-817c-60826bcf220b",
+        "role": "assistant",
+        "content": "Platform menggunakan database PostgreSQL 15 sebagai datastore utama, sementara Redis digunakan untuk caching.",
+        "attachments": [],
+        "confidence": 0.8078,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_System_Architecture.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.786,
+              "relevance_score": 0.786,
+              "excerpt": "## Stack The platform runs on a microservices architecture deployed on Kubernetes.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "TECH_Database_Schema.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5176,
+              "relevance_score": 0.5176,
+              "excerpt": "Nusantara Dynamics Database Schema Reference ========================= ## Customers The customers table stores customer_id, name, tier, created_at. ## Orders The orders table links to customers via customer_id and stores order_date and status.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "TECH_System_Architecture.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:46:29.341122+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T09:43:01.447294+00:00",
+    "updated_at": "2026-07-14T09:46:29.341122+00:00",
+    "last_message": "Platform menggunakan database PostgreSQL 15 sebagai datastore utama, sementara Redis digunakan untuk caching.",
+    "last_user_message": "What database does the platform use?",
+    "last_message_at": "2026-07-14T09:46:29.341122+00:00"
+  },
+  {
+    "id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "when is payday?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f3451cd6-4847-4b08-8be7-1cb837d645cc",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "user",
+        "content": "when is payday?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:38:24.241675+00:00"
+      },
+      {
+        "id": "6f1986e3-2c7e-490c-8119-ca7ce9565715",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "assistant",
+        "content": "Payday occurs on the 25th of each month. If the 25th is a holiday, payment is made on the prior working day. Salaries are paid on this date, and approved reimbursements are also paid in the next payroll cycle, which is on the 25th of each month.",
+        "attachments": [],
+        "confidence": 0.96,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Payroll.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.895,
+              "relevance_score": 0.895,
+              "excerpt": "## Payday Q: When is payday? A: Salaries are paid on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3624,
+              "relevance_score": 0.3624,
+              "excerpt": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "chapter": "Annual Leave",
+              "section": "Annual Leave",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "FAQ_Payroll.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:38:24.241675+00:00"
+      },
+      {
+        "id": "6efe4859-dd19-46f8-a676-122a10b89505",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "user",
+        "content": "What are the RTO and RPO?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:39:49.994006+00:00"
+      },
+      {
+        "id": "e19c2e9e-5725-4369-8e1a-a06fd8951edc",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:39:49.994006+00:00"
+      },
+      {
+        "id": "57b28c32-77ea-4e11-8bb8-57bf3c6ac3f3",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "user",
+        "content": "What unit-test coverage is required to merge code?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:41:45.900624+00:00"
+      },
+      {
+        "id": "dd546a57-7b66-4f04-bee5-7dea9cedcd59",
+        "conversation_id": "e62d7535-8bf4-4351-9c1d-4f51d733a1a4",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:41:45.900624+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T09:38:24.241675+00:00",
+    "updated_at": "2026-07-14T09:41:45.900624+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "What unit-test coverage is required to merge code?",
+    "last_message_at": "2026-07-14T09:41:45.900624+00:00"
+  },
+  {
+    "id": "7e88fa05-9053-4fa6-b0e4-cd80389330a8",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "when is payday",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "85a87610-c5ad-4db2-9a89-d6c0df6508e6",
+        "conversation_id": "7e88fa05-9053-4fa6-b0e4-cd80389330a8",
+        "role": "user",
+        "content": "when is payday",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T09:37:31.364755+00:00"
+      },
+      {
+        "id": "1cb73bde-ffa7-42e3-8e7b-85910b3939d9",
+        "conversation_id": "7e88fa05-9053-4fa6-b0e4-cd80389330a8",
+        "role": "assistant",
+        "content": "Payday terjadi pada tanggal 25 setiap bulan. Jika tanggal 25 adalah hari libur, pembayaran akan dilakukan pada hari kerja sebelumnya. Pembayaran gaji dilakukan pada hari yang sama dengan pembayaran kompensasi pengembalian biaya, yang juga pada tanggal 25 setiap bulan.",
+        "attachments": [],
+        "confidence": 0.96,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Payroll.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.895,
+              "relevance_score": 0.895,
+              "excerpt": "## Payday Q: When is payday? A: Salaries are paid on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3899,
+              "relevance_score": 0.3899,
+              "excerpt": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "chapter": "Annual Leave",
+              "section": "Annual Leave",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "FAQ_Payroll.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T09:37:31.364755+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T09:37:31.364755+00:00",
+    "updated_at": "2026-07-14T09:37:31.364755+00:00",
+    "last_message": "Payday terjadi pada tanggal 25 setiap bulan. Jika tanggal 25 adalah hari libur, pembayaran akan dilakukan pada hari kerja sebelumnya. Pembayaran gaji dilakukan pada hari yang sama dengan pembayaran kompensasi pengembalian biaya, yang juga pada tanggal 25 setiap bulan.",
+    "last_user_message": "when is payday",
+    "last_message_at": "2026-07-14T09:37:31.364755+00:00"
+  },
+  {
+    "id": "1cb99c85-b5f0-4ceb-af59-d0fd56fecba8",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5d2a36a6-32ff-45ec-bf21-890c327a87b0",
+        "conversation_id": "1cb99c85-b5f0-4ceb-af59-d0fd56fecba8",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T07:21:55.602804+00:00"
+      },
+      {
+        "id": "e63499f4-b334-45cb-9802-c1dec9778965",
+        "conversation_id": "1cb99c85-b5f0-4ceb-af59-d0fd56fecba8",
+        "role": "assistant",
+        "content": "Maksimal reimbursement yang dapat diterima adalah Rp2.000.000, karena nilai meja ergonomis tidak melebihi batas maksimal yang tidak disebutkan dalam dokumen. Nota asli wajib dilampirkan karena nilai pembelian melebihi Rp150.000. Reimbursement akan dibayarkan dalam siklus gaji berikutnya, pada tanggal 25 setiap bulan. Klaim harus diserahkan dalam 30 hari setelah tanggal pengeluaran. Jika klaim melebihi 30 hari, dibutuhkan persetujuan Manajer Keuangan.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.761,
+              "relevance_score": 0.761,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T07:21:55.602804+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T07:21:55.602804+00:00",
+    "updated_at": "2026-07-14T07:21:55.602804+00:00",
+    "last_message": "Maksimal reimbursement yang dapat diterima adalah Rp2.000.000, karena nilai meja ergonomis tidak melebihi batas maksimal yang tidak disebutkan dalam dokumen. Nota asli wajib dilampirkan karena nilai pembelian melebihi Rp150.000. Reimbursement akan dibayarkan dalam siklus gaji berikutnya, pada tanggal 25 setiap bulan. Klaim harus diserahkan dalam 30 hari setelah tanggal pengeluaran. Jika klaim melebihi 30 hari, dibutuhkan persetujuan Manajer Keuangan.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-14T07:21:55.602804+00:00"
+  },
+  {
+    "id": "2bf64034-ef63-4d4d-b8fa-cb6bcd12cefb",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5f6ef18e-c1dd-48ac-920f-a5e786a1b5ea",
+        "conversation_id": "2bf64034-ef63-4d4d-b8fa-cb6bcd12cefb",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T07:21:14.889388+00:00"
+      },
+      {
+        "id": "7e9819de-4f70-4045-8c3c-7ed47770787c",
+        "conversation_id": "2bf64034-ef63-4d4d-b8fa-cb6bcd12cefb",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah mengajukan tiket ke IT Helpdesk melalui portal. Maksimal proses reset password adalah 24 jam.",
+        "attachments": [],
+        "confidence": 0.8577,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.838,
+              "relevance_score": 0.838,
+              "excerpt": "Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 2,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T07:21:14.889388+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T07:21:14.889388+00:00",
+    "updated_at": "2026-07-14T07:21:14.889388+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah mengajukan tiket ke IT Helpdesk melalui portal. Maksimal proses reset password adalah 24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T07:21:14.889388+00:00"
+  },
+  {
     "id": "bc17875d-0611-41ce-8d06-47b5275bb679",
     "user_id": "dev-admin",
     "user_name": "Admin",

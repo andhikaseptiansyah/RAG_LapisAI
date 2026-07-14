@@ -76,7 +76,7 @@ def test_paternity_question_does_not_accept_maternity_policy() -> None:
     rows = [candidate("Female employees receive paid maternity leave after childbirth.")]
     decision = assess_answerability(question, rows)
     assert not decision.answerable
-    assert "paternity_leave_subject" in decision.failed_checks
+    assert "missing_concept:paternity_leave" in decision.failed_checks
 
 
 def test_frequency_question_requires_explicit_cadence() -> None:

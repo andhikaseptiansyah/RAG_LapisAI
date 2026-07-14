@@ -9,7 +9,8 @@ BACKEND_DIR = PROJECT_ROOT / "backend"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from ingestion.indexer import reset_collection  # noqa: E402
+from api.document_store import create_document_record, upsert_document  # noqa: E402
+from ingestion.indexer import get_collection, reset_collection  # noqa: E402
 from uploads.config import (  # noqa: E402
     CHROMA_PATH,
     COLLECTION_NAME,
@@ -21,6 +22,17 @@ from uploads.ingest import ingest  # noqa: E402
 
 CORPUS_PREFIXES = ("FAQ_", "Policy_", "Report_", "SOP_", "TECH_")
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt"}
+
+
+def _sync_document_store(path: Path, ingest_result: dict) -> None:
+    """Synchronize each document's latest chunk count with the dashboard store."""
+    record = create_document_record(
+        filename=path.name,
+        filepath=str(path.resolve()),
+        size_bytes=path.stat().st_size,
+        ingest_result=ingest_result,
+    )
+    upsert_document(record)
 
 
 def main() -> None:
@@ -54,10 +66,27 @@ def main() -> None:
     for index, path in enumerate(files, start=1):
         print(f"[{index:02d}/{len(files):02d}] {path.name}")
         result = ingest(str(path))
-        total_chunks += int(result.get("chunks") or 0)
+        chunks = int(result.get("chunks") or 0)
+        total_chunks += chunks
+
+        # Keep documents_store.json aligned with the newly indexed Chroma data.
+        _sync_document_store(path, result)
+
+    chroma_total = int(get_collection().count())
 
     print()
-    print(f"Finished. Indexed {len(files)} documents and {total_chunks} chunks.")
+    print(
+        f"Finished. Indexed {len(files)} documents and "
+        f"{total_chunks} chunks."
+    )
+    print(f"ChromaDB count : {chroma_total}")
+    print("Dashboard store synchronized.")
+
+    if chroma_total != total_chunks:
+        raise SystemExit(
+            "Chunk count mismatch: "
+            f"script={total_chunks}, chroma={chroma_total}"
+        )
 
 
 if __name__ == "__main__":

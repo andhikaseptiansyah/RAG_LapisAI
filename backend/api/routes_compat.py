@@ -28,7 +28,7 @@ from api.document_store import (
 )
 from api.chat_service import run_chat
 from api.logger import delete_log, get_logs, save_log
-from ingestion.indexer import delete_document_chunks
+from ingestion.indexer import delete_document_chunks, get_collection
 from uploads.config import UPLOAD_DIR, public_rag_config
 from uploads.ingest import ingest
 
@@ -672,9 +672,29 @@ def compat_dashboard_analytics(request: Request, range: str = "daily"):
 
 def _dashboard_summary(logs: list[dict[str, Any]]) -> dict[str, Any]:
     documents = read_documents()
-    total_chunks = sum(int(doc.get("chunks") or 0) for doc in documents)
-    avg_latency = sum(float(log.get("latency_ms") or 0.0) for log in logs) / len(logs) if logs else 0.0
-    unique_users = {str(log.get("user_id") or "dev-admin") for log in logs}
+
+    # ChromaDB is the authoritative source for the number of indexed chunks.
+    # documents_store.json may contain an older per-document chunk count after
+    # a bulk re-index, so use it only as a fallback when ChromaDB is unavailable.
+    stored_total_chunks = sum(
+        int(document.get("chunks") or 0)
+        for document in documents
+    )
+
+    try:
+        total_chunks = int(get_collection().count())
+    except Exception:
+        total_chunks = stored_total_chunks
+
+    avg_latency = (
+        sum(float(log.get("latency_ms") or 0.0) for log in logs) / len(logs)
+        if logs
+        else 0.0
+    )
+    unique_users = {
+        str(log.get("user_id") or "dev-admin")
+        for log in logs
+    }
 
     return {
         "totalDocuments": len(documents),

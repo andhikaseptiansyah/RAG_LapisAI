@@ -163,7 +163,7 @@ const getSourceLocationLabels = (
 
   const chapter =
     source.chapter ?? source.section;
-  if (chapter) {
+  if (chapter && documentType !== 'txt') {
     labels.push(`Chapter: ${chapter}`);
   }
 

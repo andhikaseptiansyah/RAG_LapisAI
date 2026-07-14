@@ -3,6 +3,7 @@ from difflib import SequenceMatcher
 from typing import Any
 
 from uploads.config import (
+    MAX_SOURCE_CITATIONS,
     MIN_ANSWER_CONFIDENCE,
     MIN_SOURCE_CONFIDENCE,
     SOURCE_EXCERPT_MAX_CHARS,
@@ -13,7 +14,7 @@ from uploads.config import (
 # sebelum threshold digunakan, terlepas dari urutan import modul FastAPI.
 EXACT_DEFINITION_CONFIDENCE = 0.90
 EXACT_TOKEN_CONFIDENCE = 0.84
-MAX_BULLETS = 2
+MAX_BULLETS = 4
 MAX_SENTENCE_CHARS = 220
 MAX_TOTAL_ANSWER_CHARS = 850
 
@@ -645,7 +646,7 @@ def _inventory_data_answer(question: str, chunks: list[dict[str, Any]], language
     # Batasi item supaya jawaban tidak kepanjangan, tapi tetap informatif.
     fields = fields[:9]
     field_lines = "\n".join(f"- {field}" for field in fields)
-    source_lines = "\n".join(_unique_sources(chunks, limit=2, confidence=confidence))
+    source_lines = "\n".join(_unique_sources(chunks, limit=MAX_SOURCE_CITATIONS, confidence=confidence))
     confidence_pct = round(confidence * 100)
 
     # Catatan proses hanya dimunculkan kalau memang ada di chunk.
@@ -773,9 +774,14 @@ def _calibrated_confidence(question: str, chunks: list[dict[str, Any]]) -> float
     inventory_support = _inventory_support_score(question, chunks)
 
     ranked_scores: list[tuple[float, float]] = []
-    rank_weights = (1.0, 0.65, 0.40)
+    rank_weights = (1.0, 0.72, 0.52, 0.36, 0.24)
 
-    for index, chunk in enumerate(chunks[:3]):
+    evidence_chunks = [
+        chunk for chunk in chunks
+        if chunk.get("answerabilityEvidenceSelected", True)
+    ] or chunks
+
+    for index, chunk in enumerate(evidence_chunks[:5]):
         score = _chunk_confidence(chunk)
         if score <= 0:
             continue
@@ -804,6 +810,17 @@ def _calibrated_confidence(question: str, chunks: list[dict[str, Any]]) -> float
 
     if inventory_support >= MIN_ANSWER_CONFIDENCE:
         confidence = max(confidence, inventory_support)
+
+    # The post-rerank bundle gate already verified all precision requirements.
+    # Use its calibrated score as a floor so a valid multi-document answer is not
+    # rejected merely because no single chunk contains the entire question.
+    answerability_scores = [
+        clamp_score(chunk.get("answerabilityScore"))
+        for chunk in evidence_chunks
+        if chunk.get("answerabilityAccepted") is True
+    ]
+    if answerability_scores:
+        confidence = max(confidence, max(answerability_scores))
 
     return clamp_score(confidence)
 
@@ -866,7 +883,7 @@ def _source_location_parts(chunk: dict[str, Any]) -> list[str]:
         or chunk.get("section")
         or metadata.get("section")
     )
-    if chapter:
+    if chapter and document_type != "txt":
         parts.append(f"Chapter: {chapter}")
 
     paragraph_start = chunk.get(
@@ -875,12 +892,6 @@ def _source_location_parts(chunk: dict[str, Any]) -> list[str]:
     paragraph_end = chunk.get(
         "paragraphEnd", metadata.get("paragraph_end")
     )
-
-    # Backward compatibility for old TXT indexes. After reindexing, TXT uses
-    # paragraph_start and paragraph_end directly.
-    if document_type == "txt" and paragraph_start is None:
-        paragraph_start = chunk.get("lineStart", metadata.get("line_start"))
-        paragraph_end = chunk.get("lineEnd", metadata.get("line_end"))
 
     if paragraph_start is not None:
         start_number = int(paragraph_start)
@@ -912,12 +923,12 @@ def _source_line(chunk: dict[str, Any], confidence: float | None = None) -> str:
 
 def _unique_sources(
     chunks: list[dict[str, Any]],
-    limit: int = 2,
+    limit: int = MAX_SOURCE_CITATIONS,
     confidence: float | None = None,
 ) -> list[str]:
     seen: set[tuple[str, ...]] = set()
     sources: list[str] = []
-    effective_limit = min(max(1, int(limit)), 2)
+    effective_limit = min(max(1, int(limit)), MAX_SOURCE_CITATIONS)
 
     ranked_chunks = sorted(
         chunks,
@@ -982,7 +993,12 @@ def build_grounded_answer(question: str, chunks: list[dict[str, Any]], language:
     query_tokens = set(_tokenize(question))
     ranked_sentences: list[tuple[float, str]] = []
 
-    for chunk_rank, chunk in enumerate(chunks[:4]):
+    evidence_chunks = [
+        chunk for chunk in chunks
+        if chunk.get("answerabilityEvidenceSelected", True)
+    ] or chunks
+
+    for chunk_rank, chunk in enumerate(evidence_chunks[:5]):
         if clamp_score(chunk.get("score")) < 0.25 and chunk_rank > 0:
             continue
         for sentence in _split_sentences(str(chunk.get("content") or "")):
@@ -1014,7 +1030,7 @@ def build_grounded_answer(question: str, chunks: list[dict[str, Any]], language:
     if len(answer_body) > MAX_TOTAL_ANSWER_CHARS:
         answer_body = answer_body[:MAX_TOTAL_ANSWER_CHARS].rsplit(" ", 1)[0].strip() + "…"
 
-    source_lines = "\n".join(_unique_sources(chunks, limit=2, confidence=confidence))
+    source_lines = "\n".join(_unique_sources(chunks, limit=MAX_SOURCE_CITATIONS, confidence=confidence))
     confidence_pct = round(confidence * 100)
 
     if language.upper() == "EN":
@@ -1059,13 +1075,13 @@ def _normalize_page(value: Any) -> int | str | None:
 def build_sources(
     chunks: list[dict[str, Any]],
     question: str = "",
-    limit: int = 2,
+    limit: int = MAX_SOURCE_CITATIONS,
 ) -> list[dict[str, Any]]:
-    """Return at most two citations ordered by descending relevance score.
+    """Return up to the configured citation limit in relevance order.
 
     PDF citations keep the physical PDF page and paragraph range. DOCX page
     numbers are returned only when the parser obtained them from a rendered
-    layout. TXT never claims a fixed page and uses chapter plus paragraph range.
+    layout. TXT never claims a page or chapter and uses only paragraph ranges.
     """
     confidence = answer_confidence(question, chunks)
     if confidence < MIN_ANSWER_CONFIDENCE:
@@ -1073,7 +1089,16 @@ def build_sources(
 
     unique_sources: dict[tuple[str, ...], dict[str, Any]] = {}
 
-    for chunk in chunks:
+    ordered_chunks = sorted(
+        chunks,
+        key=lambda chunk: (
+            bool(chunk.get("answerabilityEvidenceSelected", False)),
+            clamp_score(chunk.get("score")),
+        ),
+        reverse=True,
+    )
+
+    for chunk in ordered_chunks:
         raw_score = clamp_score(chunk.get("score"))
         semantic_score = clamp_score(chunk.get("semanticScore"))
         evidence_supported = chunk.get("evidenceSupported") is True
@@ -1137,6 +1162,8 @@ def build_sources(
             or chunk.get("section")
             or metadata.get("section")
         ) or None
+        if document_type == "txt":
+            chapter = None
 
         paragraph_start = chunk.get(
             "paragraphStart", metadata.get("paragraph_start")
@@ -1144,15 +1171,6 @@ def build_sources(
         paragraph_end = chunk.get(
             "paragraphEnd", metadata.get("paragraph_end")
         )
-        line_start = chunk.get("lineStart", metadata.get("line_start"))
-        line_end = chunk.get("lineEnd", metadata.get("line_end"))
-
-        # Old TXT indexes used line ranges. Present them as paragraph ranges only
-        # as a safe compatibility fallback. A reindex supplies real paragraph
-        # metadata and chapter names from the updated parser.
-        if document_type == "txt" and paragraph_start is None:
-            paragraph_start = line_start
-            paragraph_end = line_end
 
         excerpt = build_evidence_excerpt(
             question,
@@ -1193,7 +1211,7 @@ def build_sources(
         ):
             unique_sources[dedupe_key] = source
 
-    effective_limit = min(max(1, int(limit)), 2)
+    effective_limit = min(max(1, int(limit)), MAX_SOURCE_CITATIONS)
     return sorted(
         unique_sources.values(),
         key=lambda source: source["relevance_score"],

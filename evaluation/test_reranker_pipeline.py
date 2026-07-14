@@ -149,7 +149,7 @@ def test_full_union_is_sent_to_reranker() -> None:
 
 
 
-def test_pre_rerank_veto_blocks_reranker_resurrection() -> None:
+def test_post_rerank_gate_rejects_unsupported_resurrection() -> None:
     fake_indexer = types.ModuleType("ingestion.indexer")
     fake_indexer.embed_query = lambda _: [0.0]
     fake_indexer.get_collection = lambda: None
@@ -197,8 +197,8 @@ def test_pre_rerank_veto_blocks_reranker_resurrection() -> None:
     )
 
     assert results == []
-    assert reranker_called["value"] is False, (
-        "A baseline-rejected query must be vetoed before the cross-encoder can resurrect it."
+    assert reranker_called["value"] is True, (
+        "Reranking must run before answerability so a correct lower-ranked passage can be promoted."
     )
 
 def test_evidence_sort_uses_final_score_not_raw_logit() -> None:
@@ -254,7 +254,7 @@ def main() -> int:
     test_cross_encoder_is_blended_not_absolute()
     test_low_weight_prevents_confident_reranker_takeover()
     test_full_union_is_sent_to_reranker()
-    test_pre_rerank_veto_blocks_reranker_resurrection()
+    test_post_rerank_gate_rejects_unsupported_resurrection()
     test_evidence_sort_uses_final_score_not_raw_logit()
     print("Reranker pipeline tests passed.")
     return 0

@@ -12,6 +12,8 @@ from api.answer_formatter import (
     is_refusal_answer,
     top_confidence,
 )
+from api.grounding_validator import GroundingValidation, validate_grounded_answer
+from uploads.config import ENABLE_GENERATION_GROUNDING_VALIDATION
 
 # Ollama configuration is read from the project-root .env through uploads.config,
 # which is imported by answer_formatter before these values are evaluated.
@@ -23,7 +25,7 @@ OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
 OLLAMA_MAX_RETRIES = max(0, int(os.getenv("OLLAMA_MAX_RETRIES", "1")))
 
 MAX_CONTEXT_CHARS_PER_CHUNK = 1400
-MAX_CONTEXT_CHUNKS = 4
+MAX_CONTEXT_CHUNKS = 5
 MAX_ANSWER_CHARS = 1400
 
 
@@ -33,7 +35,12 @@ def _clean_text(value: Any) -> str:
 
 def _build_context(chunks: list[dict[str, Any]]) -> str:
     blocks: list[str] = []
-    for index, chunk in enumerate(chunks[:MAX_CONTEXT_CHUNKS], start=1):
+    selected_chunks = [
+        chunk for chunk in chunks
+        if chunk.get("answerabilityEvidenceSelected", True)
+        and not chunk.get("evidenceHardFailures")
+    ] or chunks
+    for index, chunk in enumerate(selected_chunks[:MAX_CONTEXT_CHUNKS], start=1):
         content = _clean_text(chunk.get("content"))
         if not content:
             continue
@@ -212,16 +219,30 @@ def _is_likely_incomplete_answer(
     return False
 
 
-def _repair_prompt(original_user_prompt: str, previous_answer: str) -> str:
+def _repair_prompt(
+    original_user_prompt: str,
+    previous_answer: str,
+    *,
+    validation: GroundingValidation | None = None,
+) -> str:
+    diagnostics = ""
+    if validation is not None and not validation.supported:
+        diagnostics = (
+            "\nALASAN VALIDASI GAGAL:\n"
+            f"- Unsupported facts: {', '.join(validation.unsupported_facts) or '-'}\n"
+            f"- Unsupported claims: {' | '.join(validation.unsupported_claims) or '-'}\n"
+            f"- Missing answer requirements: {', '.join(validation.missing_answer_requirements) or '-'}\n"
+        )
     return (
         f"{original_user_prompt}\n\n"
         "INSTRUKSI PERBAIKAN WAJIB:\n"
-        "Jawaban sebelumnya tidak lengkap atau terpotong. Tulis ulang dari awal, "
-        "bukan melanjutkan fragmen sebelumnya. Jawab seluruh bagian pertanyaan "
-        "dengan fakta dari konteks. Bila pertanyaan meminta beberapa angka atau "
-        "metrik, tuliskan semuanya secara eksplisit dalam satu jawaban lengkap. "
-        "Jangan hanya menulis judul, pembuka, atau label.\n\n"
-        f"JAWABAN SEBELUMNYA YANG TIDAK LENGKAP:\n{previous_answer or '(kosong)'}"
+        "Tulis ulang jawaban dari awal. Gunakan hanya fakta yang tertulis pada "
+        "konteks. Salin angka, nominal, persentase, versi, URL, email, tanggal, "
+        "dan durasi secara tepat dari konteks. Hapus klaim yang tidak dapat "
+        "ditunjukkan pada konteks. Jawab seluruh bagian pertanyaan. Jangan "
+        "menambahkan pengetahuan umum atau asumsi.\n"
+        f"{diagnostics}\n"
+        f"JAWABAN SEBELUMNYA:\n{previous_answer or '(kosong)'}"
     )
 
 
@@ -256,6 +277,8 @@ def build_ollama_grounded_answer(
         "Match every constraint in the question: actor, condition, date, amount, duration, and requested outcome. "
         "Do not replace the requested metric with a related metric, for example first response instead of final resolution. "
         "When several contexts are needed, combine only the explicitly supported facts. "
+        "Copy every number, amount, percentage, version, URL, email, date, and duration exactly from context. "
+        "Do not calculate, extrapolate, or add plausible details. "
         "Do not write citations, source lists, confidence values, headings, labels, or model names."
     )
 
@@ -276,34 +299,46 @@ def build_ollama_grounded_answer(
             "Hanya tulis fakta yang jelas ada di konteks dokumen. Jangan mengarang."
         )
 
+    validation: GroundingValidation | None = None
     try:
         raw_answer, done_reason = _ollama_chat(system_prompt, user_prompt)
         llm_answer = _clean_model_answer(raw_answer)
+        if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer:
+            validation = validate_grounded_answer(question, llm_answer, chunks)
 
         retry_count = 0
-        while (
+        while retry_count < OLLAMA_MAX_RETRIES and (
             _is_likely_incomplete_answer(question, llm_answer, done_reason)
-            and retry_count < OLLAMA_MAX_RETRIES
+            or (validation is not None and not validation.supported)
         ):
             retry_count += 1
             raw_answer, done_reason = _ollama_chat(
                 system_prompt,
-                _repair_prompt(user_prompt, llm_answer),
+                _repair_prompt(
+                    user_prompt,
+                    llm_answer,
+                    validation=validation,
+                ),
                 num_predict=max(OLLAMA_NUM_PREDICT, 800),
             )
             llm_answer = _clean_model_answer(raw_answer)
+            if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer:
+                validation = validate_grounded_answer(question, llm_answer, chunks)
 
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, Exception) as exc:
         # Keep the application usable when Ollama is offline or a model call fails.
         print(f"[OLLAMA] fallback to formatter: {exc}")
         return _fallback_answer(question, chunks, language)
 
-    # Do not return a visibly incomplete fragment. The deterministic formatter
-    # extracts the strongest supported sentences from the same retrieved chunks.
-    if _is_likely_incomplete_answer(question, llm_answer, done_reason):
+    # Never expose an incomplete or unsupported generated claim. The fallback is
+    # extractive and copies sentences from the same verified evidence bundle.
+    incomplete = _is_likely_incomplete_answer(question, llm_answer, done_reason)
+    unsupported = validation is not None and not validation.supported
+    if incomplete or unsupported:
+        details = validation.to_dict() if unsupported and validation is not None else {}
         print(
-            "[OLLAMA] incomplete answer after retry; using grounded formatter "
-            f"(done_reason={done_reason or 'unknown'})"
+            "[OLLAMA] generated answer rejected; using grounded formatter "
+            f"(done_reason={done_reason or 'unknown'}, validation={details})"
         )
         return _fallback_answer(question, chunks, language)
 

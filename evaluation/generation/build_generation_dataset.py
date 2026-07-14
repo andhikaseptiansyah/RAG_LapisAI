@@ -9,12 +9,21 @@ Important difference from the old script:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
 import requests
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+EVALUATION_DIR = PROJECT_ROOT / "evaluation"
+if str(EVALUATION_DIR) not in sys.path:
+    sys.path.insert(0, str(EVALUATION_DIR))
+
+from evaluate_retrieval import load_ground_truth as load_official_ground_truth  # noqa: E402
 
 CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/chat")
 QUERY_URL = os.getenv("LAPISAI_QUERY_URL", "http://localhost:8000/query")
@@ -22,9 +31,8 @@ TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "180"))
 
 
 def load_ground_truth(path: Path) -> list[dict[str, Any]]:
-    with path.open(encoding="utf-8") as file:
-        payload = json.load(file)
-    return list(payload.get("items") or [])
+    _, items = load_official_ground_truth(path.resolve())
+    return items
 
 
 def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -180,6 +188,8 @@ def build_dataset(
                 {
                     "id": qid,
                     "question": question,
+                    "expected_answer": str(item.get("expected_answer") or ""),
+                    "expected_sources": list(item.get("references") or []),
                     "retrieved_context": build_context(chunks),
                     "retrieved_sources": [
                         {"document": chunk["document"], "page": chunk["page"]}
@@ -197,6 +207,8 @@ def build_dataset(
                 {
                     "id": qid,
                     "question": question,
+                    "expected_answer": str(item.get("expected_answer") or ""),
+                    "expected_sources": list(item.get("references") or []),
                     "retrieved_context": "",
                     "retrieved_sources": [],
                     "retrieved_chunks": [],
@@ -221,16 +233,16 @@ def main() -> None:
     parser.add_argument(
         "--ground-truth",
         type=Path,
-        default=Path("generation_ground_truth.json"),
+        default=EVALUATION_DIR / "ground_truth_qa.csv",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("input_answers_after.json"),
+        default=Path(__file__).resolve().parent / "input_answers_official.json",
     )
     parser.add_argument(
         "--split",
-        default="test",
+        default="all",
         choices=["train", "development", "test", "all"],
     )
     parser.add_argument("--top-k", type=int, default=5)

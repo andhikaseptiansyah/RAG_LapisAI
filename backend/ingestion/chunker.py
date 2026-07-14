@@ -152,9 +152,8 @@ def _paragraph_chunks(
     if not paragraphs:
         return []
 
-    # Keep citation chapters exact by preventing one chunk from spanning two
-    # consecutive chapters or sections. This is especially important for TXT,
-    # where the chapter and paragraph range replace an unreliable page number.
+    # When reliable section metadata exists, prevent one chunk from spanning
+    # two consecutive sections. TXT input intentionally has no chapter metadata.
     groups: list[list[dict[str, Any]]] = []
     current_group: list[dict[str, Any]] = []
     current_chapter: str | None = None

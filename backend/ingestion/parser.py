@@ -407,69 +407,41 @@ def parse_docx(filepath: str, filename: str) -> list[dict]:
 def _append_txt_paragraph(
     paragraphs: list[dict[str, Any]],
     text: str,
-    chapter: str | None,
 ) -> None:
+    """Append one logical TXT paragraph without inventing page or chapter data."""
     cleaned = _clean_text(text)
     if not cleaned:
         return
 
-    record: dict[str, Any] = {
-        "number": len(paragraphs) + 1,
-        "text": cleaned,
-    }
-    if chapter:
-        record["section"] = chapter
-        record["chapter"] = chapter
-    paragraphs.append(record)
+    paragraphs.append(
+        {
+            "number": len(paragraphs) + 1,
+            "text": cleaned,
+        }
+    )
 
 
 def _parse_txt_paragraphs(lines: list[str]) -> list[dict[str, Any]]:
+    """Split TXT content into original logical paragraphs.
+
+    Plain-text files do not contain reliable page or chapter metadata. Blank
+    lines are therefore used as paragraph boundaries, while consecutive
+    non-empty lines remain part of the same paragraph.
+    """
     paragraphs: list[dict[str, Any]] = []
     buffer: list[str] = []
-    current_chapter: str | None = None
 
     def flush_buffer() -> None:
         nonlocal buffer
         if buffer:
-            _append_txt_paragraph(
-                paragraphs,
-                " ".join(buffer),
-                current_chapter,
-            )
+            _append_txt_paragraph(paragraphs, " ".join(buffer))
             buffer = []
 
     for raw_line in lines:
-        line = raw_line.rstrip("\r\n")
-        stripped = line.strip()
-
+        stripped = raw_line.rstrip("\r\n").strip()
         if not stripped:
             flush_buffer()
             continue
-
-        markdown_match = _MARKDOWN_HEADING_RE.match(stripped)
-        if markdown_match:
-            flush_buffer()
-            current_chapter = _clean_text(markdown_match.group(1))
-            _append_txt_paragraph(paragraphs, current_chapter, current_chapter)
-            continue
-
-        if _UNDERLINE_HEADING_RE.match(stripped):
-            if buffer:
-                inferred_chapter = _clean_text(buffer[-1])
-                flush_buffer()
-                if inferred_chapter:
-                    current_chapter = inferred_chapter
-                    paragraphs[-1]["section"] = current_chapter
-                    paragraphs[-1]["chapter"] = current_chapter
-            continue
-
-        detected_heading = _heading_text(stripped)
-        if detected_heading and not buffer:
-            flush_buffer()
-            current_chapter = detected_heading
-            _append_txt_paragraph(paragraphs, detected_heading, current_chapter)
-            continue
-
         buffer.append(stripped)
 
     flush_buffer()
@@ -484,32 +456,19 @@ def parse_txt(filepath: str, filename: str) -> list[dict]:
     if not paragraphs:
         return []
 
-    page_data: dict[str, Any] = {
-        "text": "\n\n".join(item["text"] for item in paragraphs),
-        "page": None,
-        "page_is_reliable": False,
-        "filename": filename,
-        "document_type": "txt",
-        "location_type": "paragraphs",
-        "paragraphs": paragraphs,
-        "paragraph_start": int(paragraphs[0]["number"]),
-        "paragraph_end": int(paragraphs[-1]["number"]),
-    }
-
-    chapter = next(
-        (
-            str(item.get("chapter"))
-            for item in reversed(paragraphs)
-            if item.get("chapter")
-        ),
-        None,
-    )
-    if chapter:
-        page_data["section"] = chapter
-        page_data["chapter"] = chapter
-
-    return [page_data]
-
+    return [
+        {
+            "text": "\n\n".join(item["text"] for item in paragraphs),
+            "page": None,
+            "page_is_reliable": False,
+            "filename": filename,
+            "document_type": "txt",
+            "location_type": "paragraphs",
+            "paragraphs": paragraphs,
+            "paragraph_start": int(paragraphs[0]["number"]),
+            "paragraph_end": int(paragraphs[-1]["number"]),
+        }
+    ]
 
 def parse_file(filepath: str) -> list[dict]:
     filename = os.path.basename(filepath)

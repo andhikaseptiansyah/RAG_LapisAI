@@ -139,7 +139,8 @@ def main() -> int:
     assert txt_sources
     assert txt_sources[0]["page"] is None
     assert txt_sources[0]["page_is_reliable"] is False
-    assert txt_sources[0]["chapter"] == "Account Recovery"
+    assert "chapter" not in txt_sources[0]
+    assert "section" not in txt_sources[0]
     assert txt_sources[0]["paragraph_start"] == 11
     assert txt_sources[0]["paragraph_end"] == 20
     assert "IT Helpdesk" in txt_sources[0]["excerpt"]
@@ -199,12 +200,14 @@ def main() -> int:
         question=question,
         limit=5,
     )
-    assert len(ordered_sources) == 2, "The API must return no more than two sources."
+    assert len(ordered_sources) == 3, "All three evidence-bearing sources should be returned within the configured cap."
     assert ordered_sources[0]["document_name"] == "First.pdf"
     assert ordered_sources[1]["document_name"] == "Third.pdf"
+    assert ordered_sources[2]["document_name"] == "Second.pdf"
     assert (
         ordered_sources[0]["relevance_score"]
         >= ordered_sources[1]["relevance_score"]
+        >= ordered_sources[2]["relevance_score"]
     )
 
     print("Source citation tests passed.")

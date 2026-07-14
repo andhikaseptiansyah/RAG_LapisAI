@@ -1,4 +1,9 @@
-"""Evaluate LapisAI generation quality with answerability-aware metrics."""
+"""Evaluate generated answers against the official Nusantara Dynamics CSV.
+
+The evaluator reports deterministic answer accuracy plus LLM-judge faithfulness
+and answer relevance. The official CSV contains only answerable questions and
+labels source documents, not source pages.
+"""
 
 from __future__ import annotations
 
@@ -7,16 +12,23 @@ import csv
 import json
 import os
 import re
+import sys
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from openai import OpenAI
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+EVALUATION_DIR = PROJECT_ROOT / "evaluation"
+if str(EVALUATION_DIR) not in sys.path:
+    sys.path.insert(0, str(EVALUATION_DIR))
+
+from evaluate_retrieval import load_ground_truth as load_official_ground_truth  # noqa: E402
 
 LLM_BASE_URL = os.getenv("EVAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_API_KEY = os.getenv("EVAL_LLM_API_KEY", "ollama")
 LLM_MODEL = os.getenv("EVAL_LLM_MODEL", "qwen3-custom:latest")
 
-client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
 
 ABSTENTION_PATTERNS = (
     "belum ketemu",
@@ -101,22 +113,64 @@ def metadata_metrics(
     if not expected:
         raise ValueError("metadata_metrics is only defined for answerable questions")
 
-    recall = score_ratio(len(expected & retrieved) / len(expected))
-    precision = score_ratio(len(expected & retrieved) / max(len(retrieved), 1))
+    # The official CSV only labels source_document. When expected pages are
+    # blank, compare at document level so a retrieved page number does not turn
+    # a correct document into a false miss.
+    document_only = all(not page for _, page in expected)
+    if document_only:
+        expected_units = {document for document, _ in expected}
+        retrieved_units = {document for document, _ in retrieved}
+        cited_units = {document for document, _ in cited}
+    else:
+        expected_units = expected
+        retrieved_units = retrieved
+        cited_units = cited
 
-    exact_citation_ratio = len(expected & cited) / len(expected)
-    if cited == expected:
+    recall_ratio = len(expected_units & retrieved_units) / len(expected_units)
+    precision_ratio = len(expected_units & retrieved_units) / max(len(retrieved_units), 1)
+    citation_ratio = len(expected_units & cited_units) / len(expected_units)
+
+    recall = score_ratio(recall_ratio)
+    precision = score_ratio(precision_ratio)
+    if cited_units == expected_units:
         citation = 5.0
-    elif exact_citation_ratio >= 0.70:
+    elif citation_ratio >= 0.70:
         citation = 4.0
-    elif exact_citation_ratio > 0:
+    elif citation_ratio > 0:
         citation = 3.0
-    elif {doc for doc, _ in expected} & {doc for doc, _ in cited}:
-        citation = 2.0
     else:
         citation = 1.0
 
     return precision, recall, citation
+
+
+def normalize_answer(text: str) -> str:
+    value = str(text or "").casefold()
+    value = value.replace("wib", " wib ")
+    value = re.sub(r"[^a-z0-9à-ÿ%]+", " ", value)
+    return " ".join(value.split())
+
+
+def answer_tokens(text: str) -> list[str]:
+    return normalize_answer(text).split()
+
+
+def exact_match(expected: str, generated: str) -> float:
+    return 1.0 if normalize_answer(expected) == normalize_answer(generated) else 0.0
+
+
+def token_f1(expected: str, generated: str) -> float:
+    expected_tokens = answer_tokens(expected)
+    generated_tokens = answer_tokens(generated)
+    if not expected_tokens or not generated_tokens:
+        return 0.0
+    common = Counter(expected_tokens) & Counter(generated_tokens)
+    overlap = sum(common.values())
+    if overlap == 0:
+        return 0.0
+    precision = overlap / len(generated_tokens)
+    recall = overlap / len(expected_tokens)
+    return 2 * precision * recall / (precision + recall)
 
 
 def detect_abstention(answer: str) -> bool:
@@ -146,22 +200,18 @@ def parse_json_object(text: str) -> dict[str, Any]:
 def llm_judge(
     *,
     question: str,
-    answerable: bool,
     expected_answer: str,
-    expected_keywords: list[str],
     context: str,
     answer: str,
 ) -> dict[str, Any]:
     prompt = f"""
-Anda adalah evaluator independen untuk sistem Retrieval-Augmented Generation.
+You are an independent evaluator for a Retrieval-Augmented Generation system.
 
-STATUS GROUND TRUTH:
-- Answerable: {str(answerable).lower()}
-- Expected answer: {expected_answer}
-- Important keywords: {json.dumps(expected_keywords, ensure_ascii=False)}
-
-PERTANYAAN:
+QUESTION:
 {question}
+
+EXPECTED ANSWER:
+{expected_answer}
 
 RETRIEVED CONTEXT:
 {context or '[EMPTY CONTEXT]'}
@@ -169,21 +219,24 @@ RETRIEVED CONTEXT:
 SYSTEM ANSWER:
 {answer}
 
-Rubrik:
-1. faithfulness (1-5): semua klaim faktual harus didukung retrieved context. Jawaban abstain yang tidak mengarang dapat tetap faithful.
-2. answer_relevance (1-5): bandingkan langsung dengan expected answer. Untuk answerable=false, penolakan yang jelas dan tepat mendapat nilai tinggi.
-3. is_hallucination: true jika ada klaim faktual spesifik yang tidak didukung context.
+Score:
+1. faithfulness (1-5): every factual claim must be supported by retrieved context.
+2. answer_relevance (1-5): the answer must directly and correctly answer the question compared with the expected answer.
+3. is_hallucination: true when the answer contains a specific factual claim unsupported by context.
 
-Kembalikan JSON saja:
+Return JSON only:
 {{
   "faithfulness": 1,
   "answer_relevance": 1,
   "is_hallucination": false,
-  "reason": "maksimal 25 kata"
+  "reason": "maximum 25 words"
 }}
 """
 
     try:
+        from openai import OpenAI
+
+        client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
         response = client.chat.completions.create(
             model=LLM_MODEL,
             temperature=0,
@@ -211,32 +264,46 @@ Kembalikan JSON saja:
 
 
 def mean(values: list[float]) -> float | None:
-    return round(sum(values) / len(values), 2) if values else None
+    return round(sum(values) / len(values), 4) if values else None
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ground-truth", type=Path, default=Path("generation_ground_truth.json"))
-    parser.add_argument("--input", type=Path, default=Path("input_answers_after.json"))
-    parser.add_argument("--output-prefix", default="after")
+    parser.add_argument(
+        "--ground-truth",
+        type=Path,
+        default=EVALUATION_DIR / "ground_truth_qa.csv",
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=Path(__file__).resolve().parent / "input_answers_official.json",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "results",
+    )
+    parser.add_argument("--output-prefix", default="official")
     args = parser.parse_args()
 
-    gt_payload = json.loads(args.ground_truth.read_text(encoding="utf-8"))
-    ground_truth = {str(item["id"]): item for item in gt_payload.get("items", [])}
+    dataset, gt_items = load_official_ground_truth(args.ground_truth.resolve())
+    ground_truth = {str(item["id"]): item for item in gt_items}
     answers = json.loads(args.input.read_text(encoding="utf-8"))
 
     rows: list[dict[str, Any]] = []
-    answerable_precision: list[float] = []
-    answerable_recall: list[float] = []
-    answerable_citation: list[float] = []
+    context_precision: list[float] = []
+    context_recall: list[float] = []
+    citation_accuracy: list[float] = []
     faithfulness: list[float] = []
     relevance: list[float] = []
+    exact_matches: list[float] = []
+    token_f1_values: list[float] = []
     hallucinations = 0
-    answerability_correct = 0
     false_refusals = 0
-    unsafe_answers = 0
 
-    print(f"Mulai Evaluasi ({LLM_MODEL})")
+    print(f"Generation evaluation dataset: {dataset.get('dataset_name')}")
+    print(f"LLM judge: {LLM_MODEL}")
 
     for index, item in enumerate(answers, start=1):
         qid = str(item.get("id") or "")
@@ -245,37 +312,31 @@ def main() -> None:
         gt = ground_truth[qid]
         print(f"[{index}/{len(answers)}] {qid}")
 
-        is_answerable = bool(gt.get("answerable", True))
-        is_abstention = detect_abstention(str(item.get("generated_answer") or ""))
-        is_answerability_correct = (is_answerable and not is_abstention) or (
-            not is_answerable and is_abstention
-        )
-        answerability_correct += int(is_answerability_correct)
-        false_refusals += int(is_answerable and is_abstention)
-        unsafe_answers += int((not is_answerable) and (not is_abstention))
+        generated_answer = str(item.get("generated_answer") or "")
+        expected_answer = str(gt.get("expected_answer") or "")
+        is_abstention = detect_abstention(generated_answer)
+        false_refusals += int(is_abstention)
 
-        precision: float | None = None
-        recall: float | None = None
-        citation: float | None = None
-        if is_answerable:
-            precision, recall, citation = metadata_metrics(
-                item.get("retrieved_sources") or [],
-                gt.get("references") or [],
-                item.get("citation") or [],
-            )
-            answerable_precision.append(precision)
-            answerable_recall.append(recall)
-            answerable_citation.append(citation)
+        precision, recall, citation = metadata_metrics(
+            item.get("retrieved_sources") or [],
+            gt.get("references") or [],
+            item.get("citation") or [],
+        )
+        context_precision.append(precision)
+        context_recall.append(recall)
+        citation_accuracy.append(citation)
+
+        em = exact_match(expected_answer, generated_answer)
+        f1 = token_f1(expected_answer, generated_answer)
+        exact_matches.append(em)
+        token_f1_values.append(f1)
 
         semantic = llm_judge(
             question=str(item.get("question") or gt.get("question") or ""),
-            answerable=is_answerable,
-            expected_answer=str(gt.get("expected_answer") or ""),
-            expected_keywords=list(gt.get("expected_answer_keywords") or []),
+            expected_answer=expected_answer,
             context=str(item.get("retrieved_context") or ""),
-            answer=str(item.get("generated_answer") or ""),
+            answer=generated_answer,
         )
-
         faithfulness.append(semantic["faithfulness"])
         relevance.append(semantic["answer_relevance"])
         hallucinations += int(semantic["is_hallucination"])
@@ -283,9 +344,16 @@ def main() -> None:
         rows.append(
             {
                 "ID": qid,
-                "Answerable": is_answerable,
+                "Question": gt.get("question"),
+                "Expected Answer": expected_answer,
+                "Generated Answer": generated_answer,
+                "Expected Source": " | ".join(
+                    str(reference.get("document") or "")
+                    for reference in gt.get("references") or []
+                ),
                 "Abstained": is_abstention,
-                "Answerability Correct": is_answerability_correct,
+                "Normalized Exact Match": round(em, 4),
+                "Token F1": round(f1, 4),
                 "Faithfulness": semantic["faithfulness"],
                 "Answer Relevance": semantic["answer_relevance"],
                 "Context Precision": precision,
@@ -300,40 +368,49 @@ def main() -> None:
         raise RuntimeError("No matching evaluation rows were found")
 
     n = len(rows)
-    answerable_count = sum(bool(row["Answerable"]) for row in rows)
-    unanswerable_count = n - answerable_count
     summary = {
         "project": "LapisAI Enterprise Knowledge Assistant",
-        "evaluation": "Answerability-aware Generation Quality Evaluation",
+        "dataset": dataset.get("dataset_name"),
+        "ground_truth": str(args.ground_truth.resolve()),
+        "evaluation": "Official 30-question Generation Quality Evaluation",
         "total_questions": n,
         "question_counts": {
-            "answerable": answerable_count,
-            "unanswerable": unanswerable_count,
+            "answerable": n,
+            "unanswerable": 0,
         },
         "metrics": {
-            "faithfulness": mean(faithfulness),
-            "answer_relevance": mean(relevance),
-            "context_precision_answerable_only": mean(answerable_precision),
-            "context_recall_answerable_only": mean(answerable_recall),
-            "citation_accuracy_answerable_only": mean(answerable_citation),
+            "normalized_exact_match": mean(exact_matches),
+            "token_f1": mean(token_f1_values),
+            "faithfulness_1_to_5": mean(faithfulness),
+            "answer_relevance_1_to_5": mean(relevance),
+            "context_precision_1_to_5": mean(context_precision),
+            "context_recall_1_to_5": mean(context_recall),
+            "citation_accuracy_1_to_5": mean(citation_accuracy),
             "hallucination_rate": round(hallucinations / n, 4),
-            "answerability_accuracy": round(answerability_correct / n, 4),
-            "false_refusal_rate_answerable": round(false_refusals / max(answerable_count, 1), 4),
-            "unsafe_answer_rate_unanswerable": round(unsafe_answers / max(unanswerable_count, 1), 4),
+            "false_refusal_rate": round(false_refusals / n, 4),
+            "unanswerable_safety_rate": None,
         },
+        "notes": [
+            "The official CSV contains only answerable questions.",
+            "Source accuracy is evaluated at document level because the CSV has no page labels.",
+            "Faithfulness and answer relevance use the configured deterministic LLM judge.",
+        ],
     }
 
-    csv_path = Path(f"generation_results_{args.output_prefix}.csv")
-    json_path = Path(f"generation_summary_{args.output_prefix}.json")
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = args.output_dir / f"generation_results_{args.output_prefix}.csv"
+    json_path = args.output_dir / f"generation_summary_{args.output_prefix}.json"
 
-    with csv_path.open("w", newline="", encoding="utf-8") as file:
+    with csv_path.open("w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
 
     json_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
-    print("\n[SUKSES]")
+    print("\n[SUCCESS]")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
+    print(f"Details: {csv_path}")
+    print(f"Summary: {json_path}")
 
 
 if __name__ == "__main__":

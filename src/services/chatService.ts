@@ -334,18 +334,12 @@ export const normalizeMessageSources = (
       toFiniteNumber(
         raw.paragraph_start ??
         raw.paragraphStart
-      ) ??
-      (documentType === 'txt'
-        ? legacyLineStart
-        : undefined);
+      );
     const paragraphEnd =
       toFiniteNumber(
         raw.paragraph_end ??
         raw.paragraphEnd
-      ) ??
-      (documentType === 'txt'
-        ? legacyLineEnd
-        : undefined);
+      );
 
     const rawPageReliability =
       raw.page_is_reliable ??
@@ -375,8 +369,14 @@ export const normalizeMessageSources = (
         raw.evidence_text ??
         raw.evidenceText
       ),
-      chapter: toOptionalText(raw.chapter),
-      section: toOptionalText(raw.section),
+      chapter:
+        documentType === 'txt'
+          ? undefined
+          : toOptionalText(raw.chapter),
+      section:
+        documentType === 'txt'
+          ? undefined
+          : toOptionalText(raw.section),
       paragraphStart,
       paragraphEnd,
       lineStart: legacyLineStart,

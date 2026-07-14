@@ -5,18 +5,19 @@ from collections import defaultdict
 from typing import Any
 
 from ingestion.indexer import embed_query, get_collection
-from retrieval.answerability import apply_answerability_gate, assess_answerability
+from retrieval.answerability import apply_answerability_gate
 from retrieval.evidence_verifier import verify_chunks
 from retrieval.query_expansion import expand_query
 from retrieval.reranker import rerank_candidates, warmup_reranker
 from uploads.config import (
-    ANSWERABILITY_PRE_RERANK_VETO,
     ENABLE_ANSWERABILITY_GATE,
     ENABLE_EVIDENCE_VERIFICATION,
+    ENABLE_QUERY_DECOMPOSITION,
     ENABLE_RERANKER,
     EVIDENCE_WEIGHT,
     MIN_EVIDENCE_SCORE,
     MIN_RESULT_SCORE,
+    QUERY_DECOMPOSITION_MAX_PARTS,
     RERANKER_CANDIDATES,
     RETRIEVAL_WARMUP_QUERY,
 )
@@ -221,65 +222,113 @@ def bm25_search(query: str, top_k: int = 20) -> list[dict]:
     return rows
 
 
+def _decompose_query(query: str) -> list[str]:
+    """Return the original query plus a few self-contained subquestions.
+
+    Decomposition is deterministic and intentionally conservative. It only
+    splits at conjunctions followed by another interrogative or evidence noun,
+    so ordinary noun phrases are not fragmented.
+    """
+    clean = re.sub(r"\s+", " ", str(query or "")).strip()
+    if not clean or not ENABLE_QUERY_DECOMPOSITION:
+        return [clean] if clean else []
+
+    split_pattern = re.compile(
+        r"\s+(?:dan|serta|and)\s+(?="
+        r"(?:berapa|apa|apakah|bagaimana|kapan|siapa|which|what|how|when|who|"
+        r"dokumen|bukti|syarat|persyaratan|nilai|jumlah|persentase|percentage)\b)",
+        flags=re.I,
+    )
+    parts = [part.strip(" ,;?.") for part in split_pattern.split(clean) if part.strip(" ,;?.")]
+    if len(parts) <= 1:
+        return [clean]
+
+    variants = [clean]
+    for part in parts:
+        if len(part.split()) < 3:
+            continue
+        if part not in variants:
+            variants.append(part)
+        if len(variants) >= max(int(QUERY_DECOMPOSITION_MAX_PARTS), 1) + 1:
+            break
+    return variants
+
+
 def _base_hybrid_candidates(
     query: str,
     *,
     candidate_k: int,
 ) -> list[dict[str, Any]]:
-    """Merge semantic top-N and BM25 top-N without early score filtering.
+    """Merge semantic and BM25 candidates across the original and subqueries.
 
-    Early filtering can remove a passage that the cross-encoder would correctly
-    promote. Final thresholding therefore happens only after reranking and
-    evidence verification.
+    Scores use the best semantic and lexical match observed for each chunk. A
+    small coverage bonus rewards passages recovered by several subqueries, but
+    the bonus cannot rescue an otherwise weak candidate.
     """
-    semantic_rows = semantic_search(query, top_k=candidate_k)
-    keyword_rows = bm25_search(query, top_k=candidate_k)
-
-    merged: dict[str, dict] = {}
-    weighted_scores: dict[str, float] = defaultdict(float)
+    query_variants = _decompose_query(query)
+    merged: dict[str, dict[str, Any]] = {}
+    semantic_best: dict[str, float] = defaultdict(float)
+    keyword_best: dict[str, float] = defaultdict(float)
+    semantic_rank_best: dict[str, int] = {}
+    keyword_rank_best: dict[str, int] = {}
     tie_breakers: dict[str, float] = defaultdict(float)
+    matched_queries: dict[str, set[str]] = defaultdict(set)
 
-    for row in semantic_rows:
-        chunk_id = row["chunkId"]
-        merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
-        weighted_scores[chunk_id] += 0.68 * _clamp(row.get("semanticScore", 0.0))
-        tie_breakers[chunk_id] += _rrf_score(row.get("semanticRank", candidate_k))
+    for variant in query_variants:
+        semantic_rows = semantic_search(variant, top_k=candidate_k)
+        keyword_rows = bm25_search(variant, top_k=candidate_k)
 
-    for row in keyword_rows:
-        chunk_id = row["chunkId"]
-        merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
-        weighted_scores[chunk_id] += 0.32 * _clamp(row.get("keywordScore", 0.0))
-        tie_breakers[chunk_id] += _rrf_score(row.get("keywordRank", candidate_k))
+        for row in semantic_rows:
+            chunk_id = row["chunkId"]
+            merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
+            score = _clamp(row.get("semanticScore", 0.0))
+            semantic_best[chunk_id] = max(semantic_best[chunk_id], score)
+            rank = int(row.get("semanticRank", candidate_k) or 0)
+            semantic_rank_best[chunk_id] = min(semantic_rank_best.get(chunk_id, rank), rank)
+            tie_breakers[chunk_id] += _rrf_score(rank)
+            matched_queries[chunk_id].add(variant)
 
+        for row in keyword_rows:
+            chunk_id = row["chunkId"]
+            merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
+            score = _clamp(row.get("keywordScore", 0.0))
+            keyword_best[chunk_id] = max(keyword_best[chunk_id], score)
+            rank = int(row.get("keywordRank", candidate_k) or 0)
+            keyword_rank_best[chunk_id] = min(keyword_rank_best.get(chunk_id, rank), rank)
+            tie_breakers[chunk_id] += _rrf_score(rank)
+            matched_queries[chunk_id].add(variant)
+
+    weighted_scores: dict[str, float] = defaultdict(float)
+    variant_count = max(len(query_variants), 1)
     for chunk_id, row in merged.items():
+        weighted = 0.68 * semantic_best[chunk_id] + 0.32 * keyword_best[chunk_id]
+        coverage_ratio = len(matched_queries[chunk_id]) / variant_count
+        if len(query_variants) > 1 and coverage_ratio > 0.5:
+            weighted += min(0.03, 0.03 * coverage_ratio)
+
         metadata = row.get("metadata", {}) or {}
         searchable_text = f"{metadata.get('filename', '')} {row.get('content', '')}"
-        exact_coverage = _exact_token_coverage(query, searchable_text)
+        exact_coverage = max(
+            (_exact_token_coverage(variant, searchable_text) for variant in query_variants),
+            default=0.0,
+        )
         row["exactTokenCoverage"] = round(exact_coverage, 6)
 
         if exact_coverage >= 1.0:
-            weighted_scores[chunk_id] = max(weighted_scores[chunk_id], 0.86)
+            weighted = max(weighted, 0.86)
         elif exact_coverage >= 0.67:
-            weighted_scores[chunk_id] = max(weighted_scores[chunk_id], 0.78)
+            weighted = max(weighted, 0.78)
 
-        inventory_score = (
-            _inventory_field_score(searchable_text)
-            if _is_inventory_query(query)
-            else 0.0
-        )
+        inventory_score = _inventory_field_score(searchable_text) if _is_inventory_query(query) else 0.0
         row["inventoryFieldScore"] = round(inventory_score, 6)
         if inventory_score >= 0.84:
-            weighted_scores[chunk_id] = max(
-                weighted_scores[chunk_id],
-                inventory_score,
-            )
+            weighted = max(weighted, inventory_score)
+
+        weighted_scores[chunk_id] = _clamp(weighted)
 
     ranked = sorted(
         weighted_scores,
-        key=lambda chunk_id: (
-            weighted_scores[chunk_id],
-            tie_breakers[chunk_id],
-        ),
+        key=lambda chunk_id: (weighted_scores[chunk_id], tie_breakers[chunk_id]),
         reverse=True,
     )
 
@@ -297,19 +346,15 @@ def _base_hybrid_candidates(
                 "content": row.get("content", ""),
                 "score": round(score, 6),
                 "baseScore": round(score, 6),
-                "semanticScore": round(_clamp(row.get("semanticScore", 0.0)), 6),
-                "semanticRank": row.get("semanticRank"),
-                "keywordScore": round(_clamp(row.get("keywordScore", 0.0)), 6),
-                "keywordRank": row.get("keywordRank"),
-                "exactTokenCoverage": round(
-                    _clamp(row.get("exactTokenCoverage", 0.0)),
-                    6,
-                ),
-                "inventoryFieldScore": round(
-                    _clamp(row.get("inventoryFieldScore", 0.0)),
-                    6,
-                ),
+                "semanticScore": round(semantic_best[chunk_id], 6),
+                "semanticRank": semantic_rank_best.get(chunk_id),
+                "keywordScore": round(keyword_best[chunk_id], 6),
+                "keywordRank": keyword_rank_best.get(chunk_id),
+                "exactTokenCoverage": round(_clamp(row.get("exactTokenCoverage", 0.0)), 6),
+                "inventoryFieldScore": round(_clamp(row.get("inventoryFieldScore", 0.0)), 6),
                 "expandedQuery": row.get("expandedQuery") or expand_query(query),
+                "queryVariants": query_variants,
+                "matchedQueryVariants": sorted(matched_queries[chunk_id]),
                 "metadata": metadata,
             }
         )
@@ -393,10 +438,11 @@ def hybrid_search(
     verify_evidence: bool = ENABLE_EVIDENCE_VERIFICATION,
     apply_answerability: bool = ENABLE_ANSWERABILITY_GATE,
 ) -> list[dict]:
-    """Run semantic top-N + BM25 top-N, cross-encoder reranking, then top-k.
+    """Run decomposed hybrid retrieval, reranking, evidence checks, and gating.
 
     Default production flow:
-      semantic top 20 + BM25 top 20 -> union -> cross-encoder -> evidence -> top 5
+      query decomposition -> semantic/BM25 union -> cross-encoder ->
+      evidence verification -> top-k answerability bundle -> final top-k
     """
     clean_query = str(query or "").strip()
     if not clean_query:
@@ -416,33 +462,9 @@ def hybrid_search(
         candidate_k=per_retriever_k,
     )
 
-    pre_rerank_decision = None
-    if (
-        use_reranker
-        and apply_answerability
-        and verify_evidence
-        and ANSWERABILITY_PRE_RERANK_VETO
-    ):
-        # Evaluate answerability on the original hybrid ranking before the
-        # cross-encoder is allowed to change scores. If the baseline retrieval
-        # cannot establish that the corpus contains an answer, reranking may not
-        # resurrect the query. This guarantees that a reranker can improve order
-        # but cannot introduce a new false positive on its own.
-        baseline_verified = _apply_evidence_verification(
-            clean_query,
-            [dict(candidate) for candidate in candidates],
-            min_score=min_score,
-        )
-        pre_rerank_decision = assess_answerability(
-            clean_query,
-            baseline_verified,
-        )
-        if not pre_rerank_decision.answerable:
-            print(
-                "[ANSWERABILITY] Pre-rerank veto rejected query: "
-                f"{pre_rerank_decision.reason}"
-            )
-            return []
+    # Answerability is deliberately evaluated after reranking and evidence
+    # verification. A pre-rerank veto caused false refusals whenever the correct
+    # passage was initially ranked second or third.
 
     if use_reranker:
         # The configured MMARCO cross-encoder is multilingual, so score the
@@ -472,18 +494,6 @@ def hybrid_search(
     if apply_answerability and verify_evidence:
         candidates = apply_answerability_gate(clean_query, candidates)
 
-    if candidates and pre_rerank_decision is not None:
-        pre_metadata = pre_rerank_decision.to_dict()
-        candidates = [
-            {
-                **candidate,
-                "preRerankAnswerabilityAccepted": True,
-                "preRerankAnswerabilityScore": pre_rerank_decision.score,
-                "preRerankAnswerabilityReason": pre_rerank_decision.reason,
-                "preRerankAnswerabilityDiagnostics": pre_metadata,
-            }
-            for candidate in candidates
-        ]
 
     return candidates[:requested_top_k]
 

@@ -1,5 +1,1821 @@
 [
   {
+    "id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "What database does the platform use?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "75f04a08-5bd6-40f6-bf04-43e347283826",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What database does the platform use?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:43:14.094620+00:00"
+      },
+      {
+        "id": "26b019f2-c26c-463e-81e6-13e4dba2165d",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Platform menggunakan database PostgreSQL 15 sebagai datastore utama, dan Redis digunakan untuk caching.",
+        "attachments": [],
+        "confidence": 0.8478,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_System_Architecture.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.786,
+              "relevance_score": 0.786,
+              "excerpt": "## Stack The platform runs on a microservices architecture deployed on Kubernetes.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "TECH_Database_Schema.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5176,
+              "relevance_score": 0.5176,
+              "excerpt": "Nusantara Dynamics Database Schema Reference ========================= ## Customers The customers table stores customer_id, name, tier, created_at. ## Orders The orders table links to customers via customer_id and stores order_date and status.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4201,
+              "relevance_score": 0.4201,
+              "excerpt": "Data in transit must use TLS 1.2 or higher.",
+              "chapter": "Encryption",
+              "section": "Encryption",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "TECH_Deployment_Runbook.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.3317,
+              "relevance_score": 0.3317,
+              "excerpt": "## Process Deployments use a blue-green strategy.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "TECH_System_Architecture.txt",
+          "page": null,
+          "follow_up_question": "Sistem orkestrasi kontainer apa yang mengelola beban kerja kita, dan *engine* teknologi apa yang digunakan untuk penyimpanan persisten (database) vs tembolok memori sementara?",
+          "followUpQuestion": "Sistem orkestrasi kontainer apa yang mengelola beban kerja kita, dan *engine* teknologi apa yang digunakan untuk penyimpanan persisten (database) vs tembolok memori sementara?"
+        },
+        "created_at": "2026-07-14T12:43:14.094620+00:00"
+      },
+      {
+        "id": "2fd7b140-5111-4ad7-9fd7-5896a2f0409e",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What was the root cause of the October 2025 outage?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:43:55.733438+00:00"
+      },
+      {
+        "id": "556d8a3c-68b7-48d1-ac2c-1925214db8b5",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:43:55.733438+00:00"
+      },
+      {
+        "id": "b74034d6-f111-4899-8363-2ca7ddd08438",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What was Q3 2025 revenue?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:44:23.067395+00:00"
+      },
+      {
+        "id": "d906a730-7516-4349-b8ad-22d1e5cad69c",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:44:23.067395+00:00"
+      },
+      {
+        "id": "fd731331-ad33-4c29-b8d0-b840dcd5ab01",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What was the 2025 overall CSAT score?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:44:41.019357+00:00"
+      },
+      {
+        "id": "4aca7b32-dacf-448b-86b3-8231005ffb1f",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:44:41.019357+00:00"
+      },
+      {
+        "id": "c5211f2c-8101-4feb-ab16-8edabba44c6a",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:45:01.758570+00:00"
+      },
+      {
+        "id": "43e60d1a-b470-4333-8677-bd5ebc6a3299",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:45:01.758570+00:00"
+      },
+      {
+        "id": "c69328a2-6540-4a4c-86ee-d74bb941c9cb",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:45:22.438129+00:00"
+      },
+      {
+        "id": "89d65c6a-d602-480e-bf3b-a8d7eb7e0e53",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:45:22.438129+00:00"
+      },
+      {
+        "id": "7e6146b3-b985-4a04-b12a-5b7d03fc1be7",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What approval is needed for a purchase above IDR 50 million?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:45:44.002538+00:00"
+      },
+      {
+        "id": "5e80bc56-8b95-4e91-8cbe-8b06411a4cc5",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Untuk pembelian di atas IDR 50 juta, dibutuhkan persetujuan dari Direktur dan tiga penawaran dari vendor.",
+        "attachments": [],
+        "confidence": 0.9194,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8021,
+              "relevance_score": 0.8021,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Procurement_Threshold.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7016,
+              "relevance_score": 0.7016,
+              "excerpt": "IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+              "chapter": "Tiers",
+              "section": "Tiers",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5483,
+              "relevance_score": 0.5483,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Procurement_Threshold.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5463,
+              "relevance_score": 0.5463,
+              "excerpt": "Procurement Approval Threshold Policy",
+              "chapter": "Procurement Approval Threshold Policy",
+              "section": "Procurement Approval Threshold Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": "Siapa pemasok pihak ketiga dengan performa terbaik dalam tinjauan tahunan kita, dan berapa nilai yang mereka capai?",
+          "followUpQuestion": "Siapa pemasok pihak ketiga dengan performa terbaik dalam tinjauan tahunan kita, dan berapa nilai yang mereka capai?"
+        },
+        "created_at": "2026-07-14T12:45:44.002538+00:00"
+      },
+      {
+        "id": "600cf868-0616-434b-8651-8f16b3cac6c1",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What is the domestic meal per diem?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:46:24.431925+00:00"
+      },
+      {
+        "id": "dfddbb0e-40b2-4da1-83ef-f3db11818c33",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "THE merujuk pada Per Diem The domestic meal per diem is IDR 250,000 per day..",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+              "chapter": "Per Diem",
+              "section": "Per Diem",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Policy_Travel_Expense.docx",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:46:24.431925+00:00"
+      },
+      {
+        "id": "8608a300-40ce-45c8-badc-bc2afea24887",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "Who must a suspected data breach be reported to and how fast?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:47:04.297867+00:00"
+      },
+      {
+        "id": "69c68daa-f56d-4d1d-b06c-327b07689c43",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Suspected data breach harus dilaporkan kepada security@nusantaradynamics.co.id dalam waktu 1 jam.",
+        "attachments": [],
+        "confidence": 0.9747,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9186,
+              "relevance_score": 0.9186,
+              "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4303,
+              "relevance_score": 0.4303,
+              "excerpt": "Data Security Policy",
+              "chapter": "Data Security Policy",
+              "section": "Data Security Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "Report_Security_Review_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3601,
+              "relevance_score": 0.3601,
+              "excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Anti_Harassment.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3413,
+              "relevance_score": 0.3413,
+              "excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": 1,
+          "follow_up_question": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+          "followUpQuestion": "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?"
+        },
+        "created_at": "2026-07-14T12:47:04.297867+00:00"
+      },
+      {
+        "id": "d7ada1aa-7408-4543-ac7c-a40b214cf234",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "How many annual leave days do employees get?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:47:39.966378+00:00"
+      },
+      {
+        "id": "c3d9418b-018f-4e3e-9a7e-a50261bcfd9d",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+        "attachments": [],
+        "confidence": 0.9699,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8848,
+              "relevance_score": 0.8848,
+              "excerpt": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "chapter": "Annual Leave",
+              "section": "Annual Leave",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "SOP_Leave_Request.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6728,
+              "relevance_score": 0.6728,
+              "excerpt": "Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5555,
+              "relevance_score": 0.5555,
+              "excerpt": "A maximum of 6 unused leave days may be carried over to the next year.",
+              "chapter": "Carryover",
+              "section": "Carryover",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4862,
+              "relevance_score": 0.4862,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Policy_Leave.docx",
+          "page": 1,
+          "follow_up_question": "Apakah mengambil liburan berturut-turut selama dua minggu memerlukan tanda tangan di luar atasan langsung saya?",
+          "followUpQuestion": "Apakah mengambil liburan berturut-turut selama dua minggu memerlukan tanda tangan di luar atasan langsung saya?"
+        },
+        "created_at": "2026-07-14T12:47:39.966378+00:00"
+      },
+      {
+        "id": "910cec90-0a18-44d5-941b-574a49ec75a5",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "How long are audit logs retained?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:48:08.533813+00:00"
+      },
+      {
+        "id": "740881b2-e80f-4746-8bf2-b56880029e60",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Audit logs disimpan selama 7 tahun.",
+        "attachments": [],
+        "confidence": 0.9876,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8833,
+              "relevance_score": 0.8833,
+              "excerpt": "## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Report_IT_Audit_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3785,
+              "relevance_score": 0.3785,
+              "excerpt": "The 2025 audit raised 14 findings: 2 high, 5 medium, 7 low.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3739,
+              "relevance_score": 0.3739,
+              "excerpt": "Daily backups are retained for 30 days; monthly backups for 12 months.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3536,
+              "relevance_score": 0.3536,
+              "excerpt": "IT revokes all system access within 2 hours of the employee's exit time.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "TECH_Data_Retention.txt",
+          "page": null,
+          "follow_up_question": "Untuk mematuhi permintaan penyimpanan hukum, berapa masa retensi wajib untuk log tindakan sistem?",
+          "followUpQuestion": "Untuk mematuhi permintaan penyimpanan hukum, berapa masa retensi wajib untuk log tindakan sistem?"
+        },
+        "created_at": "2026-07-14T12:48:08.533813+00:00"
+      },
+      {
+        "id": "6c5a8942-c80b-4a6c-89be-9461cf31bfbe",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What should I bring on my first day?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:48:41.480874+00:00"
+      },
+      {
+        "id": "c1407db3-e7c6-4769-b114-96a4c3c7228b",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:48:41.480874+00:00"
+      },
+      {
+        "id": "1c2c75c2-992d-476a-b7a1-1b159ddb5aaa",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "user",
+        "content": "What is the replacement fee for an access card?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:49:28.826826+00:00"
+      },
+      {
+        "id": "70af75eb-525b-481a-9cec-34460eb60d7a",
+        "conversation_id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
+        "role": "assistant",
+        "content": "THE merujuk pada Nusantara Dynamics Facilities FAQ ============== ## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Facilities.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5289,
+              "relevance_score": 0.5289,
+              "excerpt": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.273,
+              "relevance_score": 0.273,
+              "excerpt": "Travel & Expense Policy",
+              "chapter": "Travel & Expense Policy",
+              "section": "Travel & Expense Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.2727,
+              "relevance_score": 0.2727,
+              "excerpt": "Expense claims must be submitted within 30 days of the expense date.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "FAQ_Facilities.txt",
+          "page": null,
+          "follow_up_question": "Jika pengguna belum masuk ke sistem sejak 1 Januari, apakah profilnya masih aktif pada 1 Mei, dan seberapa sering akses mereka diaudit?",
+          "followUpQuestion": "Jika pengguna belum masuk ke sistem sejak 1 Januari, apakah profilnya masih aktif pada 1 Mei, dan seberapa sering akses mereka diaudit?"
+        },
+        "created_at": "2026-07-14T12:49:28.826826+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T12:43:14.094620+00:00",
+    "updated_at": "2026-07-14T12:49:28.826826+00:00",
+    "last_message": "THE merujuk pada Nusantara Dynamics Facilities FAQ ============== ## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+    "last_user_message": "What is the replacement fee for an access card?",
+    "last_message_at": "2026-07-14T12:49:28.826826+00:00"
+  },
+  {
+    "id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "What is the mailbox size limit?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bca3987d-fd73-4de4-9fce-7ffdc798d466",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "What is the mailbox size limit?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:08:22.780893+00:00"
+      },
+      {
+        "id": "3ddcf892-6b8c-4c72-b972-0f1dadcf5f7c",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "The mailbox size limit is 50 GB.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Email_Calendar.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "A: Use the calendar sharing option and grant the relevant colleague view access.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3746,
+              "relevance_score": 0.3746,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "TECH_Internal_API_Guide.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.3298,
+              "relevance_score": 0.3298,
+              "excerpt": "Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.301,
+              "relevance_score": 0.301,
+              "excerpt": "Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol.",
+              "chapter": "Length",
+              "section": "Length",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "FAQ_Email_Calendar.txt",
+          "page": null,
+          "follow_up_question": "Can I check my corporate inbox on my own private iPad without any prior IT setup?",
+          "followUpQuestion": "Can I check my corporate inbox on my own private iPad without any prior IT setup?"
+        },
+        "created_at": "2026-07-14T11:08:22.780893+00:00"
+      },
+      {
+        "id": "5094413f-df43-4506-a1ca-d2f320220543",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "Who must a suspected data breach be reported to and how fast?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:09:15.978056+00:00"
+      },
+      {
+        "id": "d892b648-f23b-4c0b-bf3b-934280c3505b",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "- Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.\n- Data Security Policy\n- Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss.\n- Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "attachments": [],
+        "confidence": 0.9747,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9186,
+              "relevance_score": 0.9186,
+              "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4303,
+              "relevance_score": 0.4303,
+              "excerpt": "Data Security Policy",
+              "chapter": "Data Security Policy",
+              "section": "Data Security Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "Report_Security_Review_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3601,
+              "relevance_score": 0.3601,
+              "excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Anti_Harassment.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3413,
+              "relevance_score": 0.3413,
+              "excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": 1,
+          "follow_up_question": "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?",
+          "followUpQuestion": "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?"
+        },
+        "created_at": "2026-07-14T11:09:15.978056+00:00"
+      },
+      {
+        "id": "302a4a6f-9c88-4111-8212-d02c4445a619",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:10:26.768943+00:00"
+      },
+      {
+        "id": "a6a39949-69b3-4f3d-84a6-77cc32288b29",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "- Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss.\n- Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day.\n- Unresolved complaints are escalated to the Customer Success Lead.\n- Phishing The annual phishing simulation click rate was 6%.",
+        "attachments": [],
+        "confidence": 0.6959,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Security_Review_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5199,
+              "relevance_score": 0.5199,
+              "excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4449,
+              "relevance_score": 0.4449,
+              "excerpt": "All customer complaints must receive a first response within 1 business day.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Anti_Harassment.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4316,
+              "relevance_score": 0.4316,
+              "excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.4285,
+              "relevance_score": 0.4285,
+              "excerpt": "## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "Report_Security_Review_2025.pdf",
+          "page": 1,
+          "follow_up_question": "If a client submits a grievance on Friday afternoon, by when are we contractually obligated to provide an initial reply?",
+          "followUpQuestion": "If a client submits a grievance on Friday afternoon, by when are we contractually obligated to provide an initial reply?"
+        },
+        "created_at": "2026-07-14T11:10:26.768943+00:00"
+      },
+      {
+        "id": "efa359fd-7041-4ed0-8381-8126c18f51d7",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "If a client submits a grievance on Friday afternoon, by when are we contractually obligated to provide an initial reply?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:10:54.470765+00:00"
+      },
+      {
+        "id": "bdb74ec6-7cb2-476f-81ae-419b70b83729",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "The initial reply to a grievance submitted on Friday afternoon must be provided within 1 business day, which would be by the end of the next business day, i.e., by Friday afternoon if the grievance is submitted on a Friday. The context specifies that the first response must be within 1 business day, but does not mention specific days of the week or holidays.",
+        "attachments": [],
+        "confidence": 0.6452,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5072,
+              "relevance_score": 0.5072,
+              "excerpt": "All customer complaints must receive a first response within 1 business day. Target resolution time is 3 business days.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Anti_Harassment.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3537,
+              "relevance_score": 0.3537,
+              "excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "TECH_Internal_API_Guide.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.3528,
+              "relevance_score": 0.3528,
+              "excerpt": "Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Procurement_Threshold.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3429,
+              "relevance_score": 0.3429,
+              "excerpt": "Procurement Approval Threshold Policy",
+              "chapter": "Procurement Approval Threshold Policy",
+              "section": "Procurement Approval Threshold Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            }
+          ],
+          "source": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T11:10:54.470765+00:00"
+      },
+      {
+        "id": "8542f8c8-ae84-4c24-b098-726308744a6f",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "How many days per week can employees work from home?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:11:36.601646+00:00"
+      },
+      {
+        "id": "db6b2d70-99ae-4f49-825c-bc71808d9f4d",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "Employees may work from home a maximum of 2 days per week with manager approval.",
+        "attachments": [],
+        "confidence": 0.9842,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8693,
+              "relevance_score": 0.8693,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "FAQ_Remote_Work.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8103,
+              "relevance_score": 0.8103,
+              "excerpt": "A: A one-time home-office allowance of IDR 1,500,000 is available.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5116,
+              "relevance_score": 0.5116,
+              "excerpt": "Remote Work (Work From Home) Policy",
+              "chapter": "Remote Work (Work From Home) Policy",
+              "section": "Remote Work (Work From Home) Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5115,
+              "relevance_score": 0.5115,
+              "excerpt": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+              "chapter": "Annual Leave",
+              "section": "Annual Leave",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": 1,
+          "follow_up_question": "Can I check my corporate inbox on my own private iPad without any prior IT setup?",
+          "followUpQuestion": "Can I check my corporate inbox on my own private iPad without any prior IT setup?"
+        },
+        "created_at": "2026-07-14T11:11:36.601646+00:00"
+      },
+      {
+        "id": "8636f9f8-16de-4db4-913a-ed80f52b2299",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:12:13.555808+00:00"
+      },
+      {
+        "id": "4fa08dd3-6ba1-47d8-870c-fbabee867ab0",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "- P1 IT incidents must be acknowledged within 15 minutes.\n- P1 incidents must be resolved within 4 hours.\n- If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "attachments": [],
+        "confidence": 0.9732,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4435,
+              "relevance_score": 0.4435,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "SOP_Customer_Complaint.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4279,
+              "relevance_score": 0.4279,
+              "excerpt": "All customer complaints must receive a first response within 1 business day.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4048,
+              "relevance_score": 0.4048,
+              "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": "If the main payment gateway goes offline completely (critical severity), what is the maximum permissible delay before the engineering team starts working on it, and when must operations be restored?",
+          "followUpQuestion": "If the main payment gateway goes offline completely (critical severity), what is the maximum permissible delay before the engineering team starts working on it, and when must operations be restored?"
+        },
+        "created_at": "2026-07-14T11:12:13.555808+00:00"
+      },
+      {
+        "id": "d54a0d8a-c559-4c3a-849b-b9b2c4ce6053",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "If the main payment gateway goes offline completely (critical severity), what is the maximum permissible delay before the engineering team starts working on it, and when must operations be restored?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:12:53.272946+00:00"
+      },
+      {
+        "id": "eea0b0cf-b716-4393-a49c-045f58c6e956",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "- The maximum permissible delay before the engineering team starts working on a critical severity (P1) incident is 15 minutes.\n- Operations must be restored within 4 hours from the time the incident is acknowledged.\n- If the incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure.\n- There is no specific mention of a maximum permissible delay for the engineering team to start working on the main payment gateway going offline completely.\n- The restoration of operations is required within 4 hours from the incident acknowledgment.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.584,
+              "relevance_score": 0.584,
+              "excerpt": "Remote workers must be available during core hours of 10:00-16:00 WIB.",
+              "chapter": "Core Hours",
+              "section": "Core Hours",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Leave.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5836,
+              "relevance_score": 0.5836,
+              "excerpt": "A maximum of 6 unused leave days may be carried over to the next year.",
+              "chapter": "Carryover",
+              "section": "Carryover",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5788,
+              "relevance_score": 0.5788,
+              "excerpt": "Passwords must be changed every 90 days. The last 5 passwords cannot be reused.",
+              "chapter": "Rotation",
+              "section": "Rotation",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5444,
+              "relevance_score": 0.5444,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": 1,
+          "follow_up_question": "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?",
+          "followUpQuestion": "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?"
+        },
+        "created_at": "2026-07-14T11:12:53.272946+00:00"
+      },
+      {
+        "id": "3d8ec499-c4ae-4e0f-b7e2-8d871ca75fb8",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:56:54.527085+00:00"
+      },
+      {
+        "id": "1b3a7ad6-d410-4612-b825-21a5a3e8d827",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T11:56:54.527085+00:00"
+      },
+      {
+        "id": "c2608f79-adda-4937-8d3b-9eafec74947a",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "Who must a suspected data breach be reported to and how fast?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:04:10.829953+00:00"
+      },
+      {
+        "id": "878bf54f-06a7-4230-a1d2-a7a8c15127a5",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "- Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.\n- Data Security Policy\n- Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss.\n- Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "attachments": [],
+        "confidence": 0.9747,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9186,
+              "relevance_score": 0.9186,
+              "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 7,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4303,
+              "relevance_score": 0.4303,
+              "excerpt": "Data Security Policy",
+              "chapter": "Data Security Policy",
+              "section": "Data Security Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            },
+            {
+              "document_name": "Report_Security_Review_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3601,
+              "relevance_score": 0.3601,
+              "excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Anti_Harassment.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3413,
+              "relevance_score": 0.3413,
+              "excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel.",
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": 1,
+          "follow_up_question": "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?",
+          "followUpQuestion": "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?"
+        },
+        "created_at": "2026-07-14T12:04:10.829953+00:00"
+      },
+      {
+        "id": "dcaa0a23-5194-4c5b-b301-bce913f2615b",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "user",
+        "content": "What was the 2025 overall CSAT score?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T12:15:20.148204+00:00"
+      },
+      {
+        "id": "49097fba-9f05-44c7-ba1f-06c5cda788cc",
+        "conversation_id": "b18af0f6-5c1c-4d57-8bf8-853e8f9e16ed",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T12:15:20.148204+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T11:08:22.780893+00:00",
+    "updated_at": "2026-07-14T12:15:20.148204+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "What was the 2025 overall CSAT score?",
+    "last_message_at": "2026-07-14T12:15:20.148204+00:00"
+  },
+  {
+    "id": "57bb429d-0111-4aef-b963-b1ea3bea7c75",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "eb22fc79-4d91-42c4-87d2-89074f6a8000",
+        "conversation_id": "57bb429d-0111-4aef-b963-b1ea3bea7c75",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:07:32.321266+00:00"
+      },
+      {
+        "id": "7a751c9d-480c-4cd1-bdda-2d367fdec042",
+        "conversation_id": "57bb429d-0111-4aef-b963-b1ea3bea7c75",
+        "role": "assistant",
+        "content": "- Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date.\n- Receipts Original receipts are required for any single expense above IDR 150,000.\n- Nusantara Dynamics SOP\n- Claims older than 30 days require Finance Manager approval.",
+        "attachments": [],
+        "confidence": 0.841,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7785,
+              "relevance_score": 0.7785,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            },
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5712,
+              "relevance_score": 0.5712,
+              "excerpt": "Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Policy_Procurement_Threshold.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5685,
+              "relevance_score": 0.5685,
+              "excerpt": "Below IDR 10,000,000: manager. IDR 10-50 million: department head.",
+              "chapter": "Tiers",
+              "section": "Tiers",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.3863,
+              "relevance_score": 0.3863,
+              "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+              "chapter": "Per Diem",
+              "section": "Per Diem",
+              "paragraph_start": 3,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-14T11:07:32.321266+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T11:07:32.321266+00:00",
+    "updated_at": "2026-07-14T11:07:32.321266+00:00",
+    "last_message": "- Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date.\n- Receipts Original receipts are required for any single expense above IDR 150,000.\n- Nusantara Dynamics SOP\n- Claims older than 30 days require Finance Manager approval.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-14T11:07:32.321266+00:00"
+  },
+  {
+    "id": "5b0e5a20-946f-40a7-9ae4-38f0beb5be62",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How many new enterprise customers were added in Q3 2025?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b01e9eb7-d5e5-4ea9-8cdc-d42b2f420934",
+        "conversation_id": "5b0e5a20-946f-40a7-9ae4-38f0beb5be62",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:05:48.615362+00:00"
+      },
+      {
+        "id": "2e920bed-4211-4ba4-a400-87bd380c59dd",
+        "conversation_id": "5b0e5a20-946f-40a7-9ae4-38f0beb5be62",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T11:05:48.615362+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T11:05:48.615362+00:00",
+    "updated_at": "2026-07-14T11:05:48.615362+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "How many new enterprise customers were added in Q3 2025?",
+    "last_message_at": "2026-07-14T11:05:48.615362+00:00"
+  },
+  {
+    "id": "d199de5f-5034-463b-90de-f35d84960e4c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "What unit-test coverage is required to merge code?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "00adca3f-07b5-41a3-8ea8-ae1b1efbe25b",
+        "conversation_id": "d199de5f-5034-463b-90de-f35d84960e4c",
+        "role": "user",
+        "content": "What unit-test coverage is required to merge code?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:04:12.935148+00:00"
+      },
+      {
+        "id": "64bced24-23e3-4a0c-919d-68f611d28432",
+        "conversation_id": "d199de5f-5034-463b-90de-f35d84960e4c",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T11:04:12.935148+00:00"
+      },
+      {
+        "id": "54ee5cf0-baaf-469e-92ff-8d0f00ebd75d",
+        "conversation_id": "d199de5f-5034-463b-90de-f35d84960e4c",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:05:26.456314+00:00"
+      },
+      {
+        "id": "9ba68e2c-6b5b-42e2-ad06-efedd9a8c44d",
+        "conversation_id": "d199de5f-5034-463b-90de-f35d84960e4c",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T11:05:26.456314+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T11:04:12.935148+00:00",
+    "updated_at": "2026-07-14T11:05:26.456314+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "How many new enterprise customers were added in Q3 2025?",
+    "last_message_at": "2026-07-14T11:05:26.456314+00:00"
+  },
+  {
+    "id": "53a24f4a-4331-4be9-8504-838fced591dc",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "65c9c787-2231-42b3-99e9-1a66c523e384",
+        "conversation_id": "53a24f4a-4331-4be9-8504-838fced591dc",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T11:00:34.075147+00:00"
+      },
+      {
+        "id": "cbd91109-b59a-4c09-8c6f-f3a9237aef0e",
+        "conversation_id": "53a24f4a-4331-4be9-8504-838fced591dc",
+        "role": "assistant",
+        "content": "Jika lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi tambahan atau kondisi khusus yang memengaruhi waktu proses reset.",
+        "attachments": [],
+        "confidence": 0.8625,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8066,
+              "relevance_score": 0.8066,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            },
+            {
+              "document_name": "Policy_Password.docx",
+              "document_type": "docx",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6155,
+              "relevance_score": 0.6155,
+              "excerpt": "Passwords must be changed every 90 days. The last 5 passwords cannot be reused.",
+              "chapter": "Rotation",
+              "section": "Rotation",
+              "paragraph_start": 5,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5505,
+              "relevance_score": 0.5505,
+              "excerpt": "IT revokes all system access within 2 hours of the employee's exit time.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            },
+            {
+              "document_name": "Report_Hiring_H1_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.4936,
+              "relevance_score": 0.4936,
+              "excerpt": "The company hired 37 employees in H1 2025; total headcount reached 312. Average time to hire was 28 days.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T11:00:34.075147+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T11:00:34.075147+00:00",
+    "updated_at": "2026-07-14T11:00:34.075147+00:00",
+    "last_message": "Jika lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi tambahan atau kondisi khusus yang memengaruhi waktu proses reset.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T11:00:34.075147+00:00"
+  },
+  {
     "id": "3575d386-7843-49e4-b422-ab66d848c1a2",
     "user_id": "dev-admin",
     "user_name": "Admin",

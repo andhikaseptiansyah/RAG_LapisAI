@@ -39,10 +39,17 @@ def main() -> None:
             document_path = UPLOAD_DIR / str(reference.get("document") or "")
             target_page = str(reference.get("page") or "")
             pages = parse_file(str(document_path))
+            matching_pages = [
+                page for page in pages
+                if str(page.get("page") or "") == target_page
+            ]
+            # TXT and layout-unreliable DOCX references intentionally do not
+            # expose fabricated page numbers. Fall back to the full document
+            # instead of producing an empty evidence string.
+            selected_pages = matching_pages or pages
             reference_contents.extend(
                 str(page.get("text") or "")
-                for page in pages
-                if str(page.get("page")) == target_page
+                for page in selected_pages
             )
 
         content = " ".join(reference_contents)
@@ -57,8 +64,8 @@ def main() -> None:
             strongly_supported += 1
 
         # Runtime retrieval only removes a candidate when evidence has a hard
-        # subject contradiction (wrong year, wrong metric, missing requested
-        # hard concept, and so on). A low lexical score is allowed because many
+        # subject contradiction, such as a different year or mutually exclusive
+        # metric. A low lexical score is allowed because many
         # ground-truth questions are Indonesian paraphrases of English sources.
         if decision.hard_failures:
             failures.append(

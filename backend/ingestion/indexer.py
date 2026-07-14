@@ -1,14 +1,24 @@
 from functools import lru_cache
+from typing import TYPE_CHECKING, Any
 
 import chromadb
-from sentence_transformers import SentenceTransformer
+
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
 
 from uploads.config import CHROMA_PATH, COLLECTION_NAME, EMBEDDING_MODEL
 
 
 @lru_cache(maxsize=1)
-def get_embedding_model() -> SentenceTransformer:
-    """Load embedding model once per Python process."""
+def get_embedding_model() -> "SentenceTransformer":
+    """Load the embedding model lazily on the first embedding request.
+
+    Chroma collection access and BM25 retrieval do not need PyTorch or
+    Transformers, so keeping this import lazy materially reduces API startup
+    time and avoids model initialization during health checks.
+    """
+    from sentence_transformers import SentenceTransformer
+
     return SentenceTransformer(EMBEDDING_MODEL)
 
 

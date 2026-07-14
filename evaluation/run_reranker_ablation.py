@@ -8,19 +8,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-BACKEND_DIR = Path(__file__).resolve().parents[1] / "backend"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+BACKEND_DIR = PROJECT_ROOT / "backend"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from uploads.config import (
+from uploads.config import (  # noqa: E402
     ANSWERABILITY_MIN_BASE_SCORE,
     ANSWERABILITY_PRE_RERANK_VETO,
     RERANKER_MODEL,
     RERANKER_WEIGHT,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = PROJECT_ROOT / "evaluation" / "evaluate_retrieval.py"
+DEFAULT_GROUND_TRUTH = PROJECT_ROOT / "evaluation" / "ground_truth_qa.csv"
 DEFAULT_RESULTS = PROJECT_ROOT / "evaluation" / "results" / "reranker_ablation"
 
 
@@ -40,6 +41,8 @@ def _run(label: str, args: argparse.Namespace, output_dir: Path, no_reranker: bo
     command = [
         sys.executable,
         str(EVALUATOR),
+        "--ground-truth",
+        str(args.ground_truth),
         "--split",
         args.split,
         "--k",
@@ -53,6 +56,8 @@ def _run(label: str, args: argparse.Namespace, output_dir: Path, no_reranker: bo
     ]
     if args.index_missing:
         command.append("--index-missing")
+    if args.no_evidence_verification:
+        command.append("--no-evidence-verification")
     if no_reranker:
         command.append("--no-reranker")
 
@@ -67,15 +72,23 @@ def _run(label: str, args: argparse.Namespace, output_dir: Path, no_reranker: bo
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Run retrieval evaluation with and without the cross-encoder reranker."
+        description="Compare retrieval with and without the cross-encoder reranker."
     )
-    parser.add_argument("--split", choices=("development", "test", "all"), default="development")
+    parser.add_argument(
+        "--ground-truth",
+        type=Path,
+        default=DEFAULT_GROUND_TRUTH,
+        help="Official ground_truth_qa.csv or a legacy ground-truth JSON file.",
+    )
+    parser.add_argument("--split", choices=("development", "test", "all"), default="all")
     parser.add_argument("--k", default="1,3,5")
     parser.add_argument("--candidate-k", type=int, default=20)
     parser.add_argument("--min-score", type=float, default=0.30)
     parser.add_argument("--index-missing", action="store_true")
+    parser.add_argument("--no-evidence-verification", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_RESULTS)
     args = parser.parse_args()
+    args.ground_truth = args.ground_truth.resolve()
 
     run_dir = args.output_dir.resolve() / datetime.now().strftime("%Y%m%d_%H%M%S")
     baseline_dir = run_dir / "without_reranker"
@@ -86,20 +99,29 @@ def main() -> int:
     baseline = _run("baseline without reranker", args, baseline_dir, no_reranker=True)
     reranked = _run("cross-encoder reranker", args, reranker_dir, no_reranker=False)
 
+    primary_level = str(reranked.get("primary_level") or "document")
+    level_path = ("overall", "answerable", f"{primary_level}_level")
     metrics = {
-        "page_mrr": ("overall", "answerable", "page_level", "mrr"),
-        "page_hit_at_1": ("overall", "answerable", "page_level", "hit@1"),
-        "page_recall_at_5": ("overall", "answerable", "page_level", "recall@5"),
-        "false_positive_rate": (
-            "overall",
-            "unanswerable",
-            "retrieval_false_positive_rate",
-        ),
+        "mrr": (*level_path, "mrr"),
+        "hit_at_1": (*level_path, "hit@1"),
+        "hit_at_3": (*level_path, "hit@3"),
+        "recall_at_5": (*level_path, "recall@5"),
         "mean_latency_ms": ("overall", "answerable", "latency_ms", "mean"),
     }
 
+    unanswerable_total = int(_metric(reranked, "overall", "unanswerable", "count"))
+    if unanswerable_total > 0:
+        metrics["false_positive_rate"] = (
+            "overall",
+            "unanswerable",
+            "retrieval_false_positive_rate",
+        )
+
     comparison: dict[str, Any] = {
+        "dataset": reranked.get("dataset_name"),
+        "ground_truth": str(args.ground_truth),
         "split": args.split,
+        "primary_level": primary_level,
         "candidate_k_per_retriever": args.candidate_k,
         "minimum_score": args.min_score,
         "reranker_model": RERANKER_MODEL,
@@ -107,6 +129,7 @@ def main() -> int:
         "ranking_strategy": "blended_hybrid_plus_cross_encoder",
         "answerability_min_base_score": ANSWERABILITY_MIN_BASE_SCORE,
         "answerability_pre_rerank_veto": ANSWERABILITY_PRE_RERANK_VETO,
+        "unanswerable_evaluated": unanswerable_total > 0,
         "without_reranker": {},
         "with_reranker": {},
         "delta": {},
@@ -119,19 +142,12 @@ def main() -> int:
         comparison["with_reranker"][name] = after
         comparison["delta"][name] = round(after - before, 6)
 
-    comparison["unanswerable_counts"] = {
-        "total": int(_metric(reranked, "overall", "unanswerable", "count")),
-        "without_reranker": {
-            "correctly_rejected": int(_metric(baseline, "overall", "unanswerable", "true_rejection_count")),
-            "false_positives": int(_metric(baseline, "overall", "unanswerable", "false_positive_count")),
-            "false_positive_ids": baseline.get("overall", {}).get("unanswerable", {}).get("false_positive_ids", []),
-        },
-        "with_reranker": {
-            "correctly_rejected": int(_metric(reranked, "overall", "unanswerable", "true_rejection_count")),
-            "false_positives": int(_metric(reranked, "overall", "unanswerable", "false_positive_count")),
-            "false_positive_ids": reranked.get("overall", {}).get("unanswerable", {}).get("false_positive_ids", []),
-        },
-    }
+    if unanswerable_total > 0:
+        comparison["unanswerable_counts"] = {
+            "total": unanswerable_total,
+            "without_reranker": baseline.get("overall", {}).get("unanswerable", {}),
+            "with_reranker": reranked.get("overall", {}).get("unanswerable", {}),
+        }
 
     json_path = run_dir / "reranker_comparison.json"
     json_path.write_text(json.dumps(comparison, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -139,14 +155,14 @@ def main() -> int:
     report_lines = [
         "# Reranker Ablation Comparison",
         "",
-        f"- Split: `{args.split}`",
+        f"- Dataset: `{comparison.get('dataset') or '-'}`",
+        f"- Ground truth: `{args.ground_truth}`",
+        f"- Questions: `{reranked.get('question_counts', {}).get('total', 0)}`",
+        f"- Primary retrieval level: `{primary_level}`",
         f"- Candidate count per retriever: `{args.candidate_k}`",
         f"- Minimum final score: `{args.min_score}`",
         f"- Reranker model: `{RERANKER_MODEL}`",
         f"- Reranker weight: `{RERANKER_WEIGHT}`",
-        "- Ranking strategy: `blended hybrid + cross-encoder`",
-        f"- Minimum original hybrid score: `{ANSWERABILITY_MIN_BASE_SCORE}`",
-        f"- Pre-rerank rejection veto: `{ANSWERABILITY_PRE_RERANK_VETO}`",
         "",
         "| Metric | Without reranker | With reranker | Delta |",
         "|---|---:|---:|---:|",
@@ -156,21 +172,20 @@ def main() -> int:
             f"| {name} | {comparison['without_reranker'][name]:.6f} | "
             f"{comparison['with_reranker'][name]:.6f} | {comparison['delta'][name]:+.6f} |"
         )
-    counts = comparison["unanswerable_counts"]
+
+    if unanswerable_total == 0:
+        report_lines.extend(
+            [
+                "",
+                "False-positive retrieval was not evaluated because the official CSV contains no unanswerable questions.",
+            ]
+        )
+
     report_lines.extend(
         [
             "",
-            "## Unanswerable absolute counts",
-            "",
-            f"- Total unanswerable questions: `{counts['total']}`",
-            f"- Without reranker - correctly rejected: `{counts['without_reranker']['correctly_rejected']}`, false positives: `{counts['without_reranker']['false_positives']}`",
-            f"- Without reranker false-positive IDs: `{', '.join(counts['without_reranker']['false_positive_ids']) or '-'}`",
-            f"- With reranker - correctly rejected: `{counts['with_reranker']['correctly_rejected']}`, false positives: `{counts['with_reranker']['false_positives']}`",
-            f"- With reranker false-positive IDs: `{', '.join(counts['with_reranker']['false_positive_ids']) or '-'}`",
-            "",
-            "A positive delta is desirable for MRR, Hit@1, and Recall@5. A negative delta is "
-            "desirable for false-positive rate. Latency is expected to increase and should be "
-            "reported rather than hidden.",
+            "A positive delta is desirable for MRR, Hit@1, Hit@3, and Recall@5. "
+            "Latency should be reported separately and not hidden.",
             "",
         ]
     )

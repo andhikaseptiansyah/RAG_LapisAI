@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import statistics
 import sys
 import time
@@ -15,7 +16,7 @@ from typing import Any, Iterable
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_DIR = PROJECT_ROOT / "backend"
-DEFAULT_GROUND_TRUTH = PROJECT_ROOT / "evaluation" / "ground_truth.json"
+DEFAULT_GROUND_TRUTH = PROJECT_ROOT / "evaluation" / "ground_truth_qa.csv"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "evaluation" / "results"
 
 if str(BACKEND_DIR) not in sys.path:
@@ -89,21 +90,107 @@ def parse_k_values(raw: str) -> list[int]:
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
+def detect_language(text: str) -> str:
+    """Return a lightweight language label for report grouping.
+
+    The official CSV does not include a language column. Its current questions are
+    English, while this heuristic also keeps Indonesian additions reportable without
+    requiring a schema change.
+    """
+    tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]+", str(text or "").casefold()))
+    indonesian_markers = {
+        "apa", "apakah", "berapa", "bagaimana", "kapan", "siapa", "dimana",
+        "berapa", "harus", "dalam", "dengan", "untuk", "karyawan", "hari",
+    }
+    return "id" if len(tokens.intersection(indonesian_markers)) >= 2 else "en"
+
+
+def _default_csv_corpus_directory() -> str:
+    if (PROJECT_ROOT / "documents").exists():
+        return "documents"
+    return "backend/uploads/files"
+
+
+def load_csv_ground_truth(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+
+    required = {"question", "expected_answer", "source_document"}
+    fieldnames = set(rows[0].keys()) if rows else set()
+    missing = required - fieldnames
+    if missing:
+        raise ValueError(
+            "ground_truth_qa.csv is missing required column(s): "
+            + ", ".join(sorted(missing))
+        )
+    if not rows:
+        raise ValueError("The ground-truth CSV contains no questions.")
+
+    items: list[dict[str, Any]] = []
+    seen_questions: set[str] = set()
+    for index, row in enumerate(rows, start=1):
+        question = str(row.get("question") or "").strip()
+        expected_answer = str(row.get("expected_answer") or "").strip()
+        source_document = str(row.get("source_document") or "").strip()
+        if not question or not expected_answer or not source_document:
+            raise ValueError(
+                f"CSV row {index + 1} must contain question, expected_answer, and source_document."
+            )
+        question_key = question.casefold()
+        if question_key in seen_questions:
+            raise ValueError(f"Duplicate question in CSV row {index + 1}: {question}")
+        seen_questions.add(question_key)
+        items.append(
+            {
+                "id": f"QA-{index:03d}",
+                "split": "all",
+                "category": Path(source_document).stem.split("_", 1)[0].casefold(),
+                "language": detect_language(question),
+                "difficulty": "unspecified",
+                "question_type": "factual",
+                "question": question,
+                "answerable": True,
+                "expected_answer": expected_answer,
+                "expected_answer_keywords": [],
+                "references": [{"document": source_document, "page": ""}],
+            }
+        )
+
+    payload: dict[str, Any] = {
+        "dataset_name": "Nusantara Dynamics Official Ground Truth Q&A",
+        "version": "csv-official-30",
+        "source_format": "csv",
+        "evaluation_level": "document",
+        "has_page_references": False,
+        "has_unanswerable_questions": False,
+        "corpus": {
+            "document_directory": _default_csv_corpus_directory(),
+            "included_prefixes": ["SOP_", "Report_", "Policy_", "TECH_", "FAQ_"],
+        },
+        "items": items,
+    }
+    return payload, items
+
+
 def load_ground_truth(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if not path.exists():
         raise FileNotFoundError(f"Ground-truth file not found: {path}")
+
+    if path.suffix.casefold() == ".csv":
+        return load_csv_ground_truth(path)
 
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
 
     if not isinstance(payload, dict) or not isinstance(payload.get("items"), list):
-        raise ValueError("ground_truth.json must be an object containing an 'items' array.")
+        raise ValueError("Ground-truth JSON must be an object containing an 'items' array.")
 
     items = payload["items"]
     if not items:
         raise ValueError("The ground-truth dataset contains no questions.")
 
     seen_ids: set[str] = set()
+    has_page_references = False
     for index, item in enumerate(items, start=1):
         if not isinstance(item, dict):
             raise ValueError(f"Ground-truth item #{index} is not an object.")
@@ -121,7 +208,17 @@ def load_ground_truth(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]
             raise ValueError(f"Answerable item {question_id} has no references.")
         if not answerable and references:
             raise ValueError(f"Unanswerable item {question_id} must not have references.")
+        has_page_references = has_page_references or any(
+            str(reference.get("page") or "").strip() for reference in references
+        )
 
+    payload.setdefault("source_format", "json")
+    payload.setdefault("has_page_references", has_page_references)
+    payload.setdefault(
+        "has_unanswerable_questions",
+        any(not bool(item.get("answerable")) for item in items),
+    )
+    payload.setdefault("evaluation_level", "page" if has_page_references else "document")
     return payload, items
 
 def filter_items(
@@ -358,6 +455,7 @@ def evaluate_item(
             "difficulty": item.get("difficulty"),
             "question_type": item.get("question_type"),
             "question": item["question"],
+            "expected_answer": item.get("expected_answer", ""),
             "used_query": variant,  # 5. Rekam query yang aktual digunakan
             "answerable": bool(item.get("answerable")),
             "latency_ms": round(elapsed_ms, 3),
@@ -391,12 +489,19 @@ def evaluate_item(
         else:
             references = references_for(item)
             document_relevant = expected_keys(references, "document")
-            page_relevant = expected_keys(references, "page")
-            document_results = results[:max_k]
-            page_results = results[:max_k]
+            page_relevant = {
+                reference.page_key
+                for reference in references
+                if str(reference.page or "").strip()
+            }
+            document_results = dedupe_ranked_results(results, "document")[:max_k]
+            page_results = dedupe_ranked_results(results, "page")[:max_k]
 
             document_rank = rank_of_first_relevant(document_results, document_relevant, "document")
-            page_rank = rank_of_first_relevant(page_results, page_relevant, "page")
+            page_rank = (
+                rank_of_first_relevant(page_results, page_relevant, "page")
+                if page_relevant else None
+            )
 
             base.update(
                 {
@@ -405,9 +510,12 @@ def evaluate_item(
                     "first_relevant_document_rank": document_rank,
                     "first_relevant_page_rank": page_rank,
                     "document_mrr": 1.0 / document_rank if document_rank else 0.0,
-                    "page_mrr": 1.0 / page_rank if page_rank else 0.0,
+                    "page_mrr": (1.0 / page_rank if page_rank else 0.0) if page_relevant else None,
                     "document_metrics": metrics_at_k(document_results, document_relevant, k_values, "document"),
-                    "page_metrics": metrics_at_k(page_results, page_relevant, k_values, "page"),
+                    "page_metrics": (
+                        metrics_at_k(page_results, page_relevant, k_values, "page")
+                        if page_relevant else {}
+                    ),
                 }
             )
 
@@ -416,10 +524,15 @@ def evaluate_item(
             best_eval = base
         else:
             if item.get("answerable"):
-                # Pilih varian yang menghasilkan page MRR terbaik, tie-breaker top_score
-                if base["page_mrr"] > best_eval["page_mrr"]:
+                # Prefer page MRR when page labels exist, otherwise document MRR.
+                base_metric = base.get("page_mrr")
+                best_metric = best_eval.get("page_mrr")
+                if base_metric is None or best_metric is None:
+                    base_metric = base.get("document_mrr", 0.0)
+                    best_metric = best_eval.get("document_mrr", 0.0)
+                if base_metric > best_metric:
                     best_eval = base
-                elif base["page_mrr"] == best_eval["page_mrr"] and base["top_score"] > best_eval["top_score"]:
+                elif base_metric == best_metric and base["top_score"] > best_eval["top_score"]:
                     best_eval = base
             else:
                 # Untuk pertanyaan tak terjawab, skor terendah adalah yang terbaik (paling minim false-positive)
@@ -437,18 +550,21 @@ def summarize_answerable(rows: list[dict[str, Any]], k_values: list[int]) -> dic
         return {"count": 0}
 
     document: dict[str, float] = {"mrr": mean(row["document_mrr"] for row in rows)}
-    page: dict[str, float] = {"mrr": mean(row["page_mrr"] for row in rows)}
+    page_rows = [row for row in rows if row.get("page_mrr") is not None]
+    page: dict[str, float] = {"mrr": mean(row["page_mrr"] for row in page_rows)} if page_rows else {}
 
     for k in k_values:
         for metric in ("hit", "precision", "recall"):
             key = f"{metric}@{k}"
             document[key] = mean(row["document_metrics"][key] for row in rows)
-            page[key] = mean(row["page_metrics"][key] for row in rows)
+            if page_rows:
+                page[key] = mean(row["page_metrics"][key] for row in page_rows)
 
     return {
         "count": len(rows),
         "document_level": {key: round(value, 6) for key, value in document.items()},
         "page_level": {key: round(value, 6) for key, value in page.items()},
+        "page_level_available": bool(page_rows),
         "latency_ms": {
             "mean": round(mean(row["latency_ms"] for row in rows), 3),
             "median": round(statistics.median(row["latency_ms"] for row in rows), 3),
@@ -510,6 +626,8 @@ def build_summary(
         "generated_at": utc_now_iso(),
         "dataset_name": dataset.get("dataset_name"),
         "dataset_version": dataset.get("version"),
+        "dataset_source_format": dataset.get("source_format"),
+        "primary_level": dataset.get("evaluation_level", "page"),
         "configuration": {
             "split": args.split,
             "k_values": args.k_values,
@@ -546,7 +664,7 @@ def build_summary(
         },
         "by_group": grouped_summaries(rows, args.k_values),
         "metric_definitions": {
-            "primary_level": "page",
+            "primary_level": dataset.get("evaluation_level", "page"),
             "hit@k": "1 when at least one expected page/document appears in the first k unique retrieved units; otherwise 0.",
             "precision@k": "Number of expected unique pages/documents retrieved in the first k divided by k.",
             "recall@k": "Number of expected unique pages/documents retrieved in the first k divided by all expected references.",
@@ -565,6 +683,7 @@ def flatten_for_csv(row: dict[str, Any], k_values: list[int]) -> dict[str, Any]:
         "difficulty": row.get("difficulty"),
         "question_type": row.get("question_type"),
         "question": row["question"],
+        "expected_answer": row.get("expected_answer"),
         "used_query": row.get("used_query"),  # 5. Output di CSV
         "answerable": row["answerable"],
         "expected_documents": " | ".join(row.get("expected_documents") or []),
@@ -620,6 +739,26 @@ def percent(value: Any) -> str:
     except (TypeError, ValueError):
         return "-"
 
+def _metric_table_lines(title: str, metrics: dict[str, Any], k_values: list[int]) -> list[str]:
+    lines = [
+        f"## {title}",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| MRR | {float(metrics.get('mrr', 0)):.4f} |",
+    ]
+    for k in k_values:
+        lines.extend(
+            [
+                f"| Hit Rate@{k} | {percent(metrics.get(f'hit@{k}', 0))} |",
+                f"| Precision@{k} | {percent(metrics.get(f'precision@{k}', 0))} |",
+                f"| Recall@{k} | {percent(metrics.get(f'recall@{k}', 0))} |",
+            ]
+        )
+    lines.append("")
+    return lines
+
+
 def write_markdown_report(path: Path, summary: dict[str, Any]) -> None:
     config = summary["configuration"]
     answerable = summary["overall"]["answerable"]
@@ -627,103 +766,106 @@ def write_markdown_report(path: Path, summary: dict[str, Any]) -> None:
     page = answerable.get("page_level") or {}
     document = answerable.get("document_level") or {}
     k_values = config["k_values"]
+    primary_level = summary.get("primary_level", "page")
 
     lines = [
         "# LapisAI Retrieval Evaluation Report",
         "",
         f"Generated: `{summary['generated_at']}`",
         "",
+        "## Dataset",
+        "",
+        f"- Name: `{summary.get('dataset_name') or '-'}`",
+        f"- Version: `{summary.get('dataset_version') or '-'}`",
+        f"- Source format: `{summary.get('dataset_source_format') or '-'}`",
+        f"- Ground truth: `{config['ground_truth']}`",
+        f"- Questions: `{summary['question_counts']['total']}`",
+        f"- Answerable: `{summary['question_counts']['answerable']}`",
+        f"- Unanswerable: `{summary['question_counts']['unanswerable']}`",
+        f"- Indexed corpus files: `{summary['index_status']['indexed_corpus_files']}/{summary['index_status']['corpus_files']}`",
+        "",
         "## Configuration",
         "",
         f"- Split: `{config['split']}`",
         f"- k: `{', '.join(map(str, k_values))}`",
-        f"- candidate_k: `{config['candidate_k']}`",
-        f"- minimum score: `{config['min_score']}`",
+        f"- candidate_k per retriever: `{config['candidate_k']}`",
+        f"- minimum final score: `{config['min_score']}`",
         f"- reranker enabled: `{config.get('reranker_enabled', True)}`",
         f"- reranker model: `{config.get('reranker_model', '-')}`",
-        f"- reranker candidates per retriever: `{config.get('reranker_candidates_per_retriever', '-')}`",
         f"- reranker weight: `{config.get('reranker_weight', '-')}`",
         f"- evidence verification enabled: `{config.get('evidence_verification_enabled', True)}`",
         f"- answerability gate enabled: `{config.get('answerability_gate_enabled', True)}`",
-        f"- answerability min top score: `{config.get('answerability_min_top_score', '-')}`",
-        f"- answerability min evidence score: `{config.get('answerability_min_evidence_score', '-')}`",
-        f"- answerability min score margin: `{config.get('answerability_min_score_margin', '-')}`",
-        f"- require supported evidence: `{config.get('answerability_require_supported_evidence', '-')}`",
-        f"- evaluated questions: `{summary['question_counts']['total']}`",
-        f"- indexed corpus files: `{summary['index_status']['indexed_corpus_files']}/{summary['index_status']['corpus_files']}`",
         "",
-        "## Primary results: page-level retrieval",
-        "",
-        "| Metric | Value |",
-        "|---|---:|",
-        f"| MRR | {page.get('mrr', 0):.4f} |",
     ]
-    for k in k_values:
+
+    if primary_level == "document":
+        lines.extend(_metric_table_lines("Primary results: document-level retrieval", document, k_values))
+        if page:
+            lines.extend(_metric_table_lines("Supporting results: page-level retrieval", page, k_values))
+        else:
+            lines.extend(
+                [
+                    "## Page-level retrieval",
+                    "",
+                    "Not evaluated because `ground_truth_qa.csv` provides `source_document` but no source-page labels.",
+                    "",
+                ]
+            )
+    else:
+        lines.extend(_metric_table_lines("Primary results: page-level retrieval", page, k_values))
+        lines.extend(_metric_table_lines("Supporting results: document-level retrieval", document, k_values))
+
+    language_groups = summary.get("by_group", {}).get("language", {})
+    available_languages = [
+        (lang, data.get("answerable", {}))
+        for lang, data in sorted(language_groups.items())
+        if data.get("answerable", {}).get("count", 0) > 0
+    ]
+    if available_languages:
+        lines.extend(["## Language performance", ""])
+        for lang, data in available_languages:
+            level_metrics = data.get(f"{primary_level}_level", {})
+            lines.append(
+                f"- `{lang}`: questions `{data.get('count', 0)}`, "
+                f"{primary_level} MRR `{float(level_metrics.get('mrr', 0)):.4f}`"
+            )
+        lines.append("")
+
+    if unanswerable.get("count", 0) > 0:
         lines.extend(
             [
-                f"| Hit Rate@{k} | {percent(page.get(f'hit@{k}', 0))} |",
-                f"| Precision@{k} | {percent(page.get(f'precision@{k}', 0))} |",
-                f"| Recall@{k} | {percent(page.get(f'recall@{k}', 0))} |",
+                "## Unanswerable-question retrieval behaviour",
+                "",
+                f"- Questions: `{unanswerable.get('count', 0)}`",
+                f"- Correctly rejected: `{unanswerable.get('true_rejection_count', 0)}`",
+                f"- False positives: `{unanswerable.get('false_positive_count', 0)}`",
+                f"- No-result rate: `{percent(unanswerable.get('no_result_rate', 0))}`",
+                f"- Retrieval false-positive rate: `{percent(unanswerable.get('retrieval_false_positive_rate', 0))}`",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "## Unanswerable-question evaluation",
+                "",
+                "Not evaluated because the official CSV contains only answerable questions.",
+                "",
             ]
         )
 
     lines.extend(
         [
-            "",
-            "## Supporting results: document-level retrieval",
-            "",
-            "| Metric | Value |",
-            "|---|---:|",
-            f"| MRR | {document.get('mrr', 0):.4f} |",
-        ]
-    )
-    for k in k_values:
-        lines.extend(
-            [
-                f"| Hit Rate@{k} | {percent(document.get(f'hit@{k}', 0))} |",
-                f"| Precision@{k} | {percent(document.get(f'precision@{k}', 0))} |",
-                f"| Recall@{k} | {percent(document.get(f'recall@{k}', 0))} |",
-            ]
-        )
-
-    # 2. Tambahan pemisahan bahasa dalam report Markdown
-    lines.extend([
-        "",
-        "## Language Performance",
-        ""
-    ])
-    for lang, data in sorted(summary.get("by_group", {}).get("language", {}).items()):
-        ans_data = data.get("answerable", {})
-        if ans_data.get("count", 0) > 0:
-            lines.extend([
-                f"### {str(lang).capitalize()} Query",
-                f"- Evaluated: `{ans_data.get('count', 0)}`",
-                f"- Page MRR: `{ans_data.get('page_level', {}).get('mrr', 0):.4f}`",
-                ""
-            ])
-
-    lines.extend(
-        [
-            "",
-            "## Unanswerable-question retrieval behaviour",
-            "",
-            f"- Questions: `{unanswerable.get('count', 0)}`",
-            f"- Correctly rejected: `{unanswerable.get('true_rejection_count', 0)}`",
-            f"- False positives: `{unanswerable.get('false_positive_count', 0)}`",
-            f"- No-result rate: `{percent(unanswerable.get('no_result_rate', 0))}`",
-            f"- Retrieval false-positive rate: `{percent(unanswerable.get('retrieval_false_positive_rate', 0))}`",
-            f"- False-positive IDs: `{', '.join(unanswerable.get('false_positive_ids') or []) or '-'}`",
-            f"- Mean top retrieval score: `{unanswerable.get('mean_top_score', 0):.4f}`",
-            "",
             "## Interpretation note",
             "",
-            "Page-level metrics are the primary metrics because the project requires citations to the exact source page. "
-            "Document-level metrics are included as supporting evidence. Unanswerable metrics only measure retrieval behaviour; "
-            "final refusal quality must be assessed during answer-generation evaluation.",
+            "The official CSV labels one expected source document for each question. "
+            "Therefore document-level MRR, Hit@k, Precision@k, and Recall@k are the valid primary retrieval metrics. "
+            "Page-level and unanswerable metrics must not be inferred from missing labels.",
             "",
         ]
     )
     path.write_text("\n".join(lines), encoding="utf-8")
+
 
 def print_summary(summary: dict[str, Any]) -> None:
     answerable = summary["overall"]["answerable"]
@@ -731,50 +873,69 @@ def print_summary(summary: dict[str, Any]) -> None:
     page = answerable.get("page_level") or {}
     document = answerable.get("document_level") or {}
     k_values = summary["configuration"]["k_values"]
+    primary_level = summary.get("primary_level", "page")
+    primary = document if primary_level == "document" else page
 
     print("\nLapisAI retrieval evaluation")
     print("=" * 40)
+    print(f"Dataset         : {summary.get('dataset_name') or '-'}")
     print(f"Questions       : {summary['question_counts']['total']}")
     print(f"Answerable      : {summary['question_counts']['answerable']}")
-    print(f"Unanswerable    : {summary['question_counts']['unanswerable']}")
+    if summary['question_counts']['unanswerable']:
+        print(f"Unanswerable    : {summary['question_counts']['unanswerable']}")
+    else:
+        print("Unanswerable    : Not included")
     print(
         "Indexed corpus  : "
         f"{summary['index_status']['indexed_corpus_files']}/{summary['index_status']['corpus_files']}"
     )
 
-    print("\nPage-level metrics (primary)")
-    print(f"MRR             : {page.get('mrr', 0):.4f}")
+    print(f"\n{primary_level.capitalize()}-level metrics (primary)")
+    print(f"MRR             : {primary.get('mrr', 0):.4f}")
     for k in k_values:
         print(
-            f"@{k:<2} Hit={percent(page.get(f'hit@{k}', 0)):>8}  "
-            f"Precision={percent(page.get(f'precision@{k}', 0)):>8}  "
-            f"Recall={percent(page.get(f'recall@{k}', 0)):>8}"
+            f"@{k:<2} Hit={percent(primary.get(f'hit@{k}', 0)):>8}  "
+            f"Precision={percent(primary.get(f'precision@{k}', 0)):>8}  "
+            f"Recall={percent(primary.get(f'recall@{k}', 0)):>8}"
         )
 
-    print("\nDocument-level metrics (supporting)")
-    print(f"MRR             : {document.get('mrr', 0):.4f}")
-    for k in k_values:
-        print(
-            f"@{k:<2} Hit={percent(document.get(f'hit@{k}', 0)):>8}  "
-            f"Precision={percent(document.get(f'precision@{k}', 0)):>8}  "
-            f"Recall={percent(document.get(f'recall@{k}', 0)):>8}"
-        )
+    if primary_level == "page":
+        secondary_name, secondary = "Document", document
+    else:
+        secondary_name, secondary = "Page", page
 
-    # 2. Tambahan pemisahan bahasa untuk terminal
-    if "language" in summary.get("by_group", {}):
+    if secondary:
+        print(f"\n{secondary_name}-level metrics (supporting)")
+        print(f"MRR             : {secondary.get('mrr', 0):.4f}")
+        for k in k_values:
+            print(
+                f"@{k:<2} Hit={percent(secondary.get(f'hit@{k}', 0)):>8}  "
+                f"Precision={percent(secondary.get(f'precision@{k}', 0)):>8}  "
+                f"Recall={percent(secondary.get(f'recall@{k}', 0)):>8}"
+            )
+    elif primary_level == "document":
+        print("\nPage-level metrics")
+        print("Not evaluated: the CSV has no page labels.")
+
+    language_groups = summary.get("by_group", {}).get("language", {})
+    available_languages = [
+        (lang, data.get("answerable", {}))
+        for lang, data in sorted(language_groups.items())
+        if data.get("answerable", {}).get("count", 0) > 0
+    ]
+    if available_languages:
         print("\nLanguage Performance")
         print("-" * 20)
-        for lang, data in sorted(summary["by_group"]["language"].items()):
-            ans_data = data.get("answerable", {})
-            if ans_data.get("count", 0) > 0:
-                mrr = ans_data.get("page_level", {}).get("mrr", 0)
-                print(f"{lang.capitalize()} Query")
-                print(f"MRR : {mrr:.4f}\n")
+        for lang, data in available_languages:
+            level_metrics = data.get(f"{primary_level}_level", {})
+            print(f"{lang.capitalize()} Query")
+            print(f"MRR : {float(level_metrics.get('mrr', 0)):.4f}\n")
 
     if unanswerable.get("count"):
         print("\nUnanswerable retrieval behaviour")
         print(f"No-result rate  : {percent(unanswerable.get('no_result_rate', 0))}")
         print(f"False-positive  : {percent(unanswerable.get('retrieval_false_positive_rate', 0))}")
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -784,13 +945,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--ground-truth",
         type=Path,
         default=DEFAULT_GROUND_TRUTH,
-        help="Path to ground_truth.json.",
+        help="Path to official ground_truth_qa.csv or legacy ground_truth JSON.",
     )
     parser.add_argument(
         "--split",
         choices=("development", "test", "all"),
-        default="development",
-        help="Dataset split to evaluate. Use test only for final reporting.",
+        default="all",
+        help="Dataset split to evaluate. The official CSV uses split=all.",
     )
     parser.add_argument(
         "--k",

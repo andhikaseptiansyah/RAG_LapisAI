@@ -120,7 +120,7 @@ EMBEDDING_MODEL = _env_str(
 )
 
 # Runtime and evaluation use the same calibrated retrieval cutoff.
-MIN_RESULT_SCORE = _env_float("MIN_RESULT_SCORE", 0.30)
+MIN_RESULT_SCORE = _env_float("MIN_RESULT_SCORE", 0.24)
 if not 0.0 <= MIN_RESULT_SCORE <= 1.0:
     raise ValueError("MIN_RESULT_SCORE must be between 0.0 and 1.0")
 
@@ -135,48 +135,52 @@ RERANKER_MODEL = _env_str(
 )
 RERANKER_CANDIDATES = _env_int("RERANKER_CANDIDATES", 20)
 RERANKER_WEIGHT = _env_float("RERANKER_WEIGHT", 0.25)
+ENABLE_QUERY_DECOMPOSITION = _env_bool("ENABLE_QUERY_DECOMPOSITION", True)
+QUERY_DECOMPOSITION_MAX_PARTS = _env_int("QUERY_DECOMPOSITION_MAX_PARTS", 3)
 if RERANKER_CANDIDATES <= 0:
     raise ValueError("RERANKER_CANDIDATES must be greater than zero")
 if not 0.0 <= RERANKER_WEIGHT <= 1.0:
     raise ValueError("RERANKER_WEIGHT must be between 0.0 and 1.0")
+if QUERY_DECOMPOSITION_MAX_PARTS <= 0:
+    raise ValueError("QUERY_DECOMPOSITION_MAX_PARTS must be greater than zero")
 
 ENABLE_EVIDENCE_VERIFICATION = _env_bool(
     "ENABLE_EVIDENCE_VERIFICATION",
     True,
 )
-MIN_EVIDENCE_SCORE = _env_float("MIN_EVIDENCE_SCORE", 0.45)
+MIN_EVIDENCE_SCORE = _env_float("MIN_EVIDENCE_SCORE", 0.42)
 EVIDENCE_WEIGHT = _env_float("EVIDENCE_WEIGHT", 0.25)
 
 # Separate answerability/rejection gate. A reranker only reorders candidates;
 # these settings decide whether the indexed corpus contains enough explicit
 # evidence to answer at all.
 ENABLE_ANSWERABILITY_GATE = _env_bool("ENABLE_ANSWERABILITY_GATE", True)
-ANSWERABILITY_MIN_TOP_SCORE = _env_float("ANSWERABILITY_MIN_TOP_SCORE", 0.40)
+ANSWERABILITY_MIN_TOP_SCORE = _env_float("ANSWERABILITY_MIN_TOP_SCORE", 0.35)
 # A reranker may raise the blended score, but the original hybrid score must
 # still clear this floor. This prevents a confident cross-encoder from turning
 # a weak lexical/semantic match into an answerable result by itself.
-ANSWERABILITY_MIN_BASE_SCORE = _env_float("ANSWERABILITY_MIN_BASE_SCORE", 0.30)
-ANSWERABILITY_MIN_EVIDENCE_SCORE = _env_float("ANSWERABILITY_MIN_EVIDENCE_SCORE", 0.50)
-ANSWERABILITY_MIN_SCORE_MARGIN = _env_float("ANSWERABILITY_MIN_SCORE_MARGIN", 0.015)
+ANSWERABILITY_MIN_BASE_SCORE = _env_float("ANSWERABILITY_MIN_BASE_SCORE", 0.22)
+ANSWERABILITY_MIN_EVIDENCE_SCORE = _env_float("ANSWERABILITY_MIN_EVIDENCE_SCORE", 0.42)
+ANSWERABILITY_MIN_SCORE_MARGIN = _env_float("ANSWERABILITY_MIN_SCORE_MARGIN", 0.0)
 ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE = _env_bool(
     "ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE",
     False,
 )
 ANSWERABILITY_STRONG_RETRIEVAL_SCORE = _env_float(
     "ANSWERABILITY_STRONG_RETRIEVAL_SCORE",
-    0.72,
+    0.68,
 )
 ANSWERABILITY_STRONG_EXACT_COVERAGE = _env_float(
     "ANSWERABILITY_STRONG_EXACT_COVERAGE",
-    0.25,
+    0.20,
 )
-ANSWERABILITY_MAX_CONTEXTS = _env_int("ANSWERABILITY_MAX_CONTEXTS", 3)
-# Production safety rule: when the baseline hybrid+evidence gate rejects the
-# query, reranking is not allowed to resurrect it. The reranker may reorder an
-# answerable candidate set, but it is not an answerability classifier.
+ANSWERABILITY_MAX_CONTEXTS = _env_int("ANSWERABILITY_MAX_CONTEXTS", 5)
+# Deprecated compatibility flag. Runtime answerability now executes only after
+# reranking and evidence verification, so this value is exposed for migration
+# visibility but no longer controls an early veto.
 ANSWERABILITY_PRE_RERANK_VETO = _env_bool(
     "ANSWERABILITY_PRE_RERANK_VETO",
-    True,
+    False,
 )
 if ANSWERABILITY_MAX_CONTEXTS <= 0:
     raise ValueError("ANSWERABILITY_MAX_CONTEXTS must be greater than zero")
@@ -184,11 +188,21 @@ if ANSWERABILITY_MAX_CONTEXTS <= 0:
 # Answer/source confidence gates. These settings live here (rather than being
 # read directly in answer_formatter.py) so the project-root .env is loaded
 # before the values are evaluated, regardless of Python import order.
-MIN_ANSWER_CONFIDENCE = _env_float("MIN_ANSWER_CONFIDENCE", 0.56)
-MIN_SOURCE_CONFIDENCE = _env_float("MIN_SOURCE_CONFIDENCE", 0.30)
+MIN_ANSWER_CONFIDENCE = _env_float("MIN_ANSWER_CONFIDENCE", 0.48)
+MIN_SOURCE_CONFIDENCE = _env_float("MIN_SOURCE_CONFIDENCE", 0.24)
 SOURCE_EXCERPT_MAX_CHARS = _env_int("SOURCE_EXCERPT_MAX_CHARS", 360)
+MAX_SOURCE_CITATIONS = _env_int("MAX_SOURCE_CITATIONS", 4)
+ENABLE_GENERATION_GROUNDING_VALIDATION = _env_bool(
+    "ENABLE_GENERATION_GROUNDING_VALIDATION",
+    True,
+)
+GENERATION_MIN_CLAIM_SUPPORT = _env_float("GENERATION_MIN_CLAIM_SUPPORT", 0.32)
 if SOURCE_EXCERPT_MAX_CHARS < 120:
     raise ValueError("SOURCE_EXCERPT_MAX_CHARS must be at least 120")
+if MAX_SOURCE_CITATIONS <= 0:
+    raise ValueError("MAX_SOURCE_CITATIONS must be greater than zero")
+if not 0.0 <= GENERATION_MIN_CLAIM_SUPPORT <= 1.0:
+    raise ValueError("GENERATION_MIN_CLAIM_SUPPORT must be between 0.0 and 1.0")
 
 for _name, _value in (
     ("MIN_EVIDENCE_SCORE", MIN_EVIDENCE_SCORE),
@@ -236,4 +250,9 @@ def public_rag_config() -> dict[str, str | float | bool | int]:
         "minimumAnswerConfidence": MIN_ANSWER_CONFIDENCE,
         "minimumSourceConfidence": MIN_SOURCE_CONFIDENCE,
         "sourceExcerptMaxChars": SOURCE_EXCERPT_MAX_CHARS,
+        "queryDecompositionEnabled": ENABLE_QUERY_DECOMPOSITION,
+        "queryDecompositionMaxParts": QUERY_DECOMPOSITION_MAX_PARTS,
+        "maxSourceCitations": MAX_SOURCE_CITATIONS,
+        "generationGroundingValidationEnabled": ENABLE_GENERATION_GROUNDING_VALIDATION,
+        "generationMinimumClaimSupport": GENERATION_MIN_CLAIM_SUPPORT,
     }
