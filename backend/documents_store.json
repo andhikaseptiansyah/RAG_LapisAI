@@ -1,5 +1,24 @@
 [
   {
+    "id": "a6d6a657-8654-4f8e-8e87-699197298c73",
+    "filename": "Assignment2_FLA.pdf",
+    "filepath": "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\backend\\uploads\\files\\Assignment2_FLA.pdf",
+    "type": "PDF",
+    "sizeBytes": 199486,
+    "size": "194.8 KB",
+    "uploadedAt": "2026-07-15T07:13:18.643249+00:00",
+    "indexedAt": "2026-07-15T07:13:18.643249+00:00",
+    "status": "Indexed",
+    "indexedStatus": "Indexed",
+    "vectorStatus": "Active",
+    "progress": 100,
+    "chunks": 1,
+    "note": "Indexed with Python RAG pipeline (1 chunks).",
+    "pages": 1,
+    "collection": "knowledge_base_multilingual_v1",
+    "embeddingModel": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+  },
+  {
     "id": "04621c2d-d3b9-4594-99ee-5e4b9d3ca996",
     "filename": "FAQ_Benefits.txt",
     "filepath": "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\backend\\uploads\\files\\FAQ_Benefits.txt",

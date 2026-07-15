@@ -1,6 +1,6 @@
 {
   "evaluation_name": "LapisAI Retrieval Quality Evaluation",
-  "generated_at": "2026-07-15T02:25:34+00:00",
+  "generated_at": "2026-07-14T15:32:01+00:00",
   "dataset_name": "Nusantara Dynamics Official Ground Truth Q&A",
   "dataset_version": "csv-official-30",
   "dataset_source_format": "csv",
@@ -57,10 +57,10 @@
       "page_level": {},
       "page_level_available": false,
       "latency_ms": {
-        "mean": 2524.417,
-        "median": 1034.753,
-        "min": 794.855,
-        "max": 46115.804
+        "mean": 2702.881,
+        "median": 1122.758,
+        "min": 817.648,
+        "max": 49248.002
       }
     },
     "unanswerable": {
@@ -90,10 +90,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 2524.417,
-            "median": 1034.753,
-            "min": 794.855,
-            "max": 46115.804
+            "mean": 2702.881,
+            "median": 1122.758,
+            "min": 817.648,
+            "max": 49248.002
           }
         },
         "unanswerable": {
@@ -123,10 +123,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 1045.11,
-            "median": 1114.399,
-            "min": 830.26,
-            "max": 1178.588
+            "mean": 1120.635,
+            "median": 1174.083,
+            "min": 892.036,
+            "max": 1295.632
           }
         },
         "unanswerable": {
@@ -154,10 +154,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 1055.479,
-            "median": 1123.509,
-            "min": 809.718,
-            "max": 1210.034
+            "mean": 1090.62,
+            "median": 1120.354,
+            "min": 817.648,
+            "max": 1260.924
           }
         },
         "unanswerable": {
@@ -185,10 +185,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 913.909,
-            "median": 900.773,
-            "min": 794.855,
-            "max": 1062.861
+            "mean": 1009.843,
+            "median": 970.399,
+            "min": 889.209,
+            "max": 1191.525
           }
         },
         "unanswerable": {
@@ -216,10 +216,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 7531.914,
-            "median": 1149.028,
-            "min": 932.775,
-            "max": 46115.804
+            "mean": 8051.949,
+            "median": 1344.419,
+            "min": 941.989,
+            "max": 49248.002
           }
         },
         "unanswerable": {
@@ -247,10 +247,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 996.267,
-            "median": 1034.753,
-            "min": 842.083,
-            "max": 1157.99
+            "mean": 1081.134,
+            "median": 1108.97,
+            "min": 856.283,
+            "max": 1268.015
           }
         },
         "unanswerable": {
@@ -280,10 +280,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 2524.417,
-            "median": 1034.753,
-            "min": 794.855,
-            "max": 46115.804
+            "mean": 2702.881,
+            "median": 1122.758,
+            "min": 817.648,
+            "max": 49248.002
           }
         },
         "unanswerable": {
@@ -313,10 +313,10 @@
           "page_level": {},
           "page_level_available": false,
           "latency_ms": {
-            "mean": 2524.417,
-            "median": 1034.753,
-            "min": 794.855,
-            "max": 46115.804
+            "mean": 2702.881,
+            "median": 1122.758,
+            "min": 817.648,
+            "max": 49248.002
           }
         },
         "unanswerable": {

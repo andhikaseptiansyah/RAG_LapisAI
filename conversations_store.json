@@ -1,5 +1,945 @@
 [
   {
+    "id": "b89cb86f-f361-4864-82d3-6db28d096e6c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "a84e15e9-694c-4040-9fe8-f41083e46844",
+        "conversation_id": "b89cb86f-f361-4864-82d3-6db28d096e6c",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T16:14:54.399141+00:00"
+      },
+      {
+        "id": "995b23be-d0eb-4cf5-99cc-ffbfd18f54d6",
+        "conversation_id": "b89cb86f-f361-4864-82d3-6db28d096e6c",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T16:14:54.399141+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T16:14:54.399141+00:00",
+    "updated_at": "2026-07-14T16:14:54.399141+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T16:14:54.399141+00:00"
+  },
+  {
+    "id": "e1b2db52-4aa6-4ad0-92ac-61f690c1c982",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "1",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "9a866140-26ca-4a19-bd96-1fbaac104671",
+        "conversation_id": "e1b2db52-4aa6-4ad0-92ac-61f690c1c982",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T16:02:13.494722+00:00"
+      },
+      {
+        "id": "432b564b-92d0-4d79-976f-0a57f096c74b",
+        "conversation_id": "e1b2db52-4aa6-4ad0-92ac-61f690c1c982",
+        "role": "assistant",
+        "content": "Maksimal reimbursement dari perusahaan untuk pembelian meja ergonomis seharga Rp2.000.000 tidak disebutkan dalam konteks dokumen. Nota asli wajib dilampirkan sebagai bukti pembelian.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.761,
+              "relevance_score": 0.761,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+          "followUpQuestion": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?"
+        },
+        "created_at": "2026-07-14T16:02:13.494722+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T16:02:13.494722+00:00",
+    "updated_at": "2026-07-14T16:08:00.519015+00:00",
+    "last_message": "Maksimal reimbursement dari perusahaan untuk pembelian meja ergonomis seharga Rp2.000.000 tidak disebutkan dalam konteks dokumen. Nota asli wajib dilampirkan sebagai bukti pembelian.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-14T16:02:13.494722+00:00"
+  },
+  {
+    "id": "75834ef2-2060-440e-b6b2-c0d5555cdd7c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6abf1e5c-035f-4a0a-95eb-333dbf9163c0",
+        "conversation_id": "75834ef2-2060-440e-b6b2-c0d5555cdd7c",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:59:44.644725+00:00"
+      },
+      {
+        "id": "ea3a9091-0bb2-471e-9618-a63b63b5ed5f",
+        "conversation_id": "75834ef2-2060-440e-b6b2-c0d5555cdd7c",
+        "role": "assistant",
+        "content": "- Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password?\n- A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T15:59:44.644725+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:59:44.644725+00:00",
+    "updated_at": "2026-07-14T15:59:44.644725+00:00",
+    "last_message": "- Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password?\n- A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T15:59:44.644725+00:00"
+  },
+  {
+    "id": "f7ffe8b4-6f05-46d9-9b05-e3ebb0947ab6",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "cdd0925f-445c-4c1d-ab1a-96dd12dcc558",
+        "conversation_id": "f7ffe8b4-6f05-46d9-9b05-e3ebb0947ab6",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:57:41.517137+00:00"
+      },
+      {
+        "id": "cb82b3fe-fd35-4624-a874-810eafdae6bb",
+        "conversation_id": "f7ffe8b4-6f05-46d9-9b05-e3ebb0947ab6",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T15:57:41.517137+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:57:41.517137+00:00",
+    "updated_at": "2026-07-14T15:57:41.517137+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T15:57:41.517137+00:00"
+  },
+  {
+    "id": "4b5a81eb-d158-4949-803c-f2fd326fae39",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "9921273d-0455-498f-a692-8395214bebdc",
+        "conversation_id": "4b5a81eb-d158-4949-803c-f2fd326fae39",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:56:07.762415+00:00"
+      },
+      {
+        "id": "00e4e34a-99f0-45d9-9c6c-43fa3642f7fe",
+        "conversation_id": "4b5a81eb-d158-4949-803c-f2fd326fae39",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T15:56:07.762415+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:56:07.762415+00:00",
+    "updated_at": "2026-07-14T15:56:07.762415+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T15:56:07.762415+00:00"
+  },
+  {
+    "id": "61543020-8e29-4ef2-aa2a-202451536682",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "0d8f9735-cbd6-457b-8beb-0daacb7e5bd5",
+        "conversation_id": "61543020-8e29-4ef2-aa2a-202451536682",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:55:51.700972+00:00"
+      },
+      {
+        "id": "490be873-7934-4c1b-9996-8b0881565eb9",
+        "conversation_id": "61543020-8e29-4ef2-aa2a-202451536682",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.869,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8483,
+              "relevance_score": 0.8483,
+              "excerpt": "Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T15:55:51.700972+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:55:51.700972+00:00",
+    "updated_at": "2026-07-14T15:55:51.700972+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-14T15:55:51.700972+00:00"
+  },
+  {
+    "id": "6d10d1f9-5040-4316-9def-4446e5a321ac",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, wh...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "8b383de1-9ad6-482b-8d1d-92056e2046c2",
+        "conversation_id": "6d10d1f9-5040-4316-9def-4446e5a321ac",
+        "role": "user",
+        "content": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:54:56.433571+00:00"
+      },
+      {
+        "id": "7c6defd6-34d2-4e9d-883f-3199405407d8",
+        "conversation_id": "6d10d1f9-5040-4316-9def-4446e5a321ac",
+        "role": "assistant",
+        "content": "The maximum reimbursement amount for the ergonomic desk is not specified. Original receipts are required for any single expense above IDR 150,000.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7791,
+              "relevance_score": 0.7791,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-14T15:54:56.433571+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:54:56.433571+00:00",
+    "updated_at": "2026-07-14T15:54:56.433571+00:00",
+    "last_message": "The maximum reimbursement amount for the ergonomic desk is not specified. Original receipts are required for any single expense above IDR 150,000.",
+    "last_user_message": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+    "last_message_at": "2026-07-14T15:54:56.433571+00:00"
+  },
+  {
+    "id": "01455fc7-d872-443c-973b-37f39ac1317f",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, wh...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "85b25417-9951-4dcf-bcfb-a28bfb497328",
+        "conversation_id": "01455fc7-d872-443c-973b-37f39ac1317f",
+        "role": "user",
+        "content": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:54:24.942077+00:00"
+      },
+      {
+        "id": "bf739f98-ecfc-48a0-87d2-23a1a02a0ee0",
+        "conversation_id": "01455fc7-d872-443c-973b-37f39ac1317f",
+        "role": "assistant",
+        "content": "THE merujuk pada Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7791,
+              "relevance_score": 0.7791,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-14T15:54:24.942077+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:54:24.942077+00:00",
+    "updated_at": "2026-07-14T15:54:24.942077+00:00",
+    "last_message": "THE merujuk pada Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+    "last_user_message": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+    "last_message_at": "2026-07-14T15:54:24.942077+00:00"
+  },
+  {
+    "id": "70b1cce1-6a9f-467b-b8f2-102ca3cdfcc7",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "639f3ec5-c519-40e7-bf6d-437ac09ae2bc",
+        "conversation_id": "70b1cce1-6a9f-467b-b8f2-102ca3cdfcc7",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:48:16.771801+00:00"
+      },
+      {
+        "id": "ae3c941c-64fc-4ad3-b16f-ff43c22ba7c1",
+        "conversation_id": "70b1cce1-6a9f-467b-b8f2-102ca3cdfcc7",
+        "role": "assistant",
+        "content": "The maximum reimbursement amount for purchasing an ergonomic table for WFH is not specified in the provided context. The original invoice must be attached for reimbursement.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.761,
+              "relevance_score": 0.761,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+          "followUpQuestion": "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?"
+        },
+        "created_at": "2026-07-14T15:48:16.771801+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:48:16.771801+00:00",
+    "updated_at": "2026-07-14T15:48:16.771801+00:00",
+    "last_message": "The maximum reimbursement amount for purchasing an ergonomic table for WFH is not specified in the provided context. The original invoice must be attached for reimbursement.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-14T15:48:16.771801+00:00"
+  },
+  {
+    "id": "8abc214b-177e-44f2-9cc6-c2fd2b6b0e1d",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5c6bf9cd-b356-4358-992c-a0bf01fddcd0",
+        "conversation_id": "8abc214b-177e-44f2-9cc6-c2fd2b6b0e1d",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:48:00.450672+00:00"
+      },
+      {
+        "id": "46620b72-c6ca-44f6-b018-7704166e5c6e",
+        "conversation_id": "8abc214b-177e-44f2-9cc6-c2fd2b6b0e1d",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset akan diproses dalam waktu maksimal 1x24 jam.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "If I create a credential that is 10 characters long, has a number, an uppercase letter, and a symbol, does it comply with our security standards?",
+          "followUpQuestion": "If I create a credential that is 10 characters long, has a number, an uppercase letter, and a symbol, does it comply with our security standards?"
+        },
+        "created_at": "2026-07-14T15:48:00.450672+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:48:00.450672+00:00",
+    "updated_at": "2026-07-14T15:48:00.450672+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset akan diproses dalam waktu maksimal 1x24 jam.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T15:48:00.450672+00:00"
+  },
+  {
+    "id": "e93580e4-455b-4635-9e60-571593c5f5f8",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5e574ffe-a140-4d78-807a-9e1b3d086a50",
+        "conversation_id": "e93580e4-455b-4635-9e60-571593c5f5f8",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:47:51.216269+00:00"
+      },
+      {
+        "id": "98ed2ef8-b598-41ee-9fa4-4657e8e78e61",
+        "conversation_id": "e93580e4-455b-4635-9e60-571593c5f5f8",
+        "role": "assistant",
+        "content": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+          "followUpQuestion": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?"
+        },
+        "created_at": "2026-07-14T15:47:51.216269+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:47:51.216269+00:00",
+    "updated_at": "2026-07-14T15:47:51.216269+00:00",
+    "last_message": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-14T15:47:51.216269+00:00"
+  },
+  {
+    "id": "d61dcab9-9b56-48d5-9335-219ed94c94f1",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "sebutkan work experience andhika",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "a4ef9ee4-acc7-430a-b11b-8b988158fb9a",
+        "conversation_id": "d61dcab9-9b56-48d5-9335-219ed94c94f1",
+        "role": "user",
+        "content": "sebutkan work experience andhika",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:44:59.133894+00:00"
+      },
+      {
+        "id": "e5ade637-cb1e-445f-8565-65c189f832b6",
+        "conversation_id": "d61dcab9-9b56-48d5-9335-219ed94c94f1",
+        "role": "assistant",
+        "content": "Andhika Septiansyah memiliki pengalaman kerja sebagai Full Stack Web Developer. Ia memiliki kontak email andhikaseptiansyah63@gmail.com dan nomor telepon +62 877-2994-9195. Ia berdomisili di DKI Jakarta. Portofolio Andhika dapat diakses melalui https://portofolio-amber-beta-38.vercel.app. Profil LinkedIn Andhika adalah linkedin.com/in/andhika-septiansyah.",
+        "attachments": [],
+        "confidence": 0.6577,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6494,
+              "relevance_score": 0.6494,
+              "excerpt": "https://portofolio-amber-beta-38.vercel.app linkedin.com/in/andhika-septiansyah",
+              "chapter": "ANDHIKA SEPTIANSYAH",
+              "section": "ANDHIKA SEPTIANSYAH",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T15:44:59.133894+00:00"
+      },
+      {
+        "id": "4cf65afd-79c3-4fe9-8f65-cb3f1e218d1e",
+        "conversation_id": "d61dcab9-9b56-48d5-9335-219ed94c94f1",
+        "role": "user",
+        "content": "project nya apa aja",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:46:22.800172+00:00"
+      },
+      {
+        "id": "6267ecf2-e2c8-4311-878d-ea4c592ee51c",
+        "conversation_id": "d61dcab9-9b56-48d5-9335-219ed94c94f1",
+        "role": "assistant",
+        "content": "- WFH Led the Front-End development team by managing task delegations and ensuring all project milestones were completed on schedule.\n- GoRako Waste Management Event Organizer, Web Developer PROJECT June 2025",
+        "attachments": [],
+        "confidence": 0.7177,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6955,
+              "relevance_score": 0.6955,
+              "excerpt": "Led the Front-End development team by managing task delegations and ensuring all project milestones were completed on schedule.",
+              "chapter": "WORK EXPERIENCE",
+              "section": "WORK EXPERIENCE",
+              "paragraph_start": 9,
+              "paragraph_end": 22
+            }
+          ],
+          "source": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+          "page": 1,
+          "follow_up_question": "Berapa banyak bakat baru yang bergabung dengan tenaga kerja antara Januari dan Juni 2025, dan berapa total staf saat ini?",
+          "followUpQuestion": "Berapa banyak bakat baru yang bergabung dengan tenaga kerja antara Januari dan Juni 2025, dan berapa total staf saat ini?"
+        },
+        "created_at": "2026-07-14T15:46:22.800172+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:44:59.133894+00:00",
+    "updated_at": "2026-07-14T15:46:22.800172+00:00",
+    "last_message": "- WFH Led the Front-End development team by managing task delegations and ensuring all project milestones were completed on schedule.\n- GoRako Waste Management Event Organizer, Web Developer PROJECT June 2025",
+    "last_user_message": "project nya apa aja",
+    "last_message_at": "2026-07-14T15:46:22.800172+00:00"
+  },
+  {
+    "id": "a290f1c6-6732-4ace-9064-d709dbecc6f2",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "apa pengalaman andhika septiansyah",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "3300dc01-3046-4583-813f-993a864913c8",
+        "conversation_id": "a290f1c6-6732-4ace-9064-d709dbecc6f2",
+        "role": "user",
+        "content": "apa pengalaman andhika septiansyah",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:40:38.495044+00:00"
+      },
+      {
+        "id": "7e410275-826c-418d-bc75-db37f42b53b7",
+        "conversation_id": "a290f1c6-6732-4ace-9064-d709dbecc6f2",
+        "role": "assistant",
+        "content": "Andhika Septiansyah memiliki pengalaman sebagai Full Stack Web Developer. Ia memiliki email andhikaseptiansyah63@gmail.com dan nomor telepon +62 877-2994-9195. Ia berdomisili di DKI Jakarta. Portofolio Andhika dapat diakses melalui https://portofolio-amber-beta-38.vercel.app. Profil LinkedIn Andhika dapat diakses melalui linkedin.com/in/andhika-septiansyah.",
+        "attachments": [],
+        "confidence": 0.7188,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6522,
+              "relevance_score": 0.6522,
+              "excerpt": "https://portofolio-amber-beta-38.vercel.app linkedin.com/in/andhika-septiansyah",
+              "chapter": "ANDHIKA SEPTIANSYAH",
+              "section": "ANDHIKA SEPTIANSYAH",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T15:40:38.495044+00:00"
+      },
+      {
+        "id": "e959fe97-83dc-45aa-a0d5-b087771a70a2",
+        "conversation_id": "a290f1c6-6732-4ace-9064-d709dbecc6f2",
+        "role": "user",
+        "content": "jelaskan work experience nya",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:42:02.734689+00:00"
+      },
+      {
+        "id": "7bd6aaf3-72fa-480a-a2cb-44ca68e4b152",
+        "conversation_id": "a290f1c6-6732-4ace-9064-d709dbecc6f2",
+        "role": "assistant",
+        "content": "- WORK EXPERIENCE June 2026\n- Present Mahreen Indonesia (Front-End PIC",
+        "attachments": [],
+        "confidence": 0.6554,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5878,
+              "relevance_score": 0.5878,
+              "excerpt": "April 2026 - Present PT.",
+              "chapter": "WORK EXPERIENCE",
+              "section": "WORK EXPERIENCE",
+              "paragraph_start": 9,
+              "paragraph_end": 22
+            }
+          ],
+          "source": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T15:42:02.734689+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:40:38.495044+00:00",
+    "updated_at": "2026-07-14T15:42:02.734689+00:00",
+    "last_message": "- WORK EXPERIENCE June 2026\n- Present Mahreen Indonesia (Front-End PIC",
+    "last_user_message": "jelaskan work experience nya",
+    "last_message_at": "2026-07-14T15:42:02.734689+00:00"
+  },
+  {
+    "id": "744c6580-49c2-451f-abc8-869cc77926c0",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "halo",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "30ff7a58-d5ff-4751-920d-fa365d4e525a",
+        "conversation_id": "744c6580-49c2-451f-abc8-869cc77926c0",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T15:38:55.404501+00:00"
+      },
+      {
+        "id": "a51ec905-ed0e-45ba-a999-ec20f2b53bd7",
+        "conversation_id": "744c6580-49c2-451f-abc8-869cc77926c0",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T15:38:55.404501+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T15:38:55.404501+00:00",
+    "updated_at": "2026-07-14T15:38:55.404501+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "halo",
+    "last_message_at": "2026-07-14T15:38:55.404501+00:00"
+  },
+  {
     "id": "95df6a16-7622-4a5b-90cc-98ae8dab1547",
     "user_id": "dev-admin",
     "user_name": "Admin",

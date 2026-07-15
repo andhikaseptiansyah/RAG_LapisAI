@@ -1,9 +1,8 @@
-"""Build a generation-evaluation dataset from the LapisAI API.
+"""Build the official generation-evaluation dataset from one /chat request.
 
-Important difference from the old script:
-- /query is used to capture the raw retrieved chunks and full context.
-- /chat is used to capture the final generated answer and displayed citations.
-- Source keys such as documentName and excerpt are supported.
+Source-locked mode prevents false hallucination labels caused by retrieving the
+answer with /chat and then retrieving a different context with /query.
+The answer, citations, and judge context all come from the same chat response.
 """
 
 from __future__ import annotations
@@ -12,7 +11,7 @@ import argparse
 import csv
 import json
 import os
-import sys
+import re
 from pathlib import Path
 from typing import Any
 
@@ -20,18 +19,53 @@ import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
-if str(EVALUATION_DIR) not in sys.path:
-    sys.path.insert(0, str(EVALUATION_DIR))
-
-from evaluate_retrieval import load_ground_truth as load_official_ground_truth  # noqa: E402
-
 CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/chat")
-QUERY_URL = os.getenv("LAPISAI_QUERY_URL", "http://localhost:8000/query")
+HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "180"))
+CONTEXT_MODE = "source_locked_single_pass"
+
+
+def detect_language(text: str) -> str:
+    tokens = set(re.findall(r"[a-zA-ZÀ-ÿ]+", str(text or "").casefold()))
+    indonesian = {
+        "apa", "apakah", "berapa", "bagaimana", "kapan", "siapa", "dimana",
+        "yang", "untuk", "dengan", "karyawan", "hari", "bulan", "harus",
+    }
+    return "ID" if len(tokens & indonesian) >= 2 else "EN"
 
 
 def load_ground_truth(path: Path) -> list[dict[str, Any]]:
-    _, items = load_official_ground_truth(path.resolve())
+    if path.suffix.casefold() == ".csv":
+        with path.open(encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        required = {"question", "expected_answer", "source_document"}
+        if not rows:
+            raise ValueError(f"Ground-truth CSV is empty: {path}")
+        missing = required - set(rows[0])
+        if missing:
+            raise ValueError("Missing CSV columns: " + ", ".join(sorted(missing)))
+        return [
+            {
+                "id": f"QA-{index:03d}",
+                "split": "all",
+                "question": str(row["question"]).strip(),
+                "answerable": True,
+                "expected_answer": str(row["expected_answer"]).strip(),
+                "expected_answer_keywords": [],
+                "references": [
+                    {
+                        "document": str(row["source_document"]).strip(),
+                        "page": "",
+                    }
+                ],
+            }
+            for index, row in enumerate(rows, start=1)
+        ]
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    items = list(payload.get("items") or [])
+    if not items:
+        raise ValueError(f"Ground-truth JSON contains no items: {path}")
     return items
 
 
@@ -42,6 +76,17 @@ def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"Unexpected response from {url}: expected JSON object")
     return data
+
+
+def preflight() -> None:
+    try:
+        response = requests.get(HEALTH_URL, timeout=10)
+        response.raise_for_status()
+    except Exception as error:
+        raise RuntimeError(
+            "LapisAI backend is not reachable. Start Uvicorn on port 8000 before "
+            f"running generation evaluation. Health check failed: {error}"
+        ) from error
 
 
 def normalize_source(item: Any) -> dict[str, str] | None:
@@ -68,55 +113,9 @@ def normalize_source(item: Any) -> dict[str, str] | None:
         or metadata.get("page")
         or ""
     )
-
     if not document:
         return None
-
     return {"document": str(document), "page": str(page)}
-
-
-def normalize_chunk(item: Any) -> dict[str, Any] | None:
-    if not isinstance(item, dict):
-        return None
-
-    source = normalize_source(item)
-    if source is None:
-        return None
-
-    content = (
-        item.get("content")
-        or item.get("page_content")
-        or item.get("text")
-        or item.get("excerpt")
-        or ""
-    )
-
-    return {
-        **source,
-        "chunk_id": str(item.get("chunkId") or item.get("chunk_id") or ""),
-        "content": str(content).strip(),
-        "score": item.get("score", item.get("relevanceScore", 0)),
-        "semantic_score": item.get("semanticScore", 0),
-        "keyword_score": item.get("keywordScore", 0),
-        "reranker_score": item.get("rerankerScore", 0),
-        "evidence_score": item.get("evidenceScore", 0),
-        "evidence_supported": item.get("evidenceSupported"),
-    }
-
-
-def build_context(chunks: list[dict[str, Any]]) -> str:
-    blocks: list[str] = []
-    for index, chunk in enumerate(chunks, start=1):
-        content = str(chunk.get("content") or "").strip()
-        if not content:
-            continue
-        blocks.append(
-            f"[CONTEXT {index}]\n"
-            f"Document: {chunk.get('document', '')}\n"
-            f"Page: {chunk.get('page', '')}\n"
-            f"Content: {content}"
-        )
-    return "\n\n".join(blocks)
 
 
 def normalize_chat_citations(response: dict[str, Any]) -> list[dict[str, str]]:
@@ -142,6 +141,97 @@ def normalize_chat_citations(response: dict[str, Any]) -> list[dict[str, str]]:
     return citations
 
 
+def normalize_generation_context(item: Any) -> dict[str, Any] | None:
+    if not isinstance(item, dict):
+        return None
+
+    metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
+    text = str(
+        item.get("text")
+        or item.get("content")
+        or item.get("excerpt")
+        or item.get("page_content")
+        or ""
+    ).strip()
+    document_name = str(
+        item.get("document_name")
+        or item.get("documentName")
+        or item.get("document")
+        or metadata.get("filename")
+        or ""
+    ).strip()
+    page = item.get("page", metadata.get("page"))
+    chunk_id = str(
+        item.get("chunk_id")
+        or item.get("chunkId")
+        or metadata.get("chunk_id")
+        or ""
+    )
+
+    if not text:
+        return None
+
+    return {
+        "text": text,
+        "document_name": document_name,
+        "page": page,
+        "chunk_id": chunk_id,
+    }
+
+
+def contexts_from_chat(response: dict[str, Any]) -> list[dict[str, Any]]:
+    raw_contexts = response.get("generation_contexts") or []
+    contexts = [
+        normalized
+        for item in raw_contexts
+        if (normalized := normalize_generation_context(item)) is not None
+    ]
+    if contexts:
+        return contexts
+
+    # Backward-compatible fallback. This still remains source-locked because the
+    # excerpts are returned by the same /chat response, not a second retrieval.
+    raw_sources = response.get("sources") or []
+    return [
+        normalized
+        for item in raw_sources
+        if (normalized := normalize_generation_context(item)) is not None
+    ]
+
+
+def build_context(contexts: list[dict[str, Any]]) -> str:
+    blocks: list[str] = []
+    for index, context in enumerate(contexts, start=1):
+        text = str(context.get("text") or "").strip()
+        if not text:
+            continue
+        blocks.append(
+            f"[CONTEXT {index}]\n"
+            f"Document: {context.get('document_name', '')}\n"
+            f"Page: {context.get('page', '') or ''}\n"
+            f"Evidence: {text}"
+        )
+    return "\n\n".join(blocks)
+
+
+def retrieved_sources_from_contexts(
+    contexts: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    output: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for context in contexts:
+        document = str(context.get("document_name") or "").strip()
+        page = str(context.get("page") or "")
+        if not document:
+            continue
+        key = (document, page)
+        if key in seen:
+            continue
+        seen.add(key)
+        output.append({"document": document, "page": page})
+    return output
+
+
 def build_dataset(
     ground_truth: list[dict[str, Any]],
     output: Path,
@@ -151,30 +241,28 @@ def build_dataset(
     questions = ground_truth if split == "all" else [
         item for item in ground_truth if item.get("split") == split
     ]
+    if not questions:
+        raise ValueError(f"No questions found for split={split}")
 
+    preflight()
     results: list[dict[str, Any]] = []
-    print(f"Generate {len(questions)} answers...")
+    errors: list[str] = []
+    print(f"Generate {len(questions)} answers in {CONTEXT_MODE} mode...")
 
     for index, item in enumerate(questions, start=1):
         qid = str(item["id"])
         question = str(item["question"])
-        print(f"[{index}/{len(questions)}] {qid}")
+        language = detect_language(question)
+        print(f"[{index}/{len(questions)}] {qid} ({language})")
 
         try:
-            query_response = post_json(
-                QUERY_URL,
-                {"query": question, "top_k": top_k},
-            )
-            raw_chunks = query_response.get("chunks") or []
-            chunks = [
-                normalized
-                for raw in raw_chunks
-                if (normalized := normalize_chunk(raw)) is not None
-            ]
-
             chat_response = post_json(
                 CHAT_URL,
-                {"question": question, "top_k": top_k},
+                {
+                    "question": question,
+                    "top_k": top_k,
+                    "language": language,
+                },
             )
             answer = str(
                 chat_response.get("answer")
@@ -182,50 +270,75 @@ def build_dataset(
                 or chat_response.get("response")
                 or ""
             ).strip()
+            if not answer:
+                raise RuntimeError("The chat endpoint returned an empty answer.")
+
+            contexts = contexts_from_chat(chat_response)
+            if not contexts:
+                raise RuntimeError(
+                    "The chat endpoint returned an answer without generation contexts. "
+                    "Install the source-locked backend patch and restart Uvicorn."
+                )
+
+            retrieved_context = build_context(contexts)
+            if not retrieved_context:
+                raise RuntimeError("Generation contexts contained no usable evidence text.")
+
             citations = normalize_chat_citations(chat_response)
+            retrieved_sources = retrieved_sources_from_contexts(contexts)
 
             results.append(
                 {
                     "id": qid,
                     "question": question,
+                    "language": language,
+                    "answerable": bool(item.get("answerable", True)),
                     "expected_answer": str(item.get("expected_answer") or ""),
                     "expected_sources": list(item.get("references") or []),
-                    "retrieved_context": build_context(chunks),
-                    "retrieved_sources": [
-                        {"document": chunk["document"], "page": chunk["page"]}
-                        for chunk in chunks
+                    "retrieved_context": retrieved_context,
+                    "retrieved_sources": retrieved_sources,
+                    "retrieved_chunks": [
+                        {
+                            "document": context["document_name"],
+                            "page": str(context.get("page") or ""),
+                            "chunk_id": context.get("chunk_id", ""),
+                            "content": context["text"],
+                            "generation_context": True,
+                        }
+                        for context in contexts
                     ],
-                    "retrieved_chunks": chunks,
+                    "generation_contexts": contexts,
                     "generated_answer": answer,
                     "citation": citations,
                     "system_confidence": chat_response.get("confidence", 0),
+                    "evaluation_context_mode": CONTEXT_MODE,
                 }
             )
         except Exception as error:
-            print(f"[ERROR] {qid}: {error}")
-            results.append(
-                {
-                    "id": qid,
-                    "question": question,
-                    "expected_answer": str(item.get("expected_answer") or ""),
-                    "expected_sources": list(item.get("references") or []),
-                    "retrieved_context": "",
-                    "retrieved_sources": [],
-                    "retrieved_chunks": [],
-                    "generated_answer": "Tidak ditemukan jawaban.",
-                    "citation": [],
-                    "system_confidence": 0,
-                    "error": str(error),
-                }
-            )
+            message = f"{qid}: {error}"
+            errors.append(message)
+            print(f"[ERROR] {message}")
 
+    if errors:
+        error_preview = "\n".join(f"- {item}" for item in errors[:10])
+        raise RuntimeError(
+            f"Generation dataset aborted: {len(errors)}/{len(questions)} requests failed.\n"
+            f"{error_preview}\nNo misleading evaluation file was written."
+        )
+
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(results, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
-    print("\n[SUKSES]")
-    print(f"Tersimpan : {output}")
-    print(f"Jumlah data : {len(results)}")
+    print("\n[SUCCESS]")
+    print(f"Saved       : {output}")
+    print(f"Answers     : {len(results)}")
+    print(f"Context mode: {CONTEXT_MODE}")
+    print(
+        f"Languages   : EN={sum(r['language'] == 'EN' for r in results)}, "
+        f"ID={sum(r['language'] == 'ID' for r in results)}"
+    )
 
 
 def main() -> None:
@@ -249,8 +362,8 @@ def main() -> None:
     args = parser.parse_args()
 
     build_dataset(
-        load_ground_truth(args.ground_truth),
-        args.output,
+        load_ground_truth(args.ground_truth.resolve()),
+        args.output.resolve(),
         args.split,
         max(1, args.top_k),
     )

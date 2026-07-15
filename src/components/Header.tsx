@@ -104,8 +104,9 @@ export const Header: React.FC<HeaderProps> = ({
     setIsLanguageOpen(false);
   };
 
+  // --- KODE UPDATE: Class sticky diubah jadi absolute w-full ---
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between bg-transparent px-4 md:h-20 md:px-6">
+    <header className="absolute left-0 top-0 w-full z-30 flex h-16 shrink-0 items-center justify-between bg-transparent px-4 md:h-20 md:px-6">
       <button
         type="button"
         onClick={onToggleSidebar}

@@ -4,9 +4,16 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from api.answer_formatter import build_evidence_excerpt
 from api.chat_service import run_chat
 from api.logger import save_log
+from retrieval.context_selector import select_context_bundle
 from retrieval.hybrid_search import hybrid_search
+from uploads.config import (
+    CONTEXT_REDUNDANCY_THRESHOLD,
+    CONTEXT_SECONDARY_SCORE_RATIO,
+    MAX_GENERATION_CONTEXTS,
+)
 
 router = APIRouter()
 
@@ -20,6 +27,7 @@ class ChatRequest(BaseModel):
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
+    generation_context: bool = Field(default=False)
 
 
 class ChatSourceResponse(BaseModel):
@@ -34,10 +42,18 @@ class ChatSourceResponse(BaseModel):
     line_end: int | None = None
 
 
+class GenerationContextResponse(BaseModel):
+    text: str
+    document_name: str = ""
+    page: int | str | None = None
+    chunk_id: str = ""
+
+
 class ChatResponse(BaseModel):
     answer: str
     confidence: float = Field(ge=0.0, le=1.0)
     sources: list[ChatSourceResponse]
+    generation_contexts: list[GenerationContextResponse] = Field(default_factory=list)
     follow_up_question: str | None = None
     response_time_ms: int = Field(ge=0)
 
@@ -48,6 +64,26 @@ def query_documents(payload: QueryRequest):
 
     try:
         chunks = hybrid_search(payload.query, top_k=payload.top_k)
+        raw_candidate_count = len(chunks)
+        if payload.generation_context:
+            chunks = select_context_bundle(
+                payload.query,
+                chunks,
+                max_contexts=MAX_GENERATION_CONTEXTS,
+                redundancy_threshold=CONTEXT_REDUNDANCY_THRESHOLD,
+                secondary_score_ratio=CONTEXT_SECONDARY_SCORE_RATIO,
+            )
+            chunks = [
+                {
+                    **chunk,
+                    "content": build_evidence_excerpt(
+                        payload.query,
+                        str(chunk.get("content") or ""),
+                    ) or str(chunk.get("content") or ""),
+                    "generationContext": True,
+                }
+                for chunk in chunks
+            ]
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Retrieval failed: {str(exc)}") from exc
 
@@ -59,6 +95,9 @@ def query_documents(payload: QueryRequest):
         "retrieval": {
             "mode": "hybrid",
             "topK": payload.top_k,
+            "returnedContexts": len(chunks),
+            "rawCandidateCount": raw_candidate_count,
+            "generationContext": payload.generation_context,
             "latencyMs": round(latency_ms, 2),
         },
     }
@@ -87,6 +126,7 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
         "answer": result["answer"],
         "confidence": result["confidence"],
         "sources": result["sources"],
+        "generation_contexts": result.get("generation_contexts", []),
         "follow_up_question": result.get("follow_up_question"),
         "response_time_ms": result["response_time_ms"],
     }

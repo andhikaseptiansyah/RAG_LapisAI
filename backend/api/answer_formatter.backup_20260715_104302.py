@@ -391,163 +391,67 @@ def _source_excerpt_segments(value: Any) -> list[str]:
 
 
 def _normalize_faq_question(value: str) -> str:
-    """Normalize a FAQ question for tolerant Q/A matching."""
-
+    """Normalize a FAQ question for tolerant Q/A-pair matching."""
     text = _clean_text(value).casefold()
-
-    text = re.sub(
-        r"^(?:q|question|pertanyaan)\s*:\s*",
-        "",
-        text,
-    )
-
-    text = re.sub(
-        r"[^a-z0-9?-?]+",
-        " ",
-        text,
-    )
-
-    return re.sub(
-        r"\s+",
-        " ",
-        text,
-    ).strip()
+    text = re.sub(r"^(?:q|question|pertanyaan)\s*:\s*", "", text)
+    text = re.sub(r"[^a-z0-9à-ÿ]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def _extract_faq_pairs(
-    value: Any,
-) -> list[tuple[str, str]]:
-    """Extract Q:/A: pairs from multiline or flattened FAQ text.
+def _matched_faq_answer(question: str, segments: list[str]) -> str:
+    """Return only the A: segment paired with the closest matching Q: segment.
 
-    The uploaded document may retain line breaks:
-
-        Q: What should I bring?
-        A: Bring a valid ID...
-
-    Chroma may also return the same passage flattened:
-
-        ## First Day Q: What should I bring? A: Bring a valid ID...
-
-    This parser supports both formats and stops an answer before the next
-    Q: marker or Markdown heading.
+    This prevents the context selector from choosing a neighbouring FAQ answer
+    merely because it shares generic words such as "first day", "password", or
+    "account".
     """
-
-    raw = str(value or "")
-
-    if not raw.strip():
-        return []
-
-    # Flatten whitespace while retaining Q:, A:, and Markdown markers.
-    text = _clean_text(raw)
-
-    pair_pattern = re.compile(
-        r"(?:^|\s)"
-        r"Q:\s*"
-        r"(?P<question>.*?)"
-        r"\s+A:\s*"
-        r"(?P<answer>.*?)"
-        r"(?="
-        r"\s+Q:\s*"
-        r"|\s+#{1,6}\s+"
-        r"|\Z"
-        r")",
-        flags=re.I | re.S,
-    )
-
-    pairs: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
-
-    for match in pair_pattern.finditer(text):
-        faq_question = _clean_text(
-            match.group("question")
-        ).strip(" :.-??")
-
-        faq_answer = _clean_text(
-            match.group("answer")
-        ).strip(" ,;:")
-
-        if not faq_question or not faq_answer:
-            continue
-
-        key = (
-            faq_question.casefold(),
-            faq_answer.casefold(),
-        )
-
-        if key in seen:
-            continue
-
-        seen.add(key)
-        pairs.append(
-            (
-                faq_question,
-                faq_answer,
-            )
-        )
-
-    return pairs
-
-
-def _matched_faq_answer(
-    question: str,
-    value: Any,
-) -> str:
-    """Return only the answer paired with the closest FAQ question."""
-
-    normalized_question = _normalize_faq_question(
-        question
-    )
-
+    normalized_question = _normalize_faq_question(question)
     if not normalized_question:
         return ""
 
-    question_tokens = set(
-        _tokenize(question)
-    )
-
+    question_tokens = set(_tokenize(question))
     best_score = 0.0
     best_answer = ""
 
-    for faq_question, faq_answer in _extract_faq_pairs(
-        value
-    ):
-        normalized_candidate = _normalize_faq_question(
-            faq_question
-        )
+    for index, segment in enumerate(segments):
+        if not re.match(r"^\s*Q\s*:", segment, flags=re.I):
+            continue
 
+        next_index = index + 1
+        if next_index >= len(segments):
+            continue
+
+        answer_segment = segments[next_index]
+        if not re.match(r"^\s*A\s*:", answer_segment, flags=re.I):
+            continue
+
+        normalized_candidate = _normalize_faq_question(segment)
         similarity = SequenceMatcher(
             None,
             normalized_question,
             normalized_candidate,
         ).ratio()
 
-        candidate_tokens = set(
-            _tokenize(faq_question)
-        )
-
+        candidate_tokens = set(_tokenize(segment))
         token_coverage = (
-            len(
-                question_tokens.intersection(
-                    candidate_tokens
-                )
-            )
+            len(question_tokens.intersection(candidate_tokens))
             / max(len(question_tokens), 1)
         )
 
-        score = (
-            0.60 * similarity
-            + 0.40 * token_coverage
-        )
+        # Requiring both a reasonably close phrase match and query-token support
+        # reduces false pairings while remaining tolerant of light paraphrases.
+        score = (0.60 * similarity) + (0.40 * token_coverage)
 
         if score > best_score:
             best_score = score
-            best_answer = faq_answer
+            best_answer = re.sub(
+                r"^\s*A\s*:\s*",
+                "",
+                answer_segment,
+                flags=re.I,
+            ).strip()
 
-    return (
-        best_answer
-        if best_score >= 0.42
-        else ""
-    )
+    return best_answer if best_score >= 0.42 else ""
 
 
 def build_evidence_excerpt(
@@ -563,7 +467,7 @@ def build_evidence_excerpt(
     # FAQ documents must keep the matched Q:/A: pair locked together. Returning
     # only the paired answer also keeps the model prompt and evaluation context
     # free from neighbouring, unrelated FAQ entries.
-    faq_answer = _matched_faq_answer(question, content)
+    faq_answer = _matched_faq_answer(question, segments)
     if faq_answer:
         if len(faq_answer) <= max_chars:
             return faq_answer

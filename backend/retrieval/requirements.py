@@ -1,9 +1,8 @@
-"""Generic evidence requirements used by answerability and answer validation.
+"""Generic evidence requirements for answerability and grounding validation.
 
-The module deliberately avoids benchmark-question rules. It extracts answer-type
-requirements (amount, duration, percentage, URL, version, cadence), literal
-constraints (years, quoted names, numeric conditions), and scenario comparisons
-from arbitrary Indonesian or English questions.
+This module extracts answer-type requirements from arbitrary Indonesian or
+English questions. It intentionally avoids rules tied to individual benchmark
+questions, so the runtime remains useful outside the evaluation set.
 """
 
 from __future__ import annotations
@@ -52,11 +51,16 @@ MONEY_PATTERN = re.compile(
     r"|\b\d[\d.,]*\s*(?:rupiah|IDR|USD|EUR)\b)",
     flags=re.I,
 )
-PERCENT_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?\s*(?:%|percent(?:age)?|persen(?:tase)?)(?![A-Za-z])", flags=re.I)
+PERCENT_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?\s*(?:%(?=$|[^0-9])|percent\b|percentage\b|persen\b)", flags=re.I)
+STORAGE_PATTERN = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s*(?:KB|MB|GB|TB|kilobytes?|megabytes?|gigabytes?|terabytes?)\b",
+    flags=re.I,
+)
 TIME_PATTERN = re.compile(
     r"\b(?:within\s+|at\s+least\s+|up\s+to\s+|maksimal\s+|minimal\s+|"
     r"paling\s+lambat\s+|dalam\s+waktu\s+)?"
-    r"(?:\d+\s*[x×]\s*\d+|\d+(?:[.,]\d+)?)\s*"
+    r"(?:\d+\s*[x×]\s*\d+|\d+(?:[.,]\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh)\s*"
     r"(?:minutes?|mins?|hours?|hrs?|working\s+days?|business\s+days?|days?|weeks?|months?|years?|"
     r"menit|jam|hari\s+kerja|hari|minggu|bulan|tahun)\b",
     flags=re.I,
@@ -101,10 +105,8 @@ def canonical_unit(unit: str) -> str:
     value = normalize_text(unit)
     aliases = {
         "day": "days", "hari": "days", "working day": "days", "business day": "days",
-        "year": "years", "tahun": "years",
-        "month": "months", "bulan": "months",
-        "week": "weeks", "minggu": "weeks",
-        "hour": "hours", "hr": "hours", "jam": "hours",
+        "year": "years", "tahun": "years", "month": "months", "bulan": "months",
+        "week": "weeks", "minggu": "weeks", "hour": "hours", "hr": "hours", "jam": "hours",
         "minute": "minutes", "min": "minutes", "menit": "minutes",
         "second": "seconds", "sec": "seconds", "detik": "seconds",
         "character": "characters", "char": "characters", "karakter": "characters",
@@ -114,13 +116,28 @@ def canonical_unit(unit: str) -> str:
     return aliases.get(value, value)
 
 
-def numeric_constraints(question: str) -> list[tuple[str, str]]:
+def numeric_constraints(text: str) -> list[tuple[str, str]]:
     constraints: list[tuple[str, str]] = []
-    for number, unit in NUMBER_WITH_UNIT_PATTERN.findall(str(question or "")):
+    for number, unit in NUMBER_WITH_UNIT_PATTERN.findall(str(text or "")):
         item = (number.replace(",", "."), canonical_unit(unit))
         if item not in constraints:
             constraints.append(item)
     return constraints
+
+
+def unit_family(unit: str) -> str:
+    value = canonical_unit(unit)
+    if value in {"gb", "mb", "tb", "kb"}:
+        return "storage"
+    if value in {"seconds", "minutes", "hours", "days", "weeks", "months", "years"}:
+        return "duration"
+    if value == "characters":
+        return "length"
+    if value == "requests":
+        return "request_count"
+    if value == "%":
+        return "percentage"
+    return value
 
 
 def _subject_terms_for_exact_detail(question: str) -> tuple[str, ...]:
@@ -145,131 +162,153 @@ def extract_evidence_requirements(question: str) -> list[EvidenceRequirement]:
         if requirement.key not in {item.key for item in requirements}:
             requirements.append(requirement)
 
-    asks_url = _contains_phrase(query, ("url", "endpoint", "link", "alamat web"))
-    if asks_url:
+    if _contains_phrase(query, ("url", "endpoint", "link", "alamat web")):
         add(EvidenceRequirement(
-            key="answer_url",
-            description="an explicit URL, endpoint, link, or email address",
-            kind="url",
+            "answer_url", "an explicit URL, endpoint, link, or email address", "url",
             same_chunk_terms=_subject_terms_for_exact_detail(question),
         ))
 
-    asks_version = _contains_phrase(
-        query,
-        ("version", "versi", "version number", "nomor versi", "minimum version", "versi minimum"),
-    )
-    if asks_version:
+    if _contains_phrase(query, ("version", "versi", "version number", "nomor versi", "minimum version", "versi minimum")):
         add(EvidenceRequirement("answer_version", "an explicit version number", "version"))
 
-    asks_frequency = _contains_phrase(
-        query,
-        ("how often", "how frequently", "seberapa sering", "berapa kali", "frekuensi", "jadwal pelaksanaan"),
-    )
-    if asks_frequency:
+    if _contains_phrase(query, ("how often", "how frequently", "seberapa sering", "berapa kali", "frekuensi", "jadwal pelaksanaan")):
         add(EvidenceRequirement("answer_cadence", "an explicit cadence or frequency", "cadence"))
 
-    asks_money = _contains_phrase(
+    # "How much advance notice" asks for a duration, not money. Monetary intent
+    # must include an amount-bearing subject such as cost, allowance, or reimbursement.
+    monetary_intent = _contains_phrase(
         query,
         (
             "berapa biaya", "berapa nominal", "nilai nominal", "batas nominal",
-            "cost", "price", "fee", "amount", "reimbursement", "budget",
-            "maximum reimbursement", "minimum reimbursement", "per diem", "allowance",
+            "maximum reimbursement", "minimum reimbursement", "reimbursement limit", "reimbursement maximum",
+            "batas reimbursement", "per diem", "allowance",
             "tunjangan", "subsidi", "biaya penggantian", "replacement fee",
+            "what amount", "what cost", "how much", "maximum amount", "maximum value",
+            "berapa rupiah", "jumlah biaya", "nilai maksimum",
         ),
     )
-    if asks_money:
-        add(EvidenceRequirement("answer_money", "an explicit monetary amount", "money"))
-
-    asks_percent = "%" in question or _contains_phrase(
+    duration_amount_phrase = _contains_phrase(
         query,
-        ("persen", "persentase", "percentage", "percent", "margin", "tingkat"),
+        ("advance notice", "how much notice", "berapa lama pemberitahuan", "berapa hari sebelumnya"),
     )
-    if asks_percent:
-        add(EvidenceRequirement("answer_percentage", "an explicit percentage", "percentage"))
-
-    asks_duration = _contains_phrase(
+    financial_metric_intent = _contains_phrase(
         query,
         (
-            "how long", "within how long", "berapa lama", "batas waktu", "deadline", "paling lambat",
-            "advance notice", "berapa hari", "berapa jam", "berapa bulan", "retained", "masa berlaku",
-            "valid", "rto", "rpo", "resolved", "acknowledged", "revoke", "submit",
+            "revenue", "pendapatan", "net profit", "gross profit", "laba bersih",
+            "laba kotor", "operating income", "annual sales", "quarterly sales",
         ),
     )
-    if asks_duration:
+    if (monetary_intent or financial_metric_intent) and not duration_amount_phrase:
+        add(EvidenceRequirement("answer_money", "an explicit monetary amount", "money"))
+
+    percentage_metric_intent = _contains_phrase(
+        query,
+        (
+            "csat", "customer satisfaction score", "satisfaction score",
+            "availability slo", "api availability", "service availability",
+            "unit test coverage", "unit-test coverage", "code coverage",
+        ),
+    )
+    if (
+        "%" in str(question)
+        or _contains_phrase(query, ("persen", "persentase", "percentage", "percent", "margin", "tingkat"))
+        or percentage_metric_intent
+    ):
+        add(EvidenceRequirement("answer_percentage", "an explicit percentage", "percentage"))
+
+    if _contains_phrase(
+        query,
+        (
+            "mailbox size", "mailbox limit", "mailbox quota", "storage limit",
+            "storage quota", "ukuran mailbox", "batas mailbox", "kapasitas mailbox",
+            "batas penyimpanan", "kuota penyimpanan",
+        ),
+    ):
+        add(EvidenceRequirement("answer_storage", "an explicit storage quantity", "storage"))
+
+    if _contains_phrase(
+        query,
+        (
+            "how long", "within how long", "how fast", "advance notice", "berapa lama", "seberapa cepat", "batas waktu", "deadline",
+            "paling lambat", "berapa hari", "berapa jam", "berapa bulan", "retained", "masa berlaku",
+            "valid", "rto", "rpo", "resolved", "acknowledged", "revoke", "submit",
+        ),
+    ):
         add(EvidenceRequirement("answer_duration", "an explicit duration or deadline", "duration"))
 
-    asks_when = _contains_phrase(query, ("when", "kapan", "tanggal berapa", "jam berapa", "payday"))
-    if asks_when:
+    if _contains_phrase(query, ("when", "kapan", "tanggal berapa", "jam berapa", "payday")):
         add(EvidenceRequirement("answer_date_or_time", "an explicit date, day, or time", "date_or_time"))
 
-    asks_count = _contains_phrase(query, ("how many", "berapa banyak", "berapa jumlah", "berapa orang", "berapa pelanggan"))
-    if asks_count:
+    if _contains_phrase(query, ("how many", "berapa banyak", "berapa jumlah", "berapa orang", "berapa pelanggan")):
         add(EvidenceRequirement("answer_count", "an explicit numeric count", "number"))
+
+    if _contains_phrase(
+        query,
+        (
+            "what approval", "which approval", "who approves", "who must approve",
+            "approval is needed", "approval required", "persetujuan apa",
+            "persetujuan siapa", "siapa yang menyetujui", "siapa yang harus menyetujui",
+        ),
+    ):
+        add(EvidenceRequirement("answer_approval", "an explicit approver or approval rule", "approval"))
+
+    if _contains_phrase(
+        query,
+        (
+            "reported to", "report to", "who must", "who should", "who do i contact",
+            "contact whom", "kepada siapa", "lapor ke", "dilaporkan kepada",
+            "siapa yang harus dihubungi", "kontak siapa",
+        ),
+    ) and _contains_phrase(query, ("report", "reported", "contact", "notify", "lapor", "dilaporkan", "hubungi")):
+        add(EvidenceRequirement("answer_contact", "an explicit reporting contact or responsible role", "contact"))
+
+    if _contains_phrase(
+        query,
+        (
+            "what document", "what documents", "which document", "which documents",
+            "supporting document", "supporting documents", "what must be attached",
+            "what should be attached", "what must be submitted", "dokumen apa",
+            "dokumen pendukung", "lampiran apa", "bukti apa", "apa yang harus dilampirkan",
+            "apa yang harus disertakan", "kuitansi", "receipt",
+        ),
+    ):
+        add(EvidenceRequirement(
+            "answer_supporting_document",
+            "an explicit supporting document, receipt, proof, or attachment requirement",
+            "supporting_document",
+        ))
 
     for phrase_match in QUOTED_PATTERN.finditer(str(question or "")):
         phrase = normalize_text(phrase_match.group(1))
         if len(phrase.split()) >= 3:
-            add(EvidenceRequirement(
-                key=f"quoted:{phrase}",
-                description=f"the quoted subject '{phrase}'",
-                kind="literal",
-                value=phrase,
-            ))
+            add(EvidenceRequirement(f"quoted:{phrase}", f"the quoted subject '{phrase}'", "literal", value=phrase))
 
     for year in sorted(set(YEAR_PATTERN.findall(str(question or "")))):
-        add(EvidenceRequirement(
-            key=f"year:{year}",
-            description=f"the requested year {year}",
-            kind="year",
-            value=year,
-        ))
+        add(EvidenceRequirement(f"year:{year}", f"the requested year {year}", "year", value=year))
 
     if not is_scenario_comparison(question):
         for number, unit in numeric_constraints(question):
             add(EvidenceRequirement(
-                key=f"constraint:{number}:{unit}",
-                description=f"the explicit condition {number} {unit}",
-                kind="numeric_constraint",
-                value=number,
-                unit=unit,
+                f"constraint:{number}:{unit}", f"the explicit condition {number} {unit}",
+                "numeric_constraint", value=number, unit=unit,
             ))
     else:
         for family in sorted({unit_family(unit) for _, unit in numeric_constraints(question)}):
             add(EvidenceRequirement(
-                key=f"scenario_threshold:{family}",
-                description=f"a policy threshold in the {family} measurement family",
-                kind="numeric_family",
-                unit=family,
+                f"scenario_threshold:{family}", f"a policy threshold in the {family} measurement family",
+                "numeric_family", unit=family,
             ))
 
     return requirements
-
-
-def unit_family(unit: str) -> str:
-    value = canonical_unit(unit)
-    if value in {"gb", "mb", "tb", "kb"}:
-        return "storage"
-    if value in {"seconds", "minutes", "hours", "days", "weeks", "months", "years"}:
-        return "duration"
-    if value == "characters":
-        return "length"
-    if value == "requests":
-        return "request_count"
-    if value == "%":
-        return "percentage"
-    return value
 
 
 def _has_numeric_constraint(text: str, number: str, unit: str) -> bool:
     number_pattern = re.escape(number).replace(r"\.", r"[.,]")
     unit_patterns = {
         "days": r"(?:days?|working\s+days?|business\s+days?|hari(?:\s+kerja)?)",
-        "years": r"(?:years?|tahun)",
-        "months": r"(?:months?|bulan)",
-        "weeks": r"(?:weeks?|minggu)",
-        "hours": r"(?:hours?|hrs?|jam)",
-        "minutes": r"(?:minutes?|mins?|menit)",
-        "seconds": r"(?:seconds?|secs?|detik)",
+        "years": r"(?:years?|tahun)", "months": r"(?:months?|bulan)",
+        "weeks": r"(?:weeks?|minggu)", "hours": r"(?:hours?|hrs?|jam)",
+        "minutes": r"(?:minutes?|mins?|menit)", "seconds": r"(?:seconds?|secs?|detik)",
         "characters": r"(?:characters?|chars?|karakter)",
         "requests": r"(?:requests?|calls?|permintaan|panggilan)",
         "%": r"(?:%|percent|percentage|persen)",
@@ -277,8 +316,7 @@ def _has_numeric_constraint(text: str, number: str, unit: str) -> bool:
     }
     return bool(re.search(
         rf"\b{number_pattern}\s*{unit_patterns.get(unit, re.escape(unit))}\b",
-        str(text or ""),
-        flags=re.I,
+        str(text or ""), flags=re.I,
     ))
 
 
@@ -317,6 +355,8 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
         return bool(MONEY_PATTERN.search(combined))
     if requirement.kind == "percentage":
         return bool(PERCENT_PATTERN.search(combined))
+    if requirement.kind == "storage":
+        return bool(STORAGE_PATTERN.search(combined))
     if requirement.kind == "duration":
         return bool(TIME_PATTERN.search(combined))
     if requirement.kind == "date_or_time":
@@ -328,6 +368,30 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
         )
     if requirement.kind == "number":
         return bool(NUMBER_PATTERN.search(combined))
+    if requirement.kind == "approval":
+        return bool(re.search(
+            r"\b(?:approval|approved|approve|approver|persetujuan|disetujui|menyetujui)\b",
+            combined,
+            flags=re.I,
+        ))
+    if requirement.kind == "contact":
+        return bool(
+            EMAIL_PATTERN.search(combined)
+            or re.search(
+                r"\b(?:report(?:ed)?\s+to|notify|contact|lapor\s+ke|dilaporkan\s+kepada|hubungi)\b",
+                combined,
+                flags=re.I,
+            )
+        )
+    if requirement.kind == "supporting_document":
+        return bool(re.search(
+            r"\b(?:receipt|receipts|invoice|invoices|document|documents|attachment|attachments|"
+            r"proof|evidence|kuitansi|faktur|dokumen|lampiran|bukti)\b|"
+            r"\b(?:must|required|wajib)\s+(?:be\s+)?(?:attach|attached|submit|submitted|provide|provided|"
+            r"dilampirkan|disertakan|diajukan)\b",
+            combined,
+            flags=re.I,
+        ))
     if requirement.kind in {"literal", "year"}:
         return requirement.value in normalized_combined
     if requirement.kind == "numeric_constraint":

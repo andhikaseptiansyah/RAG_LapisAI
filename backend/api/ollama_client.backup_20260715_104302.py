@@ -66,57 +66,6 @@ def _build_context(question: str, chunks: list[dict[str, Any]]) -> str:
     return "\n\n".join(blocks)
 
 
-def _build_grounding_chunks(
-    question: str,
-    chunks: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    """Build chunks containing exactly the evidence shown to Ollama.
-
-    The grounding validator, extractive fallback, source response, and
-    evaluator must inspect the same compact passage. Validation against a
-    larger raw chunk can incorrectly approve facts that were not present in
-    the model prompt.
-    """
-
-    grounded_chunks: list[dict[str, Any]] = []
-
-    for chunk in chunks[:MAX_CONTEXT_CHUNKS]:
-        raw_content = _clean_text(
-            chunk.get("content")
-        )
-
-        if not raw_content:
-            continue
-
-        excerpt = _clean_text(
-            build_evidence_excerpt(
-                question,
-                raw_content,
-            )
-        ) or raw_content
-
-        if len(excerpt) > MAX_CONTEXT_CHARS_PER_CHUNK:
-            excerpt = (
-                excerpt[:MAX_CONTEXT_CHARS_PER_CHUNK]
-                .rsplit(" ", 1)[0]
-                .strip()
-                + "?"
-            )
-
-        cloned_chunk = dict(chunk)
-        cloned_chunk["content"] = excerpt
-
-        metadata = dict(
-            chunk.get("metadata") or {}
-        )
-        metadata["content"] = excerpt
-        cloned_chunk["metadata"] = metadata
-
-        grounded_chunks.append(cloned_chunk)
-
-    return grounded_chunks
-
-
 def _clean_model_answer(answer: str) -> str:
     text = answer_text_only(answer)
     if len(text) > MAX_ANSWER_CHARS:
@@ -351,8 +300,7 @@ def build_ollama_grounded_answer(
     if confidence <= 0 and not bundle_answerable:
         return build_refusal_answer(language)
 
-    grounding_chunks = _build_grounding_chunks(question, chunks)
-    context = _build_context(question, grounding_chunks)
+    context = _build_context(question, chunks)
     if not context:
         return build_refusal_answer(language)
 
@@ -410,7 +358,7 @@ def build_ollama_grounded_answer(
         while retry_count < OLLAMA_MAX_RETRIES:
             incomplete = _is_likely_incomplete_answer(question, llm_answer, done_reason)
             grounding = (
-                validate_grounded_answer(question, llm_answer, grounding_chunks)
+                validate_grounded_answer(question, llm_answer, chunks)
                 if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer
                 else None
             )
@@ -437,7 +385,7 @@ def build_ollama_grounded_answer(
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, Exception) as exc:
         # Keep the application usable when Ollama is offline or a model call fails.
         print(f"[OLLAMA] fallback to formatter: {exc}")
-        return _fallback_answer(question, grounding_chunks, language)
+        return _fallback_answer(question, chunks, language)
 
     # Do not return a visibly incomplete fragment. The deterministic formatter
     # extracts the strongest supported sentences from the same retrieved chunks.
@@ -446,13 +394,13 @@ def build_ollama_grounded_answer(
             "[OLLAMA] incomplete answer after retry; using grounded formatter "
             f"(done_reason={done_reason or 'unknown'})"
         )
-        return _fallback_answer(question, grounding_chunks, language)
+        return _fallback_answer(question, chunks, language)
 
     if not llm_answer:
-        return _fallback_answer(question, grounding_chunks, language)
+        return _fallback_answer(question, chunks, language)
 
     if ENABLE_GENERATION_GROUNDING_VALIDATION:
-        grounding = validate_grounded_answer(question, llm_answer, grounding_chunks)
+        grounding = validate_grounded_answer(question, llm_answer, chunks)
         if not grounding.supported:
             # Preserve the supported part of a useful answer before falling back.
             # This removes hallucinated explanatory tails without converting an
@@ -477,12 +425,12 @@ def build_ollama_grounded_answer(
                 "[GROUNDING] generated answer rejected; using extractive fallback: "
                 + ", ".join(grounding.reasons)
             )
-            return _fallback_answer(question, grounding_chunks, language)
+            return _fallback_answer(question, chunks, language)
 
     if is_refusal_answer(llm_answer):
         # Retrieval and answerability already established evidence. A model-level
         # refusal is therefore treated as a generation failure, not as proof that
         # the corpus lacks an answer.
-        return _fallback_answer(question, grounding_chunks, language)
+        return _fallback_answer(question, chunks, language)
 
     return llm_answer

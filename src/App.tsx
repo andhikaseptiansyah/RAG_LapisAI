@@ -17,6 +17,7 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
+import { TTSButton } from './components/TTSButton'; // <-- IMPORT BARU TTS
 
 // UI VERSION: ANSWER + STRUCTURED CITATIONS + CONFIDENCE
 type DetectedLanguage = 'ID' | 'EN';
@@ -230,8 +231,6 @@ const CitationPanel: React.FC<{
         ? [fallbackSource]
         : [];
 
-  // Retrieval may use more candidates, but the chat UI intentionally
-  // shows no more than two citations so the answer remains compact.
   const visibleSources = [...sources]
     .sort(
       (first, second) =>
@@ -1025,6 +1024,15 @@ export const App: React.FC = () => {
       return;
     }
 
+    // --- KODE UPDATE: Matikan suara & Stop AI saat Hapus Chat ---
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    if (isGenerating) {
+      stopGenerating();
+    }
+    // ----------------------------------------------------------
+
     clearChat();
     setInputValue('');
     setAttachedFiles([]);
@@ -1041,6 +1049,15 @@ export const App: React.FC = () => {
   };
 
   const handleNewChat = () => {
+    // --- KODE UPDATE: Matikan suara & Stop AI saat Chat Baru ---
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    if (isGenerating) {
+      stopGenerating();
+    }
+    // ---------------------------------------------------------
+    
     clearChat();
     setInputValue('');
     setAttachedFiles([]);
@@ -1082,6 +1099,15 @@ export const App: React.FC = () => {
 
         return;
       }
+
+      // --- KODE UPDATE: Matikan suara & Stop AI saat pindah riwayat ---
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      if (isGenerating) {
+        stopGenerating();
+      }
+      // --------------------------------------------------------------
 
       setInputValue('');
       setAttachedFiles([]);
@@ -1242,6 +1268,7 @@ export const App: React.FC = () => {
               onMicClick={
                 handleMicClick
               }
+              language={detectedLanguage}
             />
           ) : (
             <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">
@@ -1362,7 +1389,12 @@ export const App: React.FC = () => {
                             />
                           )}
 
-                          <div className="mt-3 flex justify-end">
+                          {/* --- KODE UPDATE: Menambahkan TTSButton dan menyesuaikan tata letak --- */}
+                          <div className="mt-3 flex justify-end gap-3">
+                            <TTSButton
+                              text={message.content}
+                              language={detectedLanguage}
+                            />
                             <button
                               type="button"
                               onClick={() =>
@@ -1377,6 +1409,7 @@ export const App: React.FC = () => {
                               content_copy
                             </button>
                           </div>
+                          {/* ---------------------------------------------------------------------- */}
                         </div>
                       </div>
                     )}

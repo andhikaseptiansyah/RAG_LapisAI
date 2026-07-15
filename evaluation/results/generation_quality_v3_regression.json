@@ -1,0 +1,15 @@
+{
+  "patch": "LapisAI Generation Quality v3",
+  "static_compile": "passed",
+  "available_patch_tests": {
+    "passed": 34,
+    "failed": 0
+  },
+  "official_ground_truth_static_validation": {
+    "questions": 30,
+    "expected_answers_satisfy_detected_requirements": 30,
+    "expected_answers_accepted_by_grounding_validator": 30,
+    "safe_extractive_fallback_nonempty": 30
+  },
+  "note": "This is deterministic regression validation against the patch workspace, not a replacement for live Ollama generation evaluation."
+}

@@ -135,14 +135,10 @@ RERANKER_MODEL = _env_str(
 )
 RERANKER_CANDIDATES = _env_int("RERANKER_CANDIDATES", 20)
 RERANKER_WEIGHT = _env_float("RERANKER_WEIGHT", 0.25)
-ENABLE_QUERY_DECOMPOSITION = _env_bool("ENABLE_QUERY_DECOMPOSITION", True)
-QUERY_DECOMPOSITION_MAX_PARTS = _env_int("QUERY_DECOMPOSITION_MAX_PARTS", 3)
 if RERANKER_CANDIDATES <= 0:
     raise ValueError("RERANKER_CANDIDATES must be greater than zero")
 if not 0.0 <= RERANKER_WEIGHT <= 1.0:
     raise ValueError("RERANKER_WEIGHT must be between 0.0 and 1.0")
-if QUERY_DECOMPOSITION_MAX_PARTS <= 0:
-    raise ValueError("QUERY_DECOMPOSITION_MAX_PARTS must be greater than zero")
 
 ENABLE_EVIDENCE_VERIFICATION = _env_bool(
     "ENABLE_EVIDENCE_VERIFICATION",
@@ -175,9 +171,9 @@ ANSWERABILITY_STRONG_EXACT_COVERAGE = _env_float(
     0.20,
 )
 ANSWERABILITY_MAX_CONTEXTS = _env_int("ANSWERABILITY_MAX_CONTEXTS", 5)
-# Deprecated compatibility flag. Runtime answerability now executes only after
-# reranking and evidence verification, so this value is exposed for migration
-# visibility but no longer controls an early veto.
+# Production safety rule: when the baseline hybrid+evidence gate rejects the
+# query, reranking is not allowed to resurrect it. The reranker may reorder an
+# answerable candidate set, but it is not an answerability classifier.
 ANSWERABILITY_PRE_RERANK_VETO = _env_bool(
     "ANSWERABILITY_PRE_RERANK_VETO",
     False,
@@ -191,18 +187,8 @@ if ANSWERABILITY_MAX_CONTEXTS <= 0:
 MIN_ANSWER_CONFIDENCE = _env_float("MIN_ANSWER_CONFIDENCE", 0.48)
 MIN_SOURCE_CONFIDENCE = _env_float("MIN_SOURCE_CONFIDENCE", 0.24)
 SOURCE_EXCERPT_MAX_CHARS = _env_int("SOURCE_EXCERPT_MAX_CHARS", 360)
-MAX_SOURCE_CITATIONS = _env_int("MAX_SOURCE_CITATIONS", 4)
-ENABLE_GENERATION_GROUNDING_VALIDATION = _env_bool(
-    "ENABLE_GENERATION_GROUNDING_VALIDATION",
-    True,
-)
-GENERATION_MIN_CLAIM_SUPPORT = _env_float("GENERATION_MIN_CLAIM_SUPPORT", 0.32)
 if SOURCE_EXCERPT_MAX_CHARS < 120:
     raise ValueError("SOURCE_EXCERPT_MAX_CHARS must be at least 120")
-if MAX_SOURCE_CITATIONS <= 0:
-    raise ValueError("MAX_SOURCE_CITATIONS must be greater than zero")
-if not 0.0 <= GENERATION_MIN_CLAIM_SUPPORT <= 1.0:
-    raise ValueError("GENERATION_MIN_CLAIM_SUPPORT must be between 0.0 and 1.0")
 
 for _name, _value in (
     ("MIN_EVIDENCE_SCORE", MIN_EVIDENCE_SCORE),
@@ -215,6 +201,30 @@ for _name, _value in (
     ("ANSWERABILITY_STRONG_EXACT_COVERAGE", ANSWERABILITY_STRONG_EXACT_COVERAGE),
     ("MIN_ANSWER_CONFIDENCE", MIN_ANSWER_CONFIDENCE),
     ("MIN_SOURCE_CONFIDENCE", MIN_SOURCE_CONFIDENCE),
+):
+    if not 0.0 <= _value <= 1.0:
+        raise ValueError(f"{_name} must be between 0.0 and 1.0")
+
+
+# Generation context selection and post-generation grounding. Retrieval still
+# returns top-k for evaluation, but only a compact evidence bundle reaches the LLM.
+MAX_GENERATION_CONTEXTS = _env_int("MAX_GENERATION_CONTEXTS", 3)
+CONTEXT_REDUNDANCY_THRESHOLD = _env_float("CONTEXT_REDUNDANCY_THRESHOLD", 0.82)
+CONTEXT_SECONDARY_SCORE_RATIO = _env_float("CONTEXT_SECONDARY_SCORE_RATIO", 0.72)
+MAX_SOURCE_CITATIONS = _env_int("MAX_SOURCE_CITATIONS", 2)
+ENABLE_GENERATION_GROUNDING_VALIDATION = _env_bool(
+    "ENABLE_GENERATION_GROUNDING_VALIDATION",
+    True,
+)
+GENERATION_MIN_CLAIM_SUPPORT = _env_float("GENERATION_MIN_CLAIM_SUPPORT", 0.32)
+if MAX_GENERATION_CONTEXTS <= 0:
+    raise ValueError("MAX_GENERATION_CONTEXTS must be greater than zero")
+if MAX_SOURCE_CITATIONS <= 0:
+    raise ValueError("MAX_SOURCE_CITATIONS must be greater than zero")
+for _name, _value in (
+    ("CONTEXT_REDUNDANCY_THRESHOLD", CONTEXT_REDUNDANCY_THRESHOLD),
+    ("CONTEXT_SECONDARY_SCORE_RATIO", CONTEXT_SECONDARY_SCORE_RATIO),
+    ("GENERATION_MIN_CLAIM_SUPPORT", GENERATION_MIN_CLAIM_SUPPORT),
 ):
     if not 0.0 <= _value <= 1.0:
         raise ValueError(f"{_name} must be between 0.0 and 1.0")
@@ -250,8 +260,9 @@ def public_rag_config() -> dict[str, str | float | bool | int]:
         "minimumAnswerConfidence": MIN_ANSWER_CONFIDENCE,
         "minimumSourceConfidence": MIN_SOURCE_CONFIDENCE,
         "sourceExcerptMaxChars": SOURCE_EXCERPT_MAX_CHARS,
-        "queryDecompositionEnabled": ENABLE_QUERY_DECOMPOSITION,
-        "queryDecompositionMaxParts": QUERY_DECOMPOSITION_MAX_PARTS,
+        "maxGenerationContexts": MAX_GENERATION_CONTEXTS,
+        "contextRedundancyThreshold": CONTEXT_REDUNDANCY_THRESHOLD,
+        "contextSecondaryScoreRatio": CONTEXT_SECONDARY_SCORE_RATIO,
         "maxSourceCitations": MAX_SOURCE_CITATIONS,
         "generationGroundingValidationEnabled": ENABLE_GENERATION_GROUNDING_VALIDATION,
         "generationMinimumClaimSupport": GENERATION_MIN_CLAIM_SUPPORT,

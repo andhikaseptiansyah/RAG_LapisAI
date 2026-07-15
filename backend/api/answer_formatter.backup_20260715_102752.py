@@ -245,309 +245,127 @@ _SOURCE_DURATION_WORDS = {
 
 
 def _source_excerpt_segments(value: Any) -> list[str]:
-    """Split source text into heading-aware readable evidence units.
+    """Split source text into exact, readable evidence units.
 
-    Markdown headings are preserved as semantic context for the paragraph
-    below them. This is important for short enterprise documents where the
-    requested concept may only occur in the section heading.
-
-    Example source:
-
-        ## Database
-        The primary datastore is PostgreSQL 15.
-
-    Resulting evidence unit:
-
-        Database: The primary datastore is PostgreSQL 15.
-
-    FAQ Q:/A: structures are kept separate so the FAQ pair matcher can
-    continue selecting the answer paired with the correct question.
+    Line wrapping from PDF/TXT extraction is normalized, while document wording
+    is not paraphrased. Decorative headings and separator lines are excluded.
     """
-
-    raw = (
-        str(value or "")
-        .replace("\r\n", "\n")
-        .replace("\r", "\n")
-    )
-
+    raw = str(value or "").replace("\r\n", "\n").replace("\r", "\n")
     if not raw.strip():
         return []
 
     blocks: list[str] = []
-    active_heading = ""
-
     for raw_block in re.split(r"\n\s*\n+", raw):
         lines: list[str] = []
-        block_heading = active_heading
-        contains_faq_line = False
-
         for raw_line in raw_block.splitlines():
             line = raw_line.strip()
-
-            if not line:
+            if not line or re.fullmatch(r"[=\-_–—*#]{3,}", line):
                 continue
-
-            # Abaikan garis pemisah dekoratif.
-            if re.fullmatch(r"[=\-_??*#]{3,}", line):
+            # Markdown headings are location context, not evidence by themselves.
+            if line.startswith("##") and len(line) < 100:
                 continue
-
-            # Pertahankan heading Markdown sebagai konteks semantik untuk
-            # paragraf yang berada tepat di bawah heading tersebut.
-            heading_match = re.match(
-                r"^#{1,6}\s+(.+?)\s*$",
-                line,
-                flags=re.I,
-            )
-
-            if heading_match:
-                active_heading = _clean_text(
-                    heading_match.group(1)
-                ).strip(" :.-??")
-
-                block_heading = active_heading
-                continue
-
-            # Tandai FAQ supaya prefix Q: dan A: tidak ditutupi heading.
-            if re.match(
-                r"^(?:Q|A):\s*",
-                line,
-                flags=re.I,
-            ):
-                contains_faq_line = True
-
-            # Baris pendek tanpa tanda baca biasanya berupa judul dekoratif,
-            # nama perusahaan, nomor halaman, atau label lokasi.
-            #
-            # Heading Markdown sudah ditangani secara khusus di atas.
             if (
                 len(line) < 80
                 and not re.search(r"[.!?;:]", line)
-                and not re.match(
-                    r"^(?:Q|A):",
-                    line,
-                    flags=re.I,
-                )
+                and not re.match(r"^(?:Q|A):", line, flags=re.I)
             ):
+                # Company names, page headings, and one-line section labels are
+                # location context rather than evidence text.
                 continue
-
             lines.append(line)
 
         block = _clean_text(" ".join(lines))
-
-        # Blok dapat hanya berisi heading. Heading tersebut tetap disimpan
-        # melalui active_heading untuk blok isi berikutnya.
         if not block:
             continue
-
-        # Untuk dokumen biasa, tambahkan heading ke isi agar pertanyaan
-        # "What database..." dapat memilih paragraf di bagian Database.
-        #
-        # Untuk FAQ, jangan tambahkan heading agar segmen tetap dimulai
-        # dengan Q: atau A:.
-        if block_heading and not contains_faq_line:
-            block = f"{block_heading}: {block}"
-
-        # Abaikan blok yang hanya berupa judul pendek tanpa informasi faktual.
-        if (
-            len(block) < 80
-            and not re.search(r"[.!?;:]", block)
-        ):
+        # Skip short title-only blocks such as company name or document title.
+        if len(block) < 80 and not re.search(r"[.!?;:]", block):
             continue
+        blocks.append(block)
 
-        if block not in blocks:
-            blocks.append(block)
-
-    # Fallback jika struktur dokumen tidak menghasilkan blok.
     if not blocks:
-        fallback = _clean_text(raw)
-
-        if fallback:
-            blocks = [fallback]
+        blocks = [_clean_text(raw)]
 
     segments: list[str] = []
-
     for block in blocks:
-        # Pisahkan kalimat biasa sambil mempertahankan pasangan Q:/A:
-        # sebagai evidence unit terpisah.
+        # Keep Q:/A: pairs as separate units so a matching question can include
+        # its adjacent answer rather than the entire FAQ chunk.
         pieces = re.split(
-            (
-                r"(?<=[.!?])\s+"
-                r"(?=(?:Q:|A:|[A-Z0-9\"?]))"
-                r"|\s+(?=A:\s*)"
-            ),
+            r"(?<=[.!?])\s+(?=(?:Q:|A:|[A-Z0-9\"“]))|\s+(?=A:\s*)",
             block,
         )
-
         for piece in pieces:
             clean = _clean_text(piece)
-
             if len(clean) < 12:
                 continue
-
             if clean not in segments:
                 segments.append(clean)
 
     return segments
 
 
+
 def _normalize_faq_question(value: str) -> str:
-    """Normalize a FAQ question for tolerant Q/A matching."""
-
+    """Normalize a FAQ question for tolerant Q/A-pair matching."""
     text = _clean_text(value).casefold()
-
-    text = re.sub(
-        r"^(?:q|question|pertanyaan)\s*:\s*",
-        "",
-        text,
-    )
-
-    text = re.sub(
-        r"[^a-z0-9?-?]+",
-        " ",
-        text,
-    )
-
-    return re.sub(
-        r"\s+",
-        " ",
-        text,
-    ).strip()
+    text = re.sub(r"^(?:q|question|pertanyaan)\s*:\s*", "", text)
+    text = re.sub(r"[^a-z0-9à-ÿ]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def _extract_faq_pairs(
-    value: Any,
-) -> list[tuple[str, str]]:
-    """Extract Q:/A: pairs from multiline or flattened FAQ text.
+def _matched_faq_answer(question: str, segments: list[str]) -> str:
+    """Return only the A: segment paired with the closest matching Q: segment.
 
-    The uploaded document may retain line breaks:
-
-        Q: What should I bring?
-        A: Bring a valid ID...
-
-    Chroma may also return the same passage flattened:
-
-        ## First Day Q: What should I bring? A: Bring a valid ID...
-
-    This parser supports both formats and stops an answer before the next
-    Q: marker or Markdown heading.
+    This prevents the context selector from choosing a neighbouring FAQ answer
+    merely because it shares generic words such as "first day", "password", or
+    "account".
     """
-
-    raw = str(value or "")
-
-    if not raw.strip():
-        return []
-
-    # Flatten whitespace while retaining Q:, A:, and Markdown markers.
-    text = _clean_text(raw)
-
-    pair_pattern = re.compile(
-        r"(?:^|\s)"
-        r"Q:\s*"
-        r"(?P<question>.*?)"
-        r"\s+A:\s*"
-        r"(?P<answer>.*?)"
-        r"(?="
-        r"\s+Q:\s*"
-        r"|\s+#{1,6}\s+"
-        r"|\Z"
-        r")",
-        flags=re.I | re.S,
-    )
-
-    pairs: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
-
-    for match in pair_pattern.finditer(text):
-        faq_question = _clean_text(
-            match.group("question")
-        ).strip(" :.-??")
-
-        faq_answer = _clean_text(
-            match.group("answer")
-        ).strip(" ,;:")
-
-        if not faq_question or not faq_answer:
-            continue
-
-        key = (
-            faq_question.casefold(),
-            faq_answer.casefold(),
-        )
-
-        if key in seen:
-            continue
-
-        seen.add(key)
-        pairs.append(
-            (
-                faq_question,
-                faq_answer,
-            )
-        )
-
-    return pairs
-
-
-def _matched_faq_answer(
-    question: str,
-    value: Any,
-) -> str:
-    """Return only the answer paired with the closest FAQ question."""
-
-    normalized_question = _normalize_faq_question(
-        question
-    )
-
+    normalized_question = _normalize_faq_question(question)
     if not normalized_question:
         return ""
 
-    question_tokens = set(
-        _tokenize(question)
-    )
-
+    question_tokens = set(_tokenize(question))
     best_score = 0.0
     best_answer = ""
 
-    for faq_question, faq_answer in _extract_faq_pairs(
-        value
-    ):
-        normalized_candidate = _normalize_faq_question(
-            faq_question
-        )
+    for index, segment in enumerate(segments):
+        if not re.match(r"^\s*Q\s*:", segment, flags=re.I):
+            continue
 
+        next_index = index + 1
+        if next_index >= len(segments):
+            continue
+
+        answer_segment = segments[next_index]
+        if not re.match(r"^\s*A\s*:", answer_segment, flags=re.I):
+            continue
+
+        normalized_candidate = _normalize_faq_question(segment)
         similarity = SequenceMatcher(
             None,
             normalized_question,
             normalized_candidate,
         ).ratio()
 
-        candidate_tokens = set(
-            _tokenize(faq_question)
-        )
-
+        candidate_tokens = set(_tokenize(segment))
         token_coverage = (
-            len(
-                question_tokens.intersection(
-                    candidate_tokens
-                )
-            )
+            len(question_tokens.intersection(candidate_tokens))
             / max(len(question_tokens), 1)
         )
 
-        score = (
-            0.60 * similarity
-            + 0.40 * token_coverage
-        )
+        # Requiring both a reasonably close phrase match and query-token support
+        # reduces false pairings while remaining tolerant of light paraphrases.
+        score = (0.60 * similarity) + (0.40 * token_coverage)
 
         if score > best_score:
             best_score = score
-            best_answer = faq_answer
+            best_answer = re.sub(
+                r"^\s*A\s*:\s*",
+                "",
+                answer_segment,
+                flags=re.I,
+            ).strip()
 
-    return (
-        best_answer
-        if best_score >= 0.42
-        else ""
-    )
+    return best_answer if best_score >= 0.42 else ""
 
 
 def build_evidence_excerpt(
@@ -563,7 +381,7 @@ def build_evidence_excerpt(
     # FAQ documents must keep the matched Q:/A: pair locked together. Returning
     # only the paired answer also keeps the model prompt and evaluation context
     # free from neighbouring, unrelated FAQ entries.
-    faq_answer = _matched_faq_answer(question, content)
+    faq_answer = _matched_faq_answer(question, segments)
     if faq_answer:
         if len(faq_answer) <= max_chars:
             return faq_answer

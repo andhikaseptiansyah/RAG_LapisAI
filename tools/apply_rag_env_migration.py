@@ -1,7 +1,6 @@
-"""Safely update RAG tuning keys in an existing project .env.
+"""Safely calibrate an existing LapisAI .env for grounded generation.
 
-Unknown keys and secrets are preserved. A timestamped backup is created before
-writing. Run from the project root or pass --env path/to/.env.
+Unknown keys and secrets are preserved. A timestamped backup is always created.
 """
 
 from __future__ import annotations
@@ -13,8 +12,6 @@ from pathlib import Path
 
 UPDATES: dict[str, str] = {
     "MIN_RESULT_SCORE": "0.24",
-    "ENABLE_QUERY_DECOMPOSITION": "true",
-    "QUERY_DECOMPOSITION_MAX_PARTS": "3",
     "MIN_EVIDENCE_SCORE": "0.42",
     "ANSWERABILITY_MIN_TOP_SCORE": "0.35",
     "ANSWERABILITY_MIN_BASE_SCORE": "0.22",
@@ -27,7 +24,10 @@ UPDATES: dict[str, str] = {
     "ANSWERABILITY_PRE_RERANK_VETO": "false",
     "MIN_ANSWER_CONFIDENCE": "0.48",
     "MIN_SOURCE_CONFIDENCE": "0.24",
-    "MAX_SOURCE_CITATIONS": "4",
+    "MAX_GENERATION_CONTEXTS": "3",
+    "CONTEXT_REDUNDANCY_THRESHOLD": "0.82",
+    "CONTEXT_SECONDARY_SCORE_RATIO": "0.72",
+    "MAX_SOURCE_CITATIONS": "2",
     "ENABLE_GENERATION_GROUNDING_VALIDATION": "true",
     "GENERATION_MIN_CLAIM_SUPPORT": "0.32",
 }
@@ -64,7 +64,7 @@ def migrate(env_path: Path) -> tuple[Path, list[str]]:
     if missing:
         if output and output[-1].strip():
             output.append("")
-        output.append("# RAG grounding and answerability calibration")
+        output.append("# Grounded generation and compact context selection")
         for key in missing:
             output.append(f"{key}={UPDATES[key]}")
             changed.append(key)

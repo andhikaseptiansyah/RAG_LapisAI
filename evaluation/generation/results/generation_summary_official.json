@@ -9,15 +9,15 @@
     "unanswerable": 0
   },
   "metrics": {
-    "normalized_exact_match": 0.0,
-    "token_f1": 0.208,
-    "faithfulness_1_to_5": 3.3667,
-    "answer_relevance_1_to_5": 3.5333,
-    "context_precision_1_to_5": 2.2,
+    "normalized_exact_match": 0.0333,
+    "token_f1": 0.5375,
+    "faithfulness_1_to_5": 4.8667,
+    "answer_relevance_1_to_5": 4.8,
+    "context_precision_1_to_5": 5.0,
     "context_recall_1_to_5": 5.0,
-    "citation_accuracy_1_to_5": 3.0333,
-    "hallucination_rate": 0.2667,
-    "false_refusal_rate": 0.3333,
+    "citation_accuracy_1_to_5": 5.0,
+    "hallucination_rate": 0.0,
+    "false_refusal_rate": 0.0,
     "unanswerable_safety_rate": null
   },
   "notes": [

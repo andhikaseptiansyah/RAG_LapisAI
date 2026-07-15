@@ -1,6 +1,6 @@
 # LapisAI Retrieval Evaluation Report
 
-Generated: `2026-07-15T02:25:34+00:00`
+Generated: `2026-07-14T15:32:01+00:00`
 
 ## Dataset
 

@@ -3937,5 +3937,1043 @@
     "confidence": 0.9,
     "latency_ms": 26001,
     "timestamp": "2026-07-14T12:49:28.802936+00:00"
+  },
+  {
+    "id": "f194a4a8-b47e-4901-99a8-fbbde1dc0e90",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How long is the probation period for new employees?",
+    "answer": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12.",
+    "sources": [
+      {
+        "document_name": "SOP_Onboarding.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8762,
+        "relevance_score": 0.8762,
+        "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "paragraph_start": 1,
+        "paragraph_end": 10
+      }
+    ],
+    "confidence": 0.9687,
+    "latency_ms": 17630,
+    "timestamp": "2026-07-14T15:37:51.560542+00:00"
+  },
+  {
+    "id": "7d931433-9798-43a5-9ea4-5e8402a85dbd",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How quickly must a P1 IT incident be resolved?",
+    "answer": "A P1 IT incident must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "sources": [
+      {
+        "document_name": "SOP_IT_Incident_Handling.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8716,
+        "relevance_score": 0.8716,
+        "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9332,
+    "latency_ms": 10026,
+    "timestamp": "2026-07-14T15:38:09.219305+00:00"
+  },
+  {
+    "id": "3af75890-5ac7-4e21-99e5-61e884204321",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What approval is needed for a purchase above IDR 50 million?",
+    "answer": "- Purchases above IDR 50,000,000 require Director approval and three vendor quotations.\n- Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval.",
+    "sources": [
+      {
+        "document_name": "SOP_Procurement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8021,
+        "relevance_score": 0.8021,
+        "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "paragraph_start": 1,
+        "paragraph_end": 6
+      }
+    ],
+    "confidence": 0.8752,
+    "latency_ms": 19983,
+    "timestamp": "2026-07-14T15:38:35.638224+00:00"
+  },
+  {
+    "id": "924a2c96-f346-4c40-a7c1-f818b86a49b8",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What is the deadline to submit an expense claim?",
+    "answer": "The deadline to submit an expense claim is within 30 days of the expense date.",
+    "sources": [
+      {
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.847,
+        "relevance_score": 0.847,
+        "excerpt": "Expense claims must be submitted within 30 days of the expense date.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 9953,
+    "timestamp": "2026-07-14T15:38:52.284196+00:00"
+  },
+  {
+    "id": "e5b21807-d0f4-4ea6-b0b9-acc6408befb1",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "halo",
+    "answer": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "sources": [],
+    "confidence": 1.0,
+    "latency_ms": 0,
+    "timestamp": "2026-07-14T15:38:55.363134+00:00"
+  },
+  {
+    "id": "5c348089-4ca5-4600-bf0f-0746ed6f215a",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How much advance notice is required for annual leave?",
+    "answer": "Annual leave must be requested at least 5 working days in advance through the HR portal. The approval process is handled by the direct manager.",
+    "sources": [
+      {
+        "document_name": "SOP_Leave_Request.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8627,
+        "relevance_score": 0.8627,
+        "excerpt": "Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+        "paragraph_start": 1,
+        "paragraph_end": 6
+      }
+    ],
+    "confidence": 0.9217,
+    "latency_ms": 11002,
+    "timestamp": "2026-07-14T15:39:10.704085+00:00"
+  },
+  {
+    "id": "7025162c-5a42-4322-8e20-acc891e2a7ba",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How often are full database backups taken?",
+    "answer": "Full database backups are taken nightly at 01:00 WIB.",
+    "sources": [
+      {
+        "document_name": "SOP_Data_Backup.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8441,
+        "relevance_score": 0.8441,
+        "excerpt": "Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.8541,
+    "latency_ms": 5256,
+    "timestamp": "2026-07-14T15:39:22.526347+00:00"
+  },
+  {
+    "id": "bc15b887-2e1f-4ecd-ab45-fe108b9c5e90",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "When must IT revoke a departing employee's access?",
+    "answer": "IT must revoke a departing employee's access within 2 hours of the employee's exit time.",
+    "sources": [
+      {
+        "document_name": "SOP_Offboarding.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8758,
+        "relevance_score": 0.8758,
+        "excerpt": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+        "paragraph_start": 1,
+        "paragraph_end": 6
+      }
+    ],
+    "confidence": 0.9685,
+    "latency_ms": 11548,
+    "timestamp": "2026-07-14T15:39:41.363301+00:00"
+  },
+  {
+    "id": "619089b2-6aba-43b2-905a-8d14ba6a60e1",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How many days per week can employees work from home?",
+    "answer": "Employees may work from home a maximum of 2 days per week.",
+    "sources": [
+      {
+        "document_name": "Policy_WFH.docx",
+        "document_type": "docx",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.867,
+        "relevance_score": 0.867,
+        "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+        "chapter": "Limit",
+        "section": "Limit",
+        "paragraph_start": 5,
+        "paragraph_end": 6
+      }
+    ],
+    "confidence": 0.9367,
+    "latency_ms": 21629,
+    "timestamp": "2026-07-14T15:40:19.341246+00:00"
+  },
+  {
+    "id": "9c0ce165-713a-4643-ae10-431e583ea093",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "apa pengalaman andhika septiansyah",
+    "answer": "Andhika Septiansyah memiliki pengalaman sebagai Full Stack Web Developer. Ia memiliki email andhikaseptiansyah63@gmail.com dan nomor telepon +62 877-2994-9195. Ia berdomisili di DKI Jakarta. Portofolio Andhika dapat diakses melalui https://portofolio-amber-beta-38.vercel.app. Profil LinkedIn Andhika dapat diakses melalui linkedin.com/in/andhika-septiansyah.",
+    "sources": [
+      {
+        "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.6522,
+        "relevance_score": 0.6522,
+        "excerpt": "https://portofolio-amber-beta-38.vercel.app linkedin.com/in/andhika-septiansyah",
+        "chapter": "ANDHIKA SEPTIANSYAH",
+        "section": "ANDHIKA SEPTIANSYAH",
+        "paragraph_start": 1,
+        "paragraph_end": 4
+      }
+    ],
+    "confidence": 0.7188,
+    "latency_ms": 34555,
+    "timestamp": "2026-07-14T15:40:38.474619+00:00"
+  },
+  {
+    "id": "5d56d165-6af9-4e32-9424-006e6b99e0ce",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "Who must a suspected data breach be reported to and how fast?",
+    "answer": "A suspected data breach must be reported to security@nusantaradynamics.co.id within 1 hour.",
+    "sources": [
+      {
+        "document_name": "Policy_Data_Security.docx",
+        "document_type": "docx",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.9017,
+        "relevance_score": 0.9017,
+        "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "chapter": "Reporting",
+        "section": "Reporting",
+        "paragraph_start": 7,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9296,
+    "latency_ms": 26990,
+    "timestamp": "2026-07-14T15:41:21.074505+00:00"
+  },
+  {
+    "id": "4f3b9c36-0d6a-4956-93b4-c536388b7409",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "jelaskan work experience nya",
+    "answer": "- WORK EXPERIENCE June 2026\n- Present Mahreen Indonesia (Front-End PIC",
+    "sources": [
+      {
+        "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.5878,
+        "relevance_score": 0.5878,
+        "excerpt": "April 2026 - Present PT.",
+        "chapter": "WORK EXPERIENCE",
+        "section": "WORK EXPERIENCE",
+        "paragraph_start": 9,
+        "paragraph_end": 22
+      }
+    ],
+    "confidence": 0.6554,
+    "latency_ms": 36032,
+    "timestamp": "2026-07-14T15:42:02.697835+00:00"
+  },
+  {
+    "id": "b43355cd-cfd7-4e58-8e50-953e34ceb3bd",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How many annual leave days do employees get?",
+    "answer": "Employees are entitled to 12 days of annual leave per year.",
+    "sources": [
+      {
+        "document_name": "Policy_Leave.docx",
+        "document_type": "docx",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8848,
+        "relevance_score": 0.8848,
+        "excerpt": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+        "chapter": "Annual Leave",
+        "section": "Annual Leave",
+        "paragraph_start": 3,
+        "paragraph_end": 4
+      }
+    ],
+    "confidence": 0.9299,
+    "latency_ms": 16741,
+    "timestamp": "2026-07-14T15:42:21.546395+00:00"
+  },
+  {
+    "id": "97223ff0-2389-4b5c-a87b-b75cca44baf4",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What are the password requirements?",
+    "answer": "- Password…",
+    "sources": [
+      {
+        "document_name": "Policy_Password.docx",
+        "document_type": "docx",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.7652,
+        "relevance_score": 0.7652,
+        "excerpt": "Password Policy",
+        "chapter": "Password Policy",
+        "section": "Password Policy",
+        "paragraph_start": 2,
+        "paragraph_end": 2
+      }
+    ],
+    "confidence": 0.8567,
+    "latency_ms": 38345,
+    "timestamp": "2026-07-14T15:43:16.728891+00:00"
+  },
+  {
+    "id": "cd8f30c6-f946-4571-9409-f1337cebdfd5",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What is the domestic meal per diem?",
+    "answer": "The domestic meal per diem is IDR 250,000 per day.",
+    "sources": [
+      {
+        "document_name": "Policy_Travel_Expense.docx",
+        "document_type": "docx",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+        "chapter": "Per Diem",
+        "section": "Per Diem",
+        "paragraph_start": 3,
+        "paragraph_end": 4
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 5294,
+    "timestamp": "2026-07-14T15:43:28.506854+00:00"
+  },
+  {
+    "id": "64ef589b-f786-4859-bd2a-6c6eba2153a3",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What was Q3 2025 revenue?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 10461,
+    "timestamp": "2026-07-14T15:43:52.828957+00:00"
+  },
+  {
+    "id": "35df2e56-6ad8-419e-8add-2aad60874f79",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What was the root cause of the October 2025 outage?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 12237,
+    "timestamp": "2026-07-14T15:44:21.354851+00:00"
+  },
+  {
+    "id": "bd85e063-d01f-406c-8bd7-2ac88ac8ef3e",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "sebutkan work experience andhika",
+    "answer": "Andhika Septiansyah memiliki pengalaman kerja sebagai Full Stack Web Developer. Ia memiliki kontak email andhikaseptiansyah63@gmail.com dan nomor telepon +62 877-2994-9195. Ia berdomisili di DKI Jakarta. Portofolio Andhika dapat diakses melalui https://portofolio-amber-beta-38.vercel.app. Profil LinkedIn Andhika adalah linkedin.com/in/andhika-septiansyah.",
+    "sources": [
+      {
+        "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.6494,
+        "relevance_score": 0.6494,
+        "excerpt": "https://portofolio-amber-beta-38.vercel.app linkedin.com/in/andhika-septiansyah",
+        "chapter": "ANDHIKA SEPTIANSYAH",
+        "section": "ANDHIKA SEPTIANSYAH",
+        "paragraph_start": 1,
+        "paragraph_end": 4
+      }
+    ],
+    "confidence": 0.6577,
+    "latency_ms": 35601,
+    "timestamp": "2026-07-14T15:44:59.090549+00:00"
+  },
+  {
+    "id": "3bdb533e-9cea-48b9-a863-22f81fa4de05",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What was the 2025 overall CSAT score?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 12228,
+    "timestamp": "2026-07-14T15:45:13.443183+00:00"
+  },
+  {
+    "id": "94233e11-706d-4ca0-9e5a-5707c81e6656",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How many security incidents occurred in 2025?",
+    "answer": "There were 3 reportable security incidents in 2025. None of these incidents resulted in data loss.",
+    "sources": [
+      {
+        "document_name": "Report_Security_Review_2025.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8363,
+        "relevance_score": 0.8363,
+        "excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+        "paragraph_start": 1,
+        "paragraph_end": 6
+      }
+    ],
+    "confidence": 0.8675,
+    "latency_ms": 28310,
+    "timestamp": "2026-07-14T15:45:48.256488+00:00"
+  },
+  {
+    "id": "3931d6c9-dd3b-4dc9-bc4d-206caca83a7e",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "project nya apa aja",
+    "answer": "- WFH Led the Front-End development team by managing task delegations and ensuring all project milestones were completed on schedule.\n- GoRako Waste Management Event Organizer, Web Developer PROJECT June 2025",
+    "sources": [
+      {
+        "document_name": "AndhikaSeptiansyah_CV_57afafbf.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.6955,
+        "relevance_score": 0.6955,
+        "excerpt": "Led the Front-End development team by managing task delegations and ensuring all project milestones were completed on schedule.",
+        "chapter": "WORK EXPERIENCE",
+        "section": "WORK EXPERIENCE",
+        "paragraph_start": 9,
+        "paragraph_end": 22
+      }
+    ],
+    "confidence": 0.7177,
+    "latency_ms": 53830,
+    "timestamp": "2026-07-14T15:46:22.775124+00:00"
+  },
+  {
+    "id": "7df275cd-d1d0-401a-b793-0c2de46c5a03",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What was full-year 2025 revenue?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 10116,
+    "timestamp": "2026-07-14T15:46:47.203236+00:00"
+  },
+  {
+    "id": "64e31532-72f1-48fb-b4ed-1f843fa7ea8d",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What database does the platform use?",
+    "answer": "The platform uses PostgreSQL 15 as its primary database.",
+    "sources": [
+      {
+        "document_name": "TECH_System_Architecture.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.786,
+        "relevance_score": 0.786,
+        "excerpt": "## Stack The platform runs on a microservices architecture deployed on Kubernetes.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8016,
+    "latency_ms": 14722,
+    "timestamp": "2026-07-14T15:47:18.508514+00:00"
+  },
+  {
+    "id": "2dfae27f-d09b-4aa3-bcbb-1c8bc3d587d9",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How long are internal API tokens valid?",
+    "answer": "Internal API tokens are valid for 60 minutes.",
+    "sources": [
+      {
+        "document_name": "TECH_Internal_API_Guide.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.8291,
+        "relevance_score": 0.8291,
+        "excerpt": "Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8967,
+    "latency_ms": 11401,
+    "timestamp": "2026-07-14T15:47:36.749210+00:00"
+  },
+  {
+    "id": "a0c94807-2636-4083-b918-93f58f673e54",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 18986,
+    "timestamp": "2026-07-14T15:47:51.195773+00:00"
+  },
+  {
+    "id": "81b9380c-42a7-4fe3-9cb0-c28312344a52",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset akan diproses dalam waktu maksimal 1x24 jam.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 9172,
+    "timestamp": "2026-07-14T15:48:00.422426+00:00"
+  },
+  {
+    "id": "49f1b973-b8bd-4e43-ab6e-ab693202faa5",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "answer": "The maximum reimbursement amount for purchasing an ergonomic table for WFH is not specified in the provided context. The original invoice must be attached for reimbursement.",
+    "sources": [
+      {
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.761,
+        "relevance_score": 0.761,
+        "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.7924,
+    "latency_ms": 11082,
+    "timestamp": "2026-07-14T15:48:16.742548+00:00"
+  },
+  {
+    "id": "038fd00d-ebd2-4e17-82da-800a679e6c0f",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What are the RTO and RPO?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 3425,
+    "timestamp": "2026-07-14T15:48:22.267320+00:00"
+  },
+  {
+    "id": "b4d8cdec-9748-410c-8065-565857461da2",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What is the API availability SLO?",
+    "answer": "The API availability SLO is 99.9% per month.",
+    "sources": [
+      {
+        "document_name": "TECH_Monitoring_Guide.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "## Tools Metrics are collected with Prometheus and visualized in Grafana.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 4867,
+    "timestamp": "2026-07-14T15:48:33.448797+00:00"
+  },
+  {
+    "id": "7cf584ac-b123-47d2-a2c3-2066dbc80d9d",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How long are audit logs retained?",
+    "answer": "Audit logs are retained for 7 years.",
+    "sources": [
+      {
+        "document_name": "TECH_Data_Retention.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.8833,
+        "relevance_score": 0.8833,
+        "excerpt": "## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9876,
+    "latency_ms": 5293,
+    "timestamp": "2026-07-14T15:48:45.482867+00:00"
+  },
+  {
+    "id": "f5097cbf-44f9-4927-9596-d743f51a1a1f",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What unit-test coverage is required to merge code?",
+    "answer": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 2771,
+    "timestamp": "2026-07-14T15:48:55.010808+00:00"
+  },
+  {
+    "id": "9e860115-3665-4323-97ed-50900c55c947",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How do I reset my password?",
+    "answer": "- Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password?\n- A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "## Password Reset Q: How do I reset my password?",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9949,
+    "latency_ms": 17939,
+    "timestamp": "2026-07-14T15:49:19.999639+00:00"
+  },
+  {
+    "id": "e1c1523a-70de-47a2-95b1-ee2e55416b0d",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "When is payday?",
+    "answer": "Payday is on the 25th of each month.",
+    "sources": [
+      {
+        "document_name": "FAQ_Payroll.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.895,
+        "relevance_score": 0.895,
+        "excerpt": "## Payday Q: When is payday? A: Salaries are paid on the 25th of each month.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.96,
+    "latency_ms": 5416,
+    "timestamp": "2026-07-14T15:49:32.437059+00:00"
+  },
+  {
+    "id": "76ab54e8-fac5-41e6-a5c9-9e6d9cf9ac74",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What is the mailbox size limit?",
+    "answer": "The mailbox size limit is 50 GB.",
+    "sources": [
+      {
+        "document_name": "FAQ_Email_Calendar.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 14032,
+    "timestamp": "2026-07-14T15:49:52.758752+00:00"
+  },
+  {
+    "id": "57ea3437-232c-45be-8823-1fb3c748a23c",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What should I bring on my first day?",
+    "answer": "- Nusantara Dynamics Onboarding FAQ ============== ## First Day Q: What should I bring on my first day?\n- A: A valid ID, your tax ID (NPWP), and bank account details.",
+    "sources": [
+      {
+        "document_name": "FAQ_Onboarding.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "## First Day Q: What should I bring on my first day?",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9863,
+    "latency_ms": 25616,
+    "timestamp": "2026-07-14T15:50:25.566459+00:00"
+  },
+  {
+    "id": "c00060b7-1edc-434b-b7c1-080341335b95",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "Is there a home-office allowance?",
+    "answer": "Yes, there is a home-office allowance. The allowance is a one-time payment of IDR 1,500,000.",
+    "sources": [
+      {
+        "document_name": "FAQ_Remote_Work.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.8656,
+        "relevance_score": 0.8656,
+        "excerpt": "A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9268,
+    "latency_ms": 6575,
+    "timestamp": "2026-07-14T15:50:38.766531+00:00"
+  },
+  {
+    "id": "e39ddb63-8e0b-443e-94ed-26e3ece2e56b",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "What is the replacement fee for an access card?",
+    "answer": "The replacement fee for an access card is IDR 50,000.",
+    "sources": [
+      {
+        "document_name": "FAQ_Facilities.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.9213,
+        "relevance_score": 0.9213,
+        "excerpt": "## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 6074,
+    "timestamp": "2026-07-14T15:50:52.314099+00:00"
+  },
+  {
+    "id": "08492dac-a86b-42fa-a63c-0d8ee06df0d6",
+    "user_id": "dev-admin",
+    "user_name": "User",
+    "user_role": "staff",
+    "question": "How many new enterprise customers were added in Q3 2025?",
+    "answer": "The company added 18 new enterprise customers in Q3 2025.",
+    "sources": [
+      {
+        "document_name": "Report_Q3_2025_Performance.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8762,
+        "relevance_score": 0.8762,
+        "excerpt": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9812,
+    "latency_ms": 8345,
+    "timestamp": "2026-07-14T15:51:07.564268+00:00"
+  },
+  {
+    "id": "57859ace-f482-49bf-a490-7e3cc09c0154",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+    "answer": "THE merujuk pada Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+    "sources": [
+      {
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.7791,
+        "relevance_score": 0.7791,
+        "excerpt": "Original receipts are required for any single expense above IDR 150,000.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 65814,
+    "timestamp": "2026-07-14T15:54:24.796802+00:00"
+  },
+  {
+    "id": "fb3e20f1-f08b-4200-ba2a-cdf804489a54",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "If I buy an ergonomic desk for Rp2,000,000 for WFH needs, what is the maximum reimbursement from the company and is the original receipt required?",
+    "answer": "The maximum reimbursement amount for the ergonomic desk is not specified. Original receipts are required for any single expense above IDR 150,000.",
+    "sources": [
+      {
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.7791,
+        "relevance_score": 0.7791,
+        "excerpt": "Original receipts are required for any single expense above IDR 150,000.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.9,
+    "latency_ms": 31397,
+    "timestamp": "2026-07-14T15:54:56.410377+00:00"
+  },
+  {
+    "id": "c254f6b4-4043-4f7f-8ded-1d068237f1ac",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "answer": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar. Persentase margin laba bersihnya adalah 14%.",
+    "sources": [
+      {
+        "document_name": "Report_Financial_FY2025.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.8483,
+        "relevance_score": 0.8483,
+        "excerpt": "Net profit margin was 14%.",
+        "paragraph_start": 1,
+        "paragraph_end": 4
+      }
+    ],
+    "confidence": 0.869,
+    "latency_ms": 55205,
+    "timestamp": "2026-07-14T15:55:51.671043+00:00"
+  },
+  {
+    "id": "a0996c5e-0656-4d15-832b-6c334deec5cf",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam. Tidak ada informasi tentang durasi maksimal proses reset password dalam konteks dokumen.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 15992,
+    "timestamp": "2026-07-14T15:56:07.726695+00:00"
+  },
+  {
+    "id": "a032b14b-46f5-4065-a5e5-e1ae5a6fa60c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 66836,
+    "timestamp": "2026-07-14T15:57:41.492114+00:00"
+  },
+  {
+    "id": "16189799-efcd-4c80-b4a6-27b8c859d6d5",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "- Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password?\n- A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 123045,
+    "timestamp": "2026-07-14T15:59:44.617908+00:00"
+  },
+  {
+    "id": "85daca67-ddcb-4487-aa63-f6f62eef3ae6",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "answer": "Maksimal reimbursement dari perusahaan untuk pembelian meja ergonomis seharga Rp2.000.000 tidak disebutkan dalam konteks dokumen. Nota asli wajib dilampirkan sebagai bukti pembelian.",
+    "sources": [
+      {
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "document_type": "pdf",
+        "page": 1,
+        "page_is_reliable": true,
+        "score": 0.761,
+        "relevance_score": 0.761,
+        "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "paragraph_start": 1,
+        "paragraph_end": 8
+      }
+    ],
+    "confidence": 0.7924,
+    "latency_ms": 112634,
+    "timestamp": "2026-07-14T16:02:13.472690+00:00"
+  },
+  {
+    "id": "a516a93c-840f-499c-ad71-994709430c6b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "user_role": "admin",
+    "question": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "answer": "Jika Anda lupa password untuk masuk ke sistem internal, prosedur reset yang harus dilakukan adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset password akan diproses dalam waktu maksimal 1x24 jam.",
+    "sources": [
+      {
+        "document_name": "FAQ_IT_Support.txt",
+        "document_type": "txt",
+        "page": null,
+        "page_is_reliable": false,
+        "score": 0.7898,
+        "relevance_score": 0.7898,
+        "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "paragraph_start": 1,
+        "paragraph_end": 3
+      }
+    ],
+    "confidence": 0.8165,
+    "latency_ms": 33475,
+    "timestamp": "2026-07-14T16:14:54.351421+00:00"
   }
 ]

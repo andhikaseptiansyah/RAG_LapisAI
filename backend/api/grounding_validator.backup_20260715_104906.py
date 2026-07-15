@@ -309,101 +309,29 @@ def _qualifier_families(value: str) -> set[str]:
     }
 
 
-def _atomic_claims(value: Any) -> list[str]:
-    """Split an answer into independently validated factual claims.
+def _atomic_claims(answer: str) -> list[str]:
+    """Split an answer into independently verifiable claim units.
 
-    Besides sentence boundaries, comma-separated and semicolon-separated
-    list items are checked individually. This prevents one supported item
-    from hiding another unsupported item.
-
-    Example:
-
-        Bring your ID, academic transcripts.
-
-    becomes:
-
-        Bring your ID
-        academic transcripts
-
-    Commas inside numbers such as 1,000 are not treated as separators.
+    Sentence-only splitting allowed a supported fact and an unsupported causal or
+    explanatory tail to pass as one claim. Conjunction-level splitting makes the
+    unsupported tail independently visible to the validator.
     """
-
-    raw_text = str(value or "")
-    claims: list[str] = []
-    seen: set[str] = set()
-
-    for raw_sentence in SENTENCE_SPLIT.split(raw_text):
-        sentence = _clean(raw_sentence).lstrip("-? ")
-
-        if not sentence:
+    output: list[str] = []
+    for sentence in SENTENCE_SPLIT.split(str(answer or "")):
+        clean_sentence = _clean(sentence).lstrip("-• ")
+        if not clean_sentence:
             continue
-
-        # Bersihkan artefak tanda baca seperti ",." dan spasi sebelum koma.
-        sentence = re.sub(
-            r"\s+([,.;:!?])",
-            r"\1",
-            sentence,
-        )
-        sentence = re.sub(
-            r",\s*\.$",
-            ".",
-            sentence,
-        )
-        sentence = sentence.strip()
-
-        # Pecah daftar berdasarkan koma/semicolon, tetapi jangan pecah koma
-        # yang berada di antara angka, misalnya 1,000.
-        parts = re.split(
-            r"(?<!\d),(?!\d)|;",
-            sentence,
-        )
-
-        cleaned_parts: list[str] = []
-
+        parts = [
+            _clean(part).lstrip("-• ,")
+            for part in CLAUSE_SPLIT.split(clean_sentence)
+            if _clean(part).lstrip("-• ,")
+        ]
+        if not parts:
+            parts = [clean_sentence]
         for part in parts:
-            clean_part = _clean(part).lstrip("-? ")
-
-            # Hilangkan kata sambung pada awal item.
-            clean_part = re.sub(
-                r"^(?:and|or|dan|atau|serta)\s+",
-                "",
-                clean_part,
-                flags=re.I,
-            )
-
-            clean_part = clean_part.strip(
-                " ,;:."
-            )
-
-            if clean_part:
-                cleaned_parts.append(clean_part)
-
-        # Hanya gunakan pemecahan daftar jika memang ada minimal dua item.
-        candidate_claims = (
-            cleaned_parts
-            if len(cleaned_parts) >= 2
-            else [sentence.strip(" ,;:")]
-        )
-
-        for claim in candidate_claims:
-            claim = _clean(claim).strip()
-
-            if not claim:
-                continue
-
-            normalized = re.sub(
-                r"\W+",
-                "",
-                claim.casefold(),
-            )
-
-            if not normalized or normalized in seen:
-                continue
-
-            seen.add(normalized)
-            claims.append(claim)
-
-    return claims
+            if part not in output:
+                output.append(part)
+    return output
 
 
 def _claim_reference_units(claim: str, evidence_units: list[str]) -> list[str]:

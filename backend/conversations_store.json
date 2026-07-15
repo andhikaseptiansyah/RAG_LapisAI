@@ -1,5 +1,1151 @@
 [
   {
+    "id": "163e3178-c8ee-4f09-8df6-65b5aa297eec",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "What are the RTO and RPO?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "e58c11e6-a5d2-4e85-981e-9c539e5e1be0",
+        "conversation_id": "163e3178-c8ee-4f09-8df6-65b5aa297eec",
+        "role": "user",
+        "content": "What are the RTO and RPO?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:30:54.696830+00:00"
+      },
+      {
+        "id": "d662d902-7bb6-4703-96eb-6f34d281d9f1",
+        "conversation_id": "163e3178-c8ee-4f09-8df6-65b5aa297eec",
+        "role": "assistant",
+        "content": "The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour.",
+        "attachments": [],
+        "confidence": 0.8027,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_Disaster_Recovery.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.933,
+              "relevance_score": 0.933,
+              "excerpt": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "TECH_Disaster_Recovery.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:30:54.696830+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T07:30:54.696830+00:00",
+    "updated_at": "2026-07-15T07:30:54.696830+00:00",
+    "last_message": "The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour.",
+    "last_user_message": "What are the RTO and RPO?",
+    "last_message_at": "2026-07-15T07:30:54.696830+00:00"
+  },
+  {
+    "id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How much advance notice is required for annual leave?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "3fa63029-aea1-42d0-b79a-50d4b55e7ff2",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "user",
+        "content": "How much advance notice is required for annual leave?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:20:26.631229+00:00"
+      },
+      {
+        "id": "43f38664-9fb3-46dd-b07d-9cded09a04d8",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "assistant",
+        "content": "Annual leave must be requested at least 5 working days in advance.",
+        "attachments": [],
+        "confidence": 0.9217,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Leave_Request.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8627,
+              "relevance_score": 0.8627,
+              "excerpt": "Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Leave_Request.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:20:26.631229+00:00"
+      },
+      {
+        "id": "44303d89-2b18-4a2a-a782-5673508c5df1",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "user",
+        "content": "what  is sop",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:21:31.307372+00:00"
+      },
+      {
+        "id": "b37af298-64c2-46f7-8722-a0183a03a532",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "assistant",
+        "content": "SOP is an acronym used in the context of Nusantara Dynamics for their System Access Provisioning process.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "Access rights are reviewed every 6 months.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:21:31.307372+00:00"
+      },
+      {
+        "id": "a86354ff-f7be-4208-8052-a2ff039d5d68",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "user",
+        "content": "what sop document that u have",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:22:22.590518+00:00"
+      },
+      {
+        "id": "2ee26dee-72a1-4aa8-8be6-6e61ac52b6d8",
+        "conversation_id": "a703e297-f83f-432c-a40e-1edb4ecedd58",
+        "role": "assistant",
+        "content": "The SOP document available is SOP_Access_Provisioning.pdf.",
+        "attachments": [],
+        "confidence": 0.633,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6054,
+              "relevance_score": 0.6054,
+              "excerpt": "Access rights are reviewed every 6 months.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:22:22.590518+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T07:20:26.631229+00:00",
+    "updated_at": "2026-07-15T07:22:22.590518+00:00",
+    "last_message": "The SOP document available is SOP_Access_Provisioning.pdf.",
+    "last_user_message": "what sop document that u have",
+    "last_message_at": "2026-07-15T07:22:22.590518+00:00"
+  },
+  {
+    "id": "97ee1033-a56e-4533-8240-7e9bbc68a039",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "who is anugrah chaezar",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4ec4a779-2545-44d6-bfa5-3b5ab5551b33",
+        "conversation_id": "97ee1033-a56e-4533-8240-7e9bbc68a039",
+        "role": "user",
+        "content": "who is anugrah chaezar",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:15:45.753982+00:00"
+      },
+      {
+        "id": "68b410c2-83c6-4eca-8f53-8c2910808446",
+        "conversation_id": "97ee1033-a56e-4533-8240-7e9bbc68a039",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:15:45.753982+00:00"
+      },
+      {
+        "id": "0b42998b-f827-4ac7-b407-b10251d9a58c",
+        "conversation_id": "97ee1033-a56e-4533-8240-7e9bbc68a039",
+        "role": "user",
+        "content": "Apa itu sop?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T07:18:23.978047+00:00"
+      },
+      {
+        "id": "151c0f67-4ea1-4aa1-ba48-37f0a4162297",
+        "conversation_id": "97ee1033-a56e-4533-8240-7e9bbc68a039",
+        "role": "assistant",
+        "content": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.895,
+              "relevance_score": 0.895,
+              "excerpt": "Access rights are reviewed every 6 months.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T07:18:23.978047+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T07:15:45.753982+00:00",
+    "updated_at": "2026-07-15T07:18:23.978047+00:00",
+    "last_message": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
+    "last_user_message": "Apa itu sop?",
+    "last_message_at": "2026-07-15T07:18:23.978047+00:00"
+  },
+  {
+    "id": "6bd46548-23aa-4b61-bea8-e4f636b94f04",
+    "user_id": "dev-staff",
+    "user_name": "Staff User",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b7c82879-6b1c-44f9-8420-018390538399",
+        "conversation_id": "6bd46548-23aa-4b61-bea8-e4f636b94f04",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User"
+        },
+        "created_at": "2026-07-15T06:48:16.984610+00:00"
+      },
+      {
+        "id": "e4f055c8-d676-4be2-bdb6-860245f07641",
+        "conversation_id": "6bd46548-23aa-4b61-bea8-e4f636b94f04",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar dan persentase margin laba bersihnya adalah 14%.",
+        "attachments": [],
+        "confidence": 0.869,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-staff",
+          "user_name": "Staff User",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8483,
+              "relevance_score": 0.8483,
+              "excerpt": "Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T06:48:16.984610+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T06:48:16.984610+00:00",
+    "updated_at": "2026-07-15T06:48:16.984610+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar dan persentase margin laba bersihnya adalah 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-15T06:48:16.984610+00:00"
+  },
+  {
+    "id": "c34b9abc-baea-471e-9f35-ff92029328d3",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "25e7a357-7c52-4261-b1d6-638aa1744c29",
+        "conversation_id": "c34b9abc-baea-471e-9f35-ff92029328d3",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T05:15:58.143832+00:00"
+      },
+      {
+        "id": "deaf41f0-fd0d-4feb-bc13-2525b34281ae",
+        "conversation_id": "c34b9abc-baea-471e-9f35-ff92029328d3",
+        "role": "assistant",
+        "content": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T05:15:58.143832+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T05:15:58.143832+00:00",
+    "updated_at": "2026-07-15T05:15:58.143832+00:00",
+    "last_message": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop?",
+    "last_user_message": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+    "last_message_at": "2026-07-15T05:15:58.143832+00:00"
+  },
+  {
+    "id": "9b9c564b-2be4-43fc-aaa8-39b114daa936",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "hai",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "43a05e5a-20d8-461c-adee-cc526125ac0b",
+        "conversation_id": "9b9c564b-2be4-43fc-aaa8-39b114daa936",
+        "role": "user",
+        "content": "hai",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T05:15:03.885568+00:00"
+      },
+      {
+        "id": "9ceb559f-d200-4bed-9f83-75d4c851f78b",
+        "conversation_id": "9b9c564b-2be4-43fc-aaa8-39b114daa936",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T05:15:03.885568+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T05:15:03.885568+00:00",
+    "updated_at": "2026-07-15T05:15:03.885568+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "hai",
+    "last_message_at": "2026-07-15T05:15:03.885568+00:00"
+  },
+  {
+    "id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How many new enterprise customers were added in Q3 2025?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bf8c3557-1df5-4a81-b306-f582d516e9e2",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T05:09:51.936206+00:00"
+      },
+      {
+        "id": "716cde42-d2c2-445e-9ec0-ef36d41ea1be",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "assistant",
+        "content": "18",
+        "attachments": [],
+        "confidence": 0.9812,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8762,
+              "relevance_score": 0.8762,
+              "excerpt": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T05:09:51.936206+00:00"
+      },
+      {
+        "id": "6471fadd-d5a0-445e-9994-4d237a58e9d4",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "user",
+        "content": "What was the 2025 overall CSAT score?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T05:10:45.023432+00:00"
+      },
+      {
+        "id": "0de0c512-299a-4c5a-961d-2f24f753f032",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "assistant",
+        "content": "87%",
+        "attachments": [],
+        "confidence": 0.9055,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_CSAT_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "The overall CSAT score for 2025 was 87%, up from 83% in 2024.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T05:10:45.023432+00:00"
+      },
+      {
+        "id": "af3ec395-6b23-474b-a080-af95a31fc7e7",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "user",
+        "content": "What was the root cause of the October 2025 outage?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T05:11:55.730053+00:00"
+      },
+      {
+        "id": "d07d5e1e-5a16-4201-b07b-0f936d27885e",
+        "conversation_id": "5d10ddde-61df-4fdc-bd1f-ac101704c526",
+        "role": "assistant",
+        "content": "The root cause of the October 2025 outage was an expired TLS certificate on the API gateway.",
+        "attachments": [],
+        "confidence": 0.885,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T05:11:55.730053+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T05:09:51.936206+00:00",
+    "updated_at": "2026-07-15T05:11:55.730053+00:00",
+    "last_message": "The root cause of the October 2025 outage was an expired TLS certificate on the API gateway.",
+    "last_user_message": "What was the root cause of the October 2025 outage?",
+    "last_message_at": "2026-07-15T05:11:55.730053+00:00"
+  },
+  {
+    "id": "2e294253-b186-492e-8628-13b5908e1491",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk k...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5e8f6f8d-c236-49ef-ae65-e1a0bb2aa6c6",
+        "conversation_id": "2e294253-b186-492e-8628-13b5908e1491",
+        "role": "user",
+        "content": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T00:37:00.693439+00:00"
+      },
+      {
+        "id": "2edda5e5-452c-4d1c-bc53-970c8800e708",
+        "conversation_id": "2e294253-b186-492e-8628-13b5908e1491",
+        "role": "assistant",
+        "content": "nota asli wajib dilampirkan.",
+        "attachments": [],
+        "confidence": 0.7924,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.761,
+              "relevance_score": 0.761,
+              "excerpt": "Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T00:37:00.693439+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T00:37:00.693439+00:00",
+    "updated_at": "2026-07-15T00:37:00.693439+00:00",
+    "last_message": "nota asli wajib dilampirkan.",
+    "last_user_message": "Jika saya membeli meja ergonomis seharga Rp2.000.000 untuk kebutuhan WFH, berapa maksimal reimbursement dari perusahaan dan apakah nota asli wajib dilampirkan?",
+    "last_message_at": "2026-07-15T00:37:00.693439+00:00"
+  },
+  {
+    "id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Jika saya lupa password untuk masuk ke sistem internal, apa ...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f0aac121-87c9-4842-8272-1ecf2dc009db",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "user",
+        "content": "Jika saya lupa password untuk masuk ke sistem internal, apa prosedur reset yang harus dilakukan dan berapa lama maksimal prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:36:37.973290+00:00"
+      },
+      {
+        "id": "724fea09-2a33-4af1-8e55-f6e10569bfe6",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "assistant",
+        "content": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "attachments": [],
+        "confidence": 0.8165,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7898,
+              "relevance_score": 0.7898,
+              "excerpt": "A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:36:37.973290+00:00"
+      },
+      {
+        "id": "50b545f3-ee2c-4222-8b77-0ea2b61a729b",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:38:38.216287+00:00"
+      },
+      {
+        "id": "8847d518-b5d5-4886-92f6-64c84a38f7c5",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "assistant",
+        "content": "P1 IT incident harus diselesaikan dalam 4 jam.",
+        "attachments": [],
+        "confidence": 0.9332,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:38:38.216287+00:00"
+      },
+      {
+        "id": "ce3f6ed6-f36f-4852-8cf3-e933fd09f157",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "user",
+        "content": "What was full-year 2025 revenue?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:41:06.288246+00:00"
+      },
+      {
+        "id": "29058867-ea35-4e46-b34d-b75bdfe457cf",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "assistant",
+        "content": "Full-year 2025 revenue was IDR 158 billion.",
+        "attachments": [],
+        "confidence": 0.8516,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:41:06.288246+00:00"
+      },
+      {
+        "id": "c9a910de-54d0-4f65-b2b2-bb0662a5116a",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "user",
+        "content": "What was the root cause of the October 2025 outage?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:42:03.308741+00:00"
+      },
+      {
+        "id": "e45649e7-9ae2-4f3a-9aed-d10b5767c57c",
+        "conversation_id": "cbb4602b-8e7d-4261-8f38-1a1291998eda",
+        "role": "assistant",
+        "content": "Akar permasalahan dari gangguan pada Oktober 2025 adalah sertifikat TLS yang telah kedaluwarsa pada gateway API.",
+        "attachments": [],
+        "confidence": 0.885,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:42:03.308741+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T17:36:37.973290+00:00",
+    "updated_at": "2026-07-14T17:42:03.308741+00:00",
+    "last_message": "Akar permasalahan dari gangguan pada Oktober 2025 adalah sertifikat TLS yang telah kedaluwarsa pada gateway API.",
+    "last_user_message": "What was the root cause of the October 2025 outage?",
+    "last_message_at": "2026-07-14T17:42:03.308741+00:00"
+  },
+  {
+    "id": "612392e9-c151-487e-bb5e-099737e91454",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa total pendapatan perusahaan sepanjang FY2025 dan bera...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "29968b27-565d-479c-9f92-5a9e425753c2",
+        "conversation_id": "612392e9-c151-487e-bb5e-099737e91454",
+        "role": "user",
+        "content": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:35:23.599221+00:00"
+      },
+      {
+        "id": "bc825dd4-d4c3-44ef-b2c3-8441afa06444",
+        "conversation_id": "612392e9-c151-487e-bb5e-099737e91454",
+        "role": "assistant",
+        "content": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar dengan margin laba bersih sebesar 14%.",
+        "attachments": [],
+        "confidence": 0.869,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8483,
+              "relevance_score": 0.8483,
+              "excerpt": "Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:35:23.599221+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T17:35:23.599221+00:00",
+    "updated_at": "2026-07-14T17:35:23.599221+00:00",
+    "last_message": "Total pendapatan perusahaan sepanjang FY2025 adalah IDR 158 miliar dengan margin laba bersih sebesar 14%.",
+    "last_user_message": "Berapa total pendapatan perusahaan sepanjang FY2025 dan berapa persentase margin laba bersihnya?",
+    "last_message_at": "2026-07-14T17:35:23.599221+00:00"
+  },
+  {
+    "id": "6f6907c0-1e08-4851-bddb-d5d233eaecb9",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapakah pendapatan pada kuartal ketiga tahun 2025?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d194cb61-59b7-4da2-a267-f9f64f6dd457",
+        "conversation_id": "6f6907c0-1e08-4851-bddb-d5d233eaecb9",
+        "role": "user",
+        "content": "Berapakah pendapatan pada kuartal ketiga tahun 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:07:32.184809+00:00"
+      },
+      {
+        "id": "569332ab-030d-42e1-87fc-f2285e8df014",
+        "conversation_id": "6f6907c0-1e08-4851-bddb-d5d233eaecb9",
+        "role": "assistant",
+        "content": "- Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025.\n- Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+        "attachments": [],
+        "confidence": 0.816,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7879,
+              "relevance_score": 0.7879,
+              "excerpt": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:07:32.184809+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T17:07:32.184809+00:00",
+    "updated_at": "2026-07-14T17:07:32.184809+00:00",
+    "last_message": "- Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025.\n- Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+    "last_user_message": "Berapakah pendapatan pada kuartal ketiga tahun 2025?",
+    "last_message_at": "2026-07-14T17:07:32.184809+00:00"
+  },
+  {
+    "id": "7f360320-249b-4cf4-a439-92a0086ff799",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How many new enterprise customers were added in Q3 2025?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bedbe705-eabf-46c7-b782-ef1c47d32168",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "user",
+        "content": "How many new enterprise customers were added in Q3 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:04:48.049394+00:00"
+      },
+      {
+        "id": "d35ea7cd-be19-4b4a-88b1-c657e4b67ebc",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "assistant",
+        "content": "- Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.\n- Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025.",
+        "attachments": [],
+        "confidence": 0.9812,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8762,
+              "relevance_score": 0.8762,
+              "excerpt": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:04:48.049394+00:00"
+      },
+      {
+        "id": "283014b2-bd97-4afd-89b0-373f59bffae0",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "user",
+        "content": "What was the 2025 overall CSAT score?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:05:05.397802+00:00"
+      },
+      {
+        "id": "fb6455b5-de6f-4cfb-8944-9bed3d00630d",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:05:05.397802+00:00"
+      },
+      {
+        "id": "bf98f60b-60c2-4236-ae62-d08410beac03",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-14T17:05:55.198370+00:00"
+      },
+      {
+        "id": "9529009f-a379-4ab0-bfee-f2fec5bd6296",
+        "conversation_id": "7f360320-249b-4cf4-a439-92a0086ff799",
+        "role": "assistant",
+        "content": "- Probation New employees serve a probation period of 3 months.\n- Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation.",
+        "attachments": [],
+        "confidence": 0.9687,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8762,
+              "relevance_score": 0.8762,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-14T17:05:55.198370+00:00"
+      }
+    ],
+    "created_at": "2026-07-14T17:04:48.049394+00:00",
+    "updated_at": "2026-07-14T17:05:55.198370+00:00",
+    "last_message": "- Probation New employees serve a probation period of 3 months.\n- Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation.",
+    "last_user_message": "How long is the probation period for new employees?",
+    "last_message_at": "2026-07-14T17:05:55.198370+00:00"
+  },
+  {
     "id": "0a74d193-6966-4105-9925-a1263c4c7880",
     "user_id": "dev-admin",
     "user_name": "Admin",

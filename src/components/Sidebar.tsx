@@ -653,7 +653,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <div className="custom-scrollbar h-full overflow-y-auto pb-6 pr-2">
               <div className="flex flex-col gap-1">
-                {isLoadingChats ? (
+                {/* --- KODE UPDATE: Menambahkan kondisi && sortedChats.length === 0 --- */}
+                {isLoadingChats && sortedChats.length === 0 ? (
                   <p className="py-2 text-xs text-white/40">
                     Loading history...
                   </p>
