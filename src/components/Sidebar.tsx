@@ -74,7 +74,6 @@ const toDateLabel = (value?: string): string => {
   });
 };
 
-
 const normalizeConversationTitle = (
   value?: string
 ): string => {
@@ -244,7 +243,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }));
     }, [sortedChats]);
 
-
   useEffect(() => {
     if (!openMenuId) {
       return;
@@ -360,14 +358,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       await navigator.clipboard.writeText(
         `${window.location.origin}/?conversationId=${chat.id}`
       );
-
-      window.alert(
-        'Conversation link copied successfully.'
-      );
+      window.alert('Conversation link copied successfully.');
     } catch {
-      window.alert(
-        `Share conversation: ${chat.title}`
-      );
+      window.alert(`Share conversation: ${chat.title}`);
     }
   };
 
@@ -376,7 +369,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ) => {
     setOpenMenuId(null);
     setMenuPosition(null);
-
     const nextPinnedState = !chat.pinned;
 
     try {
@@ -389,9 +381,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setRecentChats((previousChats) =>
         previousChats.map((item) =>
           item.id === chat.id
-            ? mapConversationToRecentChat(
-                updatedConversation
-              )
+            ? mapConversationToRecentChat(updatedConversation)
             : item
         )
       );
@@ -400,7 +390,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         error instanceof Error
           ? error.message
           : 'Failed to update pin status.';
-
       window.alert(message);
     }
   };
@@ -430,9 +419,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setRecentChats((previousChats) =>
         previousChats.map((item) =>
           item.id === chat.id
-            ? mapConversationToRecentChat(
-                updatedConversation
-              )
+            ? mapConversationToRecentChat(updatedConversation)
             : item
         )
       );
@@ -441,7 +428,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         error instanceof Error
           ? error.message
           : 'Failed to save conversation name.';
-
       window.alert(message);
     }
   };
@@ -453,27 +439,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       `Delete conversation "${chat.title}"?`
     );
 
-    if (!shouldDelete) {
-      return;
-    }
+    if (!shouldDelete) return;
 
     setOpenMenuId(null);
     setMenuPosition(null);
 
     try {
       await conversationService.remove(chat.id);
-
       setRecentChats((previousChats) =>
-        previousChats.filter(
-          (item) => item.id !== chat.id
-        )
+        previousChats.filter((item) => item.id !== chat.id)
       );
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : 'Failed to delete conversation.';
-
       window.alert(message);
     }
   };
@@ -508,7 +488,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsConversationSearchOpen(false);
     setOpenMenuId(null);
     setMenuPosition(null);
-
     onSelectConversation?.(conversation.id);
   };
 
@@ -517,17 +496,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {!isConversationSearchOpen && (
         <div
           className={`
-            fixed inset-0 z-40
-            bg-black/70
-            backdrop-blur-sm
-            transition-opacity
-            duration-300
-            md:hidden
-            ${
-              isOpen
-                ? 'opacity-100'
-                : 'hidden opacity-0'
-            }
+            fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:hidden
+            ${isOpen ? 'opacity-100' : 'hidden opacity-0'}
           `}
           onClick={onClose}
         />
@@ -535,87 +505,71 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         className={`
-          absolute z-50
-          h-full
-          shrink-0
-          transform
-          flex-col
-          overflow-hidden
-          bg-black
-          transition-all
-          duration-300
-          md:relative
-
-          ${
-            isConversationSearchOpen
-              ? 'hidden md:flex'
-              : 'flex'
-          }
-
+          absolute z-50 h-full shrink-0 transform flex-col overflow-hidden bg-[#000000] transition-all duration-300 md:relative
+          ${isConversationSearchOpen ? 'hidden md:flex' : 'flex'}
           ${
             isOpen
-              ? `
-                w-[280px]
-                translate-x-0
-                border-r border-white/10
-                p-5
-                opacity-100
-                md:w-64
-                md:p-6
-              `
-              : `
-                -translate-x-full
-                border-none
-                p-0
-                opacity-0
-                md:w-0
-                md:translate-x-0
-              `
+              ? `w-[280px] translate-x-0 border-r border-white/5 p-4 md:p-5 opacity-100 md:w-72`
+              : `-translate-x-full border-none p-0 opacity-0 md:w-0 md:translate-x-0`
           }
         `}
       >
-        <div className="relative mb-7 flex min-w-[200px] items-center justify-center">
-          <img
-            src="/assistant-logo.png"
-            alt="Lapis Logo"
-            className="h-auto w-28 shrink-0 object-contain md:w-36"
-          />
-
+        {/* --- 1. USER PROFILE SECTION (Di Atas) --- */}
+        <div className="relative mb-6 mt-2 flex items-center gap-3 px-2">
+          {/* Ubah profil menjadi gelap */}
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 shadow-sm border border-white/5">
+            <span className="material-symbols-outlined text-[24px]">
+              person
+            </span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-medium text-white/50">
+              Good Day 👋
+            </p>
+            <p className="truncate text-[16px] font-bold text-white/90">
+              {user?.name ?? user?.username ?? 'Staff'}
+            </p>
+          </div>
+          
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-0 p-1 text-white/60 transition-colors hover:text-white md:hidden"
+            className="absolute right-0 p-1 text-white/50 transition-colors hover:text-white md:hidden"
             aria-label="Close sidebar"
-            title="Close sidebar"
           >
-            <span className="material-symbols-outlined">
-              close
-            </span>
+            <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        <nav className="flex min-w-[200px] flex-col gap-1">
+        {/* --- 2. MAIN MENU SECTION --- */}
+        <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+          <span>Menu: {isAdmin ? '3' : '2'}</span>
+          <span className="material-symbols-outlined text-[14px]">
+            tune
+          </span>
+        </div>
+
+        <nav className="mb-6 flex flex-col gap-1 px-1">
+          {/* Hapus warna biru pada hover, ganti menjadi dark mode (white/10) */}
           <button
             type="button"
             onClick={handleNewChat}
-            className="flex w-full items-center gap-3 whitespace-nowrap px-1 py-2.5 text-left font-mono text-sm text-white transition-colors hover:text-primary"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
           >
-            <span className="material-symbols-outlined text-[21px]">
+            <span className="material-symbols-outlined text-[20px]">
               edit_square
             </span>
-
             New Chat
           </button>
 
           <button
             type="button"
             onClick={handleOpenConversationSearch}
-            className="flex w-full items-center gap-3 whitespace-nowrap px-1 py-2.5 text-left font-mono text-sm text-white transition-colors hover:text-primary"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
           >
-            <span className="material-symbols-outlined text-[21px]">
+            <span className="material-symbols-outlined text-[20px]">
               search
             </span>
-
             Search Chats
           </button>
 
@@ -623,225 +577,165 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Link
               to="/admin"
               onClick={onClose}
-              className="flex w-full items-center gap-3 whitespace-nowrap px-1 py-2.5 text-left font-mono text-sm text-white transition-colors hover:text-primary"
+              className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
             >
-              <span className="material-symbols-outlined text-[21px]">
+              <span className="material-symbols-outlined text-[20px]">
                 admin_panel_settings
               </span>
-
               Admin Panel
             </Link>
           )}
         </nav>
 
-        <div className="mt-8 min-h-0 min-w-[200px] flex-1 overflow-hidden">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-white/45">
-              Recent Chats
-            </p>
+        {/* --- 3. RECENT CHATS SECTION (Card Design) --- */}
+        <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+          <span>Recent Chats: {sortedChats.length}</span>
+          <span className="material-symbols-outlined text-[14px]">
+            history
+          </span>
+        </div>
 
-            {sortedChats.length > 0 && (
-              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-white/35">
-                {sortedChats.length}
-              </span>
-            )}
-          </div>
-
-          <div className="relative h-full min-h-0">
-            <div className="pointer-events-none absolute left-0 right-2 top-0 z-10 h-4 bg-gradient-to-b from-black to-transparent" />
-            <div className="pointer-events-none absolute bottom-0 left-0 right-2 z-10 h-6 bg-gradient-to-t from-black to-transparent" />
-
-            <div className="custom-scrollbar h-full overflow-y-auto pb-6 pr-2">
-              <div className="flex flex-col gap-1">
-                {/* --- KODE UPDATE: Menambahkan kondisi && sortedChats.length === 0 --- */}
-                {isLoadingChats && sortedChats.length === 0 ? (
-                  <p className="py-2 text-xs text-white/40">
-                    Loading history...
-                  </p>
-                ) : historyError ? (
-                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-                    {historyError}
-                  </div>
-                ) : sortedChats.length > 0 ? (
-                  sortedChats.map((chat) => (
-                    <div
-                      key={chat.id}
-                      className="group relative flex min-w-0 items-center gap-2 rounded-xl px-1 transition-colors hover:bg-white/[0.03]"
+        {/* Gunakan abu-abu sangat gelap untuk container history */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-[#09090b] border border-white/5 p-2 mb-4">
+          <div className="custom-scrollbar h-full overflow-y-auto overflow-x-hidden pr-1">
+            <div className="flex flex-col gap-1">
+              {isLoadingChats && sortedChats.length === 0 ? (
+                <p className="py-4 text-center text-[13px] text-white/40">
+                  Loading history...
+                </p>
+              ) : historyError ? (
+                <div className="m-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/60">
+                  {historyError}
+                </div>
+              ) : sortedChats.length > 0 ? (
+                sortedChats.map((chat) => (
+                  <div
+                    key={chat.id}
+                    className="group relative flex min-w-0 items-center gap-2 rounded-[16px] px-2 transition-colors hover:bg-white/5"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleSelectConversation({
+                          id: chat.id,
+                          title: chat.title,
+                          dateLabel: chat.dateLabel,
+                          group: chat.group,
+                          pinned: chat.pinned,
+                        })
+                      }
+                      className="flex min-w-0 flex-1 items-center gap-3 truncate py-3 text-left text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                      title={chat.title}
                     >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleSelectConversation({
-                            id: chat.id,
-                            title: chat.title,
-                            dateLabel: chat.dateLabel,
-                            group: chat.group,
-                            pinned: chat.pinned,
-                          })
+                      <span className="material-symbols-outlined shrink-0 text-[18px] text-white/40 group-hover:text-white/70">
+                        chat_bubble
+                      </span>
+                      <span className="truncate">{chat.title}</span>
+                      {chat.pinned && (
+                        /* Warna pin dibuat netral (putih) */
+                        <span
+                          className="material-symbols-outlined shrink-0 text-[16px] text-white/80"
+                          title="Pinned conversation"
+                        >
+                          push_pin
+                        </span>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(event) =>
+                        handleConversationMenuClick(event, chat.id)
+                      }
+                      data-conversation-menu-trigger="true"
+                      className={`
+                        flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all
+                        ${
+                          openMenuId === chat.id
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/40 hover:bg-white/10 hover:text-white'
                         }
-                        className="flex min-w-0 flex-1 items-center gap-3 truncate py-2 text-left text-sm text-white/80 transition-colors hover:text-white"
-                        title={chat.title}
-                      >
-                        <span className="material-symbols-outlined shrink-0 text-[17px] text-white/70">
-                          chat_bubble
-                        </span>
+                      `}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">
+                        more_horiz
+                      </span>
+                    </button>
 
-                        <span className="truncate">
-                          {chat.title}
-                        </span>
-
-                        {chat.pinned && (
-                          <span
-                            className="material-symbols-outlined shrink-0 text-[15px] text-primary"
-                            title="Pinned conversation"
+                    {/* Pop-up Menu Action per Chat */}
+                    {openMenuId === chat.id &&
+                      menuPosition &&
+                      createPortal(
+                        <div
+                          data-conversation-menu="true"
+                          className="animate-fadeIn fixed z-[1000] w-56 -translate-y-1/2 rounded-[20px] border border-white/10 bg-[#121212] p-2 shadow-[0_14px_36px_rgba(0,0,0,0.65)]"
+                          style={{
+                            top: menuPosition.top,
+                            left: menuPosition.left,
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleShareChat(chat)}
+                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                           >
-                            push_pin
-                          </span>
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(event) =>
-                          handleConversationMenuClick(
-                            event,
-                            chat.id
-                          )
-                        }
-                        data-conversation-menu-trigger="true"
-                        className={`
-                          flex h-8 w-8
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-lg
-                          transition-all
-                          ${
-                            openMenuId === chat.id
-                              ? 'bg-white/10 text-white'
-                              : 'text-white/50 hover:bg-white/5 hover:text-white'
-                          }
-                        `}
-                        aria-label={`Conversation menu ${chat.title}`}
-                        title="Conversation menu"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">
-                          more_horiz
-                        </span>
-                      </button>
-
-                      {openMenuId === chat.id &&
-                        menuPosition &&
-                        createPortal(
-                          <div
-                            data-conversation-menu="true"
-                            className="animate-fadeIn fixed z-[1000] w-56 -translate-y-1/2 rounded-2xl border border-white/10 bg-[#1b1b1b] p-2 shadow-[0_14px_36px_rgba(0,0,0,0.65)]"
-                            style={{
-                              top: menuPosition.top,
-                              left: menuPosition.left,
-                            }}
+                            <span className="material-symbols-outlined text-[19px]">share</span>
+                            Share
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePin(chat)}
+                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                           >
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleShareChat(chat)
-                              }
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                            >
-                              <span className="material-symbols-outlined text-[19px]">
-                                share
-                              </span>
-
-                              Share conversation
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleTogglePin(chat)
-                              }
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                            >
-                              <span className="material-symbols-outlined text-[19px]">
-                                push_pin
-                              </span>
-
-                              {chat.pinned
-                                ? 'Unpin'
-                                : 'Pin'}
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleRenameChat(chat)
-                              }
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                            >
-                              <span className="material-symbols-outlined text-[19px]">
-                                edit
-                              </span>
-
-                              Rename
-                            </button>
-
-                            <div className="my-1 border-t border-white/10" />
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleDeleteChat(chat)
-                              }
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-red-500/10"
-                            >
-                              <span className="material-symbols-outlined text-[19px]">
-                                delete
-                              </span>
-
-                              Delete
-                            </button>
-                          </div>,
-                          document.body
-                        )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="py-2 text-xs text-white/40">
-                    No conversations yet.
-                  </p>
-                )}
-              </div>
+                            <span className="material-symbols-outlined text-[19px]">push_pin</span>
+                            {chat.pinned ? 'Unpin' : 'Pin'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRenameChat(chat)}
+                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+                          >
+                            <span className="material-symbols-outlined text-[19px]">edit</span>
+                            Rename
+                          </button>
+                          <div className="my-1 border-t border-white/10" />
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteChat(chat)}
+                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+                          >
+                            <span className="material-symbols-outlined text-[19px]">delete</span>
+                            Delete
+                          </button>
+                        </div>,
+                        document.body
+                      )}
+                  </div>
+                ))
+              ) : (
+                <p className="py-4 text-center text-[13px] text-white/40">
+                  No conversations yet.
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="min-w-[200px] border-t border-white/10 pt-4">
-          <div className="mb-3 flex items-center gap-3 rounded-2xl bg-white/5 px-3 py-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary">
-              <span className="material-symbols-outlined text-[19px]">
-                person
+        {/* --- 4. SETTINGS / BOTTOM LOGOUT SECTION --- */}
+        <div className="mt-auto px-1 pt-1">
+          {/* Ubah tombol logout menjadi tema gelap netral */}
+          <div className="flex items-center justify-between rounded-[24px] bg-[#09090b] border border-white/5 p-2">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-white/5 py-3 text-[14px] font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white active:scale-[0.98]"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                logout
               </span>
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm text-white">
-                {user?.name ?? user?.username ?? 'Staff'}
-              </p>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-white/45">
-                {user?.role ?? 'staff'}
-              </p>
-            </div>
+              Logout
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left font-mono text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              logout
-            </span>
-            Logout
-          </button>
         </div>
       </aside>
 

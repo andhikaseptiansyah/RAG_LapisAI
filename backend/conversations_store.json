@@ -1,5 +1,115 @@
 [
   {
+    "id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "hai",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d1438e8c-8e41-4150-bfc5-170118b38a85",
+        "conversation_id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+        "role": "user",
+        "content": "hai",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T09:59:44.284521+00:00"
+      },
+      {
+        "id": "ef9c8d2d-8937-4fc3-8644-e443a508ca10",
+        "conversation_id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T09:59:44.284521+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T09:59:44.284521+00:00",
+    "updated_at": "2026-07-17T09:59:44.284521+00:00",
+    "last_message": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+    "last_user_message": "hai",
+    "last_message_at": "2026-07-17T09:59:44.284521+00:00"
+  },
+  {
+    "id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "what is SOP",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "705a0a64-abdd-4e72-9980-e6d5ba47fd33",
+        "conversation_id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
+        "role": "user",
+        "content": "what is SOP",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-15T20:09:59.515197+00:00"
+      },
+      {
+        "id": "aba74bba-9320-4382-b9e8-d7761eb514ed",
+        "conversation_id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
+        "role": "assistant",
+        "content": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
+        "attachments": [],
+        "confidence": 0.9,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Access_Provisioning.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.9213,
+              "relevance_score": 0.9213,
+              "excerpt": "Access rights are reviewed every 6 months.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-15T20:09:59.515197+00:00"
+      }
+    ],
+    "created_at": "2026-07-15T20:09:59.515197+00:00",
+    "updated_at": "2026-07-15T20:09:59.515197+00:00",
+    "last_message": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
+    "last_user_message": "what is SOP",
+    "last_message_at": "2026-07-15T20:09:59.515197+00:00"
+  },
+  {
     "id": "163e3178-c8ee-4f09-8df6-65b5aa297eec",
     "user_id": "dev-admin",
     "user_name": "Admin",
