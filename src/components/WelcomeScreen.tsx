@@ -1,14 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AttachedFile } from '../types';
+import type { ModelType } from '../types';
 
 type UploadMode = 'photo' | 'file';
 type ChatLanguage = 'ID' | 'EN';
+
+const MODEL_OPTIONS: Array<{
+  value: ModelType;
+  label: string;
+  icon: string;
+}> = [
+  { value: 'ollama', label: 'Ollama (Local)', icon: 'memory' },
+  { value: 'gemini', label: 'Gemini 2.0 Flash', icon: 'cloud' },
+  { value: 'openai', label: 'GPT-4o', icon: 'smart_toy' },
+];
 
 interface WelcomeScreenProps {
   onSendMessage: (text: string, files: AttachedFile[]) => void;
   onAttachFileClick: (mode: UploadMode) => void;
   onMicClick: () => void;
   language?: ChatLanguage;
+  model: ModelType;
+  onModelChange: (model: ModelType) => void;
 }
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
@@ -16,12 +29,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onAttachFileClick,
   onMicClick,
   language = 'ID',
+  model,
+  onModelChange,
 }) => {
   const [inputValue, setInputValue] = useState('');
   
   // State untuk menu
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('Qwen3');
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
 
   const [placeholder, setPlaceholder] = useState('');
@@ -224,18 +238,21 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                         className="flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-white/5 border border-white/10 text-white/60 transition-all hover:bg-white/10 hover:text-white"
                       >
                         <span className="material-symbols-outlined text-[16px]">energy_savings_leaf</span>
-                        <span className="text-[13px] font-medium">{selectedModel}</span>
+                        <span className="text-[13px] font-medium">{MODEL_OPTIONS.find(o => o.value === model)?.label ?? model}</span>
                         <span className="material-symbols-outlined text-[16px]">expand_more</span>
                       </button>
 
                       {modelMenuOpen && (
-                        <div className="absolute top-full left-0 z-30 mt-3 w-44 rounded-2xl border border-white/10 bg-[#1a1b21] p-2 shadow-xl animate-fadeIn">
-                          <button onClick={() => { setSelectedModel('Qwen3'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Qwen3' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
-                            <span className="material-symbols-outlined text-[16px]">memory</span> Qwen3
-                          </button>
-                          <button onClick={() => { setSelectedModel('Cloud Fable5'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Cloud Fable5' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
-                            <span className="material-symbols-outlined text-[16px]">cloud</span> Cloud Fable5
-                          </button>
+                        <div className="absolute top-full left-0 z-30 mt-3 w-52 rounded-2xl border border-white/10 bg-[#1a1b21] p-2 shadow-xl animate-fadeIn">
+                          {MODEL_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              onClick={() => { onModelChange(option.value); setModelMenuOpen(false); }}
+                              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${model === option.value ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}
+                            >
+                              <span className="material-symbols-outlined text-[16px]">{option.icon}</span> {option.label}
+                            </button>
+                          ))}
                         </div>
                       )}
                     </div>

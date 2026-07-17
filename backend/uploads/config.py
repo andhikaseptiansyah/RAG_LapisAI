@@ -234,6 +234,17 @@ RETRIEVAL_WARMUP_QUERY = _env_str(
     "How do I reset my employee password?",
 )
 
+# LLM provider selection
+DEFAULT_LLM_PROVIDER = _env_str("DEFAULT_LLM_PROVIDER", "ollama")
+
+# Gemini configuration
+GEMINI_API_KEY = _env_str("GEMINI_API_KEY", "")
+GEMINI_MODEL = _env_str("GEMINI_MODEL", "gemini-2.0-flash")
+
+# OpenAI configuration
+OPENAI_API_KEY = _env_str("OPENAI_API_KEY", "")
+OPENAI_MODEL = _env_str("OPENAI_MODEL", "gpt-4o")
+
 
 def public_rag_config() -> dict[str, str | float | bool | int]:
     """Return non-secret configuration safe to display in the admin dashboard."""

@@ -1,5 +1,846 @@
 [
   {
+    "id": "c258f817-f010-4d5c-9105-2d40eb1603ae",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "0e7cf5e6-045a-4145-93da-f91d5667ea60",
+        "conversation_id": "c258f817-f010-4d5c-9105-2d40eb1603ae",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:15:54.843779+00:00"
+      },
+      {
+        "id": "d002b36c-dae6-4e1b-9af3-0a4db3a65bde",
+        "conversation_id": "c258f817-f010-4d5c-9105-2d40eb1603ae",
+        "role": "assistant",
+        "content": "Probation is 3 months with an evaluation in week 12.",
+        "attachments": [],
+        "confidence": 0.7406,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5831,
+              "relevance_score": 0.5831,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Onboarding.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:15:54.843779+00:00"
+      },
+      {
+        "id": "5e3e1229-75dd-4881-9a00-557a250756ae",
+        "conversation_id": "c258f817-f010-4d5c-9105-2d40eb1603ae",
+        "role": "user",
+        "content": "halo siapa kah wilson manik",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:16:17.679761+00:00"
+      },
+      {
+        "id": "52ccc1c2-3264-4289-ad0b-75783d73cd2c",
+        "conversation_id": "c258f817-f010-4d5c-9105-2d40eb1603ae",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:16:17.679761+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:15:54.843779+00:00",
+    "updated_at": "2026-07-17T13:16:17.679761+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "halo siapa kah wilson manik",
+    "last_message_at": "2026-07-17T13:16:17.679761+00:00"
+  },
+  {
+    "id": "89d7b2bf-8557-4a66-ac24-f2006a1fc02c",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "a4974fdf-8fa4-4703-add3-5ab3fe02ab8c",
+        "conversation_id": "89d7b2bf-8557-4a66-ac24-f2006a1fc02c",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:15:34.473842+00:00"
+      },
+      {
+        "id": "cb7e2e89-c293-46dc-9b33-6543fe1837b2",
+        "conversation_id": "89d7b2bf-8557-4a66-ac24-f2006a1fc02c",
+        "role": "assistant",
+        "content": "Probation is 3 months with an evaluation in week 12.",
+        "attachments": [],
+        "confidence": 0.7406,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5831,
+              "relevance_score": 0.5831,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Onboarding.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:15:34.473842+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:15:34.473842+00:00",
+    "updated_at": "2026-07-17T13:15:34.473842+00:00",
+    "last_message": "Probation is 3 months with an evaluation in week 12.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-17T13:15:34.473842+00:00"
+  },
+  {
+    "id": "98b5fe18-d5e2-4c2e-baa1-c8db029aca79",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4a511ef7-08bd-4841-a890-920cf6965786",
+        "conversation_id": "98b5fe18-d5e2-4c2e-baa1-c8db029aca79",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:14:56.553489+00:00"
+      },
+      {
+        "id": "1da93e19-bef3-4938-8e03-4c644585365f",
+        "conversation_id": "98b5fe18-d5e2-4c2e-baa1-c8db029aca79",
+        "role": "assistant",
+        "content": "Probation is 3 months with an evaluation in week 12.",
+        "attachments": [],
+        "confidence": 0.7406,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5831,
+              "relevance_score": 0.5831,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Onboarding.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:14:56.553489+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:14:56.553489+00:00",
+    "updated_at": "2026-07-17T13:14:56.553489+00:00",
+    "last_message": "Probation is 3 months with an evaluation in week 12.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-17T13:14:56.553489+00:00"
+  },
+  {
+    "id": "d24b08f4-9edb-4d64-a84e-6d1566e3b589",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new employee",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b9616225-3be7-4e87-be30-15605d3dcc1c",
+        "conversation_id": "d24b08f4-9edb-4d64-a84e-6d1566e3b589",
+        "role": "user",
+        "content": "How long is the probation period for new employee",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:14:02.705214+00:00"
+      },
+      {
+        "id": "b9c797d6-32ae-4cf0-9b5c-ea3793fc513d",
+        "conversation_id": "d24b08f4-9edb-4d64-a84e-6d1566e3b589",
+        "role": "assistant",
+        "content": "Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "attachments": [],
+        "confidence": 0.9679,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8762,
+              "relevance_score": 0.8762,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:14:02.705214+00:00"
+      },
+      {
+        "id": "91fafeb8-110d-4eb3-8433-b8f237a171ec",
+        "conversation_id": "d24b08f4-9edb-4d64-a84e-6d1566e3b589",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:14:36.916622+00:00"
+      },
+      {
+        "id": "6592fc96-57e2-4b9e-a53b-8b69d742b03b",
+        "conversation_id": "d24b08f4-9edb-4d64-a84e-6d1566e3b589",
+        "role": "assistant",
+        "content": "Probation is 3 months with an evaluation in week 12.",
+        "attachments": [],
+        "confidence": 0.7406,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.5831,
+              "relevance_score": 0.5831,
+              "excerpt": "A: Probation is 3 months with an evaluation in week 12.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Onboarding.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:14:36.916622+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:14:02.705214+00:00",
+    "updated_at": "2026-07-17T13:14:36.916622+00:00",
+    "last_message": "Probation is 3 months with an evaluation in week 12.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-17T13:14:36.916622+00:00"
+  },
+  {
+    "id": "eb4d0522-b7e1-4850-aee3-00f561b95a9b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new periof",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "224999b9-ead8-488a-a20a-0a7495a78426",
+        "conversation_id": "eb4d0522-b7e1-4850-aee3-00f561b95a9b",
+        "role": "user",
+        "content": "How long is the probation period for new periof",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:11:04.588606+00:00"
+      },
+      {
+        "id": "63705533-d043-44b0-b205-f976518527ca",
+        "conversation_id": "eb4d0522-b7e1-4850-aee3-00f561b95a9b",
+        "role": "assistant",
+        "content": "Probation is 3 months with an evaluation in week 12.",
+        "attachments": [],
+        "confidence": 0.7795,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "FAQ_Onboarding.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.628,
+              "relevance_score": 0.628,
+              "excerpt": "Probation is 3 months with an evaluation in week 12.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Onboarding.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:11:04.588606+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:11:04.588606+00:00",
+    "updated_at": "2026-07-17T13:11:04.588606+00:00",
+    "last_message": "Probation is 3 months with an evaluation in week 12.",
+    "last_user_message": "How long is the probation period for new periof",
+    "last_message_at": "2026-07-17T13:11:04.588606+00:00"
+  },
+  {
+    "id": "d8fecced-9ae5-4ed7-b2fa-605121ef0e0e",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new employee?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b990b0f2-66fe-4fa2-b911-da1498327229",
+        "conversation_id": "d8fecced-9ae5-4ed7-b2fa-605121ef0e0e",
+        "role": "user",
+        "content": "How long is the probation period for new employee?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:05:34.059258+00:00"
+      },
+      {
+        "id": "a3a286e1-03b4-425a-a3c4-37f1c4e811bb",
+        "conversation_id": "d8fecced-9ae5-4ed7-b2fa-605121ef0e0e",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:05:34.059258+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:05:34.059258+00:00",
+    "updated_at": "2026-07-17T13:05:34.059258+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "How long is the probation period for new employee?",
+    "last_message_at": "2026-07-17T13:05:34.059258+00:00"
+  },
+  {
+    "id": "0a8efcbf-4f59-4f09-9906-c6b6fcfdc6bc",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new employee",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "401de357-8c94-4630-ad81-cf3c73c85022",
+        "conversation_id": "0a8efcbf-4f59-4f09-9906-c6b6fcfdc6bc",
+        "role": "user",
+        "content": "How long is the probation period for new employee",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:02:47.614889+00:00"
+      },
+      {
+        "id": "91a85971-f0cc-487c-87ff-deba3109480c",
+        "conversation_id": "0a8efcbf-4f59-4f09-9906-c6b6fcfdc6bc",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:02:47.614889+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:02:47.614889+00:00",
+    "updated_at": "2026-07-17T13:02:47.614889+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "How long is the probation period for new employee",
+    "last_message_at": "2026-07-17T13:02:47.614889+00:00"
+  },
+  {
+    "id": "882a3a20-42fe-4f9c-9059-4d24202cc4f2",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ab75106a-db2e-458f-8707-d22f35c87f7c",
+        "conversation_id": "882a3a20-42fe-4f9c-9059-4d24202cc4f2",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:01:53.119800+00:00"
+      },
+      {
+        "id": "75eee01e-eac3-4821-8592-5b3504d579c8",
+        "conversation_id": "882a3a20-42fe-4f9c-9059-4d24202cc4f2",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:01:53.119800+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:01:53.119800+00:00",
+    "updated_at": "2026-07-17T13:01:53.119800+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-17T13:01:53.119800+00:00"
+  },
+  {
+    "id": "29a2b608-d841-4f38-b153-97ce9367b039",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new employee",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "31262d7c-9041-4d5c-9e54-e1ae4359a51e",
+        "conversation_id": "29a2b608-d841-4f38-b153-97ce9367b039",
+        "role": "user",
+        "content": "How long is the probation period for new employee",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:01:11.919294+00:00"
+      },
+      {
+        "id": "b6f3c96d-1f82-4dec-8e02-19f39931b777",
+        "conversation_id": "29a2b608-d841-4f38-b153-97ce9367b039",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:01:11.919294+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:01:11.919294+00:00",
+    "updated_at": "2026-07-17T13:01:11.919294+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "How long is the probation period for new employee",
+    "last_message_at": "2026-07-17T13:01:11.919294+00:00"
+  },
+  {
+    "id": "fc76c3ab-05bf-412d-81b0-1953f9829df1",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "halo",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "220c1adc-c50d-49d8-8919-94cd419b5524",
+        "conversation_id": "fc76c3ab-05bf-412d-81b0-1953f9829df1",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:00:04.760622+00:00"
+      },
+      {
+        "id": "9817302a-0f34-44ca-aca4-997a058c955e",
+        "conversation_id": "fc76c3ab-05bf-412d-81b0-1953f9829df1",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T13:00:04.760622+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T13:00:04.760622+00:00",
+    "updated_at": "2026-07-17T13:00:04.760622+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "halo",
+    "last_message_at": "2026-07-17T13:00:04.760622+00:00"
+  },
+  {
+    "id": "165e5fd0-cbdd-4d28-99dd-02c50c823247",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "halo",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f20492fc-76ac-41ad-86eb-64fbbeb1a912",
+        "conversation_id": "165e5fd0-cbdd-4d28-99dd-02c50c823247",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T12:59:56.194981+00:00"
+      },
+      {
+        "id": "d94c4e9a-7756-479c-94a9-62c26b257067",
+        "conversation_id": "165e5fd0-cbdd-4d28-99dd-02c50c823247",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T12:59:56.194981+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T12:59:56.194981+00:00",
+    "updated_at": "2026-07-17T12:59:56.194981+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "halo",
+    "last_message_at": "2026-07-17T12:59:56.194981+00:00"
+  },
+  {
+    "id": "293a2c37-2440-4664-aa6c-2d6cffaf8f67",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How long is the probation period for new employee",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "39d0aed8-c20c-4c48-bf07-bbed8f55e125",
+        "conversation_id": "293a2c37-2440-4664-aa6c-2d6cffaf8f67",
+        "role": "user",
+        "content": "How long is the probation period for new employee",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T12:59:40.417908+00:00"
+      },
+      {
+        "id": "20cb2190-a6d7-4b57-9868-762fe4b7de4f",
+        "conversation_id": "293a2c37-2440-4664-aa6c-2d6cffaf8f67",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T12:59:40.417908+00:00"
+      },
+      {
+        "id": "8c95fd32-74ec-45ae-8338-5d2df08eb02e",
+        "conversation_id": "293a2c37-2440-4664-aa6c-2d6cffaf8f67",
+        "role": "user",
+        "content": "clea",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T12:59:46.736220+00:00"
+      },
+      {
+        "id": "531b4780-1431-47e5-942b-7edfb2f68167",
+        "conversation_id": "293a2c37-2440-4664-aa6c-2d6cffaf8f67",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T12:59:46.736220+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T12:59:40.417908+00:00",
+    "updated_at": "2026-07-17T12:59:46.736220+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "clea",
+    "last_message_at": "2026-07-17T12:59:46.736220+00:00"
+  },
+  {
+    "id": "16498ef6-4830-4ece-8bc3-905a1f9e0968",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "c31a1b88-92d2-4e25-93a4-30f52a03f806",
+        "conversation_id": "16498ef6-4830-4ece-8bc3-905a1f9e0968",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T12:58:50.171825+00:00"
+      },
+      {
+        "id": "7dc2b7fa-4980-4841-b0c0-d48fba2c8763",
+        "conversation_id": "16498ef6-4830-4ece-8bc3-905a1f9e0968",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T12:58:50.171825+00:00"
+      },
+      {
+        "id": "d6b0a7c8-30fc-455a-b334-b048d2c02795",
+        "conversation_id": "16498ef6-4830-4ece-8bc3-905a1f9e0968",
+        "role": "user",
+        "content": "hai",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T12:58:54.601453+00:00"
+      },
+      {
+        "id": "e9682658-22d0-4732-8850-4e1af104f5f0",
+        "conversation_id": "16498ef6-4830-4ece-8bc3-905a1f9e0968",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-17T12:58:54.601453+00:00"
+      }
+    ],
+    "created_at": "2026-07-17T12:58:50.171825+00:00",
+    "updated_at": "2026-07-17T12:58:54.601453+00:00",
+    "last_message": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+    "last_user_message": "hai",
+    "last_message_at": "2026-07-17T12:58:54.601453+00:00"
+  },
+  {
     "id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
     "user_id": "dev-admin",
     "user_name": "Admin",

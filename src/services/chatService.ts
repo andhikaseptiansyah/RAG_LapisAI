@@ -12,6 +12,7 @@ export interface SendChatPayload {
   message: string;
   conversationId?: string;
   language?: ChatLanguage;
+  model?: string;
   attachments?: AttachedFile[];
 }
 
@@ -55,6 +56,7 @@ export interface ChatApiResponse {
   responseTimeMs?: number;
   createdAt?: string;
   language?: ChatLanguage;
+  model?: string;
 }
 
 export interface ConversationSummary {
@@ -106,6 +108,13 @@ const buildChatFormData = (
     formData.append(
       'language',
       payload.language
+    );
+  }
+
+  if (payload.model) {
+    formData.append(
+      'model',
+      payload.model
     );
   }
 

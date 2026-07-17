@@ -16,7 +16,7 @@ from api.answer_formatter import (
     top_confidence,
 )
 from api.follow_up_service import build_dataset_follow_up_question
-from api.ollama_client import build_ollama_grounded_answer
+from api.model_router import build_grounded_answer
 from retrieval.hybrid_search import hybrid_search
 from retrieval.context_selector import select_context_bundle
 from uploads.config import (
@@ -96,6 +96,7 @@ def run_chat(
     *,
     top_k: int = 5,
     language: str = "ID",
+    model: str | None = None,
 ) -> dict[str, Any]:
     """Run one chat turn and return the canonical backend response payload.
 
@@ -146,10 +147,11 @@ def run_chat(
         }
 
     answer = answer_text_only(
-        build_ollama_grounded_answer(
+        build_grounded_answer(
             question,
             chunks,
             language=normalized_language,
+            model=model,
         )
     )
 
@@ -192,5 +194,5 @@ def run_chat(
         "generation_contexts": generation_contexts,
         "follow_up_question": follow_up_question,
         "response_time_ms": int(round((time.perf_counter() - started_at) * 1000)),
-        "model": "ollama-rag" if confidence > 0 else "retrieval-refusal",
+        "model": f"{model or 'ollama'}-rag" if confidence > 0 else "retrieval-refusal",
     }

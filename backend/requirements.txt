@@ -7,4 +7,5 @@ chromadb
 sentence-transformers
 rank-bm25
 numpy
-python-dotenv
+google-generativeai
+openai

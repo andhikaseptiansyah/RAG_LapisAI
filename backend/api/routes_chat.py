@@ -22,6 +22,7 @@ class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
     language: str = Field(default="ID")
+    model: str | None = Field(default=None)
 
 
 class QueryRequest(BaseModel):
@@ -110,6 +111,7 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
             payload.question,
             top_k=payload.top_k,
             language=payload.language,
+            model=payload.model,
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(exc)}") from exc
