@@ -314,11 +314,13 @@ async def compat_chat(request: Request):
         question = str(form.get("message") or form.get("question") or "").strip()
         conversation_id = str(form.get("conversationId") or "").strip() or None
         language = str(form.get("language") or "ID").strip() or "ID"
+        model = str(form.get("model") or "").strip() or None
     else:
         payload = await request.json()
         question = str(payload.get("message") or payload.get("question") or "").strip()
         conversation_id = payload.get("conversationId") or None
         language = payload.get("language") or "ID"
+        model = payload.get("model") or None
 
     if not question:
         raise HTTPException(status_code=400, detail="Message is required")
@@ -330,6 +332,7 @@ async def compat_chat(request: Request):
             question,
             top_k=5,
             language=language,
+            model=model,
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(exc)}") from exc

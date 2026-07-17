@@ -10,6 +10,8 @@ import type {
   Message,
 } from '../types';
 
+import type { ModelType } from '../types';
+
 import {
   convertChatResponseToMessage,
   normalizeMessageSources,
@@ -38,6 +40,7 @@ interface UseChatOptions {
   initialMessages?: Message[];
   initialConversationId?: string;
   initialLanguage?: ChatLanguage;
+  initialModel?: ModelType;
 }
 
 function createLocalId(): string {
@@ -188,6 +191,7 @@ export function useChat(
     initialMessages = [],
     initialConversationId,
     initialLanguage = 'ID',
+    initialModel = 'ollama',
   } = options;
 
   const [messages, setMessages] =
@@ -200,6 +204,9 @@ export function useChat(
 
   const [language, setLanguage] =
     useState<ChatLanguage>(initialLanguage);
+
+  const [model, setModel] =
+    useState<ModelType>(initialModel);
 
   const [isGenerating, setIsGenerating] =
     useState(false);
@@ -268,6 +275,7 @@ export function useChat(
             message: normalizedContent,
             conversationId,
             language: selectedLanguage,
+            model,
             attachments,
           },
           controller.signal
@@ -329,7 +337,7 @@ export function useChat(
         }
       }
     },
-    [conversationId, isGenerating, language]
+    [conversationId, isGenerating, language, model]
   );
 
   const loadConversation = useCallback(
@@ -426,6 +434,8 @@ export function useChat(
     conversationId,
     language,
     setLanguage,
+    model,
+    setModel,
     isGenerating,
     error,
     clearError,

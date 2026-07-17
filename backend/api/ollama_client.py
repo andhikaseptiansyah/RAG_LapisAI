@@ -5,132 +5,28 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-from api.answer_formatter import (
-    answer_text_only,
-    build_evidence_excerpt,
-    build_refusal_answer,
-    build_safe_extractive_answer,
-    has_answerable_evidence,
-    is_refusal_answer,
-    top_confidence,
+from api.llm_shared import (
+    SYSTEM_PROMPT,
+    build_context,
+    build_grounding_chunks,
+    clean_model_answer,
+    clean_text,
+    fallback_answer,
 )
+from api.answer_formatter import build_refusal_answer, has_answerable_evidence, is_refusal_answer, top_confidence
 from retrieval.requirements import (
     extract_evidence_requirements,
     requirement_satisfied,
 )
 from api.grounding_validator import prune_unsupported_claims, validate_grounded_answer
-from uploads.config import ENABLE_GENERATION_GROUNDING_VALIDATION, MAX_GENERATION_CONTEXTS
+from uploads.config import ENABLE_GENERATION_GROUNDING_VALIDATION
 
-# Ollama configuration is read from the project-root .env through uploads.config,
-# which is imported by answer_formatter before these values are evaluated.
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3-custom:latest")
 OLLAMA_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "120"))
 OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "640"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
 OLLAMA_MAX_RETRIES = max(0, int(os.getenv("OLLAMA_MAX_RETRIES", "1")))
-
-MAX_CONTEXT_CHARS_PER_CHUNK = 1400
-MAX_CONTEXT_CHUNKS = MAX_GENERATION_CONTEXTS
-MAX_ANSWER_CHARS = 900
-
-
-def _clean_text(value: Any) -> str:
-    return re.sub(r"\s+", " ", str(value or "")).strip()
-
-
-def _build_context(question: str, chunks: list[dict[str, Any]]) -> str:
-    blocks: list[str] = []
-    for index, chunk in enumerate(chunks[:MAX_CONTEXT_CHUNKS], start=1):
-        raw_content = _clean_text(chunk.get("content"))
-        if not raw_content:
-            continue
-        content = _clean_text(build_evidence_excerpt(question, raw_content)) or raw_content
-        if len(content) > MAX_CONTEXT_CHARS_PER_CHUNK:
-            content = content[:MAX_CONTEXT_CHARS_PER_CHUNK].rsplit(" ", 1)[0] + "…"
-
-        metadata = chunk.get("metadata") or {}
-        name = (
-            chunk.get("documentName")
-            or chunk.get("document_name")
-            or metadata.get("filename")
-            or "-"
-        )
-        page = chunk.get("page", metadata.get("page")) or "-"
-        blocks.append(
-            f"[KONTEKS {index}]\n"
-            f"Dokumen: {name}\n"
-            f"Halaman/lokasi: {page}\n"
-            f"Bukti: {content}"
-        )
-    return "\n\n".join(blocks)
-
-
-def _build_grounding_chunks(
-    question: str,
-    chunks: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    """Build chunks containing exactly the evidence shown to Ollama.
-
-    The grounding validator, extractive fallback, source response, and
-    evaluator must inspect the same compact passage. Validation against a
-    larger raw chunk can incorrectly approve facts that were not present in
-    the model prompt.
-    """
-
-    grounded_chunks: list[dict[str, Any]] = []
-
-    for chunk in chunks[:MAX_CONTEXT_CHUNKS]:
-        raw_content = _clean_text(
-            chunk.get("content")
-        )
-
-        if not raw_content:
-            continue
-
-        excerpt = _clean_text(
-            build_evidence_excerpt(
-                question,
-                raw_content,
-            )
-        ) or raw_content
-
-        if len(excerpt) > MAX_CONTEXT_CHARS_PER_CHUNK:
-            excerpt = (
-                excerpt[:MAX_CONTEXT_CHARS_PER_CHUNK]
-                .rsplit(" ", 1)[0]
-                .strip()
-                + "?"
-            )
-
-        cloned_chunk = dict(chunk)
-        cloned_chunk["content"] = excerpt
-
-        metadata = dict(
-            chunk.get("metadata") or {}
-        )
-        metadata["content"] = excerpt
-        cloned_chunk["metadata"] = metadata
-
-        grounded_chunks.append(cloned_chunk)
-
-    return grounded_chunks
-
-
-def _clean_model_answer(answer: str) -> str:
-    text = answer_text_only(answer)
-    if len(text) > MAX_ANSWER_CHARS:
-        text = text[:MAX_ANSWER_CHARS].rsplit(" ", 1)[0].strip() + "…"
-    return text
-
-
-def _fallback_answer(question: str, chunks: list[dict[str, Any]], language: str) -> str:
-    answer = _clean_model_answer(
-        build_safe_extractive_answer(question, chunks, language=language)
-    )
-    if not answer or is_refusal_answer(answer):
-        return build_refusal_answer(language)
-    return answer
 
 
 def _answer_requirements(question: str) -> list[Any]:
@@ -162,11 +58,6 @@ def _ollama_chat(
     *,
     num_predict: int | None = None,
 ) -> tuple[str, str]:
-    """Call Ollama once and return (answer_text, done_reason).
-
-    Qwen3 thinking is explicitly disabled so the output budget is used for the
-    visible answer. The done_reason is retained to detect token-limit truncation.
-    """
     payload = {
         "model": OLLAMA_MODEL,
         "stream": False,
@@ -200,44 +91,28 @@ def _ollama_chat(
 
 
 def _question_expected_numeric_values(question: str) -> int:
-    """Estimate how many numeric values the question explicitly asks for."""
-    text = _clean_text(question).lower()
+    text = clean_text(question).lower()
     if not text:
         return 0
 
-    # Repeated "berapa" is the strongest signal: "berapa total ... dan berapa ...".
     repeated_how_many = len(re.findall(r"\bberapa\b", text))
     if repeated_how_many >= 2:
         return repeated_how_many
 
     metric_terms = {
-        "pendapatan",
-        "revenue",
-        "margin",
-        "persentase",
-        "percentage",
-        "laba",
-        "profit",
-        "biaya",
-        "cost",
-        "durasi",
-        "lama",
-        "jumlah",
-        "total",
-        "rate",
-        "tingkat",
+        "pendapatan", "revenue", "margin", "persentase", "percentage",
+        "laba", "profit", "biaya", "cost", "durasi", "lama", "jumlah",
+        "total", "rate", "tingkat",
     }
     matched_metrics = sum(1 for term in metric_terms if term in text)
 
-    # A conjunction between multiple metric terms usually requests multiple values.
     if matched_metrics >= 2 and re.search(r"\b(?:dan|serta|and)\b", text):
         return 2
     return 1 if repeated_how_many == 1 else 0
 
 
 def _answer_numeric_values(answer: str) -> list[str]:
-    """Extract distinct answer quantities such as IDR 158 billion and 14%."""
-    clean = _clean_text(answer)
+    clean = clean_text(answer)
     matches = re.findall(
         r"(?:Rp\.?|IDR|USD|EUR)?\s*\d[\d.,]*(?:\s*(?:%|persen|percent|juta|miliar|billion|triliun|trillion|jam|hari|minggu|bulan|tahun))?",
         clean,
@@ -246,7 +121,7 @@ def _answer_numeric_values(answer: str) -> list[str]:
     values: list[str] = []
     seen: set[str] = set()
     for match in matches:
-        value = _clean_text(match).casefold()
+        value = clean_text(match).casefold()
         if value and value not in seen:
             seen.add(value)
             values.append(value)
@@ -258,8 +133,7 @@ def _is_likely_incomplete_answer(
     answer: str,
     done_reason: str = "",
 ) -> bool:
-    """Detect a blank, visibly cut, or materially incomplete model answer."""
-    clean_answer = _clean_text(answer)
+    clean_answer = clean_text(answer)
     if not clean_answer:
         return True
 
@@ -268,10 +142,6 @@ def _is_likely_incomplete_answer(
 
     words = clean_answer.split()
     if len(words) < 6:
-        # Short factual answers are valid for questions such as "What database?",
-        # "What mailbox limit?", or "When is payday?". Only treat a short answer
-        # as incomplete when it fails an explicit answer-type requirement and does
-        # not contain a substantive identifier or quantity.
         if _requirements_complete(question, clean_answer):
             return False
         if re.search(
@@ -283,16 +153,8 @@ def _is_likely_incomplete_answer(
 
     lower_answer = clean_answer.casefold()
     incomplete_endings = (
-        ":",
-        ",",
-        ";",
-        "-",
-        " dan",
-        " atau",
-        " yaitu",
-        " sebesar",
-        " adalah",
-        " dengan",
+        ":", ",", ";", "-", " dan", " atau",
+        " yaitu", " sebesar", " adalah", " dengan",
     )
     if lower_answer.endswith(incomplete_endings):
         return True
@@ -340,19 +202,14 @@ def build_ollama_grounded_answer(
     chunks: list[dict[str, Any]],
     language: str = "ID",
 ) -> str:
-    """Generate only the answer text.
-
-    Source metadata and confidence are intentionally excluded here. They are
-    assembled by the chat service into separate response fields.
-    """
     confidence = top_confidence(chunks, question=question)
     bundle_answerable = has_answerable_evidence(chunks)
 
     if confidence <= 0 and not bundle_answerable:
         return build_refusal_answer(language)
 
-    grounding_chunks = _build_grounding_chunks(question, chunks)
-    context = _build_context(question, grounding_chunks)
+    grounding_chunks = build_grounding_chunks(question, chunks)
+    context = build_context(question, grounding_chunks)
     if not context:
         return build_refusal_answer(language)
 
@@ -364,20 +221,6 @@ def build_ollama_grounded_answer(
         for key in (chunk.get("contextBundleMissingRequirements") or [])
     }
     evidence_complete = bundle_answerable and not bundle_missing
-
-    system_prompt = (
-        "You are a strict enterprise Retrieval-Augmented Generation assistant. "
-        "Use only the supplied evidence. Do not use outside knowledge. "
-        "Return the direct answer only. Prefer the wording and terminology used in the evidence. "
-        "For a single-fact question, write one concise sentence. For a multi-part or list question, "
-        "write only the minimum sentences or bullets needed to cover every requested part. "
-        "Do not add an introduction, rationale, recommendation, citation, confidence, heading, label, "
-        "assumption, example, condition, exception, background detail, causal explanation, benefit, or "
-        "implication unless the question explicitly asks for it and the evidence explicitly states it. "
-        "Never replace a supported answer with a refusal. "
-        "Do not combine details from different evidence blocks into one claim unless the question explicitly "
-        "requires both details."
-    )
 
     completeness_instruction = (
         "The evidence bundle has already passed answerability checks. Do not state that information is missing. "
@@ -403,8 +246,8 @@ def build_ollama_grounded_answer(
         )
 
     try:
-        raw_answer, done_reason = _ollama_chat(system_prompt, user_prompt)
-        llm_answer = _clean_model_answer(raw_answer)
+        raw_answer, done_reason = _ollama_chat(SYSTEM_PROMPT, user_prompt)
+        llm_answer = clean_model_answer(raw_answer)
 
         retry_count = 0
         while retry_count < OLLAMA_MAX_RETRIES:
@@ -419,7 +262,7 @@ def build_ollama_grounded_answer(
 
             retry_count += 1
             raw_answer, done_reason = _ollama_chat(
-                system_prompt,
+                SYSTEM_PROMPT,
                 _repair_prompt(
                     user_prompt,
                     llm_answer,
@@ -432,32 +275,26 @@ def build_ollama_grounded_answer(
                 ),
                 num_predict=max(OLLAMA_NUM_PREDICT, 800),
             )
-            llm_answer = _clean_model_answer(raw_answer)
+            llm_answer = clean_model_answer(raw_answer)
 
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, Exception) as exc:
-        # Keep the application usable when Ollama is offline or a model call fails.
         print(f"[OLLAMA] fallback to formatter: {exc}")
-        return _fallback_answer(question, grounding_chunks, language)
+        return fallback_answer(question, grounding_chunks, language)
 
-    # Do not return a visibly incomplete fragment. The deterministic formatter
-    # extracts the strongest supported sentences from the same retrieved chunks.
     if _is_likely_incomplete_answer(question, llm_answer, done_reason):
         print(
             "[OLLAMA] incomplete answer after retry; using grounded formatter "
             f"(done_reason={done_reason or 'unknown'})"
         )
-        return _fallback_answer(question, grounding_chunks, language)
+        return fallback_answer(question, grounding_chunks, language)
 
     if not llm_answer:
-        return _fallback_answer(question, grounding_chunks, language)
+        return fallback_answer(question, grounding_chunks, language)
 
     if ENABLE_GENERATION_GROUNDING_VALIDATION:
         grounding = validate_grounded_answer(question, llm_answer, grounding_chunks)
         if not grounding.supported:
-            # Preserve the supported part of a useful answer before falling back.
-            # This removes hallucinated explanatory tails without converting an
-            # answerable question into a refusal.
-            pruned_answer = _clean_model_answer(
+            pruned_answer = clean_model_answer(
                 prune_unsupported_claims(question, llm_answer, chunks)
             )
             if pruned_answer:
@@ -477,12 +314,9 @@ def build_ollama_grounded_answer(
                 "[GROUNDING] generated answer rejected; using extractive fallback: "
                 + ", ".join(grounding.reasons)
             )
-            return _fallback_answer(question, grounding_chunks, language)
+            return fallback_answer(question, grounding_chunks, language)
 
     if is_refusal_answer(llm_answer):
-        # Retrieval and answerability already established evidence. A model-level
-        # refusal is therefore treated as a generation failure, not as proof that
-        # the corpus lacks an answer.
-        return _fallback_answer(question, grounding_chunks, language)
+        return fallback_answer(question, grounding_chunks, language)
 
     return llm_answer

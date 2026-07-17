@@ -31,6 +31,8 @@ export interface Message {
   page?: string | number;
   sources?: MessageSource[];
   responseTimeMs?: number;
-  followUpQuestion?: string;
-  shouldAnimate?: boolean;
-}
+    followUpQuestion?: string;
+    shouldAnimate?: boolean;
+  }
+
+  export type ModelType = 'ollama' | 'gemini' | 'openai';
