@@ -20,8 +20,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const [inputValue, setInputValue] = useState('');
   
   // State untuk menu
-  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('Qwen3');
+  const [selectedModel, setSelectedModel] = useState('Qwen');
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
 
   const [placeholder, setPlaceholder] = useState('');
@@ -95,11 +94,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     }
   };
 
-  const handleUploadOptionClick = (mode: UploadMode) => {
-    setAttachMenuOpen(false);
-    onAttachFileClick(mode);
-  };
-
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
     if (textareaRef.current) {
@@ -142,6 +136,19 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   return (
     <div className="relative flex-1 min-h-full w-full overflow-hidden">
       
+      {/* CSS Animasi Khusus untuk Border Gradient */}
+      <style>{`
+        @keyframes gradient-border {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animate-gradient-border {
+          background-size: 300% 300%;
+          animation: gradient-border 4s ease infinite;
+        }
+      `}</style>
+
       {/* Background Avatar */}
       <div className="absolute left-0 top-0 h-full w-full md:w-[40%] lg:w-[35%] max-w-[500px] z-0 pointer-events-none">
         <img
@@ -152,23 +159,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       <div className="relative z-10 flex min-h-full w-full items-center justify-center px-4 pb-6 pt-20 sm:px-6 md:px-8 md:pt-6">
-        <div className="flex w-full max-w-3xl flex-col items-center justify-center -mt-4 md:-mt-16 animate-fadeIn">
+        <div className="flex w-full max-w-3xl flex-col items-center justify-center translate-y-8 md:translate-y-12 lg:translate-y-16 animate-fadeIn">
           
-          {/* Center Logo */}
-          <div className="mb-5 flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] md:mb-6">
-            <img src="/icon-ungu.png" alt="Lapis Logo" className="w-20 h-auto object-contain sm:w-24 md:w-32" />
-          </div>
-
           <h1 className="mb-7 max-w-[340px] text-center font-headline text-[27px] font-medium leading-[1.16] tracking-tight text-on-surface sm:max-w-xl sm:text-3xl md:mb-8 md:max-w-none md:text-4xl">
             {language === 'ID' ? 'Ada yang bisa saya bantu?' : 'How can I help you?'}
           </h1>
 
           {/* Kotak Input Utama */}
           <div className="relative w-full max-w-[760px] px-1 md:px-2">
-            <div className="pointer-events-none absolute -left-4 top-1/2 z-0 h-28 w-40 -translate-y-1/2 rounded-full bg-[#fb7185]/35 blur-[44px] md:-left-10 md:h-36 md:w-52 md:blur-[56px]" />
-            <div className="pointer-events-none absolute -right-4 top-1/2 z-0 h-28 w-40 -translate-y-1/2 rounded-full bg-[#3b82f6]/45 blur-[44px] md:-right-10 md:h-36 md:w-52 md:blur-[56px]" />
+            {/* EFEK CAHAYA (BLOBS) DITERANGKAN: Opacity dinaikkan menjadi /60 dan /70 */}
+            <div className="pointer-events-none absolute -left-4 top-1/2 z-0 h-28 w-40 -translate-y-1/2 rounded-full bg-[#fb7185]/60 blur-[40px] md:-left-10 md:h-36 md:w-52 md:blur-[50px]" />
+            <div className="pointer-events-none absolute -right-4 top-1/2 z-0 h-28 w-40 -translate-y-1/2 rounded-full bg-[#3b82f6]/70 blur-[40px] md:-right-10 md:h-36 md:w-52 md:blur-[50px]" />
 
-            <div className="relative z-10 rounded-[24px] bg-[linear-gradient(90deg,rgba(251,113,133,0.6)_0%,rgba(139,92,246,0.3)_46%,rgba(59,130,246,0.6)_100%)] p-[1.5px] shadow-[0_0_22px_rgba(0,0,0,0.5)] transition-all duration-300 focus-within:shadow-[0_0_30px_rgba(251,113,133,0.2)] md:rounded-[28px]">
+            {/* DIV BORDER: Garis tetap soft (rgba), tapi shadow luar diubah jadi glow terang (rgba ungu) */}
+            <div className="relative z-10 rounded-[24px] bg-[linear-gradient(90deg,rgba(251,113,133,0.5),rgba(139,92,246,0.4),rgba(59,130,246,0.5),rgba(251,113,133,0.5))] p-[1.5px] shadow-[0_0_30px_rgba(139,92,246,0.25)] transition-all duration-300 focus-within:shadow-[0_0_40px_rgba(139,92,246,0.45)] md:rounded-[28px] animate-gradient-border">
               <div className="relative flex flex-col w-full rounded-[22.5px] bg-[#111216] md:rounded-[26.5px] p-2 md:p-3">
                 
                 <textarea
@@ -190,37 +194,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                   
                   {/* Grup Kiri */}
                   <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAttachMenuOpen(!attachMenuOpen);
-                          setModelMenuOpen(false);
-                        }}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 transition-all hover:bg-white/10 hover:text-white"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                      </button>
-
-                      {attachMenuOpen && (
-                        <div className="absolute top-full left-0 z-30 mt-3 w-52 rounded-2xl border border-white/10 bg-[#1a1b21] p-2 shadow-xl animate-fadeIn">
-                          <button onClick={() => handleUploadOptionClick('photo')} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[18px]">add_photo_alternate</span> {language === 'ID' ? 'Unggah Foto' : 'Upload Photo'}
-                          </button>
-                          <button onClick={() => handleUploadOptionClick('file')} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white transition-colors">
-                            <span className="material-symbols-outlined text-[18px]">description</span> {language === 'ID' ? 'Unggah Dokumen' : 'Upload File'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
                     <div className="relative hidden sm:block">
                       <button
                         type="button"
-                        onClick={() => {
-                          setModelMenuOpen(!modelMenuOpen);
-                          setAttachMenuOpen(false);
-                        }}
+                        onClick={() => setModelMenuOpen(!modelMenuOpen)}
                         className="flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-white/5 border border-white/10 text-white/60 transition-all hover:bg-white/10 hover:text-white"
                       >
                         <span className="material-symbols-outlined text-[16px]">energy_savings_leaf</span>
@@ -229,12 +206,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                       </button>
 
                       {modelMenuOpen && (
-                        <div className="absolute top-full left-0 z-30 mt-3 w-44 rounded-2xl border border-white/10 bg-[#1a1b21] p-2 shadow-xl animate-fadeIn">
-                          <button onClick={() => { setSelectedModel('Qwen3'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Qwen3' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
-                            <span className="material-symbols-outlined text-[16px]">memory</span> Qwen3
+                        <div className="absolute top-full left-0 z-30 mt-5 w-44 rounded-2xl border border-white/10 bg-[#1a1b21] p-2 shadow-xl animate-fadeIn">
+                          <button onClick={() => { setSelectedModel('Qwen'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Qwen' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
+                            <span className="material-symbols-outlined text-[16px]">memory</span> Qwen
                           </button>
-                          <button onClick={() => { setSelectedModel('Cloud Fable5'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Cloud Fable5' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
-                            <span className="material-symbols-outlined text-[16px]">cloud</span> Cloud Fable5
+                          <button onClick={() => { setSelectedModel('API OpenAI'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'API OpenAI' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
+                            <span className="material-symbols-outlined text-[16px]">api</span> API OpenAI
+                          </button>
+                          <button onClick={() => { setSelectedModel('Gemini'); setModelMenuOpen(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${selectedModel === 'Gemini' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5'}`}>
+                            <span className="material-symbols-outlined text-[16px]">auto_awesome</span> Gemini
                           </button>
                         </div>
                       )}

@@ -10,3 +10,5 @@ __pycache__/
 venv/
 env/
 query_logs.json
+users_store.json
+.auth_secret

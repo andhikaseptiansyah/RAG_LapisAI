@@ -9,16 +9,23 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ConversationSearch } from './ConversationSearch';
 import { useAuth } from '../hooks/useAuth';
-import { conversationService } from '../services/conversationService';
-import type { ConversationHistory } from './ConversationSearch';
-import type { ConversationSummary } from '../services/conversationService';
+import {
+  conversationService,
+  type ConversationSummary,
+} from '../services/conversationService';
+import type {
+  ConversationHistory,
+  ConversationQuestion,
+} from './ConversationSearch';
 
 interface SidebarProps {
   isOpen: boolean;
+  onToggle: () => void;
   onClose: () => void;
   onNewChat: () => void;
   onSelectConversation?: (
-    conversationId: string
+    conversationId: string,
+    targetMessageId?: string
   ) => void;
 }
 
@@ -30,6 +37,7 @@ interface RecentChat {
   group: string;
   lastMessage?: string;
   lastUserMessage?: string;
+  questions: ConversationQuestion[];
 }
 
 interface MenuPosition {
@@ -138,11 +146,20 @@ const mapConversationToRecentChat = (
     group: 'Latest',
     lastMessage: conversation.last_message,
     lastUserMessage: conversation.last_user_message,
+    questions: (conversation.user_messages ?? []).map(
+      (question) => ({
+        id: question.id,
+        content: question.content,
+        createdAt: question.created_at,
+        dateLabel: toDateLabel(question.created_at),
+      })
+    ),
   };
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
+  onToggle,
   onClose,
   onNewChat,
   onSelectConversation,
@@ -197,18 +214,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   useEffect(() => {
-    void loadRecentChats();
-  }, [loadRecentChats]);
-
-  useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isConversationSearchOpen) {
       void loadRecentChats();
     }
-  }, [isOpen, loadRecentChats]);
+  }, [
+    isOpen,
+    isConversationSearchOpen,
+    loadRecentChats,
+  ]);
 
   useEffect(() => {
     const handleConversationsChanged = () => {
-      void loadRecentChats();
+      if (isOpen || isConversationSearchOpen) {
+        void loadRecentChats();
+      }
     };
 
     window.addEventListener(
@@ -222,7 +241,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         handleConversationsChanged
       );
     };
-  }, [loadRecentChats]);
+  }, [
+    isOpen,
+    isConversationSearchOpen,
+    loadRecentChats,
+  ]);
 
   const sortedChats = useMemo(() => {
     return [...recentChats].sort(
@@ -240,6 +263,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         dateLabel: chat.dateLabel,
         group: chat.group,
         pinned: chat.pinned,
+        questions: chat.questions,
       }));
     }, [sortedChats]);
 
@@ -482,13 +506,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsConversationSearchOpen(false);
   };
 
+  const handleDeleteConversations = async (
+    conversationIds: string[]
+  ): Promise<void> => {
+    const result = await conversationService.removeMany(
+      conversationIds
+    );
+
+    const deletedIds = new Set(
+      result.deletedIds.length > 0
+        ? result.deletedIds
+        : conversationIds
+    );
+
+    setRecentChats((previousChats) =>
+      previousChats.filter(
+        (chat) => !deletedIds.has(chat.id)
+      )
+    );
+
+    window.dispatchEvent(
+      new Event('lapisai:conversations-changed')
+    );
+  };
+
   const handleSelectConversation = (
-    conversation: ConversationHistory
+    conversation: ConversationHistory,
+    targetMessageId?: string
   ) => {
     setIsConversationSearchOpen(false);
     setOpenMenuId(null);
     setMenuPosition(null);
-    onSelectConversation?.(conversation.id);
+    onSelectConversation?.(
+      conversation.id,
+      targetMessageId
+    );
   };
 
   return (
@@ -504,236 +556,308 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
+        style={{
+          backgroundColor: isOpen ? '#000000' : 'transparent',
+        }}
         className={`
-          absolute z-50 h-full shrink-0 transform flex-col overflow-hidden bg-[#000000] transition-all duration-300 md:relative
+          absolute left-0 top-0 z-50 h-full shrink-0 transform flex-col overflow-hidden transition-all duration-300
+          ${isOpen ? 'md:relative pointer-events-auto' : 'pointer-events-none'}
           ${isConversationSearchOpen ? 'hidden md:flex' : 'flex'}
           ${
             isOpen
               ? `w-[280px] translate-x-0 border-r border-white/5 p-4 md:p-5 opacity-100 md:w-72`
-              : `-translate-x-full border-none p-0 opacity-0 md:w-0 md:translate-x-0`
+              : `w-[80px] -translate-x-full border-none py-4 opacity-0 items-center md:translate-x-0 md:opacity-100`
           }
         `}
       >
-        {/* --- 1. USER PROFILE SECTION (Di Atas) --- */}
-        <div className="relative mb-6 mt-2 flex items-center gap-3 px-2">
-          {/* Ubah profil menjadi gelap */}
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 shadow-sm border border-white/5">
-            <span className="material-symbols-outlined text-[24px]">
+        {!isOpen && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="pointer-events-auto absolute left-1/2 top-4 -translate-x-1/2 flex h-9 w-9 items-center justify-center rounded-xl text-white transition-all hover:bg-white/10 active:scale-95"
+            aria-label="Open sidebar"
+            title="Open sidebar"
+          >
+            <img
+              src="/icon.png"
+              alt="Lapis AI"
+              className="h-7 w-7 object-contain"
+            />
+          </button>
+        )}
+
+        {/* --- 1. USER PROFILE SECTION --- */}
+        <div
+          className={`relative flex items-center ${isOpen ? 'mb-6 mt-2 px-2 gap-3' : 'pointer-events-auto mb-4 mt-[72px] flex-col gap-3 cursor-pointer'}`}
+          onClick={!isOpen ? onToggle : undefined}
+          role={!isOpen ? 'button' : undefined}
+          tabIndex={!isOpen ? 0 : undefined}
+          onKeyDown={(event) => {
+            if (
+              !isOpen &&
+              (event.key === 'Enter' || event.key === ' ')
+            ) {
+              event.preventDefault();
+              onToggle();
+            }
+          }}
+          aria-label={!isOpen ? 'Open sidebar' : undefined}
+        >
+          {/* Ikon Profil */}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-transparent text-white/80">
+            <span className="material-symbols-outlined text-[20px]">
               person
             </span>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-medium text-white/50">
-              Good Day 👋
-            </p>
-            <p className="truncate text-[16px] font-bold text-white/90">
-              {user?.name ?? user?.username ?? 'Staff'}
-            </p>
-          </div>
           
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-0 p-1 text-white/50 transition-colors hover:text-white md:hidden"
-            aria-label="Close sidebar"
-          >
-            <span className="material-symbols-outlined">close</span>
-          </button>
+          {isOpen && (
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-medium text-white/50">
+                Good Day 👋
+              </p>
+              <p className="truncate text-[16px] font-bold text-white/90">
+                {user?.name ?? user?.username ?? 'Staff'}
+              </p>
+            </div>
+          )}
+          
+          {isOpen && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute right-0 top-1 flex h-8 w-8 items-center justify-center text-white/45 transition-colors hover:text-white"
+              aria-label="Close sidebar"
+              title="Close sidebar"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* --- 2. MAIN MENU SECTION --- */}
-        <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
-          <span>Menu: {isAdmin ? '3' : '2'}</span>
-          <span className="material-symbols-outlined text-[14px]">
-            tune
-          </span>
-        </div>
+        {isOpen && (
+          <div className="mb-2 flex w-full items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+            <span>Menu: {isAdmin ? '3' : '2'}</span>
+            <span className="material-symbols-outlined text-[14px]">tune</span>
+          </div>
+        )}
 
-        <nav className="mb-6 flex flex-col gap-1 px-1">
-          {/* Hapus warna biru pada hover, ganti menjadi dark mode (white/10) */}
+        <nav className={`mb-6 flex flex-col gap-2 ${isOpen ? 'px-1 w-full' : 'pointer-events-auto items-center'}`}>
           <button
             type="button"
             onClick={handleNewChat}
-            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
+            title="New Chat"
+            className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
+              isOpen 
+                ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
+                : 'h-11 w-11 justify-center rounded-[14px] text-white/70'
+            }`}
           >
             <span className="material-symbols-outlined text-[20px]">
               edit_square
             </span>
-            New Chat
+            {isOpen && <span>New Chat</span>}
           </button>
 
           <button
             type="button"
             onClick={handleOpenConversationSearch}
-            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
+            title="Search Chats"
+            className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
+              isOpen 
+                ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
+                : 'h-11 w-11 justify-center rounded-[14px] text-white/70'
+            }`}
           >
             <span className="material-symbols-outlined text-[20px]">
               search
             </span>
-            Search Chats
+            {isOpen && <span>Search Chats</span>}
           </button>
 
           {isAdmin && (
             <Link
               to="/admin"
-              onClick={onClose}
-              className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white active:scale-[0.98]"
+              onClick={isOpen ? onClose : undefined}
+              title="Admin Panel"
+              className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
+                isOpen 
+                  ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
+                  : 'h-11 w-11 justify-center rounded-[14px] text-white/70'
+              }`}
             >
               <span className="material-symbols-outlined text-[20px]">
                 admin_panel_settings
               </span>
-              Admin Panel
+              {isOpen && <span>Admin Panel</span>}
             </Link>
           )}
         </nav>
 
-        {/* --- 3. RECENT CHATS SECTION (Card Design) --- */}
-        <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
-          <span>Recent Chats: {sortedChats.length}</span>
-          <span className="material-symbols-outlined text-[14px]">
-            history
-          </span>
-        </div>
-
-        {/* Gunakan abu-abu sangat gelap untuk container history */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-[#09090b] border border-white/5 p-2 mb-4">
-          <div className="custom-scrollbar h-full overflow-y-auto overflow-x-hidden pr-1">
-            <div className="flex flex-col gap-1">
-              {isLoadingChats && sortedChats.length === 0 ? (
-                <p className="py-4 text-center text-[13px] text-white/40">
-                  Loading history...
-                </p>
-              ) : historyError ? (
-                <div className="m-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/60">
-                  {historyError}
-                </div>
-              ) : sortedChats.length > 0 ? (
-                sortedChats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className="group relative flex min-w-0 items-center gap-2 rounded-[16px] px-2 transition-colors hover:bg-white/5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleSelectConversation({
-                          id: chat.id,
-                          title: chat.title,
-                          dateLabel: chat.dateLabel,
-                          group: chat.group,
-                          pinned: chat.pinned,
-                        })
-                      }
-                      className="flex min-w-0 flex-1 items-center gap-3 truncate py-3 text-left text-[14px] font-medium text-white/70 transition-colors hover:text-white"
-                      title={chat.title}
-                    >
-                      <span className="material-symbols-outlined shrink-0 text-[18px] text-white/40 group-hover:text-white/70">
-                        chat_bubble
-                      </span>
-                      <span className="truncate">{chat.title}</span>
-                      {chat.pinned && (
-                        /* Warna pin dibuat netral (putih) */
-                        <span
-                          className="material-symbols-outlined shrink-0 text-[16px] text-white/80"
-                          title="Pinned conversation"
-                        >
-                          push_pin
-                        </span>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={(event) =>
-                        handleConversationMenuClick(event, chat.id)
-                      }
-                      data-conversation-menu-trigger="true"
-                      className={`
-                        flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all
-                        ${
-                          openMenuId === chat.id
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/40 hover:bg-white/10 hover:text-white'
-                        }
-                      `}
-                    >
-                      <span className="material-symbols-outlined text-[20px]">
-                        more_horiz
-                      </span>
-                    </button>
-
-                    {/* Pop-up Menu Action per Chat */}
-                    {openMenuId === chat.id &&
-                      menuPosition &&
-                      createPortal(
-                        <div
-                          data-conversation-menu="true"
-                          className="animate-fadeIn fixed z-[1000] w-56 -translate-y-1/2 rounded-[20px] border border-white/10 bg-[#121212] p-2 shadow-[0_14px_36px_rgba(0,0,0,0.65)]"
-                          style={{
-                            top: menuPosition.top,
-                            left: menuPosition.left,
-                          }}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => handleShareChat(chat)}
-                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                          >
-                            <span className="material-symbols-outlined text-[19px]">share</span>
-                            Share
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleTogglePin(chat)}
-                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                          >
-                            <span className="material-symbols-outlined text-[19px]">push_pin</span>
-                            {chat.pinned ? 'Unpin' : 'Pin'}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRenameChat(chat)}
-                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-                          >
-                            <span className="material-symbols-outlined text-[19px]">edit</span>
-                            Rename
-                          </button>
-                          <div className="my-1 border-t border-white/10" />
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteChat(chat)}
-                            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
-                          >
-                            <span className="material-symbols-outlined text-[19px]">delete</span>
-                            Delete
-                          </button>
-                        </div>,
-                        document.body
-                      )}
-                  </div>
-                ))
-              ) : (
-                <p className="py-4 text-center text-[13px] text-white/40">
-                  No conversations yet.
-                </p>
-              )}
+        {/* --- 3. RECENT CHATS SECTION --- */}
+        {isOpen && (
+          <>
+            <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+              <span>Recent Chats: {sortedChats.length}</span>
+              <span className="material-symbols-outlined text-[14px]">
+                history
+              </span>
             </div>
-          </div>
-        </div>
+
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-[#09090b] border border-white/5 p-2 mb-4">
+              <div className="custom-scrollbar h-full overflow-y-auto overflow-x-hidden pr-1">
+                <div className="flex flex-col gap-1">
+                  {isLoadingChats && sortedChats.length === 0 ? (
+                    <p className="py-4 text-center text-[13px] text-white/40">
+                      Loading history...
+                    </p>
+                  ) : historyError ? (
+                    <div className="m-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/60">
+                      {historyError}
+                    </div>
+                  ) : sortedChats.length > 0 ? (
+                    sortedChats.map((chat) => (
+                      <div
+                        key={chat.id}
+                        className="group relative flex min-w-0 items-center gap-2 rounded-[16px] px-2 transition-colors hover:bg-white/5"
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSelectConversation({
+                              id: chat.id,
+                              title: chat.title,
+                              dateLabel: chat.dateLabel,
+                              group: chat.group,
+                              pinned: chat.pinned,
+                              questions: chat.questions,
+                            })
+                          }
+                          className="flex min-w-0 flex-1 items-center gap-3 truncate py-3 text-left text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                          title={chat.title}
+                        >
+                          <span className="material-symbols-outlined shrink-0 text-[18px] text-white/40 group-hover:text-white/70">
+                            chat_bubble
+                          </span>
+                          <span className="truncate">{chat.title}</span>
+                          {chat.pinned && (
+                            <span
+                              className="material-symbols-outlined shrink-0 text-[16px] text-white/80"
+                              title="Pinned conversation"
+                            >
+                              push_pin
+                            </span>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(event) =>
+                            handleConversationMenuClick(event, chat.id)
+                          }
+                          data-conversation-menu-trigger="true"
+                          className={`
+                            flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all
+                            ${
+                              openMenuId === chat.id
+                                ? 'bg-white/10 text-white'
+                                : 'text-white/40 hover:bg-white/10 hover:text-white'
+                            }
+                          `}
+                        >
+                          <span className="material-symbols-outlined text-[20px]">
+                            more_horiz
+                          </span>
+                        </button>
+
+                        {openMenuId === chat.id &&
+                          menuPosition &&
+                          createPortal(
+                            <div
+                              data-conversation-menu="true"
+                              className="animate-fadeIn fixed z-[1000] w-56 -translate-y-1/2 rounded-[20px] border border-white/10 bg-[#121212] p-2 shadow-[0_14px_36px_rgba(0,0,0,0.65)]"
+                              style={{
+                                top: menuPosition.top,
+                                left: menuPosition.left,
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => handleShareChat(chat)}
+                                className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+                              >
+                                <span className="material-symbols-outlined text-[19px]">share</span>
+                                Share
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleTogglePin(chat)}
+                                className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+                              >
+                                <span className="material-symbols-outlined text-[19px]">push_pin</span>
+                                {chat.pinned ? 'Unpin' : 'Pin'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRenameChat(chat)}
+                                className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+                              >
+                                <span className="material-symbols-outlined text-[19px]">edit</span>
+                                Rename
+                              </button>
+                              <div className="my-1 border-t border-white/10" />
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteChat(chat)}
+                                className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+                              >
+                                <span className="material-symbols-outlined text-[19px]">delete</span>
+                                Delete
+                              </button>
+                            </div>,
+                            document.body
+                          )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="py-4 text-center text-[13px] text-white/40">
+                      No conversations yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* --- 4. SETTINGS / BOTTOM LOGOUT SECTION --- */}
-        <div className="mt-auto px-1 pt-1">
-          {/* Ubah tombol logout menjadi tema gelap netral */}
-          <div className="flex items-center justify-between rounded-[24px] bg-[#09090b] border border-white/5 p-2">
+        <div className={`mt-auto pt-1 flex flex-col items-center ${isOpen ? 'px-1 w-full' : 'pointer-events-auto'}`}>
+          <div className={`flex items-center justify-between ${isOpen ? 'rounded-[24px] bg-[#09090b] border border-white/5 p-2 w-full' : 'w-full flex-col'}`}>
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-white/5 py-3 text-[14px] font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white active:scale-[0.98]"
+              title="Logout"
+              className={`flex items-center justify-center transition-colors hover:bg-white/10 hover:text-white active:scale-[0.98] ${
+                isOpen 
+                  ? 'w-full gap-2 rounded-[16px] bg-white/5 py-3 text-[14px] font-medium text-white/60' 
+                  : 'h-11 w-11 rounded-[14px] text-white/60'
+              }`}
             >
               <span className="material-symbols-outlined text-[20px]">
                 logout
               </span>
-              Logout
+              {isOpen && <span>Logout</span>}
             </button>
           </div>
         </div>
@@ -743,6 +867,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <ConversationSearch
           conversations={conversationHistory}
           onSelectConversation={handleSelectConversation}
+          onDeleteConversations={handleDeleteConversations}
           onBack={handleCloseConversationSearch}
           sidebarVisible={isOpen}
         />

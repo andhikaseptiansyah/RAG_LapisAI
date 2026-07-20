@@ -332,7 +332,7 @@ export const AdminDashboard: React.FC = () => {
   const loadQueryLogAnalytics = useCallback(async (signal?: AbortSignal) => {
     setIsQueryLogSyncing(true);
     try {
-      const response = await getQueryLogsDashboard({ range: 'daily', page: 1, limit: 1000 }, signal);
+      const response = await getQueryLogsDashboard({ range: 'daily', page: 1, limit: 0 }, signal);
       const logs = Array.isArray(response.logs) ? response.logs : [];
       const averageResponseTime = getReliableAverageResponseTime(response.performance?.averageResponseTime, logs);
       setQueryLogs(logs);

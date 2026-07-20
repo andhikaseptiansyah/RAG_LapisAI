@@ -24,15 +24,17 @@ const getStatusStyle = (status: QueryLogStatus): string => {
   switch (status) {
     case 'ANSWERED':
       return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400';
-    case 'NEED_REVIEW':
+    case 'NO_REFERENCE':
       return 'border-amber-500/20 bg-amber-500/10 text-amber-400';
     case 'NOT_FOUND':
-      return 'border-rose-500/20 bg-rose-500/10 text-rose-400';
-    case 'ERROR':
       return 'border-rose-500/20 bg-rose-500/10 text-rose-400';
     default:
       return 'border-slate-700 bg-slate-800 text-slate-300';
   }
+};
+
+const formatStatusLabel = (status: QueryLogStatus): string => {
+  return status.replace(/_/g, ' ');
 };
 
 const normalizeTimestamp = (timestamp: string): string => {
@@ -175,11 +177,11 @@ const parseResponseTimeSeconds = (value: unknown): number => {
 const calculatePerformanceFromLogs = (logs: QueryLog[]): QueryLogPerformance => {
   const totalQueries = logs.length;
   const answered = logs.filter((log) => log.status === 'ANSWERED').length;
+  const noReference = logs.filter((log) => log.status === 'NO_REFERENCE').length;
   const notFound = logs.filter((log) => log.status === 'NOT_FOUND').length;
-  const needReview = logs.filter((log) => log.status === 'NEED_REVIEW').length;
-  const errors = logs.filter((log) => log.status === 'ERROR').length;
 
   const confidenceValues = logs
+    .filter((log) => log.status === 'ANSWERED')
     .map((log) => normalizeConfidenceScore(log.confidenceScore))
     .filter((value) => Number.isFinite(value) && value > 0);
 
@@ -195,10 +197,10 @@ const calculatePerformanceFromLogs = (logs: QueryLog[]): QueryLogPerformance => 
     ? responseTimeValues.reduce((sum, value) => sum + value, 0) / responseTimeValues.length
     : 0;
 
-  return { totalQueries, answered, notFound, needReview, errors, averageConfidence, averageResponseTime };
+  return { totalQueries, answered, noReference, notFound, averageConfidence, averageResponseTime };
 };
 
-type MetricTone = 'cyan' | 'green' | 'pink' | 'yellow' | 'purple';
+type MetricTone = 'cyan' | 'green' | 'orange' | 'pink' | 'yellow' | 'purple';
 
 type PerformanceMetric = {
   label: string;
@@ -220,6 +222,10 @@ const metricStyles: Record<MetricTone, { bg: string, text: string }> = {
   },
   green: {
     bg: 'bg-[linear-gradient(135deg,#95f8c3_0%,#46d787_100%)]',
+    text: 'text-slate-900',
+  },
+  orange: {
+    bg: 'bg-[linear-gradient(135deg,#ffd88a_0%,#ff9f43_100%)]',
     text: 'text-slate-900',
   },
   pink: {
@@ -247,7 +253,7 @@ const AdminQueryLogsDetail: React.FC = () => {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const response = await getQueryLogsDashboard({ range: 'yearly', page: 1, limit: 5000 }, signal);
+      const response = await getQueryLogsDashboard({ range: 'yearly', page: 1, limit: 0 }, signal);
       const logs = Array.isArray(response.logs) ? response.logs : [];
       const sortedLogs = [...logs].sort((a, b) => {
         const first = parseTimestampToDate(a.timestamp)?.getTime() ?? 0;
@@ -307,6 +313,7 @@ const AdminQueryLogsDetail: React.FC = () => {
   const performanceSummary = useMemo<PerformanceMetric[]>(() => [
     { label: 'Total Queries', value: String(performance.totalQueries ?? totalLogs), icon: 'folder', decoIcon: 'folder', tone: 'cyan' },
     { label: 'Answered', value: String(performance.answered ?? 0), icon: 'check_circle', decoIcon: 'fact_check', tone: 'green' },
+    { label: 'No Reference', value: String(performance.noReference ?? 0), icon: 'link_off', decoIcon: 'description', tone: 'orange' },
     { label: 'Not Found', value: String(performance.notFound ?? 0), icon: 'error', decoIcon: 'folder_off', tone: 'pink' },
     { label: 'Avg Confidence', value: `${Math.round((performance.averageConfidence || 0) * 100)}%`, icon: 'bar_chart', decoIcon: 'insert_chart', tone: 'yellow' },
     { label: 'Avg Response', value: `${(performance.averageResponseTime || 0).toFixed(2)}s`, icon: 'speed', decoIcon: 'speed', tone: 'purple' },
@@ -358,7 +365,7 @@ const AdminQueryLogsDetail: React.FC = () => {
           )}
 
           {/* DESAIN CARD METRICS BARU MENGIKUTI GAMBAR */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             {performanceSummary.map((metric) => {
               const style = metricStyles[metric.tone];
               
@@ -433,7 +440,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <p className="text-sm font-medium text-slate-200 line-clamp-2">"{log.userQuestion}"</p>
                             <span className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-medium border ${getStatusStyle(log.status)}`}>
-                              {log.status}
+                              {formatStatusLabel(log.status)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-xs text-slate-500">
@@ -485,7 +492,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-3 mb-1.5">
                       <h2 className="text-lg font-semibold text-white">Detail Log</h2>
                       <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-medium border ${getStatusStyle(selectedLog.status)}`}>
-                        {selectedLog.status}
+                        {formatStatusLabel(selectedLog.status)}
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 font-mono truncate">ID: {selectedLog.queryId} • {formatLogDateTime(selectedLog.timestamp)}</p>

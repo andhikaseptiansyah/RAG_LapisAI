@@ -91,6 +91,8 @@ const getFileExtension = (filename: string) => {
   return filename.split('.').pop()?.toLowerCase() ?? '';
 };
 
+const normalizeFilename = (filename: string) => filename.trim().toLowerCase();
+
 const getDocTypeFromFile = (file: File): DocumentType => {
   const ext = getFileExtension(file.name);
   if (ext === 'pdf') return 'PDF';
@@ -158,6 +160,9 @@ const paginateItems = <T,>(items: T[], page: number) => {
   return items.slice(start, start + itemsPerPage);
 };
 
+const getStagedItemId = (file: File) =>
+  `staged-${normalizeFilename(file.name)}-${file.size}-${file.lastModified}`;
+
 export const AdminUploadFile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -165,6 +170,12 @@ export const AdminUploadFile: React.FC = () => {
   
   // STATE: Penampung lokal untuk file sebelum dikirim
   const [stagedFiles, setStagedFiles] = useState<File[]>([]);
+  const [duplicateFiles, setDuplicateFiles] = useState<File[]>([]);
+  const [replacementFilenames, setReplacementFilenames] = useState<Set<string>>(new Set());
+  const [deleteTargets, setDeleteTargets] = useState<Array<{ id: string; filename: string }>>([]);
+  const [selectedRepositoryIds, setSelectedRepositoryIds] = useState<Set<string>>(new Set());
+  const [selectedQueueIds, setSelectedQueueIds] = useState<Set<string>>(new Set());
+  const [isDeletingDocument, setIsDeletingDocument] = useState(false);
   
   const [repositoryPage, setRepositoryPage] = useState(1);
   const [queuePage, setQueuePage] = useState(1);
@@ -177,6 +188,7 @@ export const AdminUploadFile: React.FC = () => {
 
   const {
     uploadItems,
+    trainedDocuments,
     isLoading,
     isUploading,
     isIndexing,
@@ -188,6 +200,14 @@ export const AdminUploadFile: React.FC = () => {
     refreshAll,
   } = useDocuments({ initialLimit: 1000 });
 
+  const existingDocumentNames = useMemo(() => {
+    return new Set(
+      [...uploadItems, ...trainedDocuments].map((item) =>
+        normalizeFilename(item.filename)
+      )
+    );
+  }, [trainedDocuments, uploadItems]);
+
   // Filter 1: File dari database yang statusnya Ready/Waiting
   const dbWaitingItems = useMemo(() => {
     return uploadItems.filter((item) => {
@@ -198,8 +218,8 @@ export const AdminUploadFile: React.FC = () => {
 
   // Filter 2: Gabungan file lokal (staged) + file dari database (Dengan perbaikan TS)
   const waitingRepositoryItems = useMemo(() => {
-    const stagedAsItems = stagedFiles.map((file, index) => ({
-      id: `staged-${index}-${file.name}`,
+    const stagedAsItems = stagedFiles.map((file) => ({
+      id: getStagedItemId(file),
       filename: file.name,
       type: getDocTypeFromFile(file),
       size: formatBytes(file.size),
@@ -228,6 +248,22 @@ export const AdminUploadFile: React.FC = () => {
   const repositoryPageItems = useMemo(() => paginateItems(waitingRepositoryItems, repositoryPage), [repositoryPage, waitingRepositoryItems]);
   const queuePageItems = useMemo(() => paginateItems(uploadQueueItems, queuePage), [queuePage, uploadQueueItems]);
 
+  const allRepositorySelected =
+    waitingRepositoryItems.length > 0 &&
+    waitingRepositoryItems.every((item) => selectedRepositoryIds.has(item.id));
+  const allQueueSelected =
+    uploadQueueItems.length > 0 &&
+    uploadQueueItems.every((item) => selectedQueueIds.has(item.id));
+
+  const selectedRepositoryItems = useMemo(
+    () => waitingRepositoryItems.filter((item) => selectedRepositoryIds.has(item.id)),
+    [selectedRepositoryIds, waitingRepositoryItems]
+  );
+  const selectedQueueItems = useMemo(
+    () => uploadQueueItems.filter((item) => selectedQueueIds.has(item.id)),
+    [selectedQueueIds, uploadQueueItems]
+  );
+
   const totalFiles = waitingRepositoryItems.length + uploadQueueItems.length;
   const waitingFiles = waitingRepositoryItems.length;
   const pipelineFiles = uploadQueueItems.length;
@@ -236,6 +272,22 @@ export const AdminUploadFile: React.FC = () => {
 
   useEffect(() => { setRepositoryPage((current) => Math.min(current, totalRepositoryPages)); }, [totalRepositoryPages]);
   useEffect(() => { setQueuePage((current) => Math.min(current, totalQueuePages)); }, [totalQueuePages]);
+
+  useEffect(() => {
+    const validIds = new Set(waitingRepositoryItems.map((item) => item.id));
+    setSelectedRepositoryIds((current) => {
+      const next = new Set([...current].filter((id) => validIds.has(id)));
+      return next.size === current.size ? current : next;
+    });
+  }, [waitingRepositoryItems]);
+
+  useEffect(() => {
+    const validIds = new Set(uploadQueueItems.map((item) => item.id));
+    setSelectedQueueIds((current) => {
+      const next = new Set([...current].filter((id) => validIds.has(id)));
+      return next.size === current.size ? current : next;
+    });
+  }, [uploadQueueItems]);
 
   useEffect(() => {
     setLocallyMovedIds((current) => {
@@ -294,16 +346,95 @@ export const AdminUploadFile: React.FC = () => {
   const handleFiles = (files: File[]) => {
     if (files.length === 0) return;
     const { accepted, rejected } = validateFiles(files);
-    
+
+    const stagedNames = new Set(
+      stagedFiles.map((file) => normalizeFilename(file.name))
+    );
+    const newFiles: File[] = [];
+    const duplicates: File[] = [];
+
+    accepted.forEach((file) => {
+      const normalizedName = normalizeFilename(file.name);
+
+      // A duplicate can already be staged locally or already exist in the
+      // trained/upload repository. Both cases must use the confirmation modal.
+      if (
+        stagedNames.has(normalizedName) ||
+        existingDocumentNames.has(normalizedName)
+      ) {
+        duplicates.push(file);
+        return;
+      }
+
+      stagedNames.add(normalizedName);
+      newFiles.push(file);
+    });
+
     if (rejected.length > 0) {
       setWarningMessage(rejected.join(' '));
       window.setTimeout(() => setWarningMessage(''), 6000);
     }
-    
-    if (accepted.length > 0) {
-      setStagedFiles((prev) => [...prev, ...accepted]);
+
+    if (newFiles.length > 0) {
+      setStagedFiles((prev) => [...prev, ...newFiles]);
       setRepositoryPage(1);
     }
+
+    if (duplicates.length > 0) {
+      setDuplicateFiles(duplicates);
+    }
+  };
+
+  const handleCancelDuplicateUpload = () => {
+    // Keep the existing file and discard only the newly selected duplicate.
+    setDuplicateFiles([]);
+  };
+
+  const handleConfirmDuplicateUpload = () => {
+    if (duplicateFiles.length === 0) return;
+
+    const confirmedFiles = [...duplicateFiles];
+
+    setStagedFiles((currentFiles) => {
+      const nextFiles = [...currentFiles];
+
+      confirmedFiles.forEach((newFile) => {
+        const normalizedName = normalizeFilename(newFile.name);
+        const stagedIndex = nextFiles.findIndex(
+          (currentFile) =>
+            normalizeFilename(currentFile.name) === normalizedName
+        );
+
+        if (stagedIndex >= 0) {
+          // Replace the old local selection instead of creating two queue rows.
+          nextFiles[stagedIndex] = newFile;
+        } else {
+          nextFiles.push(newFile);
+        }
+      });
+
+      return nextFiles;
+    });
+
+    setReplacementFilenames((currentNames) => {
+      const nextNames = new Set(currentNames);
+
+      confirmedFiles.forEach((file) => {
+        const normalizedName = normalizeFilename(file.name);
+
+        // Only tell the backend to replace when the filename already exists
+        // in its upload/trained repository. A local staged replacement does
+        // not need the backend overwrite flag unless such a record also exists.
+        if (existingDocumentNames.has(normalizedName)) {
+          nextNames.add(normalizedName);
+        }
+      });
+
+      return nextNames;
+    });
+
+    setDuplicateFiles([]);
+    setRepositoryPage(1);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -327,10 +458,14 @@ export const AdminUploadFile: React.FC = () => {
 
     if (stagedFiles.length > 0) {
       const uploadedNames = stagedFiles.map(f => f.name);
-      const success = await uploadFiles(stagedFiles);
+      const replaceFilenames = stagedFiles
+        .filter((file) => replacementFilenames.has(normalizeFilename(file.name)))
+        .map((file) => file.name);
+      const success = await uploadFiles(stagedFiles, replaceFilenames);
       if (success) {
         pendingUploadNamesRef.current = [...pendingUploadNamesRef.current, ...uploadedNames];
-        setStagedFiles([]); 
+        setStagedFiles([]);
+        setReplacementFilenames(new Set());
         shouldRefresh = true;
       }
     }
@@ -360,19 +495,152 @@ export const AdminUploadFile: React.FC = () => {
     if (success) { await refreshAll(); } else { setLocallyMovedIds((current) => { const next = new Set(current); next.delete(id); return next; }); }
   };
 
-  const handleRemove = async (id: string) => {
-    if (id.startsWith('staged-')) {
-      const index = parseInt(id.split('-')[1], 10);
-      setStagedFiles((prev) => prev.filter((_, i) => i !== index));
-      return;
-    }
+  const toggleSelection = (
+    id: string,
+    setter: React.Dispatch<React.SetStateAction<Set<string>>>
+  ) => {
+    setter((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
-    if (!window.confirm('Remove this document from the database and admin panel?')) return;
-    const success = await removeDocument(id);
-    if (success) {
-      setLocallyMovedIds((current) => { const next = new Set(current); next.delete(id); return next; });
-      setForcedWaitingIds((current) => { const next = new Set(current); next.delete(id); return next; });
-      await refreshAll();
+  const handleToggleAllRepository = () => {
+    setSelectedRepositoryIds(
+      allRepositorySelected
+        ? new Set<string>()
+        : new Set(waitingRepositoryItems.map((item) => item.id))
+    );
+  };
+
+  const handleToggleAllQueue = () => {
+    setSelectedQueueIds(
+      allQueueSelected
+        ? new Set<string>()
+        : new Set(uploadQueueItems.map((item) => item.id))
+    );
+  };
+
+  const openDeleteConfirmation = (
+    targets: Array<{ id: string; filename: string }>
+  ) => {
+    const uniqueTargets = Array.from(
+      new Map(targets.map((target) => [target.id, target])).values()
+    );
+    setDeleteTargets(uniqueTargets);
+  };
+
+  const handleRemove = (id: string, filename: string) => {
+    openDeleteConfirmation([{ id, filename }]);
+  };
+
+  const handleDeleteSelectedRepository = () => {
+    if (selectedRepositoryItems.length === 0) return;
+    openDeleteConfirmation(
+      selectedRepositoryItems.map((item) => ({
+        id: item.id,
+        filename: item.filename,
+      }))
+    );
+  };
+
+  const handleDeleteSelectedQueue = () => {
+    if (selectedQueueItems.length === 0) return;
+    openDeleteConfirmation(
+      selectedQueueItems.map((item) => ({
+        id: item.id,
+        filename: item.filename,
+      }))
+    );
+  };
+
+  const handleCancelDelete = () => {
+    if (isDeletingDocument) return;
+    setDeleteTargets([]);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteTargets.length === 0 || isDeletingDocument) return;
+
+    setIsDeletingDocument(true);
+    const targetIds = new Set(deleteTargets.map((target) => target.id));
+    const removedStagedFiles = stagedFiles.filter((file) =>
+      targetIds.has(getStagedItemId(file))
+    );
+    const remoteTargets = deleteTargets.filter(
+      (target) => !target.id.startsWith('staged-')
+    );
+    const deletedIds = new Set(
+      deleteTargets
+        .filter((target) => target.id.startsWith('staged-'))
+        .map((target) => target.id)
+    );
+    const failedTargets: Array<{ id: string; filename: string }> = [];
+
+    try {
+      if (removedStagedFiles.length > 0) {
+        setStagedFiles((currentFiles) =>
+          currentFiles.filter(
+            (file) => !targetIds.has(getStagedItemId(file))
+          )
+        );
+
+        const removedNames = new Set(
+          removedStagedFiles.map((file) => normalizeFilename(file.name))
+        );
+        setReplacementFilenames((currentNames) => {
+          const nextNames = new Set(currentNames);
+          removedNames.forEach((name) => nextNames.delete(name));
+          return nextNames;
+        });
+      }
+
+      for (const target of remoteTargets) {
+        const success = await removeDocument(target.id);
+        if (success) deletedIds.add(target.id);
+        else failedTargets.push(target);
+      }
+
+      if (deletedIds.size > 0) {
+        setLocallyMovedIds((current) => {
+          const next = new Set(current);
+          deletedIds.forEach((id) => next.delete(id));
+          return next;
+        });
+        setForcedWaitingIds((current) => {
+          const next = new Set(current);
+          deletedIds.forEach((id) => next.delete(id));
+          return next;
+        });
+        setSelectedRepositoryIds((current) => {
+          const next = new Set(current);
+          deletedIds.forEach((id) => next.delete(id));
+          return next;
+        });
+        setSelectedQueueIds((current) => {
+          const next = new Set(current);
+          deletedIds.forEach((id) => next.delete(id));
+          return next;
+        });
+      }
+
+      if (remoteTargets.length > 0) {
+        await refreshAll();
+      }
+
+      if (failedTargets.length > 0) {
+        setDeleteTargets(failedTargets);
+        setWarningMessage(
+          `${failedTargets.length} file${failedTargets.length === 1 ? '' : 's'} could not be deleted. Please try again.`
+        );
+        window.setTimeout(() => setWarningMessage(''), 6000);
+      } else {
+        setDeleteTargets([]);
+      }
+    } finally {
+      setIsDeletingDocument(false);
     }
   };
 
@@ -394,7 +662,16 @@ export const AdminUploadFile: React.FC = () => {
   };
 
   const renderRepositoryItem = (item: UploadItem) => (
-    <div key={item.id} className="grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-3 md:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+    <div key={item.id} className="grid grid-cols-[32px_minmax(0,1fr)] md:grid-cols-[32px_minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-3 md:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+      <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`Select ${item.filename}`}>
+        <input
+          type="checkbox"
+          checked={selectedRepositoryIds.has(item.id)}
+          onChange={() => toggleSelection(item.id, setSelectedRepositoryIds)}
+          className="h-4 w-4 cursor-pointer rounded border-white/20 bg-slate-950 accent-cyan-400"
+          aria-label={`Select ${item.filename}`}
+        />
+      </label>
       <div className="flex items-center gap-3 min-w-0">
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
         <div className="min-w-0">
@@ -402,10 +679,10 @@ export const AdminUploadFile: React.FC = () => {
           <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
         </div>
       </div>
-      <div className="md:text-left"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle('Waiting')}`}>Waiting</span></div>
-      <p className="text-xs text-slate-500 line-clamp-2">{item.note || 'Waiting for batch indexing.'}</p>
-      <div className="flex md:justify-end">
-        <button type="button" onClick={() => void handleRemove(item.id)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+      <div className="col-start-2 md:col-start-auto md:text-left"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle('Waiting')}`}>Waiting</span></div>
+      <p className="col-start-2 text-xs text-slate-500 line-clamp-2 md:col-start-auto">{item.note || 'Waiting for batch indexing.'}</p>
+      <div className="col-start-2 flex md:col-start-auto md:justify-end">
+        <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
       </div>
     </div>
   );
@@ -416,7 +693,16 @@ export const AdminUploadFile: React.FC = () => {
     const progress = wasMovedLocally ? Math.max(item.progress, 5) : item.progress;
 
     return (
-      <div key={item.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-3 lg:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+      <div key={item.id} className="grid grid-cols-[32px_minmax(0,1fr)] lg:grid-cols-[32px_minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-3 lg:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
+        <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`Select ${item.filename}`}>
+          <input
+            type="checkbox"
+            checked={selectedQueueIds.has(item.id)}
+            onChange={() => toggleSelection(item.id, setSelectedQueueIds)}
+            className="h-4 w-4 cursor-pointer rounded border-white/20 bg-slate-950 accent-cyan-400"
+            aria-label={`Select ${item.filename}`}
+          />
+        </label>
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
           <div className="min-w-0">
@@ -424,15 +710,15 @@ export const AdminUploadFile: React.FC = () => {
             <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
           </div>
         </div>
-        <div><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(visibleStatus)}`}>{visibleStatus}</span></div>
-        <div className="min-w-0">
+        <div className="col-start-2 lg:col-start-auto"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(visibleStatus)}`}>{visibleStatus}</span></div>
+        <div className="col-start-2 min-w-0 lg:col-start-auto">
           <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden"><div className="h-full bg-cyan-400 transition-all" style={{ width: `${progress}%` }} /></div>
           <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{progress}% · {item.chunks} chunks</p>
         </div>
-        <p className="text-xs text-slate-500 line-clamp-2">{wasMovedLocally ? 'Moved to indexing queue.' : item.note}</p>
-        <div className="flex lg:justify-end gap-2">
+        <p className="col-start-2 text-xs text-slate-500 line-clamp-2 lg:col-start-auto">{wasMovedLocally ? 'Moved to indexing queue.' : item.note}</p>
+        <div className="col-start-2 flex gap-2 lg:col-start-auto lg:justify-end">
           {item.status === 'Failed' && (<button type="button" onClick={() => void handleRetryIndexing(item.id)} disabled={isIndexing} className={`h-8 px-3 rounded-lg text-[11px] ${baseButtonClass} ${buttonTone.yellow}`}>Retry</button>)}
-          <button type="button" onClick={() => void handleRemove(item.id)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+          <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
         </div>
       </div>
     );
@@ -585,10 +871,26 @@ export const AdminUploadFile: React.FC = () => {
                       Waiting files before batch indexing.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
                       {waitingRepositoryItems.length} waiting files
                     </span>
+                    <button
+                      type="button"
+                      onClick={handleToggleAllRepository}
+                      disabled={waitingRepositoryItems.length === 0 || isDeletingDocument}
+                      className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.cyan}`}
+                    >
+                      {allRepositorySelected ? 'Deselect All' : 'Select All'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteSelectedRepository}
+                      disabled={selectedRepositoryItems.length === 0 || isDeletingDocument}
+                      className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.pink}`}
+                    >
+                      Delete Selected{selectedRepositoryItems.length > 0 ? ` (${selectedRepositoryItems.length})` : ''}
+                    </button>
                     <button
                       type="button"
                       onClick={() => void handleStartAllIndexing()}
@@ -600,7 +902,8 @@ export const AdminUploadFile: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="hidden md:grid grid-cols-[minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+                <div className="hidden md:grid grid-cols-[32px_minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+                  <span className="text-center">Select</span>
                   <span>Document</span>
                   <span>Status</span>
                   <span>Repository Note</span>
@@ -629,15 +932,32 @@ export const AdminUploadFile: React.FC = () => {
                     Files move here only after you click Index All. Indexed means the pipeline has finished.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-full border border-cyan-400 bg-cyan-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
                     {pipelineFiles} pipeline files
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleToggleAllQueue}
+                    disabled={uploadQueueItems.length === 0 || isDeletingDocument}
+                    className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.cyan}`}
+                  >
+                    {allQueueSelected ? 'Deselect All' : 'Select All'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteSelectedQueue}
+                    disabled={selectedQueueItems.length === 0 || isDeletingDocument}
+                    className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.pink}`}
+                  >
+                    Delete Selected{selectedQueueItems.length > 0 ? ` (${selectedQueueItems.length})` : ''}
+                  </button>
                   {isLoading && <span className="text-xs text-cyan-300 font-mono animate-pulse">Loading...</span>}
                 </div>
               </div>
 
-              <div className="hidden lg:grid grid-cols-[minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+              <div className="hidden lg:grid grid-cols-[32px_minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
+                <span className="text-center">Select</span>
                 <span>Document</span>
                 <span>Status</span>
                 <span>Progress</span>
@@ -660,6 +980,133 @@ export const AdminUploadFile: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {deleteTargets.length > 0 && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-file-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) handleCancelDelete();
+          }}
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-pink-400/40 bg-[#101827] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+            <div className="flex items-start gap-4 border-b border-white/10 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-pink-300 bg-pink-400 text-slate-950">
+                <span className="material-symbols-outlined">delete</span>
+              </div>
+              <div className="min-w-0">
+                <h2 id="delete-file-title" className="font-headline text-lg font-bold text-white">
+                  {deleteTargets.length === 1 ? 'Delete this file?' : `Delete ${deleteTargets.length} files?`}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-400">
+                  {deleteTargets.length === 1
+                    ? 'Are you sure you want to delete this file? This action will remove it from the repository and cannot be undone.'
+                    : 'Are you sure you want to delete all selected files? They will be removed from the repository and this action cannot be undone.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="max-h-60 space-y-2 overflow-y-auto p-5 custom-scrollbar">
+              {deleteTargets.slice(0, 8).map((target) => (
+                <div key={target.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3">
+                  <span className="material-symbols-outlined text-pink-300">description</span>
+                  <p className="min-w-0 truncate text-sm font-semibold text-slate-100">
+                    {target.filename}
+                  </p>
+                </div>
+              ))}
+              {deleteTargets.length > 8 && (
+                <p className="px-1 text-xs font-mono text-slate-500">
+                  +{deleteTargets.length - 8} more files selected
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-white/10 p-5 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={handleCancelDelete}
+                disabled={isDeletingDocument}
+                className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.cyan}`}
+              >
+                No, Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleConfirmDelete()}
+                disabled={isDeletingDocument}
+                className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.pink}`}
+              >
+                {isDeletingDocument
+                  ? 'Deleting...'
+                  : deleteTargets.length === 1
+                    ? 'Yes, Delete'
+                    : `Yes, Delete ${deleteTargets.length} Files`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {duplicateFiles.length > 0 && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="duplicate-upload-title"
+        >
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-yellow-400/40 bg-[#101827] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+            <div className="flex items-start gap-4 border-b border-white/10 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-yellow-300 bg-yellow-400 text-slate-950">
+                <span className="material-symbols-outlined">warning</span>
+              </div>
+              <div>
+                <h2 id="duplicate-upload-title" className="font-headline text-lg font-bold text-white">
+                  {duplicateFiles.length === 1
+                    ? 'File already exists'
+                    : 'Files already exist'}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-400">
+                  {duplicateFiles.length === 1
+                    ? 'This file was uploaded previously. Are you sure you want to replace it with the newly selected file?'
+                    : 'These files were uploaded previously. Are you sure you want to replace them with the newly selected files?'}
+                </p>
+              </div>
+            </div>
+
+            <div className="max-h-56 space-y-2 overflow-y-auto p-5 custom-scrollbar">
+              {duplicateFiles.map((file) => (
+                <div key={`${file.name}-${file.size}-${file.lastModified}`} className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3">
+                  <span className="material-symbols-outlined text-yellow-300">description</span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-100">{file.name}</p>
+                    <p className="text-xs font-mono text-slate-500">New file · {formatBytes(file.size)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-white/10 p-5 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={handleCancelDuplicateUpload}
+                className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.pink}`}
+              >
+                No, Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDuplicateUpload}
+                className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.yellow}`}
+              >
+                Yes, Replace
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

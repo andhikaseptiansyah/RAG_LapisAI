@@ -1,18 +1,18 @@
 [
   {
-    "id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+    "id": "19290531-6134-4190-8604-146379423131",
     "user_id": "dev-admin",
     "user_name": "Admin",
-    "title": "hai",
-    "language": "EN",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
     "is_pinned": false,
     "pinned": false,
     "messages": [
       {
-        "id": "d1438e8c-8e41-4150-bfc5-170118b38a85",
-        "conversation_id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+        "id": "ae272e18-bade-4b80-95fc-7d0e4c218eda",
+        "conversation_id": "19290531-6134-4190-8604-146379423131",
         "role": "user",
-        "content": "hai",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
         "attachments": [],
         "confidence": null,
         "model_name": null,
@@ -20,15 +20,76 @@
           "user_id": "dev-admin",
           "user_name": "Admin"
         },
-        "created_at": "2026-07-17T09:59:44.284521+00:00"
+        "created_at": "2026-07-18T14:47:40.813226+00:00"
       },
       {
-        "id": "ef9c8d2d-8937-4fc3-8644-e443a508ca10",
-        "conversation_id": "1bf90919-0104-4b1b-bbf9-275de7f89ec3",
+        "id": "529e587b-34cf-4b79-8f11-1347b8de93ae",
+        "conversation_id": "19290531-6134-4190-8604-146379423131",
         "role": "assistant",
-        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "content": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
         "attachments": [],
-        "confidence": 1.0,
+        "confidence": 0.5943,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5668,
+              "relevance_score": 0.5668,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-18T14:47:40.813226+00:00"
+      }
+    ],
+    "created_at": "2026-07-18T14:47:40.813226+00:00",
+    "updated_at": "2026-07-18T14:47:40.813226+00:00",
+    "last_message": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-18T14:47:40.813226+00:00"
+  },
+  {
+    "id": "a16b8e72-8602-4061-99b4-4dcd5facb4a6",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa persen pengurangan konsumsi air di kantor Cikarang pa...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "037ad5e2-59f3-4b7d-a370-eb3ea8436a63",
+        "conversation_id": "a16b8e72-8602-4061-99b4-4dcd5facb4a6",
+        "role": "user",
+        "content": "Berapa persen pengurangan konsumsi air di kantor Cikarang pada 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-18T10:05:00.233023+00:00"
+      },
+      {
+        "id": "fd4c71a7-867a-4a10-8c10-7a74e57b2347",
+        "conversation_id": "a16b8e72-8602-4061-99b4-4dcd5facb4a6",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
         "model_name": "python-rag-ollama",
         "metadata": {
           "user_id": "dev-admin",
@@ -39,29 +100,13 @@
           "follow_up_question": null,
           "followUpQuestion": null
         },
-        "created_at": "2026-07-17T09:59:44.284521+00:00"
-      }
-    ],
-    "created_at": "2026-07-17T09:59:44.284521+00:00",
-    "updated_at": "2026-07-17T09:59:44.284521+00:00",
-    "last_message": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
-    "last_user_message": "hai",
-    "last_message_at": "2026-07-17T09:59:44.284521+00:00"
-  },
-  {
-    "id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
-    "user_id": "dev-admin",
-    "user_name": "Admin",
-    "title": "what is SOP",
-    "language": "ID",
-    "is_pinned": false,
-    "pinned": false,
-    "messages": [
+        "created_at": "2026-07-18T10:05:00.233023+00:00"
+      },
       {
-        "id": "705a0a64-abdd-4e72-9980-e6d5ba47fd33",
-        "conversation_id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
+        "id": "dbd43272-f522-409b-8b2b-367489a7da44",
+        "conversation_id": "a16b8e72-8602-4061-99b4-4dcd5facb4a6",
         "role": "user",
-        "content": "what is SOP",
+        "content": "Apakah perusahaan memberikan subsidi makan siang di kantin?",
         "attachments": [],
         "confidence": null,
         "model_name": null,
@@ -69,45 +114,94 @@
           "user_id": "dev-admin",
           "user_name": "Admin"
         },
-        "created_at": "2026-07-15T20:09:59.515197+00:00"
+        "created_at": "2026-07-18T10:05:20.121609+00:00"
       },
       {
-        "id": "aba74bba-9320-4382-b9e8-d7761eb514ed",
-        "conversation_id": "5ef9bf85-81be-43c1-89a9-e93b7ecd0f67",
+        "id": "14f5ae9f-0311-4937-83dd-a209086123d8",
+        "conversation_id": "a16b8e72-8602-4061-99b4-4dcd5facb4a6",
         "role": "assistant",
-        "content": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
         "attachments": [],
-        "confidence": 0.9,
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-18T10:05:20.121609+00:00"
+      }
+    ],
+    "created_at": "2026-07-18T10:05:00.233023+00:00",
+    "updated_at": "2026-07-18T10:05:20.121609+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Apakah perusahaan memberikan subsidi makan siang di kantin?",
+    "last_message_at": "2026-07-18T10:05:20.121609+00:00"
+  },
+  {
+    "id": "8a63ca48-f8f6-4544-b5f5-689c21446144",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "how long is the probation period for new empoye",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6989441d-26ab-4238-bba2-182e06c6afac",
+        "conversation_id": "8a63ca48-f8f6-4544-b5f5-689c21446144",
+        "role": "user",
+        "content": "how long is the probation period for new empoye",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-17T13:02:30.115583+00:00"
+      },
+      {
+        "id": "b3e7315c-2228-428d-acf9-491a691c9bef",
+        "conversation_id": "8a63ca48-f8f6-4544-b5f5-689c21446144",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months.",
+        "attachments": [],
+        "confidence": 0.8562,
         "model_name": "python-rag-ollama",
         "metadata": {
           "user_id": "dev-admin",
           "user_name": "Admin",
           "sources": [
             {
-              "document_name": "SOP_Access_Provisioning.pdf",
+              "document_name": "SOP_Onboarding.pdf",
               "document_type": "pdf",
               "page": 1,
               "page_is_reliable": true,
-              "score": 0.9213,
-              "relevance_score": 0.9213,
-              "excerpt": "Access rights are reviewed every 6 months.",
+              "score": 0.7576,
+              "relevance_score": 0.7576,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
               "paragraph_start": 1,
-              "paragraph_end": 6
+              "paragraph_end": 10
             }
           ],
-          "source": "SOP_Access_Provisioning.pdf",
+          "source": "SOP_Onboarding.pdf",
           "page": 1,
           "follow_up_question": null,
           "followUpQuestion": null
         },
-        "created_at": "2026-07-15T20:09:59.515197+00:00"
+        "created_at": "2026-07-17T13:02:30.115583+00:00"
       }
     ],
-    "created_at": "2026-07-15T20:09:59.515197+00:00",
-    "updated_at": "2026-07-15T20:09:59.515197+00:00",
-    "last_message": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner.",
-    "last_user_message": "what is SOP",
-    "last_message_at": "2026-07-15T20:09:59.515197+00:00"
+    "created_at": "2026-07-17T13:02:30.115583+00:00",
+    "updated_at": "2026-07-17T13:02:30.115583+00:00",
+    "last_message": "The probation period for new employees is 3 months.",
+    "last_user_message": "how long is the probation period for new empoye",
+    "last_message_at": "2026-07-17T13:02:30.115583+00:00"
   },
   {
     "id": "163e3178-c8ee-4f09-8df6-65b5aa297eec",

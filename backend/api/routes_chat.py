@@ -22,6 +22,7 @@ class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
     language: str = Field(default="ID")
+    query_id: str | None = None
 
 
 class QueryRequest(BaseModel):
@@ -105,6 +106,8 @@ def query_documents(payload: QueryRequest):
 
 @router.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest) -> dict[str, Any]:
+    started_at = time.perf_counter()
+
     try:
         result = run_chat(
             payload.question,
@@ -112,9 +115,20 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
             language=payload.language,
         )
     except Exception as exc:
+        save_log(
+            query_id=payload.query_id,
+            question=payload.question,
+            answer="",
+            sources=[],
+            latency_ms=(time.perf_counter() - started_at) * 1000,
+            confidence=0.0,
+            status="NOT_FOUND",
+            failure_reason="SERVER_ERROR",
+        )
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(exc)}") from exc
 
     save_log(
+        query_id=payload.query_id,
         question=payload.question,
         answer=result["answer"],
         sources=result["sources"],

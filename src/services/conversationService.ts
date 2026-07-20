@@ -8,6 +8,12 @@ const isChatLanguage = (
   return value === 'ID' || value === 'EN';
 };
 
+export type ConversationQuestionSummary = {
+  id: string;
+  content: string;
+  created_at?: string;
+};
+
 export type ConversationSummary = {
   id: string;
   title: string;
@@ -19,6 +25,7 @@ export type ConversationSummary = {
   last_message_at?: string;
   created_at?: string;
   updated_at?: string;
+  user_messages?: ConversationQuestionSummary[];
 };
 
 export type ConversationMessage = {
@@ -47,6 +54,16 @@ export type UpdateConversationInput = {
 type DeleteResponse = {
   message?: string;
   data?: unknown;
+};
+
+type DeleteManyInput = {
+  conversationIds: string[];
+};
+
+export type DeleteManyResponse = {
+  message?: string;
+  deletedIds: string[];
+  deletedCount: number;
 };
 
 const isObject = (
@@ -82,6 +99,36 @@ const unwrapResponse = (response: unknown): unknown => {
   }
 
   return current;
+};
+
+const normalizeConversationQuestionSummary = (
+  value: unknown
+): ConversationQuestionSummary | null => {
+  if (!isObject(value)) {
+    return null;
+  }
+
+  const id =
+    typeof value.id === 'string'
+      ? value.id.trim()
+      : '';
+  const content =
+    typeof value.content === 'string'
+      ? value.content.trim()
+      : '';
+
+  if (!id || !content) {
+    return null;
+  }
+
+  return {
+    id,
+    content,
+    created_at:
+      typeof value.created_at === 'string'
+        ? value.created_at
+        : undefined,
+  };
 };
 
 const normalizeConversationSummary = (
@@ -137,6 +184,16 @@ const normalizeConversationSummary = (
       typeof value.updated_at === 'string'
         ? value.updated_at
         : undefined,
+    user_messages: Array.isArray(value.user_messages)
+      ? value.user_messages
+          .map(normalizeConversationQuestionSummary)
+          .filter(
+            (
+              question
+            ): question is ConversationQuestionSummary =>
+              question !== null
+          )
+      : [],
   };
 };
 
@@ -392,5 +449,61 @@ export const conversationService = {
         method: 'DELETE',
       }
     );
+  },
+
+  async removeMany(
+    conversationIds: string[]
+  ): Promise<DeleteManyResponse> {
+    const uniqueIds = Array.from(
+      new Set(
+        conversationIds
+          .map((conversationId) => conversationId.trim())
+          .filter(Boolean)
+      )
+    );
+
+    if (uniqueIds.length === 0) {
+      return {
+        deletedIds: [],
+        deletedCount: 0,
+      };
+    }
+
+    const response = await apiRequest<
+      unknown,
+      DeleteManyInput
+    >('/api/conversations/bulk-delete', {
+      method: 'POST',
+      body: {
+        conversationIds: uniqueIds,
+      },
+    });
+
+    const payload = unwrapResponse(response);
+
+    if (!isObject(payload)) {
+      throw new Error(
+        'Response bulk delete percakapan tidak valid.'
+      );
+    }
+
+    const deletedIds = Array.isArray(payload.deletedIds)
+      ? payload.deletedIds.filter(
+          (value): value is string =>
+            typeof value === 'string' && Boolean(value)
+        )
+      : [];
+
+    return {
+      message:
+        typeof payload.message === 'string'
+          ? payload.message
+          : undefined,
+      deletedIds,
+      deletedCount:
+        typeof payload.deletedCount === 'number'
+          ? payload.deletedCount
+          : deletedIds.length,
+    };
   },
 };

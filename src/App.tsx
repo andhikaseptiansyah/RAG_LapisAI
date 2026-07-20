@@ -14,6 +14,7 @@ import type {
 import { useChat } from './hooks/useChat';
 import { sanitizeMarkdown } from './utils/sanitizeMarkdown';
 import { Sidebar } from './components/Sidebar';
+import { ConversationNavigatorPanel } from './components/ConversationNavigatorPanel';
 import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
@@ -623,6 +624,9 @@ export const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
 
+  const [conversationNavigatorOpen, setConversationNavigatorOpen] =
+    useState(false);
+
   const [inputValue, setInputValue] =
     useState('');
 
@@ -720,6 +724,48 @@ export const App: React.FC = () => {
       });
     }
   }, []);
+
+  const scrollToMessage = useCallback((messageId: string) => {
+    const normalizedMessageId = messageId.trim();
+
+    if (!normalizedMessageId) {
+      scrollToBottom();
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const targetMessage =
+          chatContainerRef.current?.querySelector<HTMLElement>(
+            `[data-message-id="${normalizedMessageId}"]`
+          );
+
+        if (!targetMessage) {
+          scrollToBottom();
+          return;
+        }
+
+        targetMessage.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+
+        targetMessage.classList.add(
+          'ring-1',
+          'ring-primary/60',
+          'rounded-2xl'
+        );
+
+        window.setTimeout(() => {
+          targetMessage.classList.remove(
+            'ring-1',
+            'ring-primary/60',
+            'rounded-2xl'
+          );
+        }, 1600);
+      });
+    });
+  }, [scrollToBottom]);
 
   useEffect(() => {
     scrollToBottom();
@@ -1064,6 +1110,7 @@ export const App: React.FC = () => {
     setIsFirstMessage(true);
     setShowScrollBottom(false);
     setSidebarOpen(false);
+    setConversationNavigatorOpen(false);
 
     if (
       isRecording &&
@@ -1076,7 +1123,8 @@ export const App: React.FC = () => {
 
   const handleSelectConversation =
     async (
-      selectedConversationId: string
+      selectedConversationId: string,
+      targetMessageId?: string
     ) => {
       const normalizedConversationId =
         selectedConversationId.trim();
@@ -1084,6 +1132,7 @@ export const App: React.FC = () => {
       if (!normalizedConversationId) {
         setIsFirstMessage(false);
         setSidebarOpen(false);
+        setConversationNavigatorOpen(false);
 
         setMessages(
           (previousMessages) => [
@@ -1113,6 +1162,7 @@ export const App: React.FC = () => {
       setAttachedFiles([]);
       setShowScrollBottom(false);
       setSidebarOpen(false);
+      setConversationNavigatorOpen(false);
       setIsFirstMessage(false);
 
       if (
@@ -1150,6 +1200,11 @@ export const App: React.FC = () => {
       }
 
       window.setTimeout(() => {
+        if (targetMessageId) {
+          scrollToMessage(targetMessageId);
+          return;
+        }
+
         scrollToBottom();
       }, 100);
     };
@@ -1191,6 +1246,9 @@ export const App: React.FC = () => {
 
       <Sidebar
         isOpen={sidebarOpen}
+        onToggle={() =>
+          setSidebarOpen((previousState) => !previousState)
+        }
         onClose={() =>
           setSidebarOpen(false)
         }
@@ -1214,18 +1272,17 @@ export const App: React.FC = () => {
         />
 
         <Header
-          isOpen={sidebarOpen}
+          isSidebarOpen={sidebarOpen}
+          isConversationNavigatorOpen={conversationNavigatorOpen}
           onToggleSidebar={() =>
             setSidebarOpen(
-              (previousState) =>
-                !previousState
+              (previousState) => !previousState
             )
           }
-          detectedLanguage={
-            detectedLanguage
-          }
-          onLanguageChange={
-            handleLanguageChange
+          onToggleConversationNavigator={() =>
+            setConversationNavigatorOpen(
+              (previousState) => !previousState
+            )
           }
         />
 
@@ -1276,7 +1333,8 @@ export const App: React.FC = () => {
                 (message) => (
                   <div
                     key={message.id}
-                    className={`flex ${
+                    data-message-id={message.id}
+                    className={`flex scroll-mt-24 transition-shadow ${
                       message.role ===
                       'user'
                         ? 'justify-end'
@@ -1480,6 +1538,15 @@ export const App: React.FC = () => {
           />
         )}
       </main>
+
+      <ConversationNavigatorPanel
+        isOpen={conversationNavigatorOpen}
+        onClose={() => setConversationNavigatorOpen(false)}
+        messages={messages}
+        detectedLanguage={detectedLanguage}
+        onLanguageChange={handleLanguageChange}
+        onSelectMessage={scrollToMessage}
+      />
     </div>
   );
 };

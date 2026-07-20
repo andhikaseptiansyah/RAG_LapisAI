@@ -142,6 +142,7 @@ export const getTrainedDocuments = async (
 
 export const uploadDocuments = async (
   files: File[],
+  replaceFilenames: string[] = [],
   signal?: AbortSignal
 ): Promise<UploadDocumentsResponse> => {
   if (files.length === 0) {
@@ -153,6 +154,11 @@ export const uploadDocuments = async (
   files.forEach((file) => {
     formData.append('files', file);
   });
+
+  formData.append(
+    'replaceFilenamesJson',
+    JSON.stringify(replaceFilenames)
+  );
 
   return apiRequest<
     UploadDocumentsResponse,

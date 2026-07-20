@@ -10,10 +10,16 @@ export type ChatLanguage = 'ID' | 'EN';
 
 export interface SendChatPayload {
   message: string;
+  queryId?: string;
   conversationId?: string;
   language?: ChatLanguage;
   attachments?: AttachedFile[];
 }
+
+export type QueryFailureReason =
+  | 'USER_STOPPED'
+  | 'CLIENT_ERROR'
+  | 'EMPTY_RESPONSE';
 
 type RawMessageSource = {
   document_name?: unknown;
@@ -95,6 +101,13 @@ const buildChatFormData = (
     payload.message
   );
 
+  if (payload.queryId) {
+    formData.append(
+      'queryId',
+      payload.queryId
+    );
+  }
+
   if (payload.conversationId) {
     formData.append(
       'conversationId',
@@ -150,6 +163,28 @@ export const sendChatMessage = async (
     method: 'POST',
     body: payload,
     signal,
+  });
+};
+
+export const recordQueryFailure = async (
+  queryId: string,
+  question: string,
+  reason: QueryFailureReason
+): Promise<void> => {
+  await apiRequest<
+    { status: string; queryId: string },
+    {
+      queryId: string;
+      question: string;
+      reason: QueryFailureReason;
+    }
+  >('/api/query-logs/failure', {
+    method: 'POST',
+    body: {
+      queryId,
+      question,
+      reason,
+    },
   });
 };
 

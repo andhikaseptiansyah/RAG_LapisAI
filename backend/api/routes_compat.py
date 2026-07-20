@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import uuid
@@ -11,6 +12,7 @@ from pydantic import BaseModel
 from api.conversation_store import (
     append_chat_turn,
     delete_conversation,
+    delete_conversations,
     get_conversation,
     list_summaries,
     update_conversation,
@@ -26,8 +28,20 @@ from api.document_store import (
     to_upload_item,
     upsert_document,
 )
+from api.auth_tokens import create_auth_token, resolve_auth_token
 from api.chat_service import run_chat
-from api.logger import delete_log, get_logs, save_log
+from api.logger import delete_log, get_logs, resolve_query_log_status, save_log
+from api.user_store import (
+    UserStoreError,
+    authenticate_user,
+    create_staff_user,
+    delete_user,
+    get_user_by_id,
+    normalize_username,
+    public_user,
+    read_users,
+    update_user_password,
+)
 from ingestion.indexer import delete_document_chunks, get_collection
 from uploads.config import UPLOAD_DIR, public_rag_config
 from uploads.ingest import ingest
@@ -36,38 +50,22 @@ router = APIRouter()
 
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt"}
 MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
-DEV_TOKEN_PREFIX = "lapisai-dev-token"
-
-DEV_USERS: dict[str, dict[str, str]] = {
-    "admin": {
-        "id": "dev-admin",
-        "username": "admin",
-        "name": "Admin",
-        "role": "admin",
-        "password": "admin",
-    },
-    "dhika": {
-        "id": "dev-staff-dhika",
-        "username": "dhika",
-        "name": "Dhika",
-        "role": "staff",
-        "password": "dhika",
-    },
-    "staff": {
-        "id": "dev-staff",
-        "username": "staff",
-        "name": "Staff User",
-        "role": "staff",
-        "password": "staff",
-    },
-}
-
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 class LoginPayload(BaseModel):
     username: str = "admin"
     password: str = "admin"
+
+
+class StaffCreatePayload(BaseModel):
+    username: str
+    name: str
+    password: str
+
+
+class StaffPasswordPayload(BaseModel):
+    password: str
 
 
 class IndexPayload(BaseModel):
@@ -80,6 +78,10 @@ class ConversationUpdatePayload(BaseModel):
     language: str | None = None
 
 
+class ConversationDeleteManyPayload(BaseModel):
+    conversationIds: list[str]
+
+
 class QueryLogParams(BaseModel):
     range: str | None = None
     page: int = 1
@@ -88,41 +90,19 @@ class QueryLogParams(BaseModel):
     search: str | None = None
 
 
+class QueryFailurePayload(BaseModel):
+    queryId: str
+    question: str
+    reason: str = "CLIENT_ERROR"
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
 
-def _normalize_username(username: str | None) -> str:
-    return (username or "").strip().lower()
-
-
-def _public_user(user: dict[str, str]) -> dict[str, str]:
-    return {
-        "id": user["id"],
-        "username": user["username"],
-        "name": user["name"],
-        "role": user["role"],
-    }
-
-
-def _build_token(username: str) -> str:
-    return f"{DEV_TOKEN_PREFIX}:{username}"
-
-
-def _token_to_user(token: str | None) -> dict[str, str] | None:
-    clean_token = (token or "").strip()
-
-    # Backward compatibility untuk token lama yang sudah pernah tersimpan di browser.
-    if clean_token == DEV_TOKEN_PREFIX:
-        return DEV_USERS["admin"]
-
-    prefix = f"{DEV_TOKEN_PREFIX}:"
-    if not clean_token.startswith(prefix):
-        return None
-
-    username = _normalize_username(clean_token.removeprefix(prefix))
-    return DEV_USERS.get(username)
+def _token_to_user(token: str | None) -> dict[str, Any] | None:
+    return resolve_auth_token(token)
 
 
 def _get_bearer_token(request: Request) -> str | None:
@@ -132,7 +112,7 @@ def _get_bearer_token(request: Request) -> str | None:
     return None
 
 
-def _require_user(request: Request) -> dict[str, str]:
+def _require_user(request: Request) -> dict[str, Any]:
     user = _token_to_user(_get_bearer_token(request))
     if not user:
         raise HTTPException(
@@ -142,8 +122,31 @@ def _require_user(request: Request) -> dict[str, str]:
     return user
 
 
-def _can_admin(user: dict[str, str]) -> bool:
+def _can_admin(user: dict[str, Any]) -> bool:
     return user.get("role") == "admin"
+
+
+def _require_admin(request: Request) -> dict[str, Any]:
+    user = _require_user(request)
+    if not _can_admin(user):
+        raise HTTPException(
+            status_code=403,
+            detail="Only administrators can access staff management.",
+        )
+    return user
+
+
+def _staff_management_user(
+    user: dict[str, Any],
+    chat_totals: dict[str, int],
+) -> dict[str, Any]:
+    user_id = str(user.get("id") or "")
+    return {
+        **public_user(user),
+        "totalChats": chat_totals.get(user_id, 0),
+        "createdAt": str(user.get("created_at") or ""),
+        "updatedAt": str(user.get("updated_at") or ""),
+    }
 
 
 def _safe_filename(filename: str) -> str:
@@ -151,7 +154,24 @@ def _safe_filename(filename: str) -> str:
     return name or f"document_{uuid.uuid4().hex}.txt"
 
 
-def _save_upload_file(file: UploadFile) -> tuple[str, str, int]:
+def _normalize_filename(filename: str) -> str:
+    return _safe_filename(filename).casefold()
+
+
+def _documents_with_filename(filename: str) -> list[dict[str, Any]]:
+    normalized_name = _normalize_filename(filename)
+    return [
+        document
+        for document in read_documents()
+        if _normalize_filename(str(document.get("filename") or "")) == normalized_name
+    ]
+
+
+def _save_upload_file(
+    file: UploadFile,
+    *,
+    allow_overwrite: bool = False,
+) -> tuple[str, str, int]:
     filename = _safe_filename(file.filename or "")
     ext = os.path.splitext(filename)[1].lower()
 
@@ -165,10 +185,17 @@ def _save_upload_file(file: UploadFile) -> tuple[str, str, int]:
 
     filepath = os.path.join(UPLOAD_DIR, filename)
 
-    if os.path.exists(filepath):
-        stem = Path(filename).stem
-        filepath = os.path.join(UPLOAD_DIR, f"{stem}_{uuid.uuid4().hex[:8]}{ext}")
-        filename = os.path.basename(filepath)
+    if (
+        os.path.exists(filepath)
+        or _documents_with_filename(filename)
+    ) and not allow_overwrite:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f'Dokumen "{filename}" sudah ada. '
+                "Konfirmasi penimpaan sebelum mengunggah file baru."
+            ),
+        )
 
     with open(filepath, "wb") as f:
         f.write(content)
@@ -176,12 +203,94 @@ def _save_upload_file(file: UploadFile) -> tuple[str, str, int]:
     return filename, filepath, len(content)
 
 
-def _upload_and_index(file: UploadFile) -> dict[str, Any]:
-    filename, filepath, size_bytes = _save_upload_file(file)
+def _upload_and_index(
+    file: UploadFile,
+    *,
+    replace_existing: bool = False,
+) -> dict[str, Any]:
+    requested_filename = _safe_filename(file.filename or "")
+    existing_documents = _documents_with_filename(requested_filename)
+    existing_file_backups: dict[str, bytes] = {}
+
+    if existing_documents and not replace_existing:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f'Dokumen "{requested_filename}" sudah ada. '
+                "Upload dibatalkan karena belum ada persetujuan untuk menimpa file lama."
+            ),
+        )
+
+    if replace_existing:
+        for existing_document in existing_documents:
+            old_filepath = str(existing_document.get("filepath") or "")
+            if old_filepath and os.path.exists(old_filepath):
+                try:
+                    with open(old_filepath, "rb") as old_file:
+                        existing_file_backups[old_filepath] = old_file.read()
+                except OSError:
+                    pass
+
+        canonical_filepath = os.path.join(UPLOAD_DIR, requested_filename)
+        if (
+            canonical_filepath not in existing_file_backups
+            and os.path.exists(canonical_filepath)
+        ):
+            try:
+                with open(canonical_filepath, "rb") as old_file:
+                    existing_file_backups[canonical_filepath] = old_file.read()
+            except OSError:
+                pass
+
+    filename, filepath, size_bytes = _save_upload_file(
+        file,
+        allow_overwrite=replace_existing,
+    )
+
+    if (
+        replace_existing
+        and filepath not in existing_file_backups
+        and os.path.exists(filepath)
+    ):
+        # The new file has already been written. This marker lets the rollback
+        # remove it when no previous file existed at the canonical path.
+        existing_file_backups.setdefault(filepath, b"")
+
+    if replace_existing:
+        for existing_document in existing_documents:
+            old_filename = str(existing_document.get("filename") or "")
+            if old_filename and old_filename != filename:
+                delete_document_chunks(old_filename)
 
     try:
         result = ingest(filepath)
     except Exception as exc:
+        if replace_existing:
+            for backup_path, backup_content in existing_file_backups.items():
+                try:
+                    if backup_content:
+                        with open(backup_path, "wb") as backup_file:
+                            backup_file.write(backup_content)
+                    elif os.path.exists(backup_path):
+                        os.remove(backup_path)
+                except OSError:
+                    pass
+
+            restore_document = next(
+                (
+                    document
+                    for document in existing_documents
+                    if str(document.get("filepath") or "")
+                    and os.path.exists(str(document.get("filepath") or ""))
+                ),
+                None,
+            )
+            if restore_document:
+                try:
+                    ingest(str(restore_document.get("filepath")))
+                except Exception:
+                    pass
+
         raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(exc)}") from exc
 
     record = create_document_record(
@@ -190,13 +299,41 @@ def _upload_and_index(file: UploadFile) -> dict[str, Any]:
         size_bytes=size_bytes,
         ingest_result=result,
     )
+
+    if replace_existing and existing_documents:
+        record["id"] = existing_documents[0].get("id") or record["id"]
+
+        for existing_document in existing_documents:
+            existing_id = str(existing_document.get("id") or "")
+            old_filepath = str(existing_document.get("filepath") or "")
+
+            if existing_id:
+                delete_document(existing_id)
+
+            if old_filepath and old_filepath != filepath and os.path.exists(old_filepath):
+                try:
+                    os.remove(old_filepath)
+                except OSError:
+                    pass
+
     return upsert_document(record)
+
+
+def _resolve_pagination_limit(total: int, limit: int | None, default: int = 25) -> int:
+    """Return the requested page size without an artificial upper cap.
+
+    A limit of 0 (or a negative value) means: return every matching item.
+    """
+    requested_limit = default if limit is None else int(limit)
+    if requested_limit <= 0:
+        return max(total, 1)
+    return requested_limit
 
 
 def _paginate(items: list[Any], page: int, limit: int) -> tuple[list[Any], int, int, int]:
     safe_page = max(int(page or 1), 1)
-    safe_limit = max(min(int(limit or 25), 100), 1)
     total = len(items)
+    safe_limit = _resolve_pagination_limit(total, limit)
     start = (safe_page - 1) * safe_limit
     end = start + safe_limit
     total_pages = max((total + safe_limit - 1) // safe_limit, 1)
@@ -207,7 +344,11 @@ def _map_query_log(log: dict[str, Any]) -> dict[str, Any]:
     sources = log.get("sources") or []
     confidence = float(log.get("confidence") or 0.0)
     latency_ms = float(log.get("latency_ms") or 0.0)
-    status = "ANSWERED" if sources or confidence >= 0.80 else "NOT_FOUND"
+    status = resolve_query_log_status(
+        log.get("answer"),
+        sources,
+        log.get("status"),
+    )
 
     return {
         "queryId": log.get("id", ""),
@@ -270,19 +411,19 @@ def _filter_logs(
 
 @router.post("/auth/login")
 def compat_login(payload: LoginPayload):
-    username = _normalize_username(payload.username)
+    username = normalize_username(payload.username)
     password = payload.password or ""
 
-    user = DEV_USERS.get(username)
-    if not user or password != user["password"]:
+    user = authenticate_user(username, password)
+    if not user:
         raise HTTPException(
             status_code=401,
             detail="Username atau password salah.",
         )
 
     return {
-        "token": _build_token(username),
-        "user": _public_user(user),
+        "token": create_auth_token(user),
+        "user": public_user(user),
     }
 
 
@@ -296,7 +437,7 @@ def compat_current_user(request: Request):
         )
 
     return {
-        "user": _public_user(user),
+        "user": public_user(user),
     }
 
 
@@ -314,16 +455,19 @@ async def compat_chat(request: Request):
         question = str(form.get("message") or form.get("question") or "").strip()
         conversation_id = str(form.get("conversationId") or "").strip() or None
         language = str(form.get("language") or "ID").strip() or "ID"
+        query_id = str(form.get("queryId") or "").strip() or None
     else:
         payload = await request.json()
         question = str(payload.get("message") or payload.get("question") or "").strip()
         conversation_id = payload.get("conversationId") or None
         language = payload.get("language") or "ID"
+        query_id = str(payload.get("queryId") or "").strip() or None
 
     if not question:
         raise HTTPException(status_code=400, detail="Message is required")
 
     current_user = _require_user(request)
+    started_at = time.perf_counter()
 
     try:
         result = run_chat(
@@ -332,15 +476,29 @@ async def compat_chat(request: Request):
             language=language,
         )
     except Exception as exc:
+        save_log(
+            query_id=query_id,
+            question=question,
+            answer="",
+            sources=[],
+            latency_ms=(time.perf_counter() - started_at) * 1000,
+            confidence=0.0,
+            status="NOT_FOUND",
+            failure_reason="SERVER_ERROR",
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            user_role=current_user["role"],
+        )
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(exc)}") from exc
 
-    answer = result["answer"]
-    sources = result["sources"]
-    confidence = result["confidence"]
-    response_time_ms = result["response_time_ms"]
+    answer = str(result.get("answer") or "")
+    sources = result.get("sources") or []
+    confidence = result.get("confidence") or 0.0
+    response_time_ms = result.get("response_time_ms") or ((time.perf_counter() - started_at) * 1000)
     follow_up_question = result.get("follow_up_question")
 
     save_log(
+        query_id=query_id,
         question=question,
         answer=answer,
         sources=sources,
@@ -383,10 +541,62 @@ async def compat_chat(request: Request):
     }
 
 
+@router.post("/query-logs/failure")
+def compat_record_query_failure(payload: QueryFailurePayload, request: Request):
+    current_user = _require_user(request)
+    reason = str(payload.reason or "CLIENT_ERROR").strip().upper()
+
+    log = save_log(
+        query_id=payload.queryId,
+        question=payload.question,
+        answer="",
+        sources=[],
+        latency_ms=0.0,
+        confidence=0.0,
+        status="NOT_FOUND",
+        failure_reason=reason,
+        user_id=current_user["id"],
+        user_name=current_user["name"],
+        user_role=current_user["role"],
+    )
+
+    return {"status": "recorded", "queryId": log["id"]}
+
+
 @router.get("/conversations")
 def compat_list_conversations(request: Request):
     current_user = _require_user(request)
     return list_summaries(user_id=current_user["id"])
+
+
+@router.post("/conversations/bulk-delete")
+def compat_delete_conversations(
+    payload: ConversationDeleteManyPayload,
+    request: Request,
+):
+    current_user = _require_user(request)
+    conversation_ids = list(dict.fromkeys(
+        str(conversation_id).strip()
+        for conversation_id in payload.conversationIds
+        if str(conversation_id).strip()
+    ))
+
+    if not conversation_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="Choose at least one conversation to delete.",
+        )
+
+    deleted_ids = delete_conversations(
+        conversation_ids,
+        user_id=current_user["id"],
+    )
+
+    return {
+        "message": f"{len(deleted_ids)} conversation(s) deleted",
+        "deletedIds": deleted_ids,
+        "deletedCount": len(deleted_ids),
+    }
 
 
 @router.get("/conversations/{conversation_id}")
@@ -447,6 +657,98 @@ def compat_delete_conversation(conversation_id: str, request: Request):
     return {"message": "Conversation deleted"}
 
 
+@router.get("/admin/users")
+def compat_list_staff_users(request: Request):
+    _require_admin(request)
+    chat_totals: dict[str, int] = {}
+    for log in get_logs(include_all=True):
+        user_id = str(log.get("user_id") or "dev-admin")
+        chat_totals[user_id] = chat_totals.get(user_id, 0) + 1
+
+    users = sorted(
+        read_users(),
+        key=lambda user: (
+            0 if str(user.get("role") or "") == "admin" else 1,
+            str(user.get("name") or "").casefold(),
+        ),
+    )
+    items = [
+        _staff_management_user(user, chat_totals)
+        for user in users
+    ]
+    return {
+        "users": items,
+        "total": len(items),
+        "totalChats": sum(chat_totals.values()),
+    }
+
+
+@router.post("/admin/users")
+def compat_create_staff_user(payload: StaffCreatePayload, request: Request):
+    _require_admin(request)
+    try:
+        user = create_staff_user(
+            username=payload.username,
+            name=payload.name,
+            password=payload.password,
+        )
+    except UserStoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return _staff_management_user(user, {})
+
+
+@router.patch("/admin/users/{user_id}/password")
+def compat_update_staff_password(
+    user_id: str,
+    payload: StaffPasswordPayload,
+    request: Request,
+):
+    _require_admin(request)
+    target_user = get_user_by_id(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User account not found.")
+
+    if str(target_user.get("role") or "") == "admin":
+        raise HTTPException(
+            status_code=400,
+            detail="Administrator passwords cannot be changed from Staff Management.",
+        )
+
+    try:
+        updated_user = update_user_password(user_id, payload.password)
+    except UserStoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User account not found.")
+
+    return {
+        "message": "Password updated successfully.",
+        "user": public_user(updated_user),
+    }
+
+
+@router.delete("/admin/users/{user_id}")
+def compat_delete_staff_user(user_id: str, request: Request):
+    current_user = _require_admin(request)
+    target_user = get_user_by_id(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User account not found.")
+
+    if str(target_user.get("id") or "") == str(current_user.get("id") or ""):
+        raise HTTPException(status_code=400, detail="You cannot delete your own account.")
+
+    if str(target_user.get("role") or "") == "admin":
+        raise HTTPException(status_code=400, detail="Administrator accounts cannot be deleted here.")
+
+    deleted = delete_user(user_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="User account not found.")
+
+    return None
+
+
 @router.get("/admin/documents")
 def compat_get_documents(
     search: str | None = None,
@@ -461,14 +763,93 @@ def compat_get_documents(
         "documents": page_items,
         "total": total,
         "page": safe_page,
-        "limit": max(min(int(limit or 10), 100), 1),
+        "limit": _resolve_pagination_limit(total, limit, default=10),
         "totalPages": total_pages,
     }
 
 
 @router.post("/admin/documents")
-async def compat_upload_documents(files: list[UploadFile] = File(...)):
-    records = [_upload_and_index(file) for file in files]
+async def compat_upload_documents(
+    files: list[UploadFile] = File(...),
+    replaceFilenamesJson: str = Form("[]"),
+):
+    try:
+        raw_replace_filenames = json.loads(replaceFilenamesJson or "[]")
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Format konfirmasi penimpaan file tidak valid.",
+        ) from exc
+
+    if not isinstance(raw_replace_filenames, list):
+        raise HTTPException(
+            status_code=400,
+            detail="Daftar file yang akan ditimpa harus berupa array.",
+        )
+
+    replace_filenames = {
+        _normalize_filename(str(filename))
+        for filename in raw_replace_filenames
+        if str(filename).strip()
+    }
+
+    incoming_names = [
+        _safe_filename(file.filename or "")
+        for file in files
+    ]
+    normalized_incoming_names = [
+        _normalize_filename(filename)
+        for filename in incoming_names
+    ]
+
+    repeated_names = sorted({
+        filename
+        for filename in normalized_incoming_names
+        if normalized_incoming_names.count(filename) > 1
+    })
+    if repeated_names:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Satu proses upload tidak boleh berisi beberapa file "
+                "dengan nama yang sama."
+            ),
+        )
+
+    existing_names = {
+        _normalize_filename(str(document.get("filename") or ""))
+        for document in read_documents()
+    }
+    unauthorized_duplicates = [
+        filename
+        for filename, normalized_name in zip(
+            incoming_names,
+            normalized_incoming_names,
+        )
+        if normalized_name in existing_names
+        and normalized_name not in replace_filenames
+    ]
+
+    if unauthorized_duplicates:
+        duplicate_list = ", ".join(unauthorized_duplicates)
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"File berikut sudah ada: {duplicate_list}. "
+                "Upload dibatalkan karena admin belum menyetujui penimpaan."
+            ),
+        )
+
+    records = [
+        _upload_and_index(
+            file,
+            replace_existing=(
+                _normalize_filename(file.filename or "")
+                in replace_filenames
+            ),
+        )
+        for file in files
+    ]
     return {
         "message": f"{len(records)} dokumen berhasil diupload dan di-index.",
         "uploadItems": [to_upload_item(record) for record in records],
@@ -564,7 +945,7 @@ def compat_query_logs(
         "logs": page_items,
         "total": total,
         "page": safe_page,
-        "limit": max(min(int(limit or 25), 100), 1),
+        "limit": _resolve_pagination_limit(total, limit),
         "totalPages": total_pages,
     }
 
@@ -582,25 +963,28 @@ def compat_query_logs_dashboard(
     logs = _filter_logs(current_user, range_value=range, status=status, search=search)
     page_items, total, safe_page, total_pages = _paginate(logs, page, limit)
     answered = len([log for log in logs if log["status"] == "ANSWERED"])
+    no_reference = len([log for log in logs if log["status"] == "NO_REFERENCE"])
     not_found = len([log for log in logs if log["status"] == "NOT_FOUND"])
-    errors = len([log for log in logs if log["status"] == "ERROR"])
-    need_review = len([log for log in logs if log["status"] == "NEED_REVIEW"])
-    avg_conf = sum(log["confidenceScore"] for log in logs) / len(logs) if logs else 0.0
+    answered_logs = [log for log in logs if log["status"] == "ANSWERED"]
+    avg_conf = (
+        sum(log["confidenceScore"] for log in answered_logs) / len(answered_logs)
+        if answered_logs
+        else 0.0
+    )
 
     return {
         "logs": page_items,
         "performance": {
             "totalQueries": len(logs),
             "answered": answered,
+            "noReference": no_reference,
             "notFound": not_found,
-            "needReview": need_review,
-            "errors": errors,
             "averageConfidence": round(avg_conf, 4),
             "averageResponseTime": 0.0,
         },
         "total": total,
         "page": safe_page,
-        "limit": max(min(int(limit or 25), 100), 1),
+        "limit": _resolve_pagination_limit(total, limit),
         "totalPages": total_pages,
     }
 

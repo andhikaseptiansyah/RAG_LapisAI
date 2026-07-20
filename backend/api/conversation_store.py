@@ -242,3 +242,39 @@ def delete_conversation(
         return False
     write_conversations(remaining)
     return True
+
+def delete_conversations(
+    conversation_ids: list[str],
+    user_id: str | None = None,
+    include_all: bool = False,
+) -> list[str]:
+    target_ids = {
+        str(conversation_id).strip()
+        for conversation_id in conversation_ids
+        if str(conversation_id).strip()
+    }
+
+    if not target_ids:
+        return []
+
+    conversations = read_conversations()
+    remaining: list[dict[str, Any]] = []
+    deleted_ids: list[str] = []
+
+    for item in conversations:
+        conversation_id = str(item.get("id") or "")
+        if conversation_id in target_ids and _can_access_conversation(
+            item,
+            user_id=user_id,
+            include_all=include_all,
+        ):
+            deleted_ids.append(conversation_id)
+            continue
+
+        remaining.append(item)
+
+    if deleted_ids:
+        write_conversations(remaining)
+
+    return deleted_ids
+

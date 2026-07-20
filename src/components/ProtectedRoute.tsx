@@ -46,7 +46,7 @@ export const ProtectedRoute: React.FC<
   if (!isAuthenticated || !user) {
     return (
       <Navigate
-        to="/intro"
+        to="/login"
         replace
         state={{
           from: {

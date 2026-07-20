@@ -13,6 +13,7 @@ import type {
 import {
   convertChatResponseToMessage,
   normalizeMessageSources,
+  recordQueryFailure,
   sendChatMessage,
 } from '../services/chatService';
 
@@ -210,6 +211,11 @@ export function useChat(
   const abortControllerRef =
     useRef<AbortController | null>(null);
 
+  const activeQueryRef = useRef<{
+    queryId: string;
+    question: string;
+  } | null>(null);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -240,11 +246,17 @@ export function useChat(
 
       const selectedLanguage =
         languageOverride ?? language;
+      const queryId = createLocalId();
+
+      activeQueryRef.current = {
+        queryId,
+        question: normalizedContent,
+      };
 
       setLanguage(selectedLanguage);
 
       const userMessage: Message = {
-        id: createLocalId(),
+        id: queryId,
         role: 'user',
         content: normalizedContent,
         time: getCurrentTime(),
@@ -266,6 +278,7 @@ export function useChat(
         const response = await sendChatMessage(
           {
             message: normalizedContent,
+            queryId,
             conversationId,
             language: selectedLanguage,
             attachments,
@@ -295,6 +308,10 @@ export function useChat(
           new Event('lapisai:conversations-changed')
         );
 
+        if (activeQueryRef.current?.queryId === queryId) {
+          activeQueryRef.current = null;
+        }
+
         return true;
       } catch (caughtError) {
         if (
@@ -302,6 +319,19 @@ export function useChat(
           caughtError.name === 'AbortError'
         ) {
           return false;
+        }
+
+        try {
+          await recordQueryFailure(
+            queryId,
+            normalizedContent,
+            'CLIENT_ERROR'
+          );
+        } catch (loggingError) {
+          console.error(
+            'Gagal mencatat query yang tidak menghasilkan jawaban:',
+            loggingError
+          );
         }
 
         const message =
@@ -326,6 +356,10 @@ export function useChat(
         ) {
           abortControllerRef.current = null;
           setIsGenerating(false);
+        }
+
+        if (activeQueryRef.current?.queryId === queryId) {
+          activeQueryRef.current = null;
         }
       }
     },
@@ -400,9 +434,25 @@ export function useChat(
   );
 
   const stopGenerating = useCallback(() => {
+    const activeQuery = activeQueryRef.current;
+
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
+    activeQueryRef.current = null;
     setIsGenerating(false);
+
+    if (activeQuery) {
+      void recordQueryFailure(
+        activeQuery.queryId,
+        activeQuery.question,
+        'USER_STOPPED'
+      ).catch((loggingError) => {
+        console.error(
+          'Gagal mencatat query yang dihentikan pengguna:',
+          loggingError
+        );
+      });
+    }
   }, []);
 
   const clearChat = useCallback(() => {

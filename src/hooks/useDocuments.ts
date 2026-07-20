@@ -163,7 +163,8 @@ export const useDocuments = (
 
   const uploadFiles = useCallback(
     async (
-      files: File[]
+      files: File[],
+      replaceFilenames: string[] = []
     ): Promise<boolean> => {
       if (files.length === 0) {
         setError(
@@ -178,7 +179,10 @@ export const useDocuments = (
 
       try {
         const result =
-          await uploadDocuments(files);
+          await uploadDocuments(
+            files,
+            replaceFilenames
+          );
 
         setUploadItems(
           result.uploadItems

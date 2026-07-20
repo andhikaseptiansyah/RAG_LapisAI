@@ -5,9 +5,8 @@ import {
 
 export type QueryLogStatus =
   | 'ANSWERED'
-  | 'NEED_REVIEW'
-  | 'NOT_FOUND'
-  | 'ERROR';
+  | 'NO_REFERENCE'
+  | 'NOT_FOUND';
 
 export type QueryRange =
   | 'daily'
@@ -59,9 +58,8 @@ export interface QueryLogListResponse {
 export interface QueryLogPerformance {
   totalQueries: number;
   answered: number;
+  noReference: number;
   notFound: number;
-  needReview: number;
-  errors: number;
   averageConfidence: number;
   averageResponseTime: number;
 }
