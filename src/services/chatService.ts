@@ -63,6 +63,7 @@ export interface ChatApiResponse {
   createdAt?: string;
   language?: ChatLanguage;
   model?: string;
+  generation_mode?: string;
 }
 
 export interface ConversationSummary {

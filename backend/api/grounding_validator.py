@@ -351,12 +351,19 @@ def _atomic_claims(value: Any) -> list[str]:
         )
         sentence = sentence.strip()
 
+        # Pisahkan klausa kausal/kontras terlebih dahulu. Ini memungkinkan
+        # bagian fakta yang didukung tetap dipertahankan ketika model menambah
+        # ekor spekulatif seperti "because it is more scalable".
+        clause_parts = [
+            part for part in CLAUSE_SPLIT.split(sentence)
+            if _clean(part)
+        ] or [sentence]
+
         # Pecah daftar berdasarkan koma/semicolon, tetapi jangan pecah koma
         # yang berada di antara angka, misalnya 1,000.
-        parts = re.split(
-            r"(?<!\d),(?!\d)|;",
-            sentence,
-        )
+        parts: list[str] = []
+        for clause_part in clause_parts:
+            parts.extend(re.split(r"(?<!\d),(?!\d)|;", clause_part))
 
         cleaned_parts: list[str] = []
 

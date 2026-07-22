@@ -11,7 +11,12 @@ import re
 from dataclasses import dataclass
 from typing import Iterable
 
-from retrieval.query_expansion import normalize_text
+from retrieval.query_expansion import (
+    CONCEPT_ALIASES,
+    concepts_in_text,
+    contains_alias,
+    normalize_text,
+)
 
 
 @dataclass(frozen=True)
@@ -22,6 +27,7 @@ class EvidenceRequirement:
     value: str = ""
     unit: str = ""
     same_chunk_terms: tuple[str, ...] = ()
+    subject_concepts: tuple[str, ...] = ()
 
 
 URL_PATTERN = re.compile(
@@ -216,15 +222,31 @@ def extract_evidence_requirements(question: str) -> list[EvidenceRequirement]:
     ):
         add(EvidenceRequirement("answer_percentage", "an explicit percentage", "percentage"))
 
-    if _contains_phrase(
+    storage_intent = _contains_phrase(
         query,
         (
             "mailbox size", "mailbox limit", "mailbox quota", "storage limit",
             "storage quota", "ukuran mailbox", "batas mailbox", "kapasitas mailbox",
             "batas penyimpanan", "kuota penyimpanan",
+            "maximum file upload size", "maximum file-upload size",
+            "file upload size", "file-upload size", "upload size limit",
+            "maximum attachment size", "attachment size limit",
+            "ukuran unggahan file", "batas ukuran file",
+            "ukuran maksimum file", "maksimal ukuran unggahan",
         ),
-    ):
-        add(EvidenceRequirement("answer_storage", "an explicit storage quantity", "storage"))
+    )
+    if storage_intent:
+        storage_subjects = tuple(
+            concept
+            for concept in concepts_in_text(question)
+            if concept in {"mailbox_quota", "file_upload", "customer_portal"}
+        )
+        add(EvidenceRequirement(
+            "answer_storage",
+            "an explicit storage quantity tied to the requested storage subject",
+            "storage",
+            subject_concepts=storage_subjects,
+        ))
 
     if _contains_phrase(
         query,
@@ -356,7 +378,17 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
     if requirement.kind == "percentage":
         return bool(PERCENT_PATTERN.search(combined))
     if requirement.kind == "storage":
-        return bool(STORAGE_PATTERN.search(combined))
+        for text in texts:
+            if not STORAGE_PATTERN.search(text):
+                continue
+            if not requirement.subject_concepts:
+                return True
+            if all(
+                contains_alias(text, CONCEPT_ALIASES.get(concept, (concept,)))
+                for concept in requirement.subject_concepts
+            ):
+                return True
+        return False
     if requirement.kind == "duration":
         return bool(TIME_PATTERN.search(combined))
     if requirement.kind == "date_or_time":

@@ -12,8 +12,8 @@ const MODEL_OPTIONS: Array<{
   icon: string;
 }> = [
   { value: 'ollama', label: 'Ollama (Local)', icon: 'memory' },
-  { value: 'gemini', label: 'Gemini 2.0 Flash', icon: 'cloud' },
-  { value: 'openai', label: 'GPT-4o', icon: 'smart_toy' },
+  { value: 'gemini', label: 'Gemini', icon: 'cloud' },
+  { value: 'groq', label: 'Groq Cloud', icon: 'bolt' },
 ];
 
 interface WelcomeScreenProps {

@@ -21,7 +21,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
-    language: str = Field(default="ID")
+    language: str = Field(default="AUTO")
     query_id: str | None = None
     model: str | None = Field(default=None)
     evaluation_mode: bool = Field(default=False)
@@ -61,6 +61,7 @@ class ChatResponse(BaseModel):
     response_time_ms: int = Field(ge=0)
     model: str | None = None
     generation_mode: str | None = None
+    language: str = "ID"
 
 
 @router.post("/query")
@@ -151,4 +152,5 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
         "response_time_ms": result["response_time_ms"],
         "model": result.get("model"),
         "generation_mode": result.get("generation_mode"),
+        "language": result.get("language", payload.language),
     }

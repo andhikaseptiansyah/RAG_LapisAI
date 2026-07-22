@@ -454,14 +454,14 @@ async def compat_chat(request: Request):
         form = await request.form()
         question = str(form.get("message") or form.get("question") or "").strip()
         conversation_id = str(form.get("conversationId") or "").strip() or None
-        language = str(form.get("language") or "ID").strip() or "ID"
+        language = str(form.get("language") or "AUTO").strip() or "AUTO"
         query_id = str(form.get("queryId") or "").strip() or None
         model = str(form.get("model") or "").strip() or None
     else:
         payload = await request.json()
         question = str(payload.get("message") or payload.get("question") or "").strip()
         conversation_id = payload.get("conversationId") or None
-        language = payload.get("language") or "ID"
+        language = payload.get("language") or "AUTO"
         query_id = str(payload.get("queryId") or "").strip() or None
         model = str(payload.get("model") or "").strip() or None
 
@@ -499,6 +499,7 @@ async def compat_chat(request: Request):
     confidence = result.get("confidence") or 0.0
     response_time_ms = result.get("response_time_ms") or ((time.perf_counter() - started_at) * 1000)
     follow_up_question = result.get("follow_up_question")
+    resolved_language = str(result.get("language") or language or "ID").upper()
 
     save_log(
         query_id=query_id,
@@ -517,7 +518,7 @@ async def compat_chat(request: Request):
         confidence=confidence,
         sources=sources,
         conversation_id=conversation_id,
-        language=language,
+        language=resolved_language,
         user_id=current_user["id"],
         user_name=current_user["name"],
         follow_up_question=follow_up_question,
@@ -540,8 +541,9 @@ async def compat_chat(request: Request):
         "source": primary_source.get("document_name") if primary_source else None,
         "page": primary_source.get("page") if primary_source else None,
         "createdAt": assistant_message["created_at"],
-        "language": language,
+        "language": resolved_language,
         "model": result.get("model"),
+        "generation_mode": result.get("generation_mode"),
     }
 
 

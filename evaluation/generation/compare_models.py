@@ -1,4 +1,4 @@
-"""Combine Ollama, Gemini, and OpenAI evaluation summaries."""
+"""Combine Ollama, Gemini, and Groq evaluation summaries."""
 
 from __future__ import annotations
 

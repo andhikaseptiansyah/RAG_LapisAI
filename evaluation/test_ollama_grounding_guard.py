@@ -46,4 +46,4 @@ def test_hallucinated_llm_amount_is_never_returned(monkeypatch) -> None:
 
     assert "2,000,000" not in answer
     assert "2.000.000" not in answer
-    assert "1,500,000" in answer or "1.500.000" in answer
+    assert answer == ""

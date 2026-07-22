@@ -24,7 +24,7 @@ def chunk(content: str) -> dict:
     }
 
 
-def test_model_refusal_uses_extractive_fallback(monkeypatch) -> None:
+def test_model_refusal_returns_control_to_chat_service(monkeypatch) -> None:
     monkeypatch.setattr(
         ollama,
         "_ollama_chat",
@@ -38,8 +38,7 @@ def test_model_refusal_uses_extractive_fallback(monkeypatch) -> None:
         [chunk("The maximum reimbursement is IDR 1,500,000.")],
         language="EN",
     )
-    assert not is_refusal_answer(answer)
-    assert "1,500,000" in answer
+    assert answer == ""
 
 
 def test_hallucinated_amount_is_repaired(monkeypatch) -> None:

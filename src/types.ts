@@ -35,4 +35,4 @@ export interface Message {
   shouldAnimate?: boolean;
 }
 
-export type ModelType = 'ollama' | 'gemini' | 'openai';
+export type ModelType = 'ollama' | 'gemini' | 'groq';

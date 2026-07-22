@@ -1,4 +1,4 @@
-"""One-command runner for the bilingual Ollama/Gemini/OpenAI evaluation."""
+"""One-command runner for the bilingual Ollama/Gemini/Groq evaluation."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_ENGLISH = EVALUATION_DIR / "datasets" / "qna_english_50.csv"
 DEFAULT_INDONESIAN = EVALUATION_DIR / "datasets" / "qna_indonesia_50.csv"
-VALID_MODELS = ("ollama", "gemini", "openai")
+VALID_MODELS = ("ollama", "gemini", "groq")
 
 
 def run(command: list[str]) -> None:

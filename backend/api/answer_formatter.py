@@ -1215,18 +1215,26 @@ def _unique_sources(
     return sources
 
 def has_answerable_evidence(chunks: list[dict[str, Any]]) -> bool:
-    """Return True when the post-retrieval answerability gate accepted the bundle.
+    """Return True only for a strictly accepted answerability bundle.
 
-    Answerability and display confidence are separate concerns. A correctly
-    verified bundle must not be refused again merely because the calibrated
-    confidence used for UI display falls below MIN_ANSWER_CONFIDENCE.
+    Older indexed/test rows may not carry ``answerabilityStrictlySupported``;
+    they remain compatible only when they also contain positively verified
+    evidence.
     """
-    accepted = [
-        chunk for chunk in chunks
-        if chunk.get("answerabilityAccepted") is True
-        and chunk.get("answerabilityEvidenceSelected", True)
-        and not chunk.get("evidenceHardFailures")
-    ]
+    accepted = []
+    for chunk in chunks:
+        if chunk.get("answerabilityAccepted") is not True:
+            continue
+        if not chunk.get("answerabilityEvidenceSelected", True):
+            continue
+        if chunk.get("evidenceHardFailures") or chunk.get("evidenceHardContradictions"):
+            continue
+        strict_flag = chunk.get("answerabilityStrictlySupported")
+        if strict_flag is True:
+            accepted.append(chunk)
+            continue
+        if strict_flag is None and chunk.get("evidenceSupported") is True:
+            accepted.append(chunk)
     return bool(accepted)
 
 
@@ -1271,11 +1279,21 @@ def build_safe_extractive_answer(
     it selects the minimum number of excerpts needed to cover explicit answer
     requirements. The function intentionally returns answer text only.
     """
+    if not has_answerable_evidence(chunks):
+        return build_refusal_answer(language)
+
     selected_chunks = [
         chunk for chunk in chunks
-        if chunk.get("answerabilityEvidenceSelected", True)
+        if chunk.get("answerabilityAccepted") is True
+        and chunk.get("answerabilityEvidenceSelected", True)
+        and chunk.get("answerabilityStrictlySupported", chunk.get("evidenceSupported") is True)
         and not chunk.get("evidenceHardFailures")
-    ] or [chunk for chunk in chunks if not chunk.get("evidenceHardFailures")]
+        and not chunk.get("evidenceHardContradictions")
+        and (
+            not chunk.get("answerabilityRequiresCoherentEvidence")
+            or chunk.get("answerabilityCoherentEvidence") is True
+        )
+    ]
 
     requirements = [
         requirement
@@ -1322,7 +1340,7 @@ def build_safe_extractive_answer(
         if not requirements:
             break
 
-    if not output:
+    if not output or uncovered:
         return build_refusal_answer(language)
 
     answer = " ".join(output)
@@ -1456,11 +1474,24 @@ def build_sources(
 
     unique_sources: dict[tuple[str, ...], dict[str, Any]] = {}
 
-    source_chunks = [
-        chunk for chunk in chunks
-        if chunk.get("answerabilityEvidenceSelected", True)
-        and chunk.get("contextSelected", True)
-    ] or chunks
+    if answerability_accepted:
+        source_chunks = [
+            chunk for chunk in chunks
+            if chunk.get("answerabilityAccepted") is True
+            and chunk.get("answerabilityEvidenceSelected", True)
+            and chunk.get("contextSelected", True)
+            and chunk.get("evidenceSupported") is True
+            and not chunk.get("evidenceHardContradictions")
+            and (
+                not chunk.get("answerabilityRequiresCoherentEvidence")
+                or chunk.get("answerabilityCoherentEvidence") is True
+            )
+        ]
+    else:
+        source_chunks = [
+            chunk for chunk in chunks
+            if chunk.get("contextSelected", True)
+        ]
 
     for chunk in source_chunks:
         raw_score = clamp_score(chunk.get("score"))
@@ -1470,7 +1501,10 @@ def build_sources(
 
         if hard_failures:
             continue
-        if not (
+        if answerability_accepted:
+            if not evidence_supported:
+                continue
+        elif not (
             evidence_supported
             or raw_score >= MIN_SOURCE_CONFIDENCE
             or semantic_score >= 0.40
@@ -1640,11 +1674,37 @@ def is_refusal_answer(value: Any) -> bool:
 
 
 def top_confidence(chunks: list[dict[str, Any]], question: str = "") -> float:
-    confidence = answer_confidence(question, chunks)
-    if confidence >= MIN_ANSWER_CONFIDENCE:
-        return round(confidence, 4)
-    if has_answerable_evidence(chunks):
-        # Keep the real calibrated value when possible. Answerability score is a
-        # fallback display confidence, not a second refusal threshold.
-        return round(max(confidence, _answerability_confidence(chunks), 0.01), 4)
-    return 0.0
+    """Return a conservative confidence bounded by verified source quality."""
+    if not has_answerable_evidence(chunks):
+        return 0.0
+
+    accepted = [
+        chunk for chunk in chunks
+        if chunk.get("answerabilityAccepted") is True
+        and chunk.get("answerabilityEvidenceSelected", True)
+        and chunk.get("evidenceSupported") is True
+        and not chunk.get("evidenceHardContradictions")
+        and (
+            not chunk.get("answerabilityRequiresCoherentEvidence")
+            or chunk.get("answerabilityCoherentEvidence") is True
+        )
+    ]
+    if not accepted:
+        return 0.0
+
+    calibrated = answer_confidence(question, accepted)
+    answerability = _answerability_confidence(accepted)
+    verified_source_quality = max(
+        min(
+            clamp_score(chunk.get("score")),
+            clamp_score(chunk.get("evidenceScore")),
+        )
+        for chunk in accepted
+    )
+    confidence = min(
+        max(calibrated, 0.01),
+        max(answerability, 0.01),
+        max(verified_source_quality, 0.01),
+    )
+    return round(confidence, 4)
+

@@ -9,21 +9,66 @@ and a context fingerprint for fair cross-model comparison.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
+import sys
 import time
 from pathlib import Path
 from typing import Any
 
 import requests
+from dotenv import load_dotenv
 
-from dataset_utils import (
-    context_fingerprint,
-    dataset_summary,
-    load_ground_truth_files,
-)
+try:
+    from .dataset_utils import (
+        context_fingerprint,
+        dataset_summary,
+        load_ground_truth_files,
+    )
+except ImportError:  # Direct script execution.
+    from dataset_utils import (
+        context_fingerprint,
+        dataset_summary,
+        load_ground_truth_files,
+    )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+BACKEND_DIR = PROJECT_ROOT / "backend"
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
+from api.language import detect_question_language
+
+
+def detect_language(question: str) -> str:
+    """Compatibility helper used by evaluation builders and tests."""
+    return detect_question_language(question, fallback="EN")
+
+
+def load_ground_truth(path: Path) -> list[dict[str, Any]]:
+    """Load the legacy three-column official CSV used by older tests/tools."""
+    resolved = Path(path).resolve()
+    with resolved.open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    items: list[dict[str, Any]] = []
+    for index, row in enumerate(rows, start=1):
+        items.append({
+            "id": f"QA-{index:03d}",
+            "question": str(row.get("question") or "").strip(),
+            "expected_answer": str(row.get("expected_answer") or "").strip(),
+            "answerable": True,
+            "language": detect_language(str(row.get("question") or "")),
+            "references": [{
+                "document": str(row.get("source_document") or "").strip(),
+                "page": "",
+            }],
+            "source_dataset": resolved.name,
+        })
+    return items
+
+
+load_dotenv(PROJECT_ROOT / ".env")
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 DEFAULT_DATASETS = [
     EVALUATION_DIR / "datasets" / "qna_english_50.csv",
@@ -33,17 +78,29 @@ CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/chat")
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
 CONTEXT_MODE = "source_locked_native_model_single_pass_v2"
-VALID_MODELS = ("ollama", "gemini", "openai")
+VALID_MODELS = ("ollama", "gemini", "groq")
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
-    "gemini": ("GEMINI_MODEL", "gemini-2.0-flash"),
-    "openai": ("OPENAI_MODEL", "gpt-4o"),
+    "gemini": ("GEMINI_MODEL", "gemini-3.5-flash"),
+    "groq": ("GROQ_MODEL", "llama-3.3-70b-versatile"),
 }
 
 
 def resolved_model_name(provider: str) -> str:
     env_name, default = MODEL_ENV[provider]
     return os.getenv(env_name, default)
+
+
+def validate_provider_configuration(provider: str) -> None:
+    key_env = {
+        "gemini": "GEMINI_API_KEY",
+        "groq": "GROQ_API_KEY",
+    }.get(provider)
+    if key_env and not os.getenv(key_env, "").strip():
+        raise RuntimeError(
+            f"{key_env} is not configured. Add it to the project-root .env "
+            f"before evaluating provider={provider}."
+        )
 
 
 def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -224,6 +281,7 @@ def build_dataset(
     if model not in VALID_MODELS:
         raise ValueError(f"Unsupported model {model!r}; choose from {VALID_MODELS}")
 
+    validate_provider_configuration(model)
     preflight()
     previous = _existing_results(output, model) if resume else {}
     results: list[dict[str, Any]] = []

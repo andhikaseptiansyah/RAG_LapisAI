@@ -1,25 +1,32 @@
-"""Post-rerank answerability gate for top-k evidence bundles.
+"""Strict post-rerank answerability gate for evidence bundles.
 
-The gate evaluates the complete evidence bundle. A lower-ranked chunk may satisfy
-an explicit requirement that is missing from the first result, and multi-part
-questions may be supported by complementary documents. Diagnostics remain stable
-for the API and regression tests.
+Similarity is not proof. This module rejects a query unless the selected
+retrieval bundle contains the requested subject, answer type, and constraints.
+For a single-fact question, those elements must normally co-occur in at least
+one chunk so unrelated documents cannot be stitched into a false answer.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
 from retrieval.evidence_verifier import HARD_CONCEPTS, _concept_match
 from retrieval.query_expansion import concepts_in_text
-from retrieval.requirements import evaluate_requirements
+from retrieval.requirements import (
+    EvidenceRequirement,
+    evaluate_requirements,
+    extract_evidence_requirements,
+    requirement_satisfied,
+)
 from uploads.config import (
     ANSWERABILITY_MAX_CONTEXTS,
     ANSWERABILITY_MIN_BASE_SCORE,
     ANSWERABILITY_MIN_EVIDENCE_SCORE,
     ANSWERABILITY_MIN_SCORE_MARGIN,
     ANSWERABILITY_MIN_TOP_SCORE,
+    ANSWERABILITY_REQUIRE_COHERENT_EVIDENCE,
     ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE,
     ANSWERABILITY_STRONG_EXACT_COVERAGE,
     ANSWERABILITY_STRONG_RETRIEVAL_SCORE,
@@ -43,12 +50,17 @@ class AnswerabilityDecision:
     requirement_coverage: float = 0.0
     concept_coverage: float = 0.0
     evidence_chunk_ids: tuple[str, ...] = ()
+    coherent_candidate_count: int = 0
+    coherent_chunk_ids: tuple[str, ...] = ()
+    requires_coherent_evidence: bool = False
+    strictly_supported: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["failed_checks"] = list(self.failed_checks)
         payload["passed_checks"] = list(self.passed_checks)
         payload["evidence_chunk_ids"] = list(self.evidence_chunk_ids)
+        payload["coherent_chunk_ids"] = list(self.coherent_chunk_ids)
         return payload
 
 
@@ -68,7 +80,6 @@ def _base_score(candidate: dict[str, Any]) -> float:
 
 
 def _legacy_requirement_name(key: str) -> str:
-    """Map generic requirements to stable diagnostic labels."""
     mapping = {
         "answer_url": "explicit_url_or_endpoint",
         "answer_version": "explicit_version_value",
@@ -104,7 +115,6 @@ def _select_evidence_candidates(
     ranked: list[dict[str, Any]],
     max_contexts: int,
 ) -> list[dict[str, Any]]:
-    """Keep diverse, non-empty, non-contradictory evidence candidates."""
     selected: list[dict[str, Any]] = []
     seen_chunks: set[str] = set()
     seen_locations: set[tuple[str, str, str]] = set()
@@ -146,6 +156,31 @@ def _bundle_concepts(
         if any(_concept_match(concept, text) for text in evidence_texts)
     }
     return required, present
+
+
+def _is_multi_part_question(question: str, requirements: list[EvidenceRequirement]) -> bool:
+    normalized = re.sub(r"\s+", " ", str(question or "").casefold()).strip()
+    conjunction = bool(re.search(r"\b(?:and|dan|serta|beserta|as well as)\b", normalized))
+    multiple_question_marks = str(question or "").count("?") > 1
+    # Multiple explicit answer types normally indicate a composite request even
+    # when the user omits a conjunction.
+    multiple_answer_types = len([item for item in requirements if item.key.startswith("answer_")]) > 1
+    return conjunction or multiple_question_marks or multiple_answer_types
+
+
+def _candidate_satisfies_all(
+    candidate: dict[str, Any],
+    required_concepts: set[str],
+    requirements: list[EvidenceRequirement],
+) -> bool:
+    text = str(candidate.get("content") or "")
+    if not text or candidate.get("evidenceHardContradictions"):
+        return False
+    if any(not _concept_match(concept, text) for concept in required_concepts):
+        return False
+    if any(not requirement_satisfied(requirement, [text]) for requirement in requirements):
+        return False
+    return True
 
 
 def assess_answerability(
@@ -201,22 +236,6 @@ def assess_answerability(
     second_score = _clamp(selected[1].get("score")) if len(selected) > 1 else 0.0
     score_margin = max(0.0, top_score - second_score)
 
-    supporting = [
-        candidate
-        for candidate in selected
-        if not candidate.get("evidenceContradictions")
-        and not candidate.get("evidenceHardContradictions")
-        and (
-            candidate.get("evidenceSupported") is True
-            or _clamp(candidate.get("evidenceScore")) >= min_evidence_score
-            or _clamp(candidate.get("score")) >= ANSWERABILITY_STRONG_RETRIEVAL_SCORE
-        )
-    ]
-    supporting_candidate_count = len(supporting)
-
-    # Requirements and concepts are evaluated against the complete selected
-    # bundle. This is what allows a second-ranked or second-document chunk to
-    # complete an otherwise partial answer.
     evidence_texts = [str(candidate.get("content") or "") for candidate in selected]
     requirement_passed_raw, requirement_failed_raw, requirements = evaluate_requirements(
         question,
@@ -224,19 +243,40 @@ def assess_answerability(
     )
     requirement_passed = [_legacy_requirement_name(key) for key in requirement_passed_raw]
     requirement_failed = [_legacy_requirement_name(key) for key in requirement_failed_raw]
-    requirement_coverage = (
-        len(requirement_passed_raw) / len(requirements)
-        if requirements
-        else 1.0
-    )
+    requirement_coverage = len(requirement_passed_raw) / len(requirements) if requirements else 1.0
 
     required_concepts, present_concepts = _bundle_concepts(question, evidence_texts)
     missing_concepts = required_concepts - present_concepts
-    concept_coverage = (
-        len(present_concepts) / len(required_concepts)
-        if required_concepts
-        else 1.0
+    concept_coverage = len(present_concepts) / len(required_concepts) if required_concepts else 1.0
+
+    has_semantic_requirements = bool(requirements or required_concepts)
+    multi_part = _is_multi_part_question(question, requirements)
+    requires_coherent_evidence = bool(
+        ANSWERABILITY_REQUIRE_COHERENT_EVIDENCE
+        and has_semantic_requirements
+        and not multi_part
     )
+
+    coherent = [
+        candidate
+        for candidate in selected
+        if _candidate_satisfies_all(candidate, required_concepts, requirements)
+    ]
+    coherent_chunk_ids = tuple(
+        str(item.get("chunkId") or "")
+        for item in coherent
+        if item.get("chunkId")
+    )
+
+    supporting = [
+        candidate
+        for candidate in selected
+        if candidate.get("evidenceSupported") is True
+        and not candidate.get("evidenceContradictions")
+        and not candidate.get("evidenceHardContradictions")
+        and _clamp(candidate.get("evidenceScore")) >= min_evidence_score
+    ]
+    supporting_candidate_count = len(supporting)
 
     passed: list[str] = list(requirement_passed)
     failed: list[str] = list(requirement_failed)
@@ -245,42 +285,29 @@ def assess_answerability(
         passed.append(f"concept:{concept}")
     for concept in sorted(missing_concepts):
         failed.append(f"missing_concept:{concept}")
-        # Preserve the older UI/test diagnostic while retaining the generic label.
         if concept == "paternity_leave":
             failed.append("paternity_leave_subject")
+
+    coverage_complete = requirement_coverage >= 1.0 and concept_coverage >= 1.0
+    coherent_complete = bool(coherent) or not requires_coherent_evidence
+    evidence_supported = supporting_candidate_count > 0
+    strictly_supported = coverage_complete and coherent_complete and evidence_supported
 
     strongest_exact_coverage = max(
         (_clamp(candidate.get("exactTokenCoverage")) for candidate in selected),
         default=0.0,
     )
     strong_bundle_fallback = (
-        top_score >= ANSWERABILITY_STRONG_RETRIEVAL_SCORE
+        not has_semantic_requirements
+        and top_score >= ANSWERABILITY_STRONG_RETRIEVAL_SCORE
         and strongest_base_score >= min_base_score
-        and (
-            strongest_exact_coverage >= ANSWERABILITY_STRONG_EXACT_COVERAGE
-            or requirement_coverage >= 1.0
-        )
+        and strongest_exact_coverage >= ANSWERABILITY_STRONG_EXACT_COVERAGE
     )
-    evidence_supported = supporting_candidate_count > 0 or strong_bundle_fallback
-    has_semantic_requirements = bool(requirements or required_concepts)
-    coverage_complete = requirement_coverage >= 1.0 and concept_coverage >= 1.0
-    # Explicit and fully covered requirements may override low display scores
-    # when the candidate has not been lifted by a reranker. Once reranking is
-    # applied, the original hybrid/base-score floor remains a hard veto so a
-    # cross-encoder cannot resurrect a weak retrieval result. Generic topical
-    # similarity never receives this override.
-    strong_evidence_override = (
-        evidence_supported
-        and has_semantic_requirements
-        and coverage_complete
-        and (
-            supporting_candidate_count > 0
-            or top_evidence_score >= max(min_evidence_score, 0.55)
-            or strongest_exact_coverage >= 0.45
-        )
-    )
+
+    # Verified evidence may override low display scores only when no reranker was
+    # used. A cross-encoder must never resurrect a weak base retrieval result.
     reranker_applied = any(bool(item.get("rerankerApplied")) for item in selected)
-    base_score_override = strong_evidence_override and not reranker_applied
+    strong_evidence_override = strictly_supported and has_semantic_requirements and not reranker_applied
 
     if top_score >= min_top_score:
         passed.append("minimum_top_score")
@@ -291,47 +318,57 @@ def assess_answerability(
 
     if strongest_base_score >= min_base_score:
         passed.append("minimum_base_hybrid_score")
-    elif base_score_override:
+    elif strong_evidence_override:
         passed.append("minimum_base_score_overridden_by_verified_evidence")
     else:
         failed.append("minimum_base_hybrid_score")
 
-    if supporting_candidate_count > 0:
+    if evidence_supported:
         passed.append("supported_evidence")
     elif strong_bundle_fallback:
         passed.append("strong_retrieval_fallback")
-    elif require_supported_evidence:
+    elif require_supported_evidence or has_semantic_requirements:
         failed.append("supported_evidence")
+
+    if requires_coherent_evidence:
+        if coherent:
+            passed.append("coherent_single_chunk_evidence")
+        else:
+            failed.append("no_coherent_single_chunk_evidence")
+    else:
+        passed.append("bundle_coherence_allowed")
 
     ambiguous_ranking = (
         min_score_margin > 0
         and len(selected) > 1
         and score_margin < min_score_margin
-        and not evidence_supported
+        and not strictly_supported
         and top_score < ANSWERABILITY_STRONG_RETRIEVAL_SCORE
-        and requirement_coverage < 1.0
     )
-    if ambiguous_ranking and not strong_evidence_override:
+    if ambiguous_ranking:
         failed.append("ambiguous_top_margin")
     else:
         passed.append("top_margin_or_bundle_support")
 
     support_signal = min(supporting_candidate_count / 2.0, 1.0)
     mean_evidence = sum(_clamp(item.get("evidenceScore")) for item in selected) / len(selected)
+    coherence_signal = 1.0 if coherent_complete else 0.0
     answerability_score = _clamp(
-        0.28 * top_score
-        + 0.17 * strongest_base_score
+        0.24 * top_score
+        + 0.16 * strongest_base_score
         + 0.18 * mean_evidence
         + 0.17 * requirement_coverage
-        + 0.12 * concept_coverage
-        + 0.08 * support_signal
+        + 0.13 * concept_coverage
+        + 0.07 * support_signal
+        + 0.05 * coherence_signal
     )
 
     unique_failed = tuple(dict.fromkeys(failed))
     unique_passed = tuple(dict.fromkeys(passed))
     answerable = not unique_failed
+    strictly_supported = bool(answerable and (evidence_supported or strong_bundle_fallback))
     reason = (
-        "Top-k evidence collectively satisfies the question without contradictions."
+        "The evidence bundle satisfies the requested subject, answer type, and constraints."
         if answerable
         else "Retrieval rejected: " + ", ".join(unique_failed)
     )
@@ -358,6 +395,10 @@ def assess_answerability(
         requirement_coverage=round(requirement_coverage, 6),
         concept_coverage=round(concept_coverage, 6),
         evidence_chunk_ids=evidence_chunk_ids,
+        coherent_candidate_count=len(coherent),
+        coherent_chunk_ids=coherent_chunk_ids,
+        requires_coherent_evidence=requires_coherent_evidence,
+        strictly_supported=strictly_supported,
     )
 
 
@@ -372,10 +413,12 @@ def apply_answerability_gate(
 
     metadata = decision.to_dict()
     selected_ids = set(decision.evidence_chunk_ids)
+    coherent_ids = set(decision.coherent_chunk_ids)
     return [
         {
             **candidate,
             "answerabilityAccepted": True,
+            "answerabilityStrictlySupported": decision.strictly_supported,
             "answerabilityScore": decision.score,
             "answerabilityReason": decision.reason,
             "answerabilityScoreMargin": decision.score_margin,
@@ -383,6 +426,11 @@ def apply_answerability_gate(
             "answerabilityPrecisionRequirementCount": decision.precision_requirement_count,
             "answerabilityRequirementCoverage": decision.requirement_coverage,
             "answerabilityConceptCoverage": decision.concept_coverage,
+            "answerabilityRequiresCoherentEvidence": decision.requires_coherent_evidence,
+            "answerabilityCoherentEvidence": (
+                not decision.requires_coherent_evidence
+                or str(candidate.get("chunkId") or "") in coherent_ids
+            ),
             "answerabilityEvidenceSelected": (
                 not selected_ids or str(candidate.get("chunkId") or "") in selected_ids
             ),

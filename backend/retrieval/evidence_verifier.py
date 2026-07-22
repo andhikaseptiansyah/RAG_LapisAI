@@ -62,6 +62,11 @@ HARD_CONCEPTS = {
     "rto",
     "rpo",
     "api_token",
+    "file_upload",
+    "customer_portal",
+    "mailbox_quota",
+    "incident_p1",
+    "incident_p2",
 }
 
 # Generic concepts help scoring but should not independently reject a candidate.
@@ -79,6 +84,12 @@ SOFT_CONCEPTS = {
     "password",
     "next_year",
 }
+
+
+MUTUALLY_EXCLUSIVE_CONCEPT_GROUPS: tuple[frozenset[str], ...] = (
+    frozenset({"file_upload", "mailbox_quota"}),
+    frozenset({"incident_p1", "incident_p2"}),
+)
 
 STOPWORDS = {
     "apa", "apakah", "bagaimana", "berapa", "lama", "yang", "dan", "atau",
@@ -251,6 +262,24 @@ def _lexical_coverage(question: str, content: str) -> float:
     return matched / max(len(query_tokens), 1)
 
 
+def _subject_conflicts(required: list[str], content: str) -> list[str]:
+    required_set = set(required)
+    content_concepts = set(concepts_in_text(content))
+    conflicts: list[str] = []
+    for group in MUTUALLY_EXCLUSIVE_CONCEPT_GROUPS:
+        requested = required_set.intersection(group)
+        if not requested:
+            continue
+        present_requested = content_concepts.intersection(requested)
+        present_rivals = content_concepts.intersection(group - requested)
+        if not present_requested and present_rivals:
+            conflicts.extend(
+                f"conflicting_concept:{concept}"
+                for concept in sorted(present_rivals)
+            )
+    return conflicts
+
+
 def verify_evidence(
     question: str,
     content: str,
@@ -305,6 +334,8 @@ def verify_evidence(
     for canonical in missing:
         if canonical in HARD_CONCEPTS:
             hard_failures.append(f"missing_concept:{canonical}")
+
+    hard_failures.extend(_subject_conflicts(required, content_text))
 
     if _duration_requested(question_text) and not TIME_PATTERN.search(content_text):
         hard_failures.append("missing_duration_value")
@@ -383,6 +414,11 @@ def verify_chunks(
             str(chunk.get("content") or ""),
             minimum_score=minimum_score,
         )
+        hard_failures = list(decision.hard_failures)
+        contradictions = [
+            item for item in hard_failures
+            if item.startswith("conflicting_concept:")
+        ]
         annotated.append(
             {
                 **chunk,
@@ -390,12 +426,13 @@ def verify_chunks(
                 "evidenceScore": decision.score,
                 "evidenceCoverage": decision.concept_coverage,
                 "evidenceMissingConcepts": list(decision.missing_concepts),
-                # A requirement missing from one chunk is not a contradiction.
-                # Another chunk in the bundle may satisfy it. Keep the original
-                # diagnostics, but reserve hard failures for actual conflicts.
-                "evidenceMissingRequirements": list(decision.hard_failures),
+                # Missing evidence may be supplied by another chunk. A direct
+                # subject conflict, such as mailbox quota for a file-upload-size
+                # question, is a contradiction and is removed before generation.
+                "evidenceMissingRequirements": hard_failures,
                 "evidenceHardFailures": [],
-                "evidenceContradictions": [],
+                "evidenceContradictions": contradictions,
+                "evidenceHardContradictions": contradictions,
                 "evidenceReason": decision.reason,
             }
         )

@@ -5,7 +5,7 @@ Dataset final:
 - `evaluation/datasets/qna_english_50.csv`: 50 pertanyaan (45 answerable, 5 unanswerable)
 - `evaluation/datasets/qna_indonesia_50.csv`: 50 pertanyaan (45 answerable, 5 unanswerable)
 - Total: 100 pertanyaan; setiap model menghasilkan 100 jawaban
-- Model: `ollama`, `gemini`, dan `openai`
+- Model: `ollama`, `gemini`, dan `groq`
 
 ## 1. Jalankan backend
 
@@ -16,7 +16,7 @@ Dari folder utama proyek:
 python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000 --app-dir backend
 ```
 
-Pastikan Ollama aktif dan `.env` berisi API key Gemini/OpenAI.
+Pastikan Ollama aktif dan `.env` berisi API key Gemini/Groq.
 
 ## 2. Validasi dataset tanpa memanggil model
 
@@ -69,13 +69,13 @@ evaluation/generation/results/three_model_<timestamp>/
 ├── raw/
 │   ├── input_answers_ollama.json
 │   ├── input_answers_gemini.json
-│   └── input_answers_openai.json
+│   └── input_answers_groq.json
 ├── generation_results_ollama.csv
 ├── generation_results_gemini.csv
-├── generation_results_openai.csv
+├── generation_results_groq.csv
 ├── generation_summary_ollama.json
 ├── generation_summary_gemini.json
-├── generation_summary_openai.json
+├── generation_summary_groq.json
 ├── comparison_3_models.csv
 ├── comparison_3_models.json
 └── comparison_3_models.md

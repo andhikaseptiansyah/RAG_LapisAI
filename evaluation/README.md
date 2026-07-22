@@ -211,7 +211,7 @@ Validate the dataset:
 python .\evaluation\generation\run_three_model_evaluation.py --validate-only
 ```
 
-Run Ollama, Gemini, and OpenAI with the same evaluation settings:
+Run Ollama, Gemini, and Groq with the same evaluation settings:
 
 ```powershell
 python .\evaluation\generation\run_three_model_evaluation.py

@@ -446,20 +446,20 @@ def build_ollama_grounded_answer(
         if evaluation_mode:
             raise RuntimeError("Ollama native generation failed: " + str(exc)) from exc
         # Keep the application usable when Ollama is offline or a model call fails.
-        print(f"[OLLAMA] fallback to formatter: {exc}")
-        return _fallback_answer(question, grounding_chunks, language)
+        print(f"[OLLAMA] native generation failed: {exc}")
+        return ""
 
     # Do not return a visibly incomplete fragment. The deterministic formatter
     # extracts the strongest supported sentences from the same retrieved chunks.
     if _is_likely_incomplete_answer(question, llm_answer, done_reason):
         print(
-            "[OLLAMA] incomplete answer after retry; using grounded formatter "
+            "[OLLAMA] incomplete answer after retry; returning control to chat service "
             f"(done_reason={done_reason or 'unknown'})"
         )
-        return _fallback_answer(question, grounding_chunks, language)
+        return ""
 
     if not llm_answer:
-        return _fallback_answer(question, grounding_chunks, language)
+        return ""
 
     if ENABLE_GENERATION_GROUNDING_VALIDATION:
         grounding = validate_grounded_answer(question, llm_answer, grounding_chunks)
@@ -484,15 +484,15 @@ def build_ollama_grounded_answer(
                     return pruned_answer
 
             print(
-                "[GROUNDING] generated answer rejected; using extractive fallback: "
+                "[GROUNDING] generated answer rejected; returning control to chat service: "
                 + ", ".join(grounding.reasons)
             )
-            return _fallback_answer(question, grounding_chunks, language)
+            return ""
 
     if is_refusal_answer(llm_answer):
         # Retrieval and answerability already established evidence. A model-level
         # refusal is therefore treated as a generation failure, not as proof that
         # the corpus lacks an answer.
-        return _fallback_answer(question, grounding_chunks, language)
+        return ""
 
     return llm_answer

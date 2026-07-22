@@ -199,7 +199,7 @@ export const getFriendlyApiErrorMessage = (
       return 'Dokumen yang tersedia belum memuat informasi yang relevan untuk pertanyaan ini.';
 
     case 'AI_PROVIDER_ERROR':
-      return 'Layanan AI sedang gagal merespons. Periksa API Groq atau coba lagi nanti.';
+      return 'Layanan AI sedang gagal merespons. Periksa konfigurasi provider atau coba lagi nanti.';
 
     case 'EMBEDDING_FAILED':
       return 'Embedding dokumen atau pertanyaan gagal dibuat.';

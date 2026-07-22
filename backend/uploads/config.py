@@ -144,31 +144,35 @@ ENABLE_EVIDENCE_VERIFICATION = _env_bool(
     "ENABLE_EVIDENCE_VERIFICATION",
     True,
 )
-MIN_EVIDENCE_SCORE = _env_float("MIN_EVIDENCE_SCORE", 0.42)
+MIN_EVIDENCE_SCORE = _env_float("MIN_EVIDENCE_SCORE", 0.58)
 EVIDENCE_WEIGHT = _env_float("EVIDENCE_WEIGHT", 0.25)
 
 # Separate answerability/rejection gate. A reranker only reorders candidates;
 # these settings decide whether the indexed corpus contains enough explicit
 # evidence to answer at all.
 ENABLE_ANSWERABILITY_GATE = _env_bool("ENABLE_ANSWERABILITY_GATE", True)
-ANSWERABILITY_MIN_TOP_SCORE = _env_float("ANSWERABILITY_MIN_TOP_SCORE", 0.35)
+ANSWERABILITY_MIN_TOP_SCORE = _env_float("ANSWERABILITY_MIN_TOP_SCORE", 0.50)
 # A reranker may raise the blended score, but the original hybrid score must
 # still clear this floor. This prevents a confident cross-encoder from turning
 # a weak lexical/semantic match into an answerable result by itself.
-ANSWERABILITY_MIN_BASE_SCORE = _env_float("ANSWERABILITY_MIN_BASE_SCORE", 0.22)
-ANSWERABILITY_MIN_EVIDENCE_SCORE = _env_float("ANSWERABILITY_MIN_EVIDENCE_SCORE", 0.42)
+ANSWERABILITY_MIN_BASE_SCORE = _env_float("ANSWERABILITY_MIN_BASE_SCORE", 0.30)
+ANSWERABILITY_MIN_EVIDENCE_SCORE = _env_float("ANSWERABILITY_MIN_EVIDENCE_SCORE", 0.58)
 ANSWERABILITY_MIN_SCORE_MARGIN = _env_float("ANSWERABILITY_MIN_SCORE_MARGIN", 0.0)
 ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE = _env_bool(
     "ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE",
-    False,
+    True,
+)
+ANSWERABILITY_REQUIRE_COHERENT_EVIDENCE = _env_bool(
+    "ANSWERABILITY_REQUIRE_COHERENT_EVIDENCE",
+    True,
 )
 ANSWERABILITY_STRONG_RETRIEVAL_SCORE = _env_float(
     "ANSWERABILITY_STRONG_RETRIEVAL_SCORE",
-    0.68,
+    0.75,
 )
 ANSWERABILITY_STRONG_EXACT_COVERAGE = _env_float(
     "ANSWERABILITY_STRONG_EXACT_COVERAGE",
-    0.20,
+    0.35,
 )
 ANSWERABILITY_MAX_CONTEXTS = _env_int("ANSWERABILITY_MAX_CONTEXTS", 5)
 # Production safety rule: when the baseline hybrid+evidence gate rejects the
@@ -176,7 +180,7 @@ ANSWERABILITY_MAX_CONTEXTS = _env_int("ANSWERABILITY_MAX_CONTEXTS", 5)
 # answerable candidate set, but it is not an answerability classifier.
 ANSWERABILITY_PRE_RERANK_VETO = _env_bool(
     "ANSWERABILITY_PRE_RERANK_VETO",
-    False,
+    True,
 )
 if ANSWERABILITY_MAX_CONTEXTS <= 0:
     raise ValueError("ANSWERABILITY_MAX_CONTEXTS must be greater than zero")
@@ -184,8 +188,8 @@ if ANSWERABILITY_MAX_CONTEXTS <= 0:
 # Answer/source confidence gates. These settings live here (rather than being
 # read directly in answer_formatter.py) so the project-root .env is loaded
 # before the values are evaluated, regardless of Python import order.
-MIN_ANSWER_CONFIDENCE = _env_float("MIN_ANSWER_CONFIDENCE", 0.48)
-MIN_SOURCE_CONFIDENCE = _env_float("MIN_SOURCE_CONFIDENCE", 0.24)
+MIN_ANSWER_CONFIDENCE = _env_float("MIN_ANSWER_CONFIDENCE", 0.40)
+MIN_SOURCE_CONFIDENCE = _env_float("MIN_SOURCE_CONFIDENCE", 0.30)
 SOURCE_EXCERPT_MAX_CHARS = _env_int("SOURCE_EXCERPT_MAX_CHARS", 360)
 if SOURCE_EXCERPT_MAX_CHARS < 120:
     raise ValueError("SOURCE_EXCERPT_MAX_CHARS must be at least 120")
@@ -234,16 +238,23 @@ RETRIEVAL_WARMUP_QUERY = _env_str(
     "How do I reset my employee password?",
 )
 
+# Response language. Clear English/Indonesian questions are answered in the
+# detected language even when an old client sends the opposite default.
+AUTO_DETECT_RESPONSE_LANGUAGE = _env_bool("AUTO_DETECT_RESPONSE_LANGUAGE", True)
+
 # LLM provider selection
 DEFAULT_LLM_PROVIDER = _env_str("DEFAULT_LLM_PROVIDER", "ollama")
 
 # Gemini configuration
 GEMINI_API_KEY = _env_str("GEMINI_API_KEY", "")
-GEMINI_MODEL = _env_str("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = _env_str("GEMINI_MODEL", "gemini-3.5-flash")
 
-# OpenAI configuration
-OPENAI_API_KEY = _env_str("OPENAI_API_KEY", "")
-OPENAI_MODEL = _env_str("OPENAI_MODEL", "gpt-4o")
+# Groq configuration
+GROQ_API_KEY = _env_str("GROQ_API_KEY", "")
+GROQ_BASE_URL = _env_str("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+GROQ_MODEL = _env_str("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_TIMEOUT_SECONDS = _env_float("GROQ_TIMEOUT_SECONDS", 120.0)
+GROQ_MAX_RETRIES = max(0, _env_int("GROQ_MAX_RETRIES", 2))
 
 
 def public_rag_config() -> dict[str, str | float | bool | int]:
@@ -264,6 +275,7 @@ def public_rag_config() -> dict[str, str | float | bool | int]:
         "answerabilityMinimumEvidenceScore": ANSWERABILITY_MIN_EVIDENCE_SCORE,
         "answerabilityMinimumScoreMargin": ANSWERABILITY_MIN_SCORE_MARGIN,
         "answerabilityRequireSupportedEvidence": ANSWERABILITY_REQUIRE_SUPPORTED_EVIDENCE,
+        "answerabilityRequireCoherentEvidence": ANSWERABILITY_REQUIRE_COHERENT_EVIDENCE,
         "answerabilityStrongRetrievalScore": ANSWERABILITY_STRONG_RETRIEVAL_SCORE,
         "answerabilityStrongExactCoverage": ANSWERABILITY_STRONG_EXACT_COVERAGE,
         "answerabilityMaxContexts": ANSWERABILITY_MAX_CONTEXTS,

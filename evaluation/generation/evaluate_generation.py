@@ -14,13 +14,19 @@ import math
 import os
 import re
 import statistics
+import requests
+from dotenv import load_dotenv
 from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable
 
-from dataset_utils import dataset_summary, load_ground_truth_files
+try:
+    from .dataset_utils import dataset_summary, load_ground_truth_files
+except ImportError:  # Direct script execution.
+    from dataset_utils import dataset_summary, load_ground_truth_files
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(PROJECT_ROOT / ".env")
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 DEFAULT_DATASETS = [
     EVALUATION_DIR / "datasets" / "qna_english_50.csv",
@@ -153,6 +159,30 @@ def source_metrics(
         "citation_accuracy": len(expected_units & cited_units) / len(expected_units),
         "retrieval_no_result": 1.0 if not retrieved_units else 0.0,
     }
+
+
+def metadata_metrics(
+    retrieved_sources: list[Any],
+    expected_sources: list[Any],
+    citations: list[Any],
+) -> tuple[float, float, float]:
+    """Legacy 1-to-5 wrapper around the canonical 0-to-1 source metrics."""
+    metrics = source_metrics(
+        retrieved_sources,
+        expected_sources,
+        citations,
+        answerable=bool(expected_sources),
+    )
+
+    def scaled(name: str) -> float:
+        value = metrics.get(name)
+        return 0.0 if value is None else round(float(value) * 5.0, 4)
+
+    return (
+        scaled("context_precision"),
+        scaled("context_recall"),
+        scaled("citation_accuracy"),
+    )
 
 
 def normalize_answer(text: str) -> str:
@@ -290,9 +320,11 @@ Return JSON only:
 """
 
     try:
-        from openai import OpenAI
-
-        client = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
+        endpoint = LLM_BASE_URL.rstrip("/") + "/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {LLM_API_KEY}",
+            "Content-Type": "application/json",
+        }
         request = {
             "model": LLM_MODEL,
             "temperature": 0,
@@ -300,15 +332,16 @@ Return JSON only:
                 {"role": "system", "content": "Return one valid JSON object only."},
                 {"role": "user", "content": prompt},
             ],
+            "response_format": {"type": "json_object"},
         }
-        try:
-            response = client.chat.completions.create(
-                **request,
-                response_format={"type": "json_object"},
-            )
-        except Exception:
-            response = client.chat.completions.create(**request)
-        result = parse_json_object(response.choices[0].message.content or "")
+        response = requests.post(endpoint, headers=headers, json=request, timeout=120)
+        if response.status_code >= 400:
+            request.pop("response_format", None)
+            response = requests.post(endpoint, headers=headers, json=request, timeout=120)
+        response.raise_for_status()
+        payload = response.json()
+        content = payload["choices"][0]["message"].get("content") or ""
+        result = parse_json_object(content)
         raw_hallucination = result.get("is_hallucination", False)
         if isinstance(raw_hallucination, str):
             is_hallucination = raw_hallucination.strip().casefold() in {"true", "1", "yes"}

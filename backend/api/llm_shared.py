@@ -25,7 +25,9 @@ SYSTEM_PROMPT = (
     "Do not add an introduction, rationale, recommendation, citation, confidence, heading, label, "
     "assumption, example, condition, exception, background detail, causal explanation, benefit, or "
     "implication unless the question explicitly asks for it and the evidence explicitly states it. "
-    "Never replace a supported answer with a refusal."
+    "Never replace a supported answer with a refusal. "
+    "Answer in the language explicitly requested in the user prompt. "
+    "Do not copy headings, FAQ questions, separators, or unrelated context into the answer."
 )
 
 
@@ -52,10 +54,10 @@ def build_context(question: str, chunks: list[dict[str, Any]]) -> str:
         )
         page = chunk.get("page", metadata.get("page")) or "-"
         blocks.append(
-            f"[KONTEKS {index}]\n"
-            f"Dokumen: {name}\n"
-            f"Halaman/lokasi: {page}\n"
-            f"Bukti: {content}"
+            f"[EVIDENCE {index}]\n"
+            f"Document: {name}\n"
+            f"Page/location: {page}\n"
+            f"Evidence text: {content}"
         )
     return "\n\n".join(blocks)
 
@@ -109,13 +111,34 @@ def is_incomplete_answer(question: str, answer: str) -> bool:
     clean_answer = clean_text(answer)
     if not clean_answer:
         return True
-    words = clean_answer.split()
-    if len(words) < 6:
-        return True
+
     lower_answer = clean_answer.casefold()
-    incomplete_endings = (":", ",", ";", "-", " dan", " atau")
+    incomplete_endings = (":", ",", ";", "-", " dan", " atau", " and", " or")
     if lower_answer.endswith(incomplete_endings):
         return True
+
+    words = clean_answer.split()
+    if len(words) < 6:
+        # Direct fact answers such as ``50 GB.``, ``PostgreSQL.``, or
+        # ``Within four hours.`` are complete even though they are short.
+        fragment_tail = {
+            "the", "a", "an", "of", "to", "in", "on", "for", "with",
+            "is", "are", "was", "were", "and", "or", "yang", "dan",
+            "atau", "dengan", "untuk", "dalam", "adalah",
+        }
+        last_word = re.sub(r"[^a-zà-ÿ]+", "", words[-1].casefold())
+        has_terminal_punctuation = clean_answer[-1:] in ".!?"
+        if has_terminal_punctuation and last_word not in fragment_tail:
+            return False
+        if re.search(
+            r"(?:\b\d+(?:[.,]\d+)?\s*(?:kb|mb|gb|tb|%|minutes?|hours?|days?|weeks?|months?|years?|menit|jam|hari|bulan|tahun)\b|"
+            r"https?://|\b[A-Z][A-Za-z0-9_.-]{2,}\b)",
+            clean_answer,
+            flags=re.I,
+        ):
+            return False
+        return True
+
     return False
 
 
