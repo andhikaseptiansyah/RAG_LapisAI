@@ -1,0 +1,10 @@
+﻿Model,Model Name,Scope,Total Questions,Answerable,Unanswerable,normalized_exact_match,token_f1,keyword_coverage,faithfulness_1_to_5,answer_relevance_1_to_5,context_precision,context_recall,citation_accuracy,false_refusal_rate,unanswerable_safety_rate,unanswerable_no_citation_rate,unanswerable_no_result_rate,hallucination_rate,generation_failure_rate,average_response_time_ms,p95_response_time_ms
+ollama,qwen3-custom:latest,ALL,100,90,10,0.0444,0.4244,0.6574,4.101,3.9596,0.9111,0.9111,0.9111,0.0111,0.6,0.6,0.6,0.0303,0.01,10136.8878,13619.62
+ollama,qwen3-custom:latest,EN,50,45,5,0.0667,0.5812,0.8519,4.3878,4.1837,0.9556,0.9556,0.9556,0.0222,0.2,0.2,0.2,0.0408,0.02,9579.7204,12947.43
+ollama,qwen3-custom:latest,ID,50,45,5,0.0222,0.2676,0.463,3.82,3.74,0.8667,0.8667,0.8667,0.0,1.0,1.0,1.0,0.02,0.0,10694.0552,13717.09
+gemini,gemini-2.0-flash,ALL,100,90,10,0.0111,0.3147,0.6519,3.9798,3.9192,0.9111,0.9111,0.9111,0.0111,0.6,0.6,0.6,0.0202,0.01,8193.7072,8975.36
+gemini,gemini-2.0-flash,EN,50,45,5,0.0222,0.499,0.8963,4.2245,4.1837,0.9556,0.9556,0.9556,0.0222,0.2,0.2,0.2,0.0204,0.02,8187.7644,8690.87
+gemini,gemini-2.0-flash,ID,50,45,5,0.0,0.1304,0.4074,3.74,3.66,0.8667,0.8667,0.8667,0.0,1.0,1.0,1.0,0.02,0.0,8199.65,8989.63
+openai,gpt-4o,ALL,100,90,10,0.0111,0.3147,0.6519,3.9798,3.9192,0.9111,0.9111,0.9111,0.0111,0.6,0.6,0.6,0.0202,0.01,6785.7307,7375.12
+openai,gpt-4o,EN,50,45,5,0.0222,0.499,0.8963,4.2245,4.1837,0.9556,0.9556,0.9556,0.0222,0.2,0.2,0.2,0.0204,0.02,6819.8478,7415.89
+openai,gpt-4o,ID,50,45,5,0.0,0.1304,0.4074,3.74,3.66,0.8667,0.8667,0.8667,0.0,1.0,1.0,1.0,0.02,0.0,6751.6136,7372.71

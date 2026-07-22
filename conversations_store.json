@@ -1,5 +1,237 @@
 [
   {
+    "id": "b54e5614-a4b8-4843-8e85-8edcec1d8fb5",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b0bda45e-9e3b-46f1-aa3a-dfaee7a6f5ed",
+        "conversation_id": "b54e5614-a4b8-4843-8e85-8edcec1d8fb5",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-20T12:25:22.596896+00:00"
+      },
+      {
+        "id": "69a4bf59-5781-42dd-8c6b-b978cdbbcbb3",
+        "conversation_id": "b54e5614-a4b8-4843-8e85-8edcec1d8fb5",
+        "role": "assistant",
+        "content": "Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "attachments": [],
+        "confidence": 0.7404,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.694,
+              "relevance_score": 0.694,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-20T12:25:22.596896+00:00"
+      }
+    ],
+    "created_at": "2026-07-20T12:25:22.596896+00:00",
+    "updated_at": "2026-07-20T12:25:22.596896+00:00",
+    "last_message": "Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-20T12:25:22.596896+00:00"
+  },
+  {
+    "id": "10599485-9180-4ad9-9170-d365a23bd618",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "09fcc3df-bcdc-4ab7-9e81-08632ef10fcf",
+        "conversation_id": "10599485-9180-4ad9-9170-d365a23bd618",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-20T12:23:41.292271+00:00"
+      },
+      {
+        "id": "7dc98683-b448-47a0-9937-7fc42537efca",
+        "conversation_id": "10599485-9180-4ad9-9170-d365a23bd618",
+        "role": "assistant",
+        "content": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "attachments": [],
+        "confidence": 0.5943,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5668,
+              "relevance_score": 0.5668,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": "Insiden teknis apa yang menyebabkan klien kehilangan akses platform pada pertengahan Oktober 2025, dan apa akar penyebabnya?",
+          "followUpQuestion": "Insiden teknis apa yang menyebabkan klien kehilangan akses platform pada pertengahan Oktober 2025, dan apa akar penyebabnya?"
+        },
+        "created_at": "2026-07-20T12:23:41.292271+00:00"
+      }
+    ],
+    "created_at": "2026-07-20T12:23:41.292271+00:00",
+    "updated_at": "2026-07-20T12:23:41.292271+00:00",
+    "last_message": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-20T12:23:41.292271+00:00"
+  },
+  {
+    "id": "32866035-6269-4aa7-b73f-475dfcecd894",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4ae14b8e-02d5-49dd-a24f-16281294ad7e",
+        "conversation_id": "32866035-6269-4aa7-b73f-475dfcecd894",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-20T12:23:06.332677+00:00"
+      },
+      {
+        "id": "1667b9e4-0eb3-45a7-8298-69cbeb957dd4",
+        "conversation_id": "32866035-6269-4aa7-b73f-475dfcecd894",
+        "role": "assistant",
+        "content": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "attachments": [],
+        "confidence": 0.5943,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.5668,
+              "relevance_score": 0.5668,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": "Insiden teknis apa yang menyebabkan klien kehilangan akses platform pada pertengahan Oktober 2025, dan apa akar penyebabnya?",
+          "followUpQuestion": "Insiden teknis apa yang menyebabkan klien kehilangan akses platform pada pertengahan Oktober 2025, dan apa akar penyebabnya?"
+        },
+        "created_at": "2026-07-20T12:23:06.332677+00:00"
+      }
+    ],
+    "created_at": "2026-07-20T12:23:06.332677+00:00",
+    "updated_at": "2026-07-20T12:23:06.332677+00:00",
+    "last_message": "Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-20T12:23:06.332677+00:00"
+  },
+  {
+    "id": "45c96077-dd47-462e-a471-f5941bb67ca0",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "f097e9a2-2ce5-4b85-8c84-d30290905fd7",
+        "conversation_id": "45c96077-dd47-462e-a471-f5941bb67ca0",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-20T12:21:04.250521+00:00"
+      },
+      {
+        "id": "6e1b8658-7a78-4476-aef8-cbfb474e9b4b",
+        "conversation_id": "45c96077-dd47-462e-a471-f5941bb67ca0",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-20T12:21:04.250521+00:00"
+      }
+    ],
+    "created_at": "2026-07-20T12:21:04.250521+00:00",
+    "updated_at": "2026-07-20T12:21:04.250521+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-20T12:21:04.250521+00:00"
+  },
+  {
     "id": "b89cb86f-f361-4864-82d3-6db28d096e6c",
     "user_id": "dev-admin",
     "user_name": "Admin",

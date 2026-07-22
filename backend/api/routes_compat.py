@@ -456,12 +456,14 @@ async def compat_chat(request: Request):
         conversation_id = str(form.get("conversationId") or "").strip() or None
         language = str(form.get("language") or "ID").strip() or "ID"
         query_id = str(form.get("queryId") or "").strip() or None
+        model = str(form.get("model") or "").strip() or None
     else:
         payload = await request.json()
         question = str(payload.get("message") or payload.get("question") or "").strip()
         conversation_id = payload.get("conversationId") or None
         language = payload.get("language") or "ID"
         query_id = str(payload.get("queryId") or "").strip() or None
+        model = str(payload.get("model") or "").strip() or None
 
     if not question:
         raise HTTPException(status_code=400, detail="Message is required")
@@ -474,6 +476,7 @@ async def compat_chat(request: Request):
             question,
             top_k=5,
             language=language,
+            model=model,
         )
     except Exception as exc:
         save_log(
@@ -538,6 +541,7 @@ async def compat_chat(request: Request):
         "page": primary_source.get("page") if primary_source else None,
         "createdAt": assistant_message["created_at"],
         "language": language,
+        "model": result.get("model"),
     }
 
 

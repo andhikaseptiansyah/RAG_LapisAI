@@ -339,6 +339,7 @@ def build_ollama_grounded_answer(
     question: str,
     chunks: list[dict[str, Any]],
     language: str = "ID",
+    evaluation_mode: bool = False,
 ) -> str:
     """Generate only the answer text.
 
@@ -406,6 +407,13 @@ def build_ollama_grounded_answer(
         raw_answer, done_reason = _ollama_chat(system_prompt, user_prompt)
         llm_answer = _clean_model_answer(raw_answer)
 
+        # Use the first native model response for cross-provider evaluation.
+        # Production mode keeps the existing retry/grounding/fallback guards.
+        if evaluation_mode:
+            if not llm_answer:
+                raise RuntimeError("Ollama returned an empty answer")
+            return llm_answer
+
         retry_count = 0
         while retry_count < OLLAMA_MAX_RETRIES:
             incomplete = _is_likely_incomplete_answer(question, llm_answer, done_reason)
@@ -435,6 +443,8 @@ def build_ollama_grounded_answer(
             llm_answer = _clean_model_answer(raw_answer)
 
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, Exception) as exc:
+        if evaluation_mode:
+            raise RuntimeError("Ollama native generation failed: " + str(exc)) from exc
         # Keep the application usable when Ollama is offline or a model call fails.
         print(f"[OLLAMA] fallback to formatter: {exc}")
         return _fallback_answer(question, grounding_chunks, language)

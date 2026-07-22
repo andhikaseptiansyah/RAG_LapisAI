@@ -23,6 +23,8 @@ class ChatRequest(BaseModel):
     top_k: int = Field(default=5, ge=1, le=20)
     language: str = Field(default="ID")
     query_id: str | None = None
+    model: str | None = Field(default=None)
+    evaluation_mode: bool = Field(default=False)
 
 
 class QueryRequest(BaseModel):
@@ -57,6 +59,8 @@ class ChatResponse(BaseModel):
     generation_contexts: list[GenerationContextResponse] = Field(default_factory=list)
     follow_up_question: str | None = None
     response_time_ms: int = Field(ge=0)
+    model: str | None = None
+    generation_mode: str | None = None
 
 
 @router.post("/query")
@@ -113,6 +117,8 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
             payload.question,
             top_k=payload.top_k,
             language=payload.language,
+            model=payload.model,
+            evaluation_mode=payload.evaluation_mode,
         )
     except Exception as exc:
         save_log(
@@ -143,4 +149,6 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
         "generation_contexts": result.get("generation_contexts", []),
         "follow_up_question": result.get("follow_up_question"),
         "response_time_ms": result["response_time_ms"],
+        "model": result.get("model"),
+        "generation_mode": result.get("generation_mode"),
     }

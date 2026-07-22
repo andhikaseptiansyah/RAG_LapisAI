@@ -648,6 +648,8 @@ export const App: React.FC = () => {
     sendMessage,
     loadConversation,
     setLanguage,
+    model,
+    setModel,
     stopGenerating,
     clearChat,
   } = useChat({
@@ -1326,6 +1328,8 @@ export const App: React.FC = () => {
                 handleMicClick
               }
               language={detectedLanguage}
+              model={model}
+              onModelChange={setModel}
             />
           ) : (
             <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 md:gap-6 relative z-10 pb-6 animate-fadeIn">

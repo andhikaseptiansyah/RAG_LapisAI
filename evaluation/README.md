@@ -196,3 +196,23 @@ User-facing citations follow these rules:
 - TXT: exact source-line range, for example `Lines 51–100`; no physical page is claimed.
 
 DOCX/TXT still use internal logical groups for chunk IDs and retrieval evaluation, but those internal group numbers are deliberately removed from the citation API and UI. Every source also stores a short verbatim `excerpt` selected from the retrieved chunk.
+
+## Bilingual 3-model final evaluation
+
+The final Project-1 comparison now uses 100 questions: 50 English and 50 Indonesian, including 10 deliberately unanswerable questions. See:
+
+```text
+evaluation/EVALUATION_3_MODELS.md
+```
+
+Validate the dataset:
+
+```powershell
+python .\evaluation\generation\run_three_model_evaluation.py --validate-only
+```
+
+Run Ollama, Gemini, and OpenAI with the same evaluation settings:
+
+```powershell
+python .\evaluation\generation\run_three_model_evaluation.py
+```

@@ -1,0 +1,104 @@
+{
+  "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
+  "evaluation": "Bilingual 3-model generation evaluation",
+  "model": "openai",
+  "model_name": "gpt-4o",
+  "judge_model": "qwen3-custom:latest",
+  "ground_truth_files": [
+    "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\evaluation\\datasets\\qna_english_50.csv",
+    "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\evaluation\\datasets\\qna_indonesia_50.csv"
+  ],
+  "dataset": {
+    "total": 100,
+    "answerable": 90,
+    "unanswerable": 10,
+    "by_language": {
+      "EN": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      },
+      "ID": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    }
+  },
+  "overall": {
+    "total_questions": 100,
+    "answerable_questions": 90,
+    "unanswerable_questions": 10,
+    "normalized_exact_match": 0.0111,
+    "token_f1": 0.3147,
+    "keyword_coverage": 0.6519,
+    "faithfulness_1_to_5": 3.9798,
+    "answer_relevance_1_to_5": 3.9192,
+    "context_precision": 0.9111,
+    "context_recall": 0.9111,
+    "citation_accuracy": 0.9111,
+    "false_refusal_rate": 0.0111,
+    "unanswerable_safety_rate": 0.6,
+    "unanswerable_no_citation_rate": 0.6,
+    "unanswerable_no_result_rate": 0.6,
+    "hallucination_rate": 0.0202,
+    "generation_failure_rate": 0.01,
+    "judge_error_rate": 0.0,
+    "average_response_time_ms": 6785.7307,
+    "median_response_time_ms": 6771.27,
+    "p95_response_time_ms": 7375.12
+  },
+  "by_language": {
+    "EN": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0222,
+      "token_f1": 0.499,
+      "keyword_coverage": 0.8963,
+      "faithfulness_1_to_5": 4.2245,
+      "answer_relevance_1_to_5": 4.1837,
+      "context_precision": 0.9556,
+      "context_recall": 0.9556,
+      "citation_accuracy": 0.9556,
+      "false_refusal_rate": 0.0222,
+      "unanswerable_safety_rate": 0.2,
+      "unanswerable_no_citation_rate": 0.2,
+      "unanswerable_no_result_rate": 0.2,
+      "hallucination_rate": 0.0204,
+      "generation_failure_rate": 0.02,
+      "judge_error_rate": 0.0,
+      "average_response_time_ms": 6819.8478,
+      "median_response_time_ms": 6662.77,
+      "p95_response_time_ms": 7415.89
+    },
+    "ID": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0,
+      "token_f1": 0.1304,
+      "keyword_coverage": 0.4074,
+      "faithfulness_1_to_5": 3.74,
+      "answer_relevance_1_to_5": 3.66,
+      "context_precision": 0.8667,
+      "context_recall": 0.8667,
+      "citation_accuracy": 0.8667,
+      "false_refusal_rate": 0.0,
+      "unanswerable_safety_rate": 1.0,
+      "unanswerable_no_citation_rate": 1.0,
+      "unanswerable_no_result_rate": 1.0,
+      "hallucination_rate": 0.02,
+      "generation_failure_rate": 0.0,
+      "judge_error_rate": 0.0,
+      "average_response_time_ms": 6751.6136,
+      "median_response_time_ms": 6898.58,
+      "p95_response_time_ms": 7372.71
+    }
+  },
+  "notes": [
+    "All answerable source metrics are evaluated at document level because the CSV has no page labels.",
+    "Unanswerable safety requires a refusal and no citation.",
+    "The same configured judge model must be used for all three evaluated models."
+  ]
+}

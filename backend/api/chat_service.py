@@ -16,7 +16,7 @@ from api.answer_formatter import (
     top_confidence,
 )
 from api.follow_up_service import build_dataset_follow_up_question
-from api.ollama_client import build_ollama_grounded_answer
+from api.model_router import build_grounded_answer
 from retrieval.hybrid_search import hybrid_search
 from retrieval.context_selector import select_context_bundle
 from uploads.config import (
@@ -96,6 +96,8 @@ def run_chat(
     *,
     top_k: int = 5,
     language: str = "ID",
+    model: str | None = None,
+    evaluation_mode: bool = False,
 ) -> dict[str, Any]:
     """Run one chat turn and return the canonical backend response payload.
 
@@ -146,17 +148,23 @@ def run_chat(
         }
 
     answer = answer_text_only(
-        build_ollama_grounded_answer(
+        build_grounded_answer(
             question,
             chunks,
             language=normalized_language,
+            model=model,
+            evaluation_mode=evaluation_mode,
         )
     )
 
     # A model refusal after accepted retrieval is a generation failure. Recover
     # with a verbatim extractive answer instead of converting it into a false
     # refusal.
-    if (not answer or is_refusal_answer(answer)) and bundle_answerable:
+    if (
+        not evaluation_mode
+        and (not answer or is_refusal_answer(answer))
+        and bundle_answerable
+    ):
         answer = answer_text_only(
             build_safe_extractive_answer(
                 question,
@@ -171,7 +179,10 @@ def run_chat(
         limit=min(MAX_SOURCE_CITATIONS, 2),
     )
 
-    if not answer or is_refusal_answer(answer) or not sources:
+    if evaluation_mode:
+        if not answer:
+            raise RuntimeError("Native model generation returned an empty answer")
+    elif not answer or is_refusal_answer(answer) or not sources:
         answer = build_refusal_answer(normalized_language)
         confidence = 0.0
         sources = []
@@ -192,5 +203,10 @@ def run_chat(
         "generation_contexts": generation_contexts,
         "follow_up_question": follow_up_question,
         "response_time_ms": int(round((time.perf_counter() - started_at) * 1000)),
-        "model": "ollama-rag" if confidence > 0 else "retrieval-refusal",
+        "model": f"{model or 'ollama'}-rag" if confidence > 0 else "retrieval-refusal",
+        "generation_mode": (
+            "native_model" if evaluation_mode and confidence > 0 else
+            "retrieval_refusal" if confidence <= 0 else
+            "production_guarded"
+        ),
     }

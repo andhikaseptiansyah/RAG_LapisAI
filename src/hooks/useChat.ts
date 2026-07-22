@@ -8,6 +8,7 @@ import {
 import type {
   AttachedFile,
   Message,
+  ModelType,
 } from '../types';
 
 import {
@@ -39,6 +40,7 @@ interface UseChatOptions {
   initialMessages?: Message[];
   initialConversationId?: string;
   initialLanguage?: ChatLanguage;
+  initialModel?: ModelType;
 }
 
 function createLocalId(): string {
@@ -189,6 +191,7 @@ export function useChat(
     initialMessages = [],
     initialConversationId,
     initialLanguage = 'ID',
+    initialModel = 'ollama',
   } = options;
 
   const [messages, setMessages] =
@@ -201,6 +204,9 @@ export function useChat(
 
   const [language, setLanguage] =
     useState<ChatLanguage>(initialLanguage);
+
+  const [model, setModel] =
+    useState<ModelType>(initialModel);
 
   const [isGenerating, setIsGenerating] =
     useState(false);
@@ -281,6 +287,7 @@ export function useChat(
             queryId,
             conversationId,
             language: selectedLanguage,
+            model,
             attachments,
           },
           controller.signal
@@ -363,7 +370,7 @@ export function useChat(
         }
       }
     },
-    [conversationId, isGenerating, language]
+    [conversationId, isGenerating, language, model]
   );
 
   const loadConversation = useCallback(
@@ -476,6 +483,8 @@ export function useChat(
     conversationId,
     language,
     setLanguage,
+    model,
+    setModel,
     isGenerating,
     error,
     clearError,

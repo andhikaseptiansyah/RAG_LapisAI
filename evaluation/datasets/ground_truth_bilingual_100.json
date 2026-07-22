@@ -1,0 +1,1903 @@
+{
+  "dataset_name": "LapisAI Bilingual 100 Q&A",
+  "description": "50 English + 50 Indonesian questions for 3-model RAG evaluation",
+  "summary": {
+    "total": 100,
+    "answerable": 90,
+    "unanswerable": 10,
+    "by_language": {
+      "EN": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      },
+      "ID": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "EN-001",
+      "split": "all",
+      "language": "EN",
+      "question": "How long is the probation period for new employees?",
+      "answerable": true,
+      "expected_answer": "3 months, with a performance evaluation in week 12.",
+      "expected_answer_keywords": [
+        "3 months",
+        "probation",
+        "week 12"
+      ],
+      "references": [
+        {
+          "document": "SOP_Onboarding.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-002",
+      "split": "all",
+      "language": "EN",
+      "question": "How quickly must a P1 IT incident be resolved?",
+      "answerable": true,
+      "expected_answer": "Within 4 hours, acknowledged within 15 minutes.",
+      "expected_answer_keywords": [
+        "P1",
+        "4 hours",
+        "15 minutes"
+      ],
+      "references": [
+        {
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-003",
+      "split": "all",
+      "language": "EN",
+      "question": "What approval is needed for a purchase above IDR 50 million?",
+      "answerable": true,
+      "expected_answer": "Director approval plus three vendor quotations.",
+      "expected_answer_keywords": [
+        "Director approval",
+        "3 vendor quotations",
+        "above IDR 50 million"
+      ],
+      "references": [
+        {
+          "document": "SOP_Procurement.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-004",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the deadline to submit an expense claim?",
+      "answerable": true,
+      "expected_answer": "Within 30 days of the expense date.",
+      "expected_answer_keywords": [
+        "30 days",
+        "expense claim deadline"
+      ],
+      "references": [
+        {
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-005",
+      "split": "all",
+      "language": "EN",
+      "question": "How much advance notice is required for annual leave?",
+      "answerable": true,
+      "expected_answer": "At least 5 working days via the HR portal.",
+      "expected_answer_keywords": [
+        "5 working days",
+        "annual leave",
+        "HR portal"
+      ],
+      "references": [
+        {
+          "document": "SOP_Leave_Request.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-006",
+      "split": "all",
+      "language": "EN",
+      "question": "How often are full database backups taken?",
+      "answerable": true,
+      "expected_answer": "Nightly at 01:00 WIB, with incremental backups every 6 hours.",
+      "expected_answer_keywords": [
+        "nightly 01:00 WIB",
+        "full backup",
+        "6 hours incremental"
+      ],
+      "references": [
+        {
+          "document": "SOP_Data_Backup.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-007",
+      "split": "all",
+      "language": "EN",
+      "question": "When must IT revoke a departing employee's access?",
+      "answerable": true,
+      "expected_answer": "Within 2 hours of the employee's exit time.",
+      "expected_answer_keywords": [
+        "2 hours",
+        "offboarding",
+        "access revocation"
+      ],
+      "references": [
+        {
+          "document": "SOP_Offboarding.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-008",
+      "split": "all",
+      "language": "EN",
+      "question": "How many days per week can employees work from home?",
+      "answerable": true,
+      "expected_answer": "Up to 2 days per week with manager approval.",
+      "expected_answer_keywords": [
+        "2 days per week",
+        "WFH",
+        "manager approval"
+      ],
+      "references": [
+        {
+          "document": "Policy_WFH.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-009",
+      "split": "all",
+      "language": "EN",
+      "question": "Who must a suspected data breach be reported to and how fast?",
+      "answerable": true,
+      "expected_answer": "security@nusantaradynamics.co.id within 1 hour.",
+      "expected_answer_keywords": [
+        "security@nusantaradynamics.co.id",
+        "1 hour",
+        "data breach"
+      ],
+      "references": [
+        {
+          "document": "Policy_Data_Security.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-010",
+      "split": "all",
+      "language": "EN",
+      "question": "How many annual leave days do employees get?",
+      "answerable": true,
+      "expected_answer": "12 days per year, accruing monthly.",
+      "expected_answer_keywords": [
+        "12 days",
+        "annual leave",
+        "accruing monthly"
+      ],
+      "references": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-011",
+      "split": "all",
+      "language": "EN",
+      "question": "What are the password requirements?",
+      "answerable": true,
+      "expected_answer": "At least 12 characters with upper, lower, number, and symbol; changed every 90 days.",
+      "expected_answer_keywords": [
+        "12 characters",
+        "upper lower number symbol",
+        "90 days"
+      ],
+      "references": [
+        {
+          "document": "Policy_Password.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-012",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the domestic meal per diem?",
+      "answerable": true,
+      "expected_answer": "IDR 250,000 per day.",
+      "expected_answer_keywords": [
+        "IDR 250,000",
+        "per day",
+        "meal per diem"
+      ],
+      "references": [
+        {
+          "document": "Policy_Travel_Expense.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-013",
+      "split": "all",
+      "language": "EN",
+      "question": "What was Q3 2025 revenue?",
+      "answerable": true,
+      "expected_answer": "IDR 42.5 billion, up 12% over Q2 2025.",
+      "expected_answer_keywords": [
+        "IDR 42.5 billion",
+        "12%",
+        "Q3 2025"
+      ],
+      "references": [
+        {
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-014",
+      "split": "all",
+      "language": "EN",
+      "question": "What was the root cause of the October 2025 outage?",
+      "answerable": true,
+      "expected_answer": "An expired TLS certificate on the API gateway.",
+      "expected_answer_keywords": [
+        "expired TLS certificate",
+        "API gateway"
+      ],
+      "references": [
+        {
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-015",
+      "split": "all",
+      "language": "EN",
+      "question": "What was the 2025 overall CSAT score?",
+      "answerable": true,
+      "expected_answer": "87%, up from 83% in 2024.",
+      "expected_answer_keywords": [
+        "87%",
+        "83%",
+        "CSAT 2025"
+      ],
+      "references": [
+        {
+          "document": "Report_CSAT_2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-016",
+      "split": "all",
+      "language": "EN",
+      "question": "How many security incidents occurred in 2025?",
+      "answerable": true,
+      "expected_answer": "3 reportable incidents, none resulting in data loss.",
+      "expected_answer_keywords": [
+        "3 incidents",
+        "no data loss",
+        "2025"
+      ],
+      "references": [
+        {
+          "document": "Report_Security_Review_2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-017",
+      "split": "all",
+      "language": "EN",
+      "question": "What was full-year 2025 revenue?",
+      "answerable": true,
+      "expected_answer": "IDR 158 billion, with a 14% net profit margin.",
+      "expected_answer_keywords": [
+        "IDR 158 billion",
+        "14%",
+        "net profit margin"
+      ],
+      "references": [
+        {
+          "document": "Report_Financial_FY2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-018",
+      "split": "all",
+      "language": "EN",
+      "question": "What database does the platform use?",
+      "answerable": true,
+      "expected_answer": "PostgreSQL 15, with Redis for caching.",
+      "expected_answer_keywords": [
+        "PostgreSQL 15",
+        "Redis",
+        "caching"
+      ],
+      "references": [
+        {
+          "document": "TECH_System_Architecture.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-019",
+      "split": "all",
+      "language": "EN",
+      "question": "How long are internal API tokens valid?",
+      "answerable": true,
+      "expected_answer": "60 minutes.",
+      "expected_answer_keywords": [
+        "60 minutes",
+        "API token"
+      ],
+      "references": [
+        {
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-020",
+      "split": "all",
+      "language": "EN",
+      "question": "What are the RTO and RPO?",
+      "answerable": true,
+      "expected_answer": "RTO is 4 hours and RPO is 1 hour.",
+      "expected_answer_keywords": [
+        "RTO 4 hours",
+        "RPO 1 hour"
+      ],
+      "references": [
+        {
+          "document": "TECH_Disaster_Recovery.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-021",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the API availability SLO?",
+      "answerable": true,
+      "expected_answer": "99.9% per month.",
+      "expected_answer_keywords": [
+        "99.9%",
+        "monthly",
+        "API availability SLO"
+      ],
+      "references": [
+        {
+          "document": "TECH_Monitoring_Guide.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-022",
+      "split": "all",
+      "language": "EN",
+      "question": "How long are audit logs retained?",
+      "answerable": true,
+      "expected_answer": "7 years.",
+      "expected_answer_keywords": [
+        "7 years",
+        "audit logs"
+      ],
+      "references": [
+        {
+          "document": "TECH_Data_Retention.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-023",
+      "split": "all",
+      "language": "EN",
+      "question": "What unit-test coverage is required to merge code?",
+      "answerable": true,
+      "expected_answer": "At least 80%.",
+      "expected_answer_keywords": [
+        "80%",
+        "unit-test coverage",
+        "merge"
+      ],
+      "references": [
+        {
+          "document": "TECH_CICD_Pipeline.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-024",
+      "split": "all",
+      "language": "EN",
+      "question": "How do I reset my password?",
+      "answerable": true,
+      "expected_answer": "Raise a ticket to the IT Helpdesk via the portal; processed within 1x24 hours.",
+      "expected_answer_keywords": [
+        "IT Helpdesk",
+        "portal",
+        "1x24 hours"
+      ],
+      "references": [
+        {
+          "document": "FAQ_IT_Support.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-025",
+      "split": "all",
+      "language": "EN",
+      "question": "When is payday?",
+      "answerable": true,
+      "expected_answer": "The 25th of each month (prior working day if a holiday).",
+      "expected_answer_keywords": [
+        "25th",
+        "payday",
+        "prior working day"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-026",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the mailbox size limit?",
+      "answerable": true,
+      "expected_answer": "50 GB.",
+      "expected_answer_keywords": [
+        "50 GB",
+        "mailbox quota"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-027",
+      "split": "all",
+      "language": "EN",
+      "question": "What should I bring on my first day?",
+      "answerable": true,
+      "expected_answer": "A valid ID, NPWP (tax ID), and bank account details.",
+      "expected_answer_keywords": [
+        "valid ID",
+        "NPWP",
+        "bank account details"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-028",
+      "split": "all",
+      "language": "EN",
+      "question": "Is there a home-office allowance?",
+      "answerable": true,
+      "expected_answer": "Yes, a one-time allowance of IDR 1,500,000.",
+      "expected_answer_keywords": [
+        "IDR 1,500,000",
+        "home-office allowance"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Remote_Work.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-029",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the replacement fee for an access card?",
+      "answerable": true,
+      "expected_answer": "IDR 50,000.",
+      "expected_answer_keywords": [
+        "IDR 50,000",
+        "replacement access card"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-030",
+      "split": "all",
+      "language": "EN",
+      "question": "How many new enterprise customers were added in Q3 2025?",
+      "answerable": true,
+      "expected_answer": "18, bringing the total to 214.",
+      "expected_answer_keywords": [
+        "18 new customers",
+        "214 total",
+        "Q3 2025"
+      ],
+      "references": [
+        {
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-031",
+      "split": "all",
+      "language": "EN",
+      "question": "How many dependents are covered by the company health insurance plan?",
+      "answerable": true,
+      "expected_answer": "The company health insurance plan covers employees and up to three dependents.",
+      "expected_answer_keywords": [
+        "up to 3 dependents",
+        "health insurance"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Benefits.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-032",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the standard employee mailbox quota?",
+      "answerable": true,
+      "expected_answer": "The standard mailbox quota is 50 GB.",
+      "expected_answer_keywords": [
+        "50 GB",
+        "mailbox quota"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-033",
+      "split": "all",
+      "language": "EN",
+      "question": "How much does a replacement employee access card cost?",
+      "answerable": true,
+      "expected_answer": "A replacement access card costs IDR 50,000.",
+      "expected_answer_keywords": [
+        "IDR 50,000",
+        "replacement access card"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-034",
+      "split": "all",
+      "language": "EN",
+      "question": "Where and when can employees find their payslips?",
+      "answerable": true,
+      "expected_answer": "Payslips are available after the 25th in the HR portal under My Documents.",
+      "expected_answer_keywords": [
+        "HR portal",
+        "My Documents",
+        "after the 25th"
+      ],
+      "references": [
+        {
+          "document": "FAQ_HR.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-035",
+      "split": "all",
+      "language": "EN",
+      "question": "What documents or details should a new employee bring on the first day?",
+      "answerable": true,
+      "expected_answer": "A new employee should bring a valid ID, a tax ID or NPWP, and bank account details.",
+      "expected_answer_keywords": [
+        "valid ID",
+        "NPWP",
+        "bank account details"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-036",
+      "split": "all",
+      "language": "EN",
+      "question": "When is salary paid if the 25th falls on a holiday?",
+      "answerable": true,
+      "expected_answer": "Salary is paid on the prior working day when the 25th is a holiday.",
+      "expected_answer_keywords": [
+        "prior working day",
+        "25th",
+        "holiday"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-037",
+      "split": "all",
+      "language": "EN",
+      "question": "What should an employee do after receiving a suspicious email?",
+      "answerable": true,
+      "expected_answer": "The employee should not click any links and should report the email using the Report Phishing button.",
+      "expected_answer_keywords": [
+        "do not click links",
+        "Report Phishing button"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Security_Awareness.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-038",
+      "split": "all",
+      "language": "EN",
+      "question": "Who approves an employee request for access to a software tool?",
+      "answerable": true,
+      "expected_answer": "The system owner approves the software access request submitted through the IT Service Desk.",
+      "expected_answer_keywords": [
+        "system owner",
+        "IT Service Desk",
+        "approves"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Software_Access.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-039",
+      "split": "all",
+      "language": "EN",
+      "question": "Through which channels can an employee confidentially report harassment?",
+      "answerable": true,
+      "expected_answer": "Harassment can be reported confidentially to HR or through the whistleblower channel.",
+      "expected_answer_keywords": [
+        "HR",
+        "whistleblower channel",
+        "confidentially"
+      ],
+      "references": [
+        {
+          "document": "Policy_Anti_Harassment.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-040",
+      "split": "all",
+      "language": "EN",
+      "question": "What must happen before a personal device is used for work email?",
+      "answerable": true,
+      "expected_answer": "The personal device must be enrolled in the mobile device management or MDM system.",
+      "expected_answer_keywords": [
+        "enrolled",
+        "MDM",
+        "mobile device management"
+      ],
+      "references": [
+        {
+          "document": "Policy_BYOD.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-041",
+      "split": "all",
+      "language": "EN",
+      "question": "How must a potential conflict of interest be disclosed?",
+      "answerable": true,
+      "expected_answer": "A potential conflict of interest must be disclosed to HR in writing.",
+      "expected_answer_keywords": [
+        "HR",
+        "in writing",
+        "conflict of interest"
+      ],
+      "references": [
+        {
+          "document": "Policy_Code_of_Conduct.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-042",
+      "split": "all",
+      "language": "EN",
+      "question": "How quickly must a suspected data breach be reported, and to which address?",
+      "answerable": true,
+      "expected_answer": "A suspected data breach must be reported within one hour to security@nusantaradynamics.co.id.",
+      "expected_answer_keywords": [
+        "within 1 hour",
+        "security@nusantaradynamics.co.id"
+      ],
+      "references": [
+        {
+          "document": "Policy_Data_Security.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-043",
+      "split": "all",
+      "language": "EN",
+      "question": "What are the four information-classification levels?",
+      "answerable": true,
+      "expected_answer": "The four levels are Public, Internal, Confidential, and Restricted.",
+      "expected_answer_keywords": [
+        "Public",
+        "Internal",
+        "Confidential",
+        "Restricted"
+      ],
+      "references": [
+        {
+          "document": "Policy_Information_Classification.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-044",
+      "split": "all",
+      "language": "EN",
+      "question": "What are the password length, complexity, and rotation requirements?",
+      "answerable": true,
+      "expected_answer": "Passwords must be at least 12 characters, include uppercase and lowercase letters, a number, and a symbol, and be changed every 90 days.",
+      "expected_answer_keywords": [
+        "12 characters",
+        "upper case",
+        "lower case",
+        "number",
+        "symbol",
+        "90 days"
+      ],
+      "references": [
+        {
+          "document": "Policy_Password.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-045",
+      "split": "all",
+      "language": "EN",
+      "question": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+      "answerable": true,
+      "expected_answer": "A department head approves purchases valued from IDR 10 million to IDR 50 million.",
+      "expected_answer_keywords": [
+        "department head",
+        "IDR 10-50 million"
+      ],
+      "references": [
+        {
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-046",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the direct password-reset URL?",
+      "answerable": false,
+      "expected_answer": "The indexed documents do not provide a direct password-reset URL; they only instruct employees to raise an IT Helpdesk ticket through the portal.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-047",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the full street address of the company headquarters?",
+      "answerable": false,
+      "expected_answer": "The company headquarters address is not available in the indexed documents.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-048",
+      "split": "all",
+      "language": "EN",
+      "question": "How often is a full disaster-recovery failover exercise conducted?",
+      "answerable": false,
+      "expected_answer": "The indexed documents do not state a schedule for a full disaster-recovery failover exercise.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-049",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the maximum permitted email attachment size?",
+      "answerable": false,
+      "expected_answer": "The maximum email attachment size is not stated in the indexed documents.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "EN-050",
+      "split": "all",
+      "language": "EN",
+      "question": "What is the maximum file-upload size in the customer portal?",
+      "answerable": false,
+      "expected_answer": "The indexed documents do not specify a maximum file-upload size for the customer portal.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_english_50.csv"
+    },
+    {
+      "id": "ID-001",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+      "answerable": true,
+      "expected_answer": "Ajukan tiket ke IT Helpdesk melalui portal. Reset diproses dalam waktu 1x24 jam.",
+      "expected_answer_keywords": [
+        "IT Helpdesk",
+        "portal",
+        "1x24 jam"
+      ],
+      "references": [
+        {
+          "document": "FAQ_IT_Support.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-002",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa tunjangan satu kali untuk perlengkapan kerja dari rumah?",
+      "answerable": true,
+      "expected_answer": "Tunjangan satu kali untuk home office adalah IDR 1.500.000.",
+      "expected_answer_keywords": [
+        "IDR 1.500.000",
+        "tunjangan kerja dari rumah"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Remote_Work.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-003",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa maksimum sisa cuti tahunan yang boleh dibawa ke tahun berikutnya?",
+      "answerable": true,
+      "expected_answer": "Maksimum enam hari cuti yang tidak terpakai dapat dibawa ke tahun berikutnya.",
+      "expected_answer_keywords": [
+        "6 hari",
+        "cuti terbawa",
+        "tahun berikutnya"
+      ],
+      "references": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-004",
+      "split": "all",
+      "language": "ID",
+      "question": "Pada jam berapa pekerja remote wajib tersedia selama core hours?",
+      "answerable": true,
+      "expected_answer": "Pekerja remote wajib tersedia pada pukul 10.00 sampai 16.00 WIB.",
+      "expected_answer_keywords": [
+        "10:00-16:00 WIB",
+        "jam kerja inti"
+      ],
+      "references": [
+        {
+          "document": "Policy_WFH.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-005",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+      "answerable": true,
+      "expected_answer": "Pendapatan tahun 2025 adalah IDR 158 miliar dengan margin laba bersih 14%.",
+      "expected_answer_keywords": [
+        "IDR 158 miliar",
+        "14%",
+        "margin laba bersih"
+      ],
+      "references": [
+        {
+          "document": "Report_Financial_FY2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-006",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+      "answerable": true,
+      "expected_answer": "Penyebab utamanya adalah sertifikat TLS yang kedaluwarsa pada API gateway.",
+      "expected_answer_keywords": [
+        "sertifikat TLS kedaluwarsa",
+        "API Gateway"
+      ],
+      "references": [
+        {
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-007",
+      "split": "all",
+      "language": "ID",
+      "question": "Untuk pengeluaran sebesar berapa bukti pembayaran asli wajib disertakan?",
+      "answerable": true,
+      "expected_answer": "Bukti pembayaran asli wajib disertakan untuk setiap satu pengeluaran di atas IDR 150.000.",
+      "expected_answer_keywords": [
+        "di atas IDR 150.000",
+        "bukti pembayaran asli"
+      ],
+      "references": [
+        {
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-008",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+      "answerable": true,
+      "expected_answer": "IT harus mencabut seluruh akses sistem dalam waktu dua jam sejak waktu keluar karyawan.",
+      "expected_answer_keywords": [
+        "dalam 2 jam",
+        "waktu keluar karyawan",
+        "pencabutan seluruh akses sistem"
+      ],
+      "references": [
+        {
+          "document": "SOP_Offboarding.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-009",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa nilai RTO dan RPO pada rencana pemulihan bencana?",
+      "answerable": true,
+      "expected_answer": "RTO adalah empat jam dan RPO adalah satu jam.",
+      "expected_answer_keywords": [
+        "RTO",
+        "4 jam",
+        "RPO",
+        "1 jam"
+      ],
+      "references": [
+        {
+          "document": "TECH_Disaster_Recovery.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-010",
+      "split": "all",
+      "language": "ID",
+      "question": "Aplikasi apa yang digunakan untuk koneksi VPN dan apakah MFA diwajibkan?",
+      "answerable": true,
+      "expected_answer": "Karyawan menggunakan klien WireGuard, dan akses VPN wajib memakai autentikasi multifaktor.",
+      "expected_answer_keywords": [
+        "WireGuard",
+        "autentikasi multifaktor",
+        "VPN"
+      ],
+      "references": [
+        {
+          "document": "TECH_VPN_Setup.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-011",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa lama cuti melahirkan yang diberikan perusahaan?",
+      "answerable": false,
+      "expected_answer": "Informasi mengenai durasi cuti melahirkan tidak tersedia dalam dokumen yang diindeks.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-012",
+      "split": "all",
+      "language": "ID",
+      "question": "Apakah perusahaan memberikan subsidi makan siang di kantin?",
+      "answerable": false,
+      "expected_answer": "Informasi mengenai subsidi makan siang di kantin tidak tersedia dalam dokumen yang diindeks.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-013",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa pendapatan resmi perusahaan untuk tahun penuh 2026?",
+      "answerable": false,
+      "expected_answer": "Laporan pendapatan tahun penuh 2026 tidak tersedia dalam dokumen yang diindeks.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-014",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa persen pengurangan konsumsi air di kantor Cikarang pada 2025?",
+      "answerable": false,
+      "expected_answer": "Informasi mengenai pengurangan konsumsi air di kantor Cikarang tidak tersedia; dokumen hanya menyebut konsumsi listrik.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-015",
+      "split": "all",
+      "language": "ID",
+      "question": "Versi minimum macOS apa yang didukung untuk laptop perusahaan?",
+      "answerable": false,
+      "expected_answer": "Informasi mengenai versi minimum macOS tidak tersedia dalam dokumen yang diindeks.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-016",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa banyak tanggungan yang dicakup oleh asuransi kesehatan perusahaan?",
+      "answerable": true,
+      "expected_answer": "Asuransi kesehatan perusahaan mencakup karyawan dan hingga 3 orang tanggungan.",
+      "expected_answer_keywords": [
+        "3 tanggungan",
+        "asuransi kesehatan"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Benefits.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-017",
+      "split": "all",
+      "language": "ID",
+      "question": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+      "answerable": true,
+      "expected_answer": "Ya, perusahaan memberikan kontribusi ke BPJS Ketenagakerjaan untuk seluruh karyawan.",
+      "expected_answer_keywords": [
+        "BPJS Ketenagakerjaan",
+        "pensiun"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Benefits.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-018",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa kuota ukuran mailbox standar untuk karyawan?",
+      "answerable": true,
+      "expected_answer": "Kuota mailbox standar untuk karyawan adalah 50 GB.",
+      "expected_answer_keywords": [
+        "50 GB",
+        "kuota mailbox"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-019",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana cara membagikan kalender kepada rekan kerja?",
+      "answerable": true,
+      "expected_answer": "Gunakan opsi calendar sharing dan berikan akses lihat (view access) kepada rekan kerja terkait.",
+      "expected_answer_keywords": [
+        "berbagi kalender",
+        "akses lihat"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-020",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa biaya penggantian kartu akses karyawan yang hilang?",
+      "answerable": true,
+      "expected_answer": "Biaya penggantian kartu akses adalah IDR 50.000, diajukan di meja resepsionis.",
+      "expected_answer_keywords": [
+        "IDR 50.000",
+        "penggantian kartu akses"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-021",
+      "split": "all",
+      "language": "ID",
+      "question": "Di mana lokasi parkir karyawan tersedia?",
+      "answerable": true,
+      "expected_answer": "Parkir karyawan tersedia di Basement 2.",
+      "expected_answer_keywords": [
+        "Basement 2",
+        "parkir karyawan"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-022",
+      "split": "all",
+      "language": "ID",
+      "question": "Di mana karyawan dapat menemukan slip gaji mereka?",
+      "answerable": true,
+      "expected_answer": "Slip gaji tersedia di HR portal pada bagian My Documents setelah tanggal 25.",
+      "expected_answer_keywords": [
+        "HR portal",
+        "My Documents",
+        "setelah tanggal 25"
+      ],
+      "references": [
+        {
+          "document": "FAQ_HR.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-023",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana cara memperbarui data rekening bank di sistem HR?",
+      "answerable": true,
+      "expected_answer": "Ajukan perubahan melalui HR portal; perubahan berlaku mulai siklus payroll berikutnya.",
+      "expected_answer_keywords": [
+        "HR portal",
+        "siklus payroll berikutnya"
+      ],
+      "references": [
+        {
+          "document": "FAQ_HR.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-024",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana prosedur mengajukan permintaan laptop baru?",
+      "answerable": true,
+      "expected_answer": "Ajukan permintaan melalui IT Service Desk dengan persetujuan manajer.",
+      "expected_answer_keywords": [
+        "IT Service Desk",
+        "persetujuan manajer"
+      ],
+      "references": [
+        {
+          "document": "FAQ_IT_Support.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-025",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa saja yang harus dibawa karyawan baru pada hari pertama kerja?",
+      "answerable": true,
+      "expected_answer": "Karyawan baru harus membawa KTP yang masih berlaku, NPWP, dan detail rekening bank.",
+      "expected_answer_keywords": [
+        "KTP yang masih berlaku",
+        "NPWP",
+        "detail rekening bank"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-026",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa lama masa probation karyawan baru dan kapan evaluasinya?",
+      "answerable": true,
+      "expected_answer": "Masa probation berlangsung 3 bulan dengan evaluasi kinerja formal pada minggu ke-12.",
+      "expected_answer_keywords": [
+        "3 bulan",
+        "minggu ke-12",
+        "evaluasi"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-027",
+      "split": "all",
+      "language": "ID",
+      "question": "Pada tanggal berapa gaji karyawan dibayarkan setiap bulannya?",
+      "answerable": true,
+      "expected_answer": "Gaji dibayarkan pada tanggal 25 setiap bulan.",
+      "expected_answer_keywords": [
+        "tanggal 25",
+        "hari gajian"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-028",
+      "split": "all",
+      "language": "ID",
+      "question": "Kapan lembur yang telah disetujui akan dibayarkan?",
+      "answerable": true,
+      "expected_answer": "Lembur yang telah disetujui dibayarkan pada siklus payroll bulan berikutnya.",
+      "expected_answer_keywords": [
+        "lembur",
+        "payroll bulan berikutnya"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-029",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa hari maksimal karyawan diperbolehkan bekerja dari rumah dalam seminggu?",
+      "answerable": true,
+      "expected_answer": "Karyawan diperbolehkan bekerja dari rumah maksimal 2 hari per minggu dengan persetujuan manajer.",
+      "expected_answer_keywords": [
+        "2 hari per minggu",
+        "persetujuan manajer"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Remote_Work.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-030",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa yang harus dilakukan karyawan jika menerima email mencurigakan?",
+      "answerable": true,
+      "expected_answer": "Karyawan tidak boleh mengklik tautan apa pun dan harus melaporkannya menggunakan tombol Report Phishing.",
+      "expected_answer_keywords": [
+        "jangan klik tautan",
+        "tombol Report Phishing"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Security_Awareness.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-031",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa yang harus dilakukan jika laptop kantor hilang?",
+      "answerable": true,
+      "expected_answer": "Laporkan segera ke IT agar perangkat dapat dihapus datanya dari jarak jauh (remote wipe).",
+      "expected_answer_keywords": [
+        "laporkan ke IT",
+        "remote wipe"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Security_Awareness.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-032",
+      "split": "all",
+      "language": "ID",
+      "question": "Siapa yang menyetujui permintaan akses ke sebuah aplikasi atau software?",
+      "answerable": true,
+      "expected_answer": "Permintaan akses diajukan melalui IT Service Desk dan disetujui oleh pemilik sistem (system owner).",
+      "expected_answer_keywords": [
+        "IT Service Desk",
+        "pemilik sistem"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Software_Access.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-033",
+      "split": "all",
+      "language": "ID",
+      "question": "Siapa yang menanggung biaya lisensi software untuk keperluan kerja?",
+      "answerable": true,
+      "expected_answer": "Lisensi perangkat lunak bisnis yang telah disetujui ditanggung oleh anggaran IT.",
+      "expected_answer_keywords": [
+        "anggaran IT",
+        "lisensi software"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Software_Access.txt",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-034",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana sikap perusahaan terhadap tindakan pelecehan di tempat kerja?",
+      "answerable": true,
+      "expected_answer": "Perusahaan menerapkan kebijakan tanpa toleransi (zero tolerance) terhadap segala bentuk pelecehan, dan keluhan dapat dilaporkan secara rahasia ke HR atau melalui jalur whistleblower.",
+      "expected_answer_keywords": [
+        "tanpa toleransi",
+        "HR",
+        "jalur whistleblower"
+      ],
+      "references": [
+        {
+          "document": "Policy_Anti_Harassment.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-035",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa syarat yang harus dipenuhi sebelum perangkat pribadi digunakan untuk email kantor?",
+      "answerable": true,
+      "expected_answer": "Perangkat pribadi harus didaftarkan terlebih dahulu ke sistem mobile device management (MDM).",
+      "expected_answer_keywords": [
+        "MDM",
+        "manajemen perangkat mobile",
+        "terdaftar"
+      ],
+      "references": [
+        {
+          "document": "Policy_BYOD.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-036",
+      "split": "all",
+      "language": "ID",
+      "question": "Apakah perusahaan berhak menghapus data dari perangkat pribadi karyawan?",
+      "answerable": true,
+      "expected_answer": "Ya, perusahaan berhak melakukan remote wipe untuk menghapus data korporat dari perangkat yang telah terdaftar dalam MDM.",
+      "expected_answer_keywords": [
+        "remote wipe",
+        "data korporat",
+        "MDM"
+      ],
+      "references": [
+        {
+          "document": "Policy_BYOD.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-037",
+      "split": "all",
+      "language": "ID",
+      "question": "Bagaimana cara karyawan mengungkapkan potensi konflik kepentingan?",
+      "answerable": true,
+      "expected_answer": "Potensi konflik kepentingan harus diungkapkan secara tertulis kepada HR.",
+      "expected_answer_keywords": [
+        "HR",
+        "tertulis",
+        "konflik kepentingan"
+      ],
+      "references": [
+        {
+          "document": "Policy_Code_of_Conduct.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-038",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa saja aturan keamanan data pada laptop perusahaan?",
+      "answerable": true,
+      "expected_answer": "Seluruh laptop perusahaan wajib menggunakan enkripsi disk penuh (full-disk encryption), dan penggunaan penyimpanan USB pribadi pada laptop perusahaan dilarang.",
+      "expected_answer_keywords": [
+        "enkripsi disk penuh",
+        "penyimpanan USB dilarang"
+      ],
+      "references": [
+        {
+          "document": "Policy_Data_Security.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-039",
+      "split": "all",
+      "language": "ID",
+      "question": "Ada berapa level klasifikasi informasi di perusahaan dan apa saja?",
+      "answerable": true,
+      "expected_answer": "Terdapat empat level klasifikasi informasi, yaitu Public, Internal, Confidential, dan Restricted.",
+      "expected_answer_keywords": [
+        "Public",
+        "Internal",
+        "Confidential",
+        "Restricted"
+      ],
+      "references": [
+        {
+          "document": "Policy_Information_Classification.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-040",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa aturan penanganan data dengan klasifikasi Restricted?",
+      "answerable": true,
+      "expected_answer": "Data Restricted hanya boleh diakses melalui perangkat yang dikelola perusahaan dan tidak boleh dikirim melalui email eksternal.",
+      "expected_answer_keywords": [
+        "perangkat yang dikelola perusahaan",
+        "tidak boleh dikirim email eksternal"
+      ],
+      "references": [
+        {
+          "document": "Policy_Information_Classification.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-041",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa hari cuti tahunan yang diberikan kepada karyawan?",
+      "answerable": true,
+      "expected_answer": "Karyawan berhak atas 12 hari cuti tahunan per tahun, yang terakumulasi setiap bulan.",
+      "expected_answer_keywords": [
+        "12 hari",
+        "cuti tahunan",
+        "terakumulasi setiap bulan"
+      ],
+      "references": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-042",
+      "split": "all",
+      "language": "ID",
+      "question": "Kapan surat keterangan dokter diperlukan untuk cuti sakit?",
+      "answerable": true,
+      "expected_answer": "Surat keterangan dokter diperlukan jika cuti sakit lebih dari 2 hari berturut-turut.",
+      "expected_answer_keywords": [
+        "surat keterangan dokter",
+        "lebih dari 2 hari berturut-turut"
+      ],
+      "references": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-043",
+      "split": "all",
+      "language": "ID",
+      "question": "Apa saja persyaratan panjang dan kompleksitas kata sandi perusahaan?",
+      "answerable": true,
+      "expected_answer": "Kata sandi harus terdiri dari minimal 12 karakter, mencakup huruf besar, huruf kecil, angka, dan simbol.",
+      "expected_answer_keywords": [
+        "12 karakter",
+        "huruf besar",
+        "huruf kecil",
+        "angka",
+        "simbol"
+      ],
+      "references": [
+        {
+          "document": "Policy_Password.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-044",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa lama siklus penggantian kata sandi dan apakah kata sandi lama boleh dipakai ulang?",
+      "answerable": true,
+      "expected_answer": "Kata sandi harus diganti setiap 90 hari, dan 5 kata sandi terakhir tidak boleh digunakan kembali.",
+      "expected_answer_keywords": [
+        "90 hari",
+        "5 kata sandi terakhir tidak boleh dipakai ulang"
+      ],
+      "references": [
+        {
+          "document": "Policy_Password.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-045",
+      "split": "all",
+      "language": "ID",
+      "question": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10.000.000?",
+      "answerable": true,
+      "expected_answer": "Pembelian dengan nilai di bawah IDR 10.000.000 disetujui oleh manajer.",
+      "expected_answer_keywords": [
+        "di bawah IDR 10.000.000",
+        "persetujuan manajer"
+      ],
+      "references": [
+        {
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-046",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa nilai uang makan (per diem) harian untuk perjalanan dinas domestik?",
+      "answerable": true,
+      "expected_answer": "Uang makan harian untuk perjalanan dinas domestik adalah IDR 250.000 per hari.",
+      "expected_answer_keywords": [
+        "IDR 250.000",
+        "per hari",
+        "uang makan (per diem)"
+      ],
+      "references": [
+        {
+          "document": "Policy_Travel_Expense.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-047",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa batas maksimum biaya hotel per malam untuk perjalanan dinas domestik?",
+      "answerable": true,
+      "expected_answer": "Biaya hotel dibatasi maksimal IDR 800.000 per malam untuk perjalanan dinas domestik.",
+      "expected_answer_keywords": [
+        "IDR 800.000",
+        "per malam",
+        "batas biaya hotel"
+      ],
+      "references": [
+        {
+          "document": "Policy_Travel_Expense.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-048",
+      "split": "all",
+      "language": "ID",
+      "question": "Siapa saja yang berhak mengajukan kerja jarak jauh (remote work)?",
+      "answerable": true,
+      "expected_answer": "Seluruh karyawan tetap (confirmed employees) berhak bekerja jarak jauh, dengan persetujuan manajer.",
+      "expected_answer_keywords": [
+        "karyawan tetap",
+        "memenuhi syarat",
+        "persetujuan manajer"
+      ],
+      "references": [
+        {
+          "document": "Policy_WFH.docx",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-049",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa skor CSAT dan NPS perusahaan secara keseluruhan pada tahun 2025?",
+      "answerable": true,
+      "expected_answer": "Skor CSAT keseluruhan pada 2025 adalah 87%, dan Net Promoter Score mencapai 46.",
+      "expected_answer_keywords": [
+        "87%",
+        "CSAT",
+        "NPS 46"
+      ],
+      "references": [
+        {
+          "document": "Report_CSAT_2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    },
+    {
+      "id": "ID-050",
+      "split": "all",
+      "language": "ID",
+      "question": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+      "answerable": true,
+      "expected_answer": "Perusahaan merekrut 37 karyawan pada semester pertama (H1) 2025, sehingga total headcount mencapai 312 orang, dengan rata-rata waktu perekrutan 28 hari.",
+      "expected_answer_keywords": [
+        "37 karyawan",
+        "312 total karyawan",
+        "28 hari"
+      ],
+      "references": [
+        {
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": ""
+        }
+      ],
+      "source_dataset": "qna_indonesia_50.csv"
+    }
+  ]
+}

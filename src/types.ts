@@ -34,3 +34,5 @@ export interface Message {
   followUpQuestion?: string;
   shouldAnimate?: boolean;
 }
+
+export type ModelType = 'ollama' | 'gemini' | 'openai';
