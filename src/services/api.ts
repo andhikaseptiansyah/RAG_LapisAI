@@ -21,6 +21,7 @@ export type ApiErrorCode =
   | 'DOCUMENT_EMPTY'
   | 'DOCUMENT_PARSE_FAILED'
   | 'DOCUMENT_TOO_LARGE'
+  | 'DOCUMENT_ALREADY_EXISTS'
   | 'RATE_LIMITED'
   | 'INTERNAL_SERVER_ERROR'
   | 'NETWORK_ERROR'
@@ -149,6 +150,7 @@ const normalizeErrorCode = (
       'DOCUMENT_EMPTY',
       'DOCUMENT_PARSE_FAILED',
       'DOCUMENT_TOO_LARGE',
+      'DOCUMENT_ALREADY_EXISTS',
       'RATE_LIMITED',
       'INTERNAL_SERVER_ERROR',
       'NETWORK_ERROR',
@@ -187,7 +189,7 @@ export const getFriendlyApiErrorMessage = (
       return 'Sesi kamu sudah habis. Silakan login ulang.';
 
     case 'INVALID_CREDENTIALS':
-      return error.message || 'Username atau password salah.';
+      return error.message || 'Nama pengguna atau kata sandi salah.';
 
     case 'ENDPOINT_NOT_FOUND':
       return 'Endpoint tidak ditemukan. Periksa URL API dan route backend.';
@@ -208,10 +210,13 @@ export const getFriendlyApiErrorMessage = (
       return 'Dokumen kosong atau tidak memiliki teks yang bisa dibaca.';
 
     case 'DOCUMENT_PARSE_FAILED':
-      return 'Dokumen gagal dibaca. Periksa format atau isi file.';
+      return 'Dokumen gagal dibaca. Periksa format atau isi berkas.';
 
     case 'DOCUMENT_TOO_LARGE':
       return 'Dokumen terlalu besar untuk diproses.';
+
+    case 'DOCUMENT_ALREADY_EXISTS':
+      return error.message || 'Dokumen dengan nama yang sama sudah ada.';
 
     case 'RATE_LIMITED': {
       const suffix = error.retryAfterSeconds
@@ -228,7 +233,63 @@ export const getFriendlyApiErrorMessage = (
       return 'Frontend tidak bisa terhubung ke backend. Pastikan server backend menyala.';
 
     default:
-      return error.message || 'Request gagal diproses.';
+      return error.message || 'Permintaan gagal diproses.';
+  }
+};
+
+export const getAdminApiErrorMessage = (
+  error: unknown
+): string => {
+  if (!(error instanceof ApiError)) {
+    return error instanceof Error
+      ? error.message
+      : 'An unknown error occurred.';
+  }
+
+  const payload = isApiErrorPayload(error.data)
+    ? error.data
+    : null;
+  const nestedDetail =
+    payload && isApiErrorPayload(payload.detail)
+      ? payload.detail
+      : null;
+
+  if (nestedDetail?.message && typeof nestedDetail.message === 'string') {
+    return nestedDetail.message;
+  }
+  if (payload?.detail && typeof payload.detail === 'string') {
+    return payload.detail;
+  }
+  if (payload?.message && typeof payload.message === 'string') {
+    return payload.message;
+  }
+
+  switch (error.code) {
+    case 'AUTH_EXPIRED':
+    case 'AUTH_REQUIRED':
+      return 'Your session has expired. Sign in again.';
+    case 'INVALID_CREDENTIALS':
+      return error.message || 'The username or password is incorrect.';
+    case 'ENDPOINT_NOT_FOUND':
+      return 'The API endpoint was not found.';
+    case 'DOCUMENT_EMPTY':
+      return 'The document is empty or contains no readable text.';
+    case 'DOCUMENT_PARSE_FAILED':
+      return 'The document could not be parsed. Check its format and contents.';
+    case 'DOCUMENT_TOO_LARGE':
+      return 'The document exceeds the maximum file size.';
+    case 'DOCUMENT_ALREADY_EXISTS':
+      return error.message || 'A document with the same filename already exists.';
+    case 'RATE_LIMITED':
+      return error.retryAfterSeconds
+        ? `Too many requests. Try again in ${error.retryAfterSeconds} seconds.`
+        : 'Too many requests. Try again shortly.';
+    case 'INTERNAL_SERVER_ERROR':
+      return 'The server encountered an error. Try again later.';
+    case 'NETWORK_ERROR':
+      return 'The frontend could not connect to the backend. Confirm that the backend is running.';
+    default:
+      return error.message || 'The request could not be completed.';
   }
 };
 
@@ -290,7 +351,7 @@ export const apiRequest = async <
     const message =
       error instanceof Error
         ? error.message
-        : 'Tidak dapat terhubung ke server.';
+        : 'Unable to connect to the server.';
 
     throw new ApiError(
       message,
@@ -307,8 +368,13 @@ export const apiRequest = async <
       ? responseData
       : null;
 
+    const nestedDetail =
+      payload && isApiErrorPayload(payload.detail)
+        ? payload.detail
+        : null;
+
     const code = normalizeErrorCode(
-      payload?.code,
+      payload?.code ?? nestedDetail?.code,
       response.status
     );
 
@@ -324,13 +390,23 @@ export const apiRequest = async <
           : undefined;
 
     let errorMessage =
-      `Request gagal dengan status ${response.status}`;
+      `Request failed with status ${response.status}`;
 
     if (
       payload?.message &&
       typeof payload.message === 'string'
     ) {
       errorMessage = payload.message;
+    } else if (
+      nestedDetail?.message &&
+      typeof nestedDetail.message === 'string'
+    ) {
+      errorMessage = nestedDetail.message;
+    } else if (
+      payload?.detail &&
+      typeof payload.detail === 'string'
+    ) {
+      errorMessage = payload.detail;
     } else if (typeof responseData === 'string') {
       errorMessage = responseData;
     }
@@ -368,6 +444,34 @@ export const apiRequest = async <
   }
 
   return responseData as TResponse;
+};
+
+export const getDuplicateFilenamesFromApiError = (
+  error: unknown
+): string[] => {
+  if (!(error instanceof ApiError) || error.status !== 409) {
+    return [];
+  }
+
+  const responsePayload = isApiErrorPayload(error.data)
+    ? error.data
+    : null;
+  const detail =
+    responsePayload && isApiErrorPayload(responsePayload.detail)
+      ? responsePayload.detail
+      : null;
+  const rawFilenames = detail
+    ? (detail as { duplicateFilenames?: unknown }).duplicateFilenames
+    : undefined;
+
+  if (!Array.isArray(rawFilenames)) {
+    return [];
+  }
+
+  return rawFilenames
+    .filter((value): value is string => typeof value === 'string')
+    .map((value) => value.trim())
+    .filter(Boolean);
 };
 
 export type QueryValue =

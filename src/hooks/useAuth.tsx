@@ -37,11 +37,7 @@ const AuthContext =
 const isAdminRole = (
   role?: string
 ): boolean => {
-  return (
-    role === 'admin' ||
-    role === 'superadmin' ||
-    role === 'owner'
-  );
+  return role === 'admin';
 };
 
 const normalizeStoredUser = (
@@ -54,9 +50,7 @@ const normalizeStoredUser = (
   const role =
     storedUser.role === 'user' ||
     storedUser.role === 'staff' ||
-    storedUser.role === 'admin' ||
-    storedUser.role === 'superadmin' ||
-    storedUser.role === 'owner'
+    storedUser.role === 'admin'
       ? storedUser.role
       : 'user';
 
@@ -66,7 +60,7 @@ const normalizeStoredUser = (
     name:
       storedUser.name ||
       storedUser.username ||
-      'User',
+      'Pengguna',
     role,
   };
 };
@@ -101,7 +95,7 @@ export function AuthProvider({
 
     if (!result.token || !result.user) {
       throw new Error(
-        'Response login dari server tidak lengkap.'
+        'Respons login dari server tidak lengkap.'
       );
     }
 

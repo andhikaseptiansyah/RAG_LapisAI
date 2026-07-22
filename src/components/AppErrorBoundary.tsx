@@ -19,7 +19,7 @@ export class AppErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: unknown): void {
-    console.error('Lapis AI gagal dirender:', error);
+    console.error('Lapis AI failed to render:', error);
   }
 
   render(): React.ReactNode {
@@ -42,7 +42,7 @@ export class AppErrorBoundary extends React.Component<
       >
         <section style={{ maxWidth: 480, textAlign: 'center' }}>
           <h1 style={{ margin: 0, fontSize: 24 }}>
-            Aplikasi gagal dimuat
+            Application failed to load
           </h1>
           <p
             style={{
@@ -51,8 +51,8 @@ export class AppErrorBoundary extends React.Component<
               lineHeight: 1.6,
             }}
           >
-            Muat ulang halaman. Jika masalah tetap terjadi, periksa
-            Console browser untuk melihat error yang sebenarnya.
+            Reload the page. If the problem continues, check the browser
+            console for the underlying error.
           </p>
           <button
             type="button"

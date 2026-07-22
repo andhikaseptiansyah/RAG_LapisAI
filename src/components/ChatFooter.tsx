@@ -107,7 +107,7 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
             </div>
 
             <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <button onClick={onMicClick} className={`p-1.5 transition-colors rounded-full flex items-center justify-center ${isRecording ? 'text-error recording' : 'text-white/55 hover:text-white'}`} title="Voice to Text">
+              <button onClick={onMicClick} className={`p-1.5 transition-colors rounded-full flex items-center justify-center ${isRecording ? 'text-error recording' : 'text-white/55 hover:text-white'}`} title="Suara ke Teks">
                 <span className="flex items-center justify-center gap-[2px] w-5 h-5" aria-hidden="true">
                   <span className="w-[2px] h-2.5 bg-current rounded-full"></span>
                   <span className="w-[2px] h-4 bg-current rounded-full"></span>

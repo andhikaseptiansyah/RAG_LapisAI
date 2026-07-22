@@ -47,13 +47,13 @@ interface MenuPosition {
 
 const toDateLabel = (value?: string): string => {
   if (!value) {
-    return 'Latest';
+    return 'Terbaru';
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return 'Latest';
+    return 'Terbaru';
   }
 
   const now = new Date();
@@ -73,10 +73,10 @@ const toDateLabel = (value?: string): string => {
     diffMs / (1000 * 60 * 60 * 24)
   );
 
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
+  if (diffDays === 0) return 'Hari ini';
+  if (diffDays === 1) return 'Kemarin';
 
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',
   });
@@ -123,7 +123,7 @@ const buildConversationDisplayTitle = (
     return lastMessage;
   }
 
-  return 'New Conversation';
+  return 'Percakapan Baru';
 };
 
 const mapConversationToRecentChat = (
@@ -143,7 +143,7 @@ const mapConversationToRecentChat = (
       conversation.is_pinned ?? conversation.pinned
     ),
     dateLabel: toDateLabel(dateValue),
-    group: 'Latest',
+    group: 'Terbaru',
     lastMessage: conversation.last_message,
     lastUserMessage: conversation.last_user_message,
     questions: (conversation.user_messages ?? []).map(
@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to load conversation history.';
+          : 'Gagal memuat riwayat percakapan.';
 
       setHistoryError(message);
       setRecentChats([]);
@@ -382,9 +382,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       await navigator.clipboard.writeText(
         `${window.location.origin}/?conversationId=${chat.id}`
       );
-      window.alert('Conversation link copied successfully.');
+      window.alert('Tautan percakapan berhasil disalin.');
     } catch {
-      window.alert(`Share conversation: ${chat.title}`);
+      window.alert(`Bagikan percakapan: ${chat.title}`);
     }
   };
 
@@ -413,7 +413,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to update pin status.';
+          : 'Gagal memperbarui status sematan.';
       window.alert(message);
     }
   };
@@ -422,7 +422,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const newTitle = window.prompt(
-      'Rename conversation',
+      'Ubah nama percakapan',
       chat.title
     );
 
@@ -451,7 +451,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to save conversation name.';
+          : 'Gagal menyimpan nama percakapan.';
       window.alert(message);
     }
   };
@@ -460,7 +460,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const shouldDelete = window.confirm(
-      `Delete conversation "${chat.title}"?`
+      `Hapus percakapan "${chat.title}"?`
     );
 
     if (!shouldDelete) return;
@@ -477,7 +477,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to delete conversation.';
+          : 'Gagal menghapus percakapan.';
       window.alert(message);
     }
   };
@@ -575,8 +575,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onToggle}
             className="pointer-events-auto absolute left-1/2 top-4 -translate-x-1/2 flex h-9 w-9 items-center justify-center rounded-xl text-white transition-all hover:bg-white/10 active:scale-95"
-            aria-label="Open sidebar"
-            title="Open sidebar"
+            aria-label="Buka bilah samping"
+            title="Buka bilah samping"
           >
             <img
               src="/icon.png"
@@ -601,7 +601,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onToggle();
             }
           }}
-          aria-label={!isOpen ? 'Open sidebar' : undefined}
+          aria-label={!isOpen ? 'Buka bilah samping' : undefined}
         >
           {/* Ikon Profil */}
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-transparent text-white/80">
@@ -613,10 +613,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {isOpen && (
             <div className="min-w-0 flex-1">
               <p className="text-[12px] font-medium text-white/50">
-                Good Day 👋
+                Selamat datang 👋
               </p>
               <p className="truncate text-[16px] font-bold text-white/90">
-                {user?.name ?? user?.username ?? 'Staff'}
+                {user?.name ?? user?.username ?? 'Staf'}
               </p>
             </div>
           )}
@@ -626,8 +626,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={onClose}
               className="absolute right-0 top-1 flex h-8 w-8 items-center justify-center text-white/45 transition-colors hover:text-white"
-              aria-label="Close sidebar"
-              title="Close sidebar"
+              aria-label="Tutup bilah samping"
+              title="Tutup bilah samping"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -657,7 +657,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={handleNewChat}
-            title="New Chat"
+            title="Percakapan Baru"
             className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
               isOpen 
                 ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -667,13 +667,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="material-symbols-outlined text-[20px]">
               edit_square
             </span>
-            {isOpen && <span>New Chat</span>}
+            {isOpen && <span>Percakapan Baru</span>}
           </button>
 
           <button
             type="button"
             onClick={handleOpenConversationSearch}
-            title="Search Chats"
+            title="Cari Percakapan"
             className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
               isOpen 
                 ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -683,14 +683,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="material-symbols-outlined text-[20px]">
               search
             </span>
-            {isOpen && <span>Search Chats</span>}
+            {isOpen && <span>Cari Percakapan</span>}
           </button>
 
           {isAdmin && (
             <Link
               to="/admin"
               onClick={isOpen ? onClose : undefined}
-              title="Admin Panel"
+              title="Panel Admin"
               className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
                 isOpen 
                   ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -700,7 +700,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 admin_panel_settings
               </span>
-              {isOpen && <span>Admin Panel</span>}
+              {isOpen && <span>Panel Admin</span>}
             </Link>
           )}
         </nav>
@@ -709,7 +709,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {isOpen && (
           <>
             <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
-              <span>Recent Chats: {sortedChats.length}</span>
+              <span>Percakapan Terbaru: {sortedChats.length}</span>
               <span className="material-symbols-outlined text-[14px]">
                 history
               </span>
@@ -720,7 +720,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex flex-col gap-1">
                   {isLoadingChats && sortedChats.length === 0 ? (
                     <p className="py-4 text-center text-[13px] text-white/40">
-                      Loading history...
+                      Memuat riwayat...
                     </p>
                   ) : historyError ? (
                     <div className="m-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/60">
@@ -754,7 +754,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           {chat.pinned && (
                             <span
                               className="material-symbols-outlined shrink-0 text-[16px] text-white/80"
-                              title="Pinned conversation"
+                              title="Percakapan disematkan"
                             >
                               push_pin
                             </span>
@@ -798,7 +798,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">share</span>
-                                Share
+                                Bagikan
                               </button>
                               <button
                                 type="button"
@@ -806,7 +806,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">push_pin</span>
-                                {chat.pinned ? 'Unpin' : 'Pin'}
+                                {chat.pinned ? 'Lepas Sematan' : 'Sematkan'}
                               </button>
                               <button
                                 type="button"
@@ -814,7 +814,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">edit</span>
-                                Rename
+                                Ubah Nama
                               </button>
                               <div className="my-1 border-t border-white/10" />
                               <button
@@ -823,7 +823,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">delete</span>
-                                Delete
+                                Hapus
                               </button>
                             </div>,
                             document.body
@@ -832,7 +832,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ))
                   ) : (
                     <p className="py-4 text-center text-[13px] text-white/40">
-                      No conversations yet.
+                      Belum ada percakapan.
                     </p>
                   )}
                 </div>
@@ -847,7 +847,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={handleLogout}
-              title="Logout"
+              title="Keluar"
               className={`flex items-center justify-center transition-colors hover:bg-white/10 hover:text-white active:scale-[0.98] ${
                 isOpen 
                   ? 'w-full gap-2 rounded-[16px] bg-white/5 py-3 text-[14px] font-medium text-white/60' 
@@ -857,7 +857,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 logout
               </span>
-              {isOpen && <span>Logout</span>}
+              {isOpen && <span>Keluar</span>}
             </button>
           </div>
         </div>

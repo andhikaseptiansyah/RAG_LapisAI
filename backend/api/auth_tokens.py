@@ -6,14 +6,13 @@ import os
 import secrets
 import threading
 import time
-from pathlib import Path
 from typing import Any
 
+from api.storage_paths import AUTH_SECRET_FILE
 from api.user_store import get_user_by_id, normalize_username
 
 TOKEN_PREFIX = "lapisai-v1"
 TOKEN_TTL_SECONDS = int(os.getenv("LAPISAI_AUTH_TOKEN_TTL_SECONDS", "43200"))
-AUTH_SECRET_FILE = Path(__file__).resolve().parent.parent / ".auth_secret"
 SECRET_LOCK = threading.RLock()
 
 

@@ -1,13 +1,15 @@
 import json
 import os
 import uuid
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from uploads.config import BACKEND_DIR, COLLECTION_NAME, EMBEDDING_MODEL
+from api.storage_paths import DOCUMENT_STORE_FILE
+from uploads.config import COLLECTION_NAME, EMBEDDING_MODEL
 
-DOCUMENT_STORE_FILE = str(BACKEND_DIR / "documents_store.json")
+DOCUMENT_STORE_LOCK = threading.RLock()
 
 
 def now_iso() -> str:
@@ -15,11 +17,11 @@ def now_iso() -> str:
 
 
 def read_documents() -> list[dict[str, Any]]:
-    if not os.path.exists(DOCUMENT_STORE_FILE):
+    if not DOCUMENT_STORE_FILE.exists():
         return []
 
     try:
-        with open(DOCUMENT_STORE_FILE, "r", encoding="utf-8") as f:
+        with DOCUMENT_STORE_FILE.open("r", encoding="utf-8") as f:
             data = json.load(f)
             if not isinstance(data, list):
                 return []
@@ -39,8 +41,13 @@ def read_documents() -> list[dict[str, Any]]:
 
 
 def write_documents(documents: list[dict[str, Any]]) -> None:
-    with open(DOCUMENT_STORE_FILE, "w", encoding="utf-8") as f:
-        json.dump(documents, f, indent=2, ensure_ascii=False)
+    with DOCUMENT_STORE_LOCK:
+        DOCUMENT_STORE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temporary_file = DOCUMENT_STORE_FILE.with_suffix(".tmp")
+        with temporary_file.open("w", encoding="utf-8") as f:
+            json.dump(documents, f, indent=2, ensure_ascii=False)
+        os.chmod(temporary_file, 0o600)
+        os.replace(temporary_file, DOCUMENT_STORE_FILE)
 
 
 def format_size(size_bytes: int | float | None) -> str:

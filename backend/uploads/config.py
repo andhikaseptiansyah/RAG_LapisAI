@@ -1,7 +1,6 @@
 """Single source of truth for the RAG runtime configuration.
 
-All backend, evaluation, re-indexing, and legacy Python service modules import
-settings from this file. Values are loaded from the project-root ``.env`` and
+All backend, evaluation, and re-indexing modules import settings from this file. Values are loaded from the project-root ``.env`` and
 can still be overridden by process environment variables.
 """
 
@@ -112,7 +111,7 @@ CHROMA_COLLECTION = _env_str(
 COLLECTION_NAME = CHROMA_COLLECTION
 
 # One multilingual embedding model is used by ingestion, retrieval, evaluation,
-# metadata, dashboard, and the legacy Python service.
+# metadata, dashboard, and evaluation tooling.
 EMBEDDING_MODEL = _env_str(
     "EMBEDDING_MODEL",
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
@@ -238,9 +237,8 @@ RETRIEVAL_WARMUP_QUERY = _env_str(
     "How do I reset my employee password?",
 )
 
-# Response language. Clear English/Indonesian questions are answered in the
-# detected language even when an old client sends the opposite default.
-AUTO_DETECT_RESPONSE_LANGUAGE = _env_bool("AUTO_DETECT_RESPONSE_LANGUAGE", True)
+# Response language follows the explicit UI preference. Automatic detection is
+# used only when a client deliberately sends AUTO or omits the preference.
 
 # LLM provider selection
 DEFAULT_LLM_PROVIDER = _env_str("DEFAULT_LLM_PROVIDER", "ollama")

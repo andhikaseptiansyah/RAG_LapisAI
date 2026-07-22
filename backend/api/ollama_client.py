@@ -19,6 +19,8 @@ from retrieval.requirements import (
     requirement_satisfied,
 )
 from api.grounding_validator import prune_unsupported_claims, validate_grounded_answer
+from api.language import answer_matches_requested_language
+from api.llm_shared import build_language_repair_prompt
 from uploads.config import ENABLE_GENERATION_GROUNDING_VALIDATION, MAX_GENERATION_CONTEXTS
 
 # Ollama configuration is read from the project-root .env through uploads.config,
@@ -366,10 +368,21 @@ def build_ollama_grounded_answer(
     }
     evidence_complete = bundle_answerable and not bundle_missing
 
+    language_rule = (
+        "MANDATORY OUTPUT LANGUAGE: English only. Translate Indonesian evidence into natural English. "
+        if is_english
+        else (
+            "MANDATORY OUTPUT LANGUAGE: Bahasa Indonesia only. Translate English evidence into natural "
+            "Bahasa Indonesia. Do not copy English sentences except proper names, product names, codes, "
+            "and acronyms. "
+        )
+    )
     system_prompt = (
-        "You are a strict enterprise Retrieval-Augmented Generation assistant. "
+        language_rule
+        + "You are a strict enterprise Retrieval-Augmented Generation assistant. "
         "Use only the supplied evidence. Do not use outside knowledge. "
-        "Return the direct answer only. Prefer the wording and terminology used in the evidence. "
+        "Return the direct answer only. Use the evidence facts, but translate ordinary wording into the "
+        "mandatory output language. "
         "For a single-fact question, write one concise sentence. For a multi-part or list question, "
         "write only the minimum sentences or bullets needed to cover every requested part. "
         "Do not add an introduction, rationale, recommendation, citation, confidence, heading, label, "
@@ -392,7 +405,8 @@ def build_ollama_grounded_answer(
             f"EVIDENCE:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Write the shortest complete answer in English. Output answer text only."
+            "Translate any Indonesian evidence needed for the answer. Write the shortest complete "
+            "answer in English. Output answer text only. ENGLISH ONLY."
         )
     else:
         user_prompt = (
@@ -400,29 +414,55 @@ def build_ollama_grounded_answer(
             f"BUKTI:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Tulis jawaban lengkap yang paling singkat dalam Bahasa Indonesia. Keluarkan teks jawaban saja."
+            "Terjemahkan bukti berbahasa Inggris yang diperlukan. Tulis jawaban lengkap yang paling "
+            "singkat dalam Bahasa Indonesia. Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
+            "nama produk, kode, dan akronim. Keluarkan teks jawaban saja. BAHASA INDONESIA SAJA."
         )
 
     try:
         raw_answer, done_reason = _ollama_chat(system_prompt, user_prompt)
         llm_answer = _clean_model_answer(raw_answer)
 
-        # Use the first native model response for cross-provider evaluation.
+        if llm_answer and not answer_matches_requested_language(llm_answer, language):
+            print("[OLLAMA] answer language mismatch; requesting a language-only rewrite")
+            raw_answer, done_reason = _ollama_chat(
+                system_prompt,
+                build_language_repair_prompt(
+                    question,
+                    context,
+                    llm_answer,
+                    language,
+                ),
+                num_predict=max(OLLAMA_NUM_PREDICT, 800),
+            )
+            llm_answer = _clean_model_answer(raw_answer)
+
+        # Use the first language-correct native model response for cross-provider evaluation.
         # Production mode keeps the existing retry/grounding/fallback guards.
         if evaluation_mode:
             if not llm_answer:
                 raise RuntimeError("Ollama returned an empty answer")
+            if not answer_matches_requested_language(llm_answer, language):
+                raise RuntimeError("Ollama returned an answer in the wrong language")
             return llm_answer
 
         retry_count = 0
         while retry_count < OLLAMA_MAX_RETRIES:
             incomplete = _is_likely_incomplete_answer(question, llm_answer, done_reason)
+            wrong_language = bool(
+                llm_answer
+                and not answer_matches_requested_language(llm_answer, language)
+            )
             grounding = (
                 validate_grounded_answer(question, llm_answer, grounding_chunks)
-                if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer
+                if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer and not wrong_language
                 else None
             )
-            if not incomplete and (grounding is None or grounding.supported):
+            if (
+                not incomplete
+                and not wrong_language
+                and (grounding is None or grounding.supported)
+            ):
                 break
 
             retry_count += 1
@@ -431,7 +471,11 @@ def build_ollama_grounded_answer(
                 _repair_prompt(
                     user_prompt,
                     llm_answer,
-                    reasons=grounding.reasons if grounding is not None else ("incomplete_answer",),
+                    reasons=(
+                        grounding.reasons
+                        if grounding is not None
+                        else (("wrong_output_language",) if wrong_language else ("incomplete_answer",))
+                    ),
                     unsupported_facts=grounding.unsupported_facts if grounding is not None else (),
                     unsupported_claims=grounding.unsupported_claims if grounding is not None else (),
                     missing_requirements=(
@@ -461,6 +505,10 @@ def build_ollama_grounded_answer(
     if not llm_answer:
         return ""
 
+    if not answer_matches_requested_language(llm_answer, language):
+        print("[OLLAMA] answer rejected because output language is still incorrect")
+        return ""
+
     if ENABLE_GENERATION_GROUNDING_VALIDATION:
         grounding = validate_grounded_answer(question, llm_answer, grounding_chunks)
         if not grounding.supported:
@@ -476,6 +524,7 @@ def build_ollama_grounded_answer(
                     pruned_grounding.supported
                     and not _is_likely_incomplete_answer(question, pruned_answer)
                     and not is_refusal_answer(pruned_answer)
+                    and answer_matches_requested_language(pruned_answer, language)
                 ):
                     print(
                         "[GROUNDING] removed unsupported clauses: "

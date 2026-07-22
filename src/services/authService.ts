@@ -1,11 +1,6 @@
 import { apiRequest } from './api';
 
-export type AuthRole =
-  | 'user'
-  | 'staff'
-  | 'admin'
-  | 'superadmin'
-  | 'owner';
+export type AuthRole = 'user' | 'staff' | 'admin';
 
 export interface AuthUser {
   id: string;
@@ -92,8 +87,6 @@ const normalizeRole = (
 ): AuthRole => {
   if (role === 'staff') return 'staff';
   if (role === 'admin') return 'admin';
-  if (role === 'superadmin') return 'superadmin';
-  if (role === 'owner') return 'owner';
   if (role === 'user') return 'user';
 
   return 'user';
@@ -108,17 +101,17 @@ const normalizeUser = (rawUser: RawUser): AuthUser => {
     rawUser.displayName?.trim() ||
     rawUser.display_name?.trim() ||
     username ||
-    'User';
+    'Pengguna';
 
   if (!id) {
     throw new Error(
-      'Response login tidak valid: id user kosong.'
+      'Respons login tidak valid: ID pengguna kosong.'
     );
   }
 
   if (!username) {
     throw new Error(
-      'Response login tidak valid: username kosong.'
+      'Respons login tidak valid: nama pengguna kosong.'
     );
   }
 
@@ -140,13 +133,13 @@ const normalizeLoginResponse = (
 
   if (!payload.token) {
     throw new Error(
-      'Response login tidak valid: token tidak ditemukan.'
+      'Respons login tidak valid: token tidak ditemukan.'
     );
   }
 
   if (!payload.user) {
     throw new Error(
-      'Response login tidak valid: data user tidak ditemukan.'
+      'Respons login tidak valid: data pengguna tidak ditemukan.'
     );
   }
 
@@ -166,7 +159,7 @@ const normalizeCurrentUserResponse = (
 
   if (!payload.user) {
     throw new Error(
-      'Response user tidak valid: data user tidak ditemukan.'
+      'Respons pengguna tidak valid: data pengguna tidak ditemukan.'
     );
   }
 

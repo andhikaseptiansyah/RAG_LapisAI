@@ -4,7 +4,7 @@ import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
@@ -34,12 +34,13 @@ from api.logger import delete_log, get_logs, resolve_query_log_status, save_log
 from api.user_store import (
     UserStoreError,
     authenticate_user,
-    create_staff_user,
+    create_managed_user,
     delete_user,
     get_user_by_id,
     normalize_username,
     public_user,
     read_users,
+    update_user,
     update_user_password,
 )
 from ingestion.indexer import delete_document_chunks, get_collection
@@ -54,14 +55,21 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 class LoginPayload(BaseModel):
-    username: str = "admin"
-    password: str = "admin"
+    username: str
+    password: str
 
 
 class StaffCreatePayload(BaseModel):
     username: str
     name: str
     password: str
+    role: Literal["user", "staff"] = "staff"
+
+
+class StaffUpdatePayload(BaseModel):
+    username: str | None = None
+    name: str | None = None
+    role: Literal["user", "staff"] | None = None
 
 
 class StaffPasswordPayload(BaseModel):
@@ -70,6 +78,10 @@ class StaffPasswordPayload(BaseModel):
 
 class IndexPayload(BaseModel):
     documentIds: list[str] | None = None
+
+
+class DocumentConflictPayload(BaseModel):
+    filenames: list[str]
 
 
 class ConversationUpdatePayload(BaseModel):
@@ -131,7 +143,7 @@ def _require_admin(request: Request) -> dict[str, Any]:
     if not _can_admin(user):
         raise HTTPException(
             status_code=403,
-            detail="Only administrators can access staff management.",
+            detail="Only administrators can access this feature.",
         )
     return user
 
@@ -158,6 +170,25 @@ def _normalize_filename(filename: str) -> str:
     return _safe_filename(filename).casefold()
 
 
+def _validate_upload_content(filename: str, content: bytes) -> None:
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty files cannot be processed.")
+
+    extension = Path(filename).suffix.lower()
+    if extension == ".pdf" and not content.startswith(b"%PDF-"):
+        raise HTTPException(status_code=400, detail="The file content does not match PDF format.")
+    if extension == ".docx" and not content.startswith(b"PK"):
+        raise HTTPException(status_code=400, detail="The file content does not match DOCX format.")
+    if extension == ".txt":
+        try:
+            content.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail="TXT files must use UTF-8 encoding.",
+            ) from exc
+
+
 def _documents_with_filename(filename: str) -> list[dict[str, Any]]:
     normalized_name = _normalize_filename(filename)
     return [
@@ -165,6 +196,61 @@ def _documents_with_filename(filename: str) -> list[dict[str, Any]]:
         for document in read_documents()
         if _normalize_filename(str(document.get("filename") or "")) == normalized_name
     ]
+
+
+def _upload_file_paths(filename: str) -> list[Path]:
+    normalized_name = _normalize_filename(filename)
+    upload_directory = Path(UPLOAD_DIR)
+
+    try:
+        candidates = upload_directory.iterdir()
+    except OSError:
+        return []
+
+    return [
+        candidate
+        for candidate in candidates
+        if candidate.is_file()
+        and _normalize_filename(candidate.name) == normalized_name
+    ]
+
+
+def _known_upload_filenames() -> set[str]:
+    names = {
+        _normalize_filename(str(document.get("filename") or ""))
+        for document in read_documents()
+        if str(document.get("filename") or "").strip()
+    }
+
+    upload_directory = Path(UPLOAD_DIR)
+    try:
+        for candidate in upload_directory.iterdir():
+            if candidate.is_file():
+                names.add(_normalize_filename(candidate.name))
+    except OSError:
+        pass
+
+    return names
+
+
+def _duplicate_document_exception(filenames: list[str]) -> HTTPException:
+    unique_filenames = list(dict.fromkeys(
+        filename.strip()
+        for filename in filenames
+        if filename.strip()
+    ))
+    duplicate_list = ", ".join(unique_filenames)
+    return HTTPException(
+        status_code=409,
+        detail={
+            "code": "DOCUMENT_ALREADY_EXISTS",
+            "message": (
+                f"The following files already exist: {duplicate_list}. "
+                "Choose Replace and Re-index to overwrite the existing document."
+            ),
+            "duplicateFilenames": unique_filenames,
+        },
+    )
 
 
 def _save_upload_file(
@@ -181,21 +267,16 @@ def _save_upload_file(
     content = file.file.read()
 
     if len(content) > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(status_code=400, detail="File size exceeds 25 MB limit")
+        raise HTTPException(status_code=400, detail="The file exceeds the 25 MB limit.")
 
+    _validate_upload_content(filename, content)
     filepath = os.path.join(UPLOAD_DIR, filename)
 
     if (
-        os.path.exists(filepath)
+        _upload_file_paths(filename)
         or _documents_with_filename(filename)
     ) and not allow_overwrite:
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                f'Dokumen "{filename}" sudah ada. '
-                "Konfirmasi penimpaan sebelum mengunggah file baru."
-            ),
-        )
+        raise _duplicate_document_exception([filename])
 
     with open(filepath, "wb") as f:
         f.write(content)
@@ -210,18 +291,21 @@ def _upload_and_index(
 ) -> dict[str, Any]:
     requested_filename = _safe_filename(file.filename or "")
     existing_documents = _documents_with_filename(requested_filename)
+    existing_upload_paths = _upload_file_paths(requested_filename)
     existing_file_backups: dict[str, bytes] = {}
 
-    if existing_documents and not replace_existing:
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                f'Dokumen "{requested_filename}" sudah ada. '
-                "Upload dibatalkan karena belum ada persetujuan untuk menimpa file lama."
-            ),
-        )
+    if (existing_documents or existing_upload_paths) and not replace_existing:
+        raise _duplicate_document_exception([requested_filename])
 
     if replace_existing:
+        for existing_upload_path in existing_upload_paths:
+            try:
+                existing_file_backups[str(existing_upload_path)] = (
+                    existing_upload_path.read_bytes()
+                )
+            except OSError:
+                pass
+
         for existing_document in existing_documents:
             old_filepath = str(existing_document.get("filepath") or "")
             if old_filepath and os.path.exists(old_filepath):
@@ -257,8 +341,13 @@ def _upload_and_index(
         existing_file_backups.setdefault(filepath, b"")
 
     if replace_existing:
-        for existing_document in existing_documents:
-            old_filename = str(existing_document.get("filename") or "")
+        old_filenames = {
+            str(existing_document.get("filename") or "")
+            for existing_document in existing_documents
+        }
+        old_filenames.update(path.name for path in existing_upload_paths)
+
+        for old_filename in old_filenames:
             if old_filename and old_filename != filename:
                 delete_document_chunks(old_filename)
 
@@ -276,22 +365,32 @@ def _upload_and_index(
                 except OSError:
                     pass
 
-            restore_document = next(
+            restore_path = next(
                 (
-                    document
+                    str(document.get("filepath") or "")
                     for document in existing_documents
                     if str(document.get("filepath") or "")
                     and os.path.exists(str(document.get("filepath") or ""))
                 ),
-                None,
+                "",
             )
-            if restore_document:
+            if not restore_path:
+                restore_path = next(
+                    (
+                        str(existing_upload_path)
+                        for existing_upload_path in existing_upload_paths
+                        if existing_upload_path.exists()
+                    ),
+                    "",
+                )
+
+            if restore_path:
                 try:
-                    ingest(str(restore_document.get("filepath")))
+                    ingest(restore_path)
                 except Exception:
                     pass
 
-        raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(exc)}") from exc
+        raise HTTPException(status_code=500, detail=f"Document processing failed: {str(exc)}") from exc
 
     record = create_document_record(
         filename=filename,
@@ -300,8 +399,9 @@ def _upload_and_index(
         ingest_result=result,
     )
 
-    if replace_existing and existing_documents:
-        record["id"] = existing_documents[0].get("id") or record["id"]
+    if replace_existing:
+        if existing_documents:
+            record["id"] = existing_documents[0].get("id") or record["id"]
 
         for existing_document in existing_documents:
             existing_id = str(existing_document.get("id") or "")
@@ -313,6 +413,14 @@ def _upload_and_index(
             if old_filepath and old_filepath != filepath and os.path.exists(old_filepath):
                 try:
                     os.remove(old_filepath)
+                except OSError:
+                    pass
+
+        for existing_upload_path in existing_upload_paths:
+            old_path = str(existing_upload_path)
+            if old_path != filepath and os.path.exists(old_path):
+                try:
+                    os.remove(old_path)
                 except OSError:
                     pass
 
@@ -381,6 +489,16 @@ def _map_query_log(log: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _response_time_seconds(log: dict[str, Any]) -> float:
+    raw_value = log.get("responseTime", 0.0)
+    try:
+        if isinstance(raw_value, str):
+            raw_value = raw_value.strip().lower().removesuffix("s")
+        return max(float(raw_value or 0.0), 0.0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def _filter_logs(
     current_user: dict[str, str],
     range_value: str | None = None,
@@ -418,7 +536,7 @@ def compat_login(payload: LoginPayload):
     if not user:
         raise HTTPException(
             status_code=401,
-            detail="Username atau password salah.",
+            detail="Nama pengguna atau kata sandi salah.",
         )
 
     return {
@@ -466,7 +584,7 @@ async def compat_chat(request: Request):
         model = str(payload.get("model") or "").strip() or None
 
     if not question:
-        raise HTTPException(status_code=400, detail="Message is required")
+        raise HTTPException(status_code=400, detail="Pesan wajib diisi.")
 
     current_user = _require_user(request)
     started_at = time.perf_counter()
@@ -492,7 +610,7 @@ async def compat_chat(request: Request):
             user_name=current_user["name"],
             user_role=current_user["role"],
         )
-        raise HTTPException(status_code=500, detail=f"Chat failed: {str(exc)}") from exc
+        raise HTTPException(status_code=500, detail=f"Proses chat gagal: {str(exc)}") from exc
 
     answer = str(result.get("answer") or "")
     sources = result.get("sources") or []
@@ -590,7 +708,7 @@ def compat_delete_conversations(
     if not conversation_ids:
         raise HTTPException(
             status_code=400,
-            detail="Choose at least one conversation to delete.",
+            detail="Pilih minimal satu percakapan untuk dihapus.",
         )
 
     deleted_ids = delete_conversations(
@@ -610,7 +728,7 @@ def compat_get_conversation(conversation_id: str, request: Request):
     current_user = _require_user(request)
     conversation = get_conversation(conversation_id, user_id=current_user["id"])
     if not conversation:
-        raise HTTPException(status_code=404, detail="Conversation not found")
+        raise HTTPException(status_code=404, detail="Percakapan tidak ditemukan.")
 
     return {
         "conversation": {
@@ -638,7 +756,7 @@ def compat_update_conversation(conversation_id: str, payload: ConversationUpdate
         user_id=current_user["id"],
     )
     if not updated:
-        raise HTTPException(status_code=404, detail="Conversation not found")
+        raise HTTPException(status_code=404, detail="Percakapan tidak ditemukan.")
 
     return {
         "id": updated.get("id"),
@@ -659,8 +777,8 @@ def compat_delete_conversation(conversation_id: str, request: Request):
     current_user = _require_user(request)
     deleted = delete_conversation(conversation_id, user_id=current_user["id"])
     if not deleted:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    return {"message": "Conversation deleted"}
+        raise HTTPException(status_code=404, detail="Percakapan tidak ditemukan.")
+    return {"message": "Percakapan berhasil dihapus."}
 
 
 @router.get("/admin/users")
@@ -690,18 +808,50 @@ def compat_list_staff_users(request: Request):
 
 
 @router.post("/admin/users")
-def compat_create_staff_user(payload: StaffCreatePayload, request: Request):
+def compat_create_managed_user(payload: StaffCreatePayload, request: Request):
     _require_admin(request)
     try:
-        user = create_staff_user(
+        user = create_managed_user(
             username=payload.username,
             name=payload.name,
             password=payload.password,
+            role=payload.role,
         )
     except UserStoreError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return _staff_management_user(user, {})
+
+
+@router.patch("/admin/users/{user_id}")
+def compat_update_managed_user(
+    user_id: str,
+    payload: StaffUpdatePayload,
+    request: Request,
+):
+    _require_admin(request)
+    target_user = get_user_by_id(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Account not found.")
+    if str(target_user.get("role") or "") == "admin":
+        raise HTTPException(
+            status_code=400,
+            detail="Administrator accounts cannot be edited from Account Management.",
+        )
+
+    updates = payload.dict(exclude_none=True)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No changes were submitted.")
+
+    try:
+        updated_user = update_user(user_id, **updates)
+    except UserStoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="Account not found.")
+
+    return _staff_management_user(updated_user, {})
 
 
 @router.patch("/admin/users/{user_id}/password")
@@ -713,12 +863,12 @@ def compat_update_staff_password(
     _require_admin(request)
     target_user = get_user_by_id(user_id)
     if not target_user:
-        raise HTTPException(status_code=404, detail="User account not found.")
+        raise HTTPException(status_code=404, detail="Account not found.")
 
     if str(target_user.get("role") or "") == "admin":
         raise HTTPException(
             status_code=400,
-            detail="Administrator passwords cannot be changed from Staff Management.",
+            detail="Administrator passwords cannot be changed from Account Management.",
         )
 
     try:
@@ -727,7 +877,7 @@ def compat_update_staff_password(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     if not updated_user:
-        raise HTTPException(status_code=404, detail="User account not found.")
+        raise HTTPException(status_code=404, detail="Account not found.")
 
     return {
         "message": "Password updated successfully.",
@@ -740,29 +890,31 @@ def compat_delete_staff_user(user_id: str, request: Request):
     current_user = _require_admin(request)
     target_user = get_user_by_id(user_id)
     if not target_user:
-        raise HTTPException(status_code=404, detail="User account not found.")
+        raise HTTPException(status_code=404, detail="Account not found.")
 
     if str(target_user.get("id") or "") == str(current_user.get("id") or ""):
         raise HTTPException(status_code=400, detail="You cannot delete your own account.")
 
     if str(target_user.get("role") or "") == "admin":
-        raise HTTPException(status_code=400, detail="Administrator accounts cannot be deleted here.")
+        raise HTTPException(status_code=400, detail="Administrator accounts cannot be deleted from this page.")
 
     deleted = delete_user(user_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="User account not found.")
+        raise HTTPException(status_code=404, detail="Account not found.")
 
     return None
 
 
 @router.get("/admin/documents")
 def compat_get_documents(
+    request: Request,
     search: str | None = None,
     page: int = 1,
     limit: int = 10,
     status: str | None = None,
     type: str | None = None,
 ):
+    _require_admin(request)
     documents = [to_repository_document(doc) for doc in filter_documents(search=search, doc_type=type, status=status)]
     page_items, total, safe_page, total_pages = _paginate(documents, page, limit)
     return {
@@ -774,23 +926,47 @@ def compat_get_documents(
     }
 
 
+@router.post("/admin/documents/conflicts")
+def compat_document_conflicts(
+    payload: DocumentConflictPayload,
+    request: Request,
+):
+    _require_admin(request)
+    incoming_names = list(dict.fromkeys(
+        _safe_filename(filename)
+        for filename in payload.filenames
+        if str(filename).strip()
+    ))
+    existing_names = _known_upload_filenames()
+    duplicate_filenames = [
+        filename
+        for filename in incoming_names
+        if _normalize_filename(filename) in existing_names
+    ]
+    return {
+        "duplicateFilenames": duplicate_filenames,
+    }
+
+
 @router.post("/admin/documents")
 async def compat_upload_documents(
+    request: Request,
     files: list[UploadFile] = File(...),
     replaceFilenamesJson: str = Form("[]"),
 ):
+    _require_admin(request)
     try:
         raw_replace_filenames = json.loads(replaceFilenamesJson or "[]")
     except json.JSONDecodeError as exc:
         raise HTTPException(
             status_code=400,
-            detail="Format konfirmasi penimpaan file tidak valid.",
+            detail="The file replacement confirmation format is invalid.",
         ) from exc
 
     if not isinstance(raw_replace_filenames, list):
         raise HTTPException(
             status_code=400,
-            detail="Daftar file yang akan ditimpa harus berupa array.",
+            detail="The replacement filename list must be an array.",
         )
 
     replace_filenames = {
@@ -817,15 +993,12 @@ async def compat_upload_documents(
         raise HTTPException(
             status_code=400,
             detail=(
-                "Satu proses upload tidak boleh berisi beberapa file "
-                "dengan nama yang sama."
+                "A single upload cannot contain multiple files "
+                "with the same filename."
             ),
         )
 
-    existing_names = {
-        _normalize_filename(str(document.get("filename") or ""))
-        for document in read_documents()
-    }
+    existing_names = _known_upload_filenames()
     unauthorized_duplicates = [
         filename
         for filename, normalized_name in zip(
@@ -837,14 +1010,7 @@ async def compat_upload_documents(
     ]
 
     if unauthorized_duplicates:
-        duplicate_list = ", ".join(unauthorized_duplicates)
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                f"File berikut sudah ada: {duplicate_list}. "
-                "Upload dibatalkan karena admin belum menyetujui penimpaan."
-            ),
-        )
+        raise _duplicate_document_exception(unauthorized_duplicates)
 
     records = [
         _upload_and_index(
@@ -857,18 +1023,20 @@ async def compat_upload_documents(
         for file in files
     ]
     return {
-        "message": f"{len(records)} dokumen berhasil diupload dan di-index.",
+        "message": f"{len(records)} document(s) uploaded and indexed successfully.",
         "uploadItems": [to_upload_item(record) for record in records],
     }
 
 
 @router.get("/admin/documents/uploads")
-def compat_upload_queue():
+def compat_upload_queue(request: Request):
+    _require_admin(request)
     return [to_upload_item(doc) for doc in read_documents()]
 
 
 @router.get("/admin/documents/trained")
-def compat_trained_documents():
+def compat_trained_documents(request: Request):
+    _require_admin(request)
     documents = [doc for doc in read_documents() if int(doc.get("chunks") or 0) > 0]
     return {
         "documents": [to_trained_document(doc) for doc in documents],
@@ -876,19 +1044,54 @@ def compat_trained_documents():
     }
 
 
+def _reindex_document_record(document: dict[str, Any]) -> dict[str, Any]:
+    document_id = str(document.get("id") or "")
+    filepath = str(document.get("filepath") or "")
+    if not filepath or not os.path.exists(filepath):
+        raise HTTPException(
+            status_code=404,
+            detail=f'Source file for "{document.get("filename") or document_id}" was not found.',
+        )
+
+    try:
+        result = ingest(filepath)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f'Re-indexing "{document.get("filename") or document_id}" failed: {str(exc)}',
+        ) from exc
+
+    updated = create_document_record(
+        filename=str(document.get("filename") or os.path.basename(filepath)),
+        filepath=filepath,
+        size_bytes=int(document.get("sizeBytes") or os.path.getsize(filepath)),
+        ingest_result=result,
+    )
+    updated["id"] = document_id
+    updated["indexedStatus"] = "Re-indexed"
+    updated["note"] = f'Re-indexing completed ({updated.get("chunks", 0)} chunks).'
+    return upsert_document(updated)
+
+
 @router.post("/admin/documents/index")
-def compat_start_indexing(payload: IndexPayload | None = None):
+def compat_start_indexing(request: Request, payload: IndexPayload | None = None):
+    _require_admin(request)
     ids = set((payload.documentIds if payload else None) or [])
     documents = read_documents()
-    selected = [doc for doc in documents if not ids or doc.get("id") in ids]
+    selected = [doc for doc in documents if not ids or str(doc.get("id") or "") in ids]
+    if not selected:
+        raise HTTPException(status_code=404, detail="No documents were selected.")
+
+    updated_documents = [_reindex_document_record(document) for document in selected]
     return {
-        "message": "Dokumen sudah diproses oleh Python RAG pipeline.",
-        "uploadItems": [to_upload_item(doc) for doc in selected],
+        "message": f"{len(updated_documents)} document(s) re-indexed successfully.",
+        "uploadItems": [to_upload_item(doc) for doc in updated_documents],
     }
 
 
 @router.get("/admin/documents/{document_id}/status")
-def compat_document_status(document_id: str):
+def compat_document_status(document_id: str, request: Request):
+    _require_admin(request)
     document = get_document(document_id)
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -896,33 +1099,23 @@ def compat_document_status(document_id: str):
 
 
 @router.post("/admin/documents/{document_id}/reindex")
-def compat_reindex_document(document_id: str):
+def compat_reindex_document(document_id: str, request: Request):
+    _require_admin(request)
     document = get_document(document_id)
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
 
     filepath = document.get("filepath")
     if not filepath or not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="Original uploaded file not found")
+        raise HTTPException(status_code=404, detail="The document source file was not found.")
 
-    try:
-        result = ingest(filepath)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Re-index failed: {str(exc)}") from exc
-
-    updated = create_document_record(
-        filename=document.get("filename", os.path.basename(filepath)),
-        filepath=filepath,
-        size_bytes=int(document.get("sizeBytes") or os.path.getsize(filepath)),
-        ingest_result=result,
-    )
-    updated["id"] = document_id
-    upsert_document(updated)
+    updated = _reindex_document_record(document)
     return to_upload_item(updated)
 
 
 @router.delete("/admin/documents/{document_id}")
-def compat_delete_document(document_id: str):
+def compat_delete_document(document_id: str, request: Request):
+    _require_admin(request)
     document = delete_document(document_id)
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -944,7 +1137,7 @@ def compat_query_logs(
     status: str | None = None,
     search: str | None = None,
 ):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     logs = _filter_logs(current_user, range_value=range, status=status, search=search)
     page_items, total, safe_page, total_pages = _paginate(logs, page, limit)
     return {
@@ -965,7 +1158,7 @@ def compat_query_logs_dashboard(
     status: str | None = None,
     search: str | None = None,
 ):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     logs = _filter_logs(current_user, range_value=range, status=status, search=search)
     page_items, total, safe_page, total_pages = _paginate(logs, page, limit)
     answered = len([log for log in logs if log["status"] == "ANSWERED"])
@@ -986,7 +1179,10 @@ def compat_query_logs_dashboard(
             "noReference": no_reference,
             "notFound": not_found,
             "averageConfidence": round(avg_conf, 4),
-            "averageResponseTime": 0.0,
+            "averageResponseTime": round(
+                sum(_response_time_seconds(log) for log in logs) / len(logs),
+                4,
+            ) if logs else 0.0,
         },
         "total": total,
         "page": safe_page,
@@ -997,23 +1193,23 @@ def compat_query_logs_dashboard(
 
 @router.get("/admin/query-logs/{query_id}")
 def compat_query_log_detail(query_id: str, request: Request):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     for log in _filter_logs(current_user):
         if log["queryId"] == query_id:
             return log
-    raise HTTPException(status_code=404, detail="Query log not found")
+    raise HTTPException(status_code=404, detail="Query log not found.")
 
 
 @router.delete("/admin/query-logs/{query_id}")
 def compat_delete_query_log(query_id: str, request: Request):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     deleted = delete_log(
         query_id,
         user_id=current_user["id"],
         include_all=_can_admin(current_user),
     )
     if not deleted:
-        raise HTTPException(status_code=404, detail="Query log not found")
+        raise HTTPException(status_code=404, detail="Query log not found.")
     return None
 
 
@@ -1032,7 +1228,7 @@ def compat_dashboard(
     documentPage: int = 1,
     documentLimit: int = 5,
 ):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     logs = _logs_for_dashboard_user(current_user)
     summary = _dashboard_summary(logs)
     analytics = _chat_analytics(range, logs)
@@ -1050,13 +1246,13 @@ def compat_dashboard(
 
 @router.get("/admin/dashboard/summary")
 def compat_dashboard_summary(request: Request):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     return _dashboard_summary(_logs_for_dashboard_user(current_user))
 
 
 @router.get("/admin/dashboard/chat-analytics")
 def compat_dashboard_analytics(request: Request, range: str = "daily"):
-    current_user = _require_user(request)
+    current_user = _require_admin(request)
     return _chat_analytics(range, _logs_for_dashboard_user(current_user))
 
 

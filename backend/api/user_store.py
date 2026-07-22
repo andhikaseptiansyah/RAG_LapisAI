@@ -7,13 +7,15 @@ import secrets
 import threading
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
-USER_STORE_FILE = Path(__file__).resolve().parent.parent / "users_store.json"
+from api.storage_paths import USER_STORE_FILE
+
 USER_STORE_LOCK = threading.RLock()
 PASSWORD_ITERATIONS = 210_000
 USERNAME_PATTERN = re.compile(r"^[a-z0-9._-]{3,32}$")
+MANAGEABLE_ROLES = {"user", "staff"}
+VALID_ROLES = {"user", "staff", "admin"}
 
 
 class UserStoreError(ValueError):
@@ -36,10 +38,7 @@ def _hash_password(password: str) -> str:
         salt,
         PASSWORD_ITERATIONS,
     )
-    return (
-        f"pbkdf2_sha256${PASSWORD_ITERATIONS}$"
-        f"{salt.hex()}${digest.hex()}"
-    )
+    return f"pbkdf2_sha256${PASSWORD_ITERATIONS}${salt.hex()}${digest.hex()}"
 
 
 def _verify_password(password: str, encoded_hash: str) -> bool:
@@ -83,30 +82,32 @@ def _build_user(
 
 
 def _default_users() -> list[dict[str, Any]]:
-    # IDs and credentials are preserved for compatibility with existing query logs
-    # and the development accounts that already ship with this project.
+    """Create only the bootstrap administrator for a new installation."""
+    username = normalize_username(os.getenv("BOOTSTRAP_ADMIN_USERNAME", "admin"))
+    if not USERNAME_PATTERN.fullmatch(username):
+        username = "admin"
+
+    name = " ".join(os.getenv("BOOTSTRAP_ADMIN_NAME", "Administrator").split())
+    if len(name) < 2 or len(name) > 80:
+        name = "Administrator"
+
+    configured_password = os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "").strip()
+    password = configured_password or secrets.token_urlsafe(18)
+
+    if not configured_password:
+        print(
+            "[AUTH] BOOTSTRAP_ADMIN_PASSWORD is not configured. "
+            f"Initial administrator password for username '{username}': {password}"
+        )
+
     return [
         _build_user(
             user_id="dev-admin",
-            username="admin",
-            name="Admin",
+            username=username,
+            name=name,
             role="admin",
-            password="admin",
-        ),
-        _build_user(
-            user_id="dev-staff-dhika",
-            username="dhika",
-            name="Dhika",
-            role="staff",
-            password="dhika",
-        ),
-        _build_user(
-            user_id="dev-staff",
-            username="staff",
-            name="Staff User",
-            role="staff",
-            password="staff",
-        ),
+            password=password,
+        )
     ]
 
 
@@ -115,6 +116,7 @@ def _write_users_unlocked(users: list[dict[str, Any]]) -> None:
     temporary_file = USER_STORE_FILE.with_suffix(".tmp")
     with temporary_file.open("w", encoding="utf-8") as file_handle:
         json.dump(users, file_handle, indent=2, ensure_ascii=False)
+    os.chmod(temporary_file, 0o600)
     os.replace(temporary_file, USER_STORE_FILE)
 
 
@@ -131,10 +133,10 @@ def read_users() -> list[dict[str, Any]]:
             with USER_STORE_FILE.open("r", encoding="utf-8") as file_handle:
                 data = json.load(file_handle)
         except (OSError, json.JSONDecodeError) as exc:
-            raise RuntimeError("User account storage could not be read.") from exc
+            raise RuntimeError("The account store could not be read.") from exc
 
         if not isinstance(data, list):
-            raise RuntimeError("User account storage has an invalid format.")
+            raise RuntimeError("The account store format is invalid.")
 
         return [user for user in data if isinstance(user, dict)]
 
@@ -144,7 +146,7 @@ def public_user(user: dict[str, Any]) -> dict[str, str]:
         "id": str(user.get("id") or ""),
         "username": str(user.get("username") or ""),
         "name": str(user.get("name") or ""),
-        "role": str(user.get("role") or "staff"),
+        "role": str(user.get("role") or "user"),
     }
 
 
@@ -185,7 +187,7 @@ def _validate_username(username: str) -> str:
     normalized = normalize_username(username)
     if not USERNAME_PATTERN.fullmatch(normalized):
         raise UserStoreError(
-            "Username must contain 3-32 lowercase letters, numbers, dots, underscores, or hyphens."
+            "Username must contain 3-32 lowercase letters, numbers, periods, underscores, or hyphens."
         )
     return normalized
 
@@ -206,10 +208,25 @@ def _validate_password(password: str) -> str:
     return clean_password
 
 
-def create_staff_user(username: str, name: str, password: str) -> dict[str, Any]:
+def _validate_role(role: str, *, manageable_only: bool = False) -> str:
+    clean_role = str(role or "").strip().lower()
+    allowed = MANAGEABLE_ROLES if manageable_only else VALID_ROLES
+    if clean_role not in allowed:
+        allowed_text = ", ".join(sorted(allowed))
+        raise UserStoreError(f"Role must be one of: {allowed_text}.")
+    return clean_role
+
+
+def create_managed_user(
+    username: str,
+    name: str,
+    password: str,
+    role: str = "staff",
+) -> dict[str, Any]:
     normalized_username = _validate_username(username)
     clean_name = _validate_name(name)
     clean_password = _validate_password(password)
+    clean_role = _validate_role(role, manageable_only=True)
 
     with USER_STORE_LOCK:
         users = read_users()
@@ -217,18 +234,69 @@ def create_staff_user(username: str, name: str, password: str) -> dict[str, Any]
             normalize_username(str(user.get("username") or "")) == normalized_username
             for user in users
         ):
-            raise UserStoreError("This username is already in use.")
+            raise UserStoreError("Username is already in use.")
 
         user = _build_user(
-            user_id=f"staff-{uuid.uuid4().hex}",
+            user_id=f"{clean_role}-{uuid.uuid4().hex}",
             username=normalized_username,
             name=clean_name,
-            role="staff",
+            role=clean_role,
             password=clean_password,
         )
         users.append(user)
         _write_users_unlocked(users)
         return user
+
+
+def create_staff_user(username: str, name: str, password: str) -> dict[str, Any]:
+    """Compatibility wrapper for older imports."""
+    return create_managed_user(username, name, password, role="staff")
+
+
+def update_user(
+    user_id: str,
+    *,
+    username: str | None = None,
+    name: str | None = None,
+    role: str | None = None,
+) -> dict[str, Any] | None:
+    with USER_STORE_LOCK:
+        users = read_users()
+        target_index = next(
+            (
+                index
+                for index, user in enumerate(users)
+                if str(user.get("id") or "") == user_id
+            ),
+            None,
+        )
+        if target_index is None:
+            return None
+
+        current = users[target_index]
+        updated = dict(current)
+
+        if username is not None:
+            normalized_username = _validate_username(username)
+            duplicate = any(
+                index != target_index
+                and normalize_username(str(user.get("username") or "")) == normalized_username
+                for index, user in enumerate(users)
+            )
+            if duplicate:
+                raise UserStoreError("Username is already in use.")
+            updated["username"] = normalized_username
+
+        if name is not None:
+            updated["name"] = _validate_name(name)
+
+        if role is not None:
+            updated["role"] = _validate_role(role, manageable_only=True)
+
+        updated["updated_at"] = _now_iso()
+        users[target_index] = updated
+        _write_users_unlocked(users)
+        return updated
 
 
 def update_user_password(user_id: str, password: str) -> dict[str, Any] | None:

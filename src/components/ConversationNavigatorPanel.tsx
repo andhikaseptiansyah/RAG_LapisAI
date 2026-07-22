@@ -45,7 +45,7 @@ export const ConversationNavigatorPanel: React.FC<
       return [
         {
           id: message.id,
-          content: message.content.trim() || 'Message with attachment',
+          content: message.content.trim() || 'Pesan dengan lampiran',
           time: message.time,
           attachmentCount: message.attachments?.length ?? 0,
           position,
@@ -91,7 +91,7 @@ export const ConversationNavigatorPanel: React.FC<
             ? 'w-[300px] translate-x-0 border-l border-[#1a1a1a] opacity-100 md:w-[340px]'
             : 'translate-x-full border-transparent opacity-0 md:w-0 md:translate-x-0'
         }`}
-        aria-label="Current conversation navigator"
+        aria-label="Navigasi percakapan aktif"
       >
         <div className="flex h-full min-h-0 flex-col px-5 pb-5 pt-6">
           
@@ -103,8 +103,8 @@ export const ConversationNavigatorPanel: React.FC<
               type="button"
               onClick={onClose}
               className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111] text-white/50 transition-all hover:bg-[#1a1a1a] hover:text-white"
-              aria-label="Close current conversation navigator"
-              title="Close current conversation navigator"
+              aria-label="Tutup navigasi percakapan aktif"
+              title="Tutup navigasi percakapan aktif"
             >
               <span className="material-symbols-outlined text-[20px]">
                 right_panel_close
@@ -115,7 +115,7 @@ export const ConversationNavigatorPanel: React.FC<
             <div className="absolute left-1/2 top-0 flex h-8 -translate-x-1/2 items-center justify-center pointer-events-none">
               <img
                 src="/assistant-logo.png"
-                alt="Lapis AI Logo"
+                alt="Logo Lapis AI"
                 className="h-[100px] w-auto shrink-0 select-none object-contain"
                 draggable="false"
               />
@@ -132,10 +132,10 @@ export const ConversationNavigatorPanel: React.FC<
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-                  Response language
+                  Bahasa jawaban
                 </p>
                 <p className="mt-1 text-[11px] text-white/40">
-                  Choose the language for the answer.
+                  Pilih bahasa yang digunakan untuk jawaban.
                 </p>
               </div>
 
@@ -163,7 +163,7 @@ export const ConversationNavigatorPanel: React.FC<
                       {language}
                     </span>
                     <span className={`mt-0.5 block truncate text-[10px] ${isSelected ? 'text-white/60' : 'text-white/30'}`}>
-                      {language === 'ID' ? 'Bahasa Indonesia' : 'English'}
+                      {language === 'ID' ? 'Bahasa Indonesia' : 'Bahasa Inggris'}
                     </span>
                   </button>
                 );
@@ -176,10 +176,10 @@ export const ConversationNavigatorPanel: React.FC<
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-                  Questions in this chat
+                  Pertanyaan dalam percakapan ini
                 </p>
                 <p className="mt-1 text-[11px] text-white/40">
-                  Select a question to jump to it.
+                  Pilih pertanyaan untuk membuka posisinya.
                 </p>
               </div>
 
@@ -197,7 +197,7 @@ export const ConversationNavigatorPanel: React.FC<
               <input
                 value={searchKeyword}
                 onChange={(event) => setSearchKeyword(event.target.value)}
-                placeholder="Search in this chat"
+                placeholder="Cari dalam percakapan ini"
                 className="h-12 w-full rounded-xl border border-[#1a1a1a] bg-[#0c0c0c] pl-11 pr-10 text-[13px] text-white/90 outline-none transition-all duration-200 placeholder:text-white/30 focus:border-[#333] focus:bg-[#111] focus:ring-2 focus:ring-[#333]/30"
               />
               {searchKeyword && (
@@ -205,7 +205,7 @@ export const ConversationNavigatorPanel: React.FC<
                   type="button"
                   onClick={() => setSearchKeyword('')}
                   className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-[#1a1a1a] text-white/50 transition-colors hover:bg-[#2a2a2a] hover:text-white"
-                  aria-label="Clear search"
+                  aria-label="Bersihkan pencarian"
                 >
                   <span className="material-symbols-outlined text-[16px]">
                     close
@@ -223,10 +223,10 @@ export const ConversationNavigatorPanel: React.FC<
                     </span>
                   </div>
                   <p className="text-[14px] font-medium text-white/70">
-                    No questions yet
+                    Belum ada pertanyaan
                   </p>
                   <p className="mt-1.5 max-w-[220px] text-[11px] leading-relaxed text-white/40">
-                    Questions from this conversation will appear here after you send them.
+                    Pertanyaan dari percakapan ini akan muncul setelah Anda mengirimkannya.
                   </p>
                 </div>
               ) : filteredQuestions.length === 0 ? (
@@ -235,7 +235,7 @@ export const ConversationNavigatorPanel: React.FC<
                     search_off
                   </span>
                   <p className="mt-3 text-[12px] text-white/50">
-                    No matching question found.
+                    Pertanyaan yang sesuai tidak ditemukan.
                   </p>
                 </div>
               ) : (

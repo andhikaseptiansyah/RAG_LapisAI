@@ -1,10 +1,13 @@
 import json
 import os
+import threading
 import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-CONVERSATION_STORE_FILE = "./conversations_store.json"
+from api.storage_paths import CONVERSATION_STORE_FILE
+
+CONVERSATION_STORE_LOCK = threading.RLock()
 LEGACY_ADMIN_USER_ID = "dev-admin"
 
 
@@ -13,20 +16,26 @@ def now_iso() -> str:
 
 
 def read_conversations() -> list[dict[str, Any]]:
-    if not os.path.exists(CONVERSATION_STORE_FILE):
-        return []
+    with CONVERSATION_STORE_LOCK:
+        if not CONVERSATION_STORE_FILE.exists():
+            return []
 
-    try:
-        with open(CONVERSATION_STORE_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
-    except (json.JSONDecodeError, OSError):
-        return []
+        try:
+            with CONVERSATION_STORE_FILE.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, list) else []
+        except (json.JSONDecodeError, OSError):
+            return []
 
 
 def write_conversations(conversations: list[dict[str, Any]]) -> None:
-    with open(CONVERSATION_STORE_FILE, "w", encoding="utf-8") as f:
-        json.dump(conversations, f, indent=2, ensure_ascii=False)
+    with CONVERSATION_STORE_LOCK:
+        CONVERSATION_STORE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temporary_file = CONVERSATION_STORE_FILE.with_suffix(".tmp")
+        with temporary_file.open("w", encoding="utf-8") as f:
+            json.dump(conversations, f, indent=2, ensure_ascii=False)
+        os.chmod(temporary_file, 0o600)
+        os.replace(temporary_file, CONVERSATION_STORE_FILE)
 
 
 def create_title(message: str) -> str:

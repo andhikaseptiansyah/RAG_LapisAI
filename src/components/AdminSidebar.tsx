@@ -26,8 +26,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           type="button"
           onClick={() => setIsDesktopOpen(true)}
           className="hidden md:inline-flex fixed left-4 top-5 z-[60] h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#0c0f1a] text-slate-300 shadow-xl hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400/30 transition-all"
-          aria-label="Buka sidebar admin"
-          title="Buka sidebar"
+          aria-label="Open admin sidebar"
+          title="Open sidebar"
         >
           <span className="material-symbols-outlined text-[24px]">chevron_right</span>
         </button>
@@ -59,8 +59,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={() => setIsDesktopOpen(false)}
               className="hidden md:inline-flex absolute -right-4 top-1/2 -translate-y-1/2 h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-[#0c0f1a] text-slate-300 shadow-lg hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400/30 transition-all"
-              aria-label="Tutup sidebar admin"
-              title="Tutup sidebar"
+              aria-label="Close admin sidebar"
+              title="Close sidebar"
             >
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
@@ -69,8 +69,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={onClose}
               className="md:hidden absolute right-0 p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
-              aria-label="Tutup sidebar admin"
-              title="Tutup sidebar admin"
+              aria-label="Close admin sidebar"
+              title="Close admin sidebar"
             >
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>

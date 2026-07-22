@@ -246,7 +246,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                       className="flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-white/5 border border-white/10 text-white/60 transition-all hover:bg-white/10 hover:text-white"
                     >
                       <span className="material-symbols-outlined text-[16px]">graphic_eq</span>
-                      <span className="text-[13px] font-medium hidden sm:block">Voice</span>
+                      <span className="text-[13px] font-medium hidden sm:block">{language === 'ID' ? 'Suara' : 'Voice'}</span>
                     </button>
 
                     <button

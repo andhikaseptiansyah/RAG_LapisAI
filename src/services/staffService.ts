@@ -1,6 +1,8 @@
 import { apiRequest } from './api';
 import type { AuthRole } from './authService';
 
+export type ManagedAccountRole = 'user' | 'staff';
+
 export interface ManagedUser {
   id: string;
   username: string;
@@ -17,10 +19,17 @@ export interface ManagedUserListResponse {
   totalChats: number;
 }
 
-export interface CreateStaffPayload {
+export interface CreateManagedUserPayload {
   username: string;
   name: string;
   password: string;
+  role: ManagedAccountRole;
+}
+
+export interface UpdateManagedUserPayload {
+  username?: string;
+  name?: string;
+  role?: ManagedAccountRole;
 }
 
 export interface PasswordUpdateResponse {
@@ -31,22 +40,29 @@ export interface PasswordUpdateResponse {
 export const getManagedUsers = async (
   signal?: AbortSignal
 ): Promise<ManagedUserListResponse> => {
-  return apiRequest<ManagedUserListResponse>(
-    '/api/admin/users',
-    {
-      method: 'GET',
-      signal,
-    }
-  );
+  return apiRequest<ManagedUserListResponse>('/api/admin/users', {
+    method: 'GET',
+    signal,
+  });
 };
 
-export const createStaffAccount = async (
-  payload: CreateStaffPayload
+export const createManagedUser = async (
+  payload: CreateManagedUserPayload
+): Promise<ManagedUser> => {
+  return apiRequest<ManagedUser>('/api/admin/users', {
+    method: 'POST',
+    body: payload,
+  });
+};
+
+export const updateManagedUser = async (
+  userId: string,
+  payload: UpdateManagedUserPayload
 ): Promise<ManagedUser> => {
   return apiRequest<ManagedUser>(
-    '/api/admin/users',
+    `/api/admin/users/${encodeURIComponent(userId)}`,
     {
-      method: 'POST',
+      method: 'PATCH',
       body: payload,
     }
   );
@@ -70,8 +86,6 @@ export const deleteManagedUser = async (
 ): Promise<void> => {
   await apiRequest<null>(
     `/api/admin/users/${encodeURIComponent(userId)}`,
-    {
-      method: 'DELETE',
-    }
+    { method: 'DELETE' }
   );
 };

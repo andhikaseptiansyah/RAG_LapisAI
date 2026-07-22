@@ -201,7 +201,7 @@ const buildTopQuestions = (logs: QueryLog[], limit = 5): TopQuestionPoint[] => {
     const question = getQuestionFromQueryLog(log);
     if (!question) return acc;
 
-    const key = question.toLocaleLowerCase('id-ID');
+    const key = question.toLocaleLowerCase('en-US');
     const current = acc.get(key);
     acc.set(key, {
       question: current?.question ?? question,
@@ -429,9 +429,9 @@ export const AdminDashboard: React.FC = () => {
   const dashboardTotalChats = dashboardAnalytics.reduce((total, item) => total + item.totalChats, 0);
 
   const summaryCards = [
-    { label: 'Total Documents', value: summary?.totalDocuments ?? 0, helper: 'Dokumen tersimpan di database', icon: 'folder_open', image: metricImages.documents, gradient: 'from-cyan-300 via-teal-300 to-cyan-500' },
-    { label: 'Total Chunks', value: summary?.totalChunks ?? 0, helper: 'Chunks hasil indexing', icon: 'database', image: metricImages.chunks, gradient: 'from-amber-200 via-yellow-300 to-orange-400' },
-    { label: 'Total Chats', value: summary?.totalChats ?? 0, helper: 'Percakapan dari query log', icon: 'forum', image: metricImages.chats, gradient: 'from-fuchsia-300 via-pink-300 to-violet-400' },
+    { label: 'Total Documents', value: summary?.totalDocuments ?? 0, helper: 'Documents stored in the database', icon: 'folder_open', image: metricImages.documents, gradient: 'from-cyan-300 via-teal-300 to-cyan-500' },
+    { label: 'Total Chunks', value: summary?.totalChunks ?? 0, helper: 'Indexed document chunks', icon: 'database', image: metricImages.chunks, gradient: 'from-amber-200 via-yellow-300 to-orange-400' },
+    { label: 'Total Chats', value: summary?.totalChats ?? 0, helper: 'Conversations recorded in query logs', icon: 'forum', image: metricImages.chats, gradient: 'from-fuchsia-300 via-pink-300 to-violet-400' },
   ];
 
   const effectiveViewDate = useMemo(() => {
@@ -447,7 +447,7 @@ export const AdminDashboard: React.FC = () => {
   const { currentMonthName, calendarGrid } = useMemo(() => {
     const year = effectiveViewDate.getFullYear();
     const month = effectiveViewDate.getMonth();
-    const monthName = effectiveViewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const monthName = effectiveViewDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const prevMonthDays = new Date(year, month, 0).getDate();

@@ -9,7 +9,7 @@ import {
   type QueryLogStatus,
   type QueryRange,
 } from '../services/queryLogService';
-import { getFriendlyApiErrorMessage } from '../services/api';
+import { getAdminApiErrorMessage } from '../services/api';
 
 const queryRangeLabels: Record<QueryRange, string> = {
   daily: 'Today',
@@ -133,7 +133,7 @@ const formatSourceLocation = (source: RetrievedSource): string => {
   const labels: string[] = [];
 
   if (source.page?.trim()) {
-    labels.push(`Halaman ${source.page}`);
+    labels.push(`Page ${source.page}`);
   }
   if (source.section?.trim()) {
     labels.push(`Bagian: ${source.section}`);
@@ -155,7 +155,7 @@ const formatSourceLocation = (source: RetrievedSource): string => {
     );
   }
 
-  return labels.join(' • ') || 'Lokasi sumber tidak tersedia';
+  return labels.join(' • ') || 'Source location unavailable';
 };
 
 const normalizeConfidenceScore = (value: unknown): number => {
@@ -263,7 +263,7 @@ const AdminQueryLogsDetail: React.FC = () => {
       setAllQueryLogs(sortedLogs);
     } catch (error) {
       if (signal?.aborted) return;
-      setErrorMessage(getFriendlyApiErrorMessage(error));
+      setErrorMessage(getAdminApiErrorMessage(error));
       setAllQueryLogs([]);
       setSelectedQueryId(null);
     } finally {
@@ -342,7 +342,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                 Query Logs
               </h1>
               <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
-                Monitor pertanyaan pengguna, dokumen sumber yang diambil, dan performa respon sistem.
+                Monitor user questions, retrieved source documents, and system response performance.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -423,7 +423,7 @@ const AdminQueryLogsDetail: React.FC = () => {
               <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm flex flex-col">
                 <div className="flex-1 divide-y divide-slate-800/50">
                   {isLoading && queryLogs.length === 0 ? (
-                    <div className="p-8 text-center text-sm text-slate-500">Memuat log pertanyaan...</div>
+                    <div className="p-8 text-center text-sm text-slate-500">Loading query logs...</div>
                   ) : queryLogs.length > 0 ? (
                     queryLogs.map((log) => {
                       const isSelected = selectedQueryId === log.queryId;
@@ -451,7 +451,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                       );
                     })
                   ) : (
-                    <div className="p-8 text-center text-sm text-slate-500">Tidak ada log untuk periode ini.</div>
+                    <div className="p-8 text-center text-sm text-slate-500">No logs found for this period.</div>
                   )}
                 </div>
 
@@ -505,7 +505,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                         <p className="text-sm font-medium text-slate-200 truncate">{selectedLog.userName}</p>
                       </div>
                       <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800">
-                        <p className="text-xs font-medium text-slate-500 mb-1">Waktu Respon</p>
+                        <p className="text-xs font-medium text-slate-500 mb-1">Response Time</p>
                         <p className="text-sm font-medium text-slate-200">{selectedLog.responseTime}</p>
                       </div>
                       <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800 hidden md:block">
@@ -517,7 +517,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">help</span> Pertanyaan User
+                          <span className="material-symbols-outlined text-[16px]">help</span> User Question
                         </h3>
                         <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-200">
                           {selectedLog.userQuestion}
@@ -526,10 +526,10 @@ const AdminQueryLogsDetail: React.FC = () => {
 
                       <div>
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">smart_toy</span> Jawaban Sistem
+                          <span className="material-symbols-outlined text-[16px]">smart_toy</span> System Answer
                         </h3>
                         <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
-                          {selectedLog.answerGenerated || 'Tidak ada jawaban yang dihasilkan.'}
+                          {selectedLog.answerGenerated || 'No answer was generated.'}
                         </div>
                       </div>
                     </div>
@@ -537,10 +537,10 @@ const AdminQueryLogsDetail: React.FC = () => {
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">description</span> Sumber Terambil
+                          <span className="material-symbols-outlined text-[16px]">description</span> Retrieved Sources
                         </h3>
                         <span className="text-xs text-slate-500 bg-slate-950 border border-slate-800 px-2 py-1 rounded-md">
-                          {(selectedLog.retrievedDocuments ?? []).length} dokumen
+                          {(selectedLog.retrievedDocuments ?? []).length} documents
                         </span>
                       </div>
 
@@ -565,7 +565,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                         </div>
                       ) : (
                         <p className="text-sm text-slate-500 p-4 rounded-lg border border-slate-800 border-dashed text-center">
-                          Tidak ada dokumen referensi yang ditemukan pada vektor DB.
+                          No reference documents were found in the vector database.
                         </p>
                       )}
                     </div>
@@ -573,7 +573,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                 </>
               ) : (
                 <div className="h-[400px] flex items-center justify-center text-sm text-slate-500 p-6">
-                  Pilih log dari daftar di sebelah kiri untuk melihat detail.
+                  Select a log from the list on the left to view its details.
                 </div>
               )}
             </div>

@@ -1,26 +1,25 @@
-RAG LapisAI Fixed - Test Report
-===============================
+RAG LapisAI Language and Upload Hotfix - Test Report
+====================================================
 
-Executed successfully:
+Validation completed in the packaging environment:
 
-1. PYTHONPATH=backend python evaluation/test_retrieval_metrics.py
-   Result: Retrieval metric tests passed.
+1. Backend unit suite
+   Command: cd backend && PYTHONPATH=. python -m unittest discover -s tests -v
+   Result: 14 tests passed.
 
-2. PYTHONPATH=backend python evaluation/test_retrieval_improvements.py
-   Result: Retrieval improvement tests passed.
+2. Python syntax compilation
+   Command: cd backend && python -m compileall -q .
+   Result: passed.
 
-3. PYTHONPATH=backend python evaluation/test_evidence_ground_truth.py
-   Result: Evidence verifier did not hard-reject any answerable ground-truth source set.
+3. TypeScript and TSX syntax parsing
+   Result: 39 source files parsed with zero syntax diagnostics.
 
-4. PYTHONPATH=backend python evaluation/test_indonesian_answer_gate.py
-   Result: Indonesian password-reset answer gate passed.
-   Confidence: 0.7603
-   Source: FAQ_IT_Support.txt
+4. Response-language regression check
+   Result: the English probation answer shown in the issue screenshot is rejected for an explicit ID request, while an Indonesian rewrite is accepted.
 
-5. python -m compileall -q backend evaluation
-   Result: Python syntax compilation passed.
+5. Upload conflict contract
+   Result: duplicate filenames return structured conflict data, and the frontend reopens the replace-confirmation dialog instead of showing only a generic 409 message.
 
-Note:
-The full live ChromaDB/Ollama integration was not executed in this environment because
-sentence-transformers, ChromaDB, and the local Ollama model are not installed here.
-Run reindex_corpus.py on the target machine before the first retrieval test.
+Limitations:
+- A full Vite build was not run because Node dependencies were unavailable in this environment.
+- Live document indexing and model generation were not run because ChromaDB, embedding models, reranker models, and configured LLM providers were unavailable.

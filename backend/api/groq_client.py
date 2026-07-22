@@ -5,8 +5,10 @@ import requests
 
 from api.answer_formatter import build_refusal_answer, has_answerable_evidence, is_refusal_answer, top_confidence
 from api.grounding_validator import prune_unsupported_claims, validate_grounded_answer
+from api.language import answer_matches_requested_language
 from api.llm_shared import (
-    SYSTEM_PROMPT,
+    build_language_repair_prompt,
+    build_system_prompt,
     build_context,
     build_grounding_chunks,
     build_user_prompt,
@@ -95,8 +97,26 @@ def build_groq_grounded_answer(
         return build_refusal_answer(language)
 
     try:
-        raw_answer = _groq_chat(SYSTEM_PROMPT, build_user_prompt(question, context, language))
+        system_prompt = build_system_prompt(language)
+        raw_answer = _groq_chat(system_prompt, build_user_prompt(question, context, language))
         llm_answer = clean_model_answer(raw_answer)
+
+        if llm_answer and not answer_matches_requested_language(llm_answer, language):
+            print("[GROQ] answer language mismatch; requesting a language-only rewrite")
+            repaired_raw_answer = _groq_chat(
+                system_prompt,
+                build_language_repair_prompt(
+                    question,
+                    context,
+                    llm_answer,
+                    language,
+                ),
+            )
+            llm_answer = clean_model_answer(repaired_raw_answer)
+
+        if llm_answer and not answer_matches_requested_language(llm_answer, language):
+            print("[GROQ] answer rejected because output language is still incorrect")
+            return ""
         if evaluation_mode:
             if not llm_answer:
                 raise RuntimeError("Groq returned an empty answer")

@@ -13,7 +13,7 @@ interface LoginLocationState {
 }
 
 const isAdminRole = (role: string): boolean => {
-  return role === 'admin' || role === 'superadmin' || role === 'owner';
+  return role === 'admin';
 };
 
 const resolveRedirectPath = (
@@ -82,7 +82,7 @@ export const Login: React.FC = () => {
     const normalizedUsername = username.trim();
 
     if (!normalizedUsername || !password) {
-      triggerError('Username dan password wajib diisi.');
+      triggerError('Nama pengguna dan kata sandi wajib diisi.');
       return;
     }
 
@@ -96,7 +96,7 @@ export const Login: React.FC = () => {
       });
 
       if (!authenticatedUser?.role) {
-        throw new Error('Login berhasil, tetapi data role user tidak terbaca.');
+        throw new Error('Login berhasil, tetapi data peran akun tidak terbaca.');
       }
 
       navigate(resolveRedirectPath(authenticatedUser, requestedPath), { replace: true });
@@ -113,7 +113,7 @@ export const Login: React.FC = () => {
       <div className="flex min-h-screen items-center justify-center bg-[#030712] font-body text-slate-200">
         <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 1.5 }} className="flex flex-col items-center gap-4">
           <span className="material-symbols-outlined animate-spin text-[32px] text-blue-500">progress_activity</span>
-          <span className="font-mono text-sm tracking-widest text-slate-400">INITIALIZING NODE...</span>
+          <span className="font-mono text-sm tracking-widest text-slate-400">MEMULAI SISTEM...</span>
         </motion.div>
       </div>
     );
@@ -202,10 +202,10 @@ export const Login: React.FC = () => {
           </motion.div>
 
           <h1 className="font-headline text-[28px] font-bold tracking-wide text-white drop-shadow-md">
-            Assistant
+            Asisten
           </h1>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-blue-400/80">
-            Enterprise AI Node
+            Sistem AI Perusahaan
           </p>
         </div>
 
@@ -219,7 +219,7 @@ export const Login: React.FC = () => {
           {/* Username Input */}
           <div className="flex flex-col gap-2">
             <label className="ml-1 font-mono text-[11px] uppercase tracking-wider text-slate-400" htmlFor="username">
-              Username
+              Nama pengguna
             </label>
             <div className="group relative rounded-xl transition-all focus-within:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
               <span className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${isUsernameValid ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]' : 'text-slate-500 group-focus-within:text-blue-400'}`}>
@@ -230,7 +230,7 @@ export const Login: React.FC = () => {
                 name="username"
                 autoComplete="username"
                 className="w-full rounded-xl border border-white/10 bg-[#0f1423]/80 py-4 pl-[44px] pr-4 text-sm text-white backdrop-blur-md transition-all placeholder:text-slate-600 hover:bg-[#141a2e]/90 focus:border-blue-500/50 focus:bg-[#0a0d17] focus:outline-none focus:ring-0"
-                placeholder="Enter your ID"
+                placeholder="Masukkan ID Anda"
                 type="text"
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
@@ -241,7 +241,7 @@ export const Login: React.FC = () => {
           {/* Password Input */}
           <div className="flex flex-col gap-2">
             <label className="ml-1 font-mono text-[11px] uppercase tracking-wider text-slate-400" htmlFor="password">
-              Password
+              Kata Sandi
             </label>
             <div className="group relative rounded-xl transition-all focus-within:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
               <span className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${isPasswordValid ? 'text-blue-400' : 'text-slate-500'}`}>
@@ -280,11 +280,11 @@ export const Login: React.FC = () => {
             {isSubmitting ? (
               <>
                 <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
-                Authenticating...
+                Memverifikasi...
               </>
             ) : (
               <>
-                Log In
+                Masuk
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>
               </>
             )}
@@ -297,12 +297,12 @@ export const Login: React.FC = () => {
             <span className="material-symbols-outlined text-[14px] text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
               verified_user
             </span>
-            <p className="text-xs tracking-wide">Verified End-to-End Encrypted Session</p>
+            <p className="text-xs tracking-wide">Sesi terenkripsi end-to-end terverifikasi</p>
           </div>
 
           <div className="flex justify-center gap-6">
-            <span className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:text-white">Privacy</span>
-            <span className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:text-white">Terms</span>
+            <span className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:text-white">Privasi</span>
+            <span className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:text-white">Ketentuan</span>
             <span className="font-mono text-[10px] uppercase tracking-wider text-slate-600">v4.2.0</span>
           </div>
         </div>

@@ -81,6 +81,10 @@ export interface UploadDocumentsResponse {
   uploadItems: UploadItem[];
 }
 
+export interface DocumentConflictResponse {
+  duplicateFilenames: string[];
+}
+
 export interface IndexDocumentsPayload {
   documentIds?: string[];
 }
@@ -140,13 +144,27 @@ export const getTrainedDocuments = async (
   );
 };
 
+export const checkDocumentConflicts = async (
+  filenames: string[],
+  signal?: AbortSignal
+): Promise<DocumentConflictResponse> => {
+  return apiRequest<
+    DocumentConflictResponse,
+    { filenames: string[] }
+  >('/api/admin/documents/conflicts', {
+    method: 'POST',
+    body: { filenames },
+    signal,
+  });
+};
+
 export const uploadDocuments = async (
   files: File[],
   replaceFilenames: string[] = [],
   signal?: AbortSignal
 ): Promise<UploadDocumentsResponse> => {
   if (files.length === 0) {
-    throw new Error('Tidak ada file yang dipilih');
+    throw new Error('No files were selected.');
   }
 
   const formData = new FormData();
@@ -170,7 +188,7 @@ export const uploadDocuments = async (
   });
 };
 
-export const startDocumentIndexing = async (
+export const reindexDocuments = async (
   documentIds?: string[]
 ): Promise<IndexDocumentsResponse> => {
   return apiRequest<

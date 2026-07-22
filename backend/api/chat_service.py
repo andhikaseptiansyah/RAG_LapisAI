@@ -16,12 +16,11 @@ from api.answer_formatter import (
     top_confidence,
 )
 from api.follow_up_service import build_dataset_follow_up_question
-from api.language import resolve_response_language
+from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
 from retrieval.context_selector import select_context_bundle
 from retrieval.hybrid_search import hybrid_search
 from uploads.config import (
-    AUTO_DETECT_RESPONSE_LANGUAGE,
     CONTEXT_REDUNDANCY_THRESHOLD,
     CONTEXT_SECONDARY_SCORE_RATIO,
     MAX_GENERATION_CONTEXTS,
@@ -120,11 +119,7 @@ def run_chat(
     """Run one grounded chat turn using a strict evidence-first pipeline."""
     started_at = time.perf_counter()
     requested_language = str(language or "AUTO").upper()
-    normalized_language = (
-        resolve_response_language(question, requested_language)
-        if AUTO_DETECT_RESPONSE_LANGUAGE
-        else (requested_language if requested_language in {"ID", "EN"} else "ID")
-    )
+    normalized_language = resolve_response_language(question, requested_language)
     selected_provider = resolve_provider(model)
 
     if is_small_talk(question):
@@ -176,14 +171,27 @@ def run_chat(
 
     used_extractive_fallback = False
     answer = native_answer
+    native_language_ok = bool(
+        answer and answer_matches_requested_language(answer, normalized_language)
+    )
     if evaluation_mode:
         if not answer:
             raise RuntimeError("Native model generation returned an empty answer")
-    elif not answer or is_refusal_answer(answer):
+        if not native_language_ok:
+            raise RuntimeError("Native model generation used the wrong output language")
+    elif not answer or is_refusal_answer(answer) or not native_language_ok:
         answer = answer_text_only(
             build_safe_extractive_answer(question, chunks, language=normalized_language)
         )
         used_extractive_fallback = bool(answer and not is_refusal_answer(answer))
+
+    if answer and not answer_matches_requested_language(answer, normalized_language):
+        print(
+            "[CHAT] extractive fallback rejected because it does not match "
+            f"requested language={normalized_language}"
+        )
+        answer = ""
+        used_extractive_fallback = False
 
     sources = build_sources(
         chunks,

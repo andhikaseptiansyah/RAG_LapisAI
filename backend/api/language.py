@@ -1,9 +1,4 @@
-"""Deterministic response-language resolution for Indonesian and English.
-
-The frontend may still send an explicit language preference, but a clearly
-English question should not receive Indonesian boilerplate, and vice versa.
-The detector is deliberately lightweight and dependency-free.
-"""
+"""Deterministic response-language resolution and output-language checks."""
 
 from __future__ import annotations
 
@@ -14,7 +9,10 @@ INDONESIAN_MARKERS = {
     "dimana", "siapa", "yang", "dan", "atau", "untuk", "dengan", "dalam",
     "pada", "dari", "ke", "di", "tidak", "harus", "bisa", "dapat", "maksimal",
     "minimum", "ukuran", "batas", "dokumen", "perusahaan", "pelanggan",
-    "unggah", "unggahan", "berapa", "seberapa", "cepat", "lama",
+    "unggah", "unggahan", "seberapa", "cepat", "lama", "adalah", "akan",
+    "baru", "masa", "percobaan", "karyawan", "bulan", "minggu", "hari",
+    "jam", "menit", "tahun", "sebelum", "setelah", "dilakukan", "selama",
+    "berlaku", "memiliki", "menjadi", "jawaban", "informasi", "berdasarkan",
 }
 
 ENGLISH_MARKERS = {
@@ -22,7 +20,12 @@ ENGLISH_MARKERS = {
     "was", "were", "the", "a", "an", "of", "to", "in", "on", "for",
     "with", "and", "or", "not", "must", "should", "can", "maximum",
     "minimum", "size", "limit", "document", "company", "customer", "portal",
-    "upload", "file", "resolved", "acknowledged", "within",
+    "upload", "file", "resolved", "acknowledged", "within", "new", "employees",
+    "employee", "serve", "serves", "probation", "period", "months", "month",
+    "weeks", "week", "days", "day", "hours", "hour", "minutes", "minute",
+    "years", "year", "before", "after", "conducted", "during", "applies",
+    "has", "have", "becomes", "answer", "information", "based", "formal",
+    "performance", "evaluation", "confirmation",
 }
 
 INDONESIAN_PREFIXES = (
@@ -42,29 +45,43 @@ def _normalize(value: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _language_scores(value: str) -> tuple[int, int]:
+    normalized = _normalize(value)
+    if not normalized:
+        return 0, 0
+
+    tokens = re.findall(r"[a-z0-9à-ÿ]+", normalized)
+    english_score = sum(token in ENGLISH_MARKERS for token in tokens)
+    indonesian_score = sum(token in INDONESIAN_MARKERS for token in tokens)
+
+    if normalized.startswith(ENGLISH_PREFIXES):
+        english_score += 3
+    if normalized.startswith(INDONESIAN_PREFIXES):
+        indonesian_score += 3
+
+    # Product names, acronyms, codes, and numbers are neutral. Common affixes
+    # provide extra evidence only when enough alphabetic text is present.
+    indonesian_score += sum(
+        token.startswith(("meng", "meny", "ber", "ter", "diper", "ke"))
+        or token.endswith(("nya", "kan", "lah"))
+        for token in tokens
+        if len(token) >= 5
+    )
+    english_score += sum(
+        token.endswith(("ing", "tion", "ment", "ness", "able"))
+        for token in tokens
+        if len(token) >= 6
+    )
+    return english_score, indonesian_score
+
+
 def detect_question_language(question: str, fallback: str = "ID") -> str:
-    """Return ``ID`` or ``EN`` using conservative lexical evidence."""
     normalized = _normalize(question)
     normalized_fallback = "EN" if str(fallback).upper() == "EN" else "ID"
     if not normalized:
         return normalized_fallback
 
-    if normalized.startswith(ENGLISH_PREFIXES):
-        english_prefix_bonus = 3
-    else:
-        english_prefix_bonus = 0
-
-    if normalized.startswith(INDONESIAN_PREFIXES):
-        indonesian_prefix_bonus = 3
-    else:
-        indonesian_prefix_bonus = 0
-
-    tokens = re.findall(r"[a-z0-9à-ÿ]+", normalized)
-    english_score = english_prefix_bonus + sum(token in ENGLISH_MARKERS for token in tokens)
-    indonesian_score = indonesian_prefix_bonus + sum(token in INDONESIAN_MARKERS for token in tokens)
-
-    # Common technical words can occur in both languages. Require a meaningful
-    # margin before overriding the caller's explicit preference.
+    english_score, indonesian_score = _language_scores(normalized)
     if english_score >= indonesian_score + 2 and english_score >= 3:
         return "EN"
     if indonesian_score >= english_score + 2 and indonesian_score >= 3:
@@ -73,12 +90,28 @@ def detect_question_language(question: str, fallback: str = "ID") -> str:
 
 
 def resolve_response_language(question: str, requested_language: str | None) -> str:
-    """Resolve the actual language used by the response.
-
-    ``AUTO`` always follows the detected question language. Explicit ``ID`` or
-    ``EN`` remains the fallback, but a clearly opposite-language question is
-    corrected to prevent mixed-language output.
-    """
+    """Use an explicit UI preference exactly; detect only for AUTO or empty values."""
     requested = str(requested_language or "AUTO").strip().upper()
-    fallback = requested if requested in {"ID", "EN"} else "ID"
-    return detect_question_language(question, fallback=fallback)
+    if requested in {"ID", "EN"}:
+        return requested
+    return detect_question_language(question, fallback="ID")
+
+
+def answer_matches_requested_language(answer: str, requested_language: str) -> bool:
+    """Return False only when the answer clearly uses the opposite language.
+
+    Very short numeric, code, acronym, or proper-name answers are treated as
+    language-neutral and therefore accepted.
+    """
+    normalized = _normalize(answer)
+    if not normalized:
+        return False
+
+    target = "EN" if str(requested_language).upper() == "EN" else "ID"
+    english_score, indonesian_score = _language_scores(normalized)
+
+    if english_score == 0 and indonesian_score == 0:
+        return True
+    if target == "ID":
+        return not (english_score >= 2 and english_score >= indonesian_score + 2)
+    return not (indonesian_score >= 2 and indonesian_score >= english_score + 2)

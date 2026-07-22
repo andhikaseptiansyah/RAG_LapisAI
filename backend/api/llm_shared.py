@@ -16,10 +16,10 @@ MAX_CONTEXT_CHARS_PER_CHUNK = 1400
 MAX_CONTEXT_CHUNKS = MAX_GENERATION_CONTEXTS
 MAX_ANSWER_CHARS = 900
 
-SYSTEM_PROMPT = (
+BASE_SYSTEM_PROMPT = (
     "You are a strict enterprise Retrieval-Augmented Generation assistant. "
     "Use only the supplied evidence. Do not use outside knowledge. "
-    "Return the direct answer only. Prefer the wording and terminology used in the evidence. "
+    "Return the direct answer only. Preserve the evidence facts and technical terminology, but translate ordinary wording into the required output language. "
     "For a single-fact question, write one concise sentence. For a multi-part or list question, "
     "write only the minimum sentences or bullets needed to cover every requested part. "
     "Do not add an introduction, rationale, recommendation, citation, confidence, heading, label, "
@@ -29,6 +29,25 @@ SYSTEM_PROMPT = (
     "Answer in the language explicitly requested in the user prompt. "
     "Do not copy headings, FAQ questions, separators, or unrelated context into the answer."
 )
+
+
+def build_system_prompt(language: str) -> str:
+    if str(language).upper() == "EN":
+        language_rule = (
+            "MANDATORY OUTPUT LANGUAGE: English only. Translate Indonesian evidence into "
+            "natural English. Do not output Indonesian sentences. "
+        )
+    else:
+        language_rule = (
+            "MANDATORY OUTPUT LANGUAGE: Bahasa Indonesia only. Translate English evidence "
+            "into natural Bahasa Indonesia. Do not copy English sentences, except proper "
+            "names, product names, codes, and acronyms. "
+        )
+    return language_rule + BASE_SYSTEM_PROMPT
+
+
+# Kept for modules outside the main router that still import the constant.
+SYSTEM_PROMPT = build_system_prompt("ID")
 
 
 def clean_text(value: Any) -> str:
@@ -146,12 +165,44 @@ def build_user_prompt(question: str, context: str, language: str) -> str:
     is_english = language.upper() == "EN"
     if is_english:
         return (
+            "OUTPUT LANGUAGE: ENGLISH ONLY.\n"
             f"QUESTION:\n{question}\n\n"
             f"EVIDENCE:\n{context}\n\n"
-            "Write the shortest complete answer in English. Output answer text only."
+            "Translate any Indonesian evidence needed for the answer. Write the shortest "
+            "complete answer in English. Output answer text only. ENGLISH ONLY."
         )
     return (
+        "BAHASA KELUARAN: BAHASA INDONESIA SAJA.\n"
         f"PERTANYAAN:\n{question}\n\n"
         f"BUKTI:\n{context}\n\n"
-        "Tulis jawaban lengkap yang paling singkat dalam Bahasa Indonesia. Keluarkan teks jawaban saja."
+        "Terjemahkan bukti berbahasa Inggris yang diperlukan. Tulis jawaban lengkap yang "
+        "paling singkat dalam Bahasa Indonesia. Jangan menyalin kalimat bahasa Inggris, "
+        "kecuali nama diri, nama produk, kode, dan akronim. Keluarkan teks jawaban saja. "
+        "BAHASA INDONESIA SAJA."
+    )
+
+
+def build_language_repair_prompt(
+    question: str,
+    context: str,
+    previous_answer: str,
+    language: str,
+) -> str:
+    if str(language).upper() == "EN":
+        instruction = (
+            "Rewrite the answer in English only. Translate all ordinary Indonesian wording. "
+            "Preserve every supported fact, number, date, unit, proper name, product name, "
+            "code, and acronym. Do not add facts. Output the rewritten answer only."
+        )
+    else:
+        instruction = (
+            "Tulis ulang jawaban hanya dalam Bahasa Indonesia. Terjemahkan seluruh kata dan "
+            "kalimat bahasa Inggris yang umum. Pertahankan semua fakta, angka, tanggal, satuan, "
+            "nama diri, nama produk, kode, dan akronim yang didukung bukti. Jangan menambah "
+            "fakta. Keluarkan hanya jawaban hasil penulisan ulang."
+        )
+    return (
+        f"{build_user_prompt(question, context, language)}\n\n"
+        f"PREVIOUS ANSWER WITH WRONG LANGUAGE:\n{previous_answer}\n\n"
+        f"MANDATORY LANGUAGE CORRECTION:\n{instruction}"
     )

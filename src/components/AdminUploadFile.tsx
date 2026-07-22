@@ -422,12 +422,10 @@ export const AdminUploadFile: React.FC = () => {
       confirmedFiles.forEach((file) => {
         const normalizedName = normalizeFilename(file.name);
 
-        // Only tell the backend to replace when the filename already exists
-        // in its upload/trained repository. A local staged replacement does
-        // not need the backend overwrite flag unless such a record also exists.
-        if (existingDocumentNames.has(normalizedName)) {
-          nextNames.add(normalizedName);
-        }
+        // Always include the confirmed filename in the replacement list.
+        // This also handles files that exist on disk but are missing from the
+        // document metadata store.
+        nextNames.add(normalizedName);
       });
 
       return nextNames;
@@ -461,12 +459,24 @@ export const AdminUploadFile: React.FC = () => {
       const replaceFilenames = stagedFiles
         .filter((file) => replacementFilenames.has(normalizeFilename(file.name)))
         .map((file) => file.name);
-      const success = await uploadFiles(stagedFiles, replaceFilenames);
-      if (success) {
+      const result = await uploadFiles(stagedFiles, replaceFilenames);
+      if (result.success) {
         pendingUploadNamesRef.current = [...pendingUploadNamesRef.current, ...uploadedNames];
         setStagedFiles([]);
         setReplacementFilenames(new Set());
         shouldRefresh = true;
+      } else if (result.duplicateFilenames.length > 0) {
+        const conflictNames = new Set(
+          result.duplicateFilenames.map(normalizeFilename)
+        );
+        const conflicts = stagedFiles.filter((file) =>
+          conflictNames.has(normalizeFilename(file.name))
+        );
+        if (conflicts.length > 0) {
+          clearError();
+          setDuplicateFiles(conflicts);
+          setWarningMessage('One or more files already exist. Confirm replacement, then click Index All again.');
+        }
       }
     }
 
@@ -779,7 +789,7 @@ export const AdminUploadFile: React.FC = () => {
                   Upload & Index <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">Knowledge Base</span>
                 </h1>
                 <p className="text-slate-400 text-xs md:text-sm mt-1.5 max-w-2xl">
-                  Upload files first. They will wait in the Trained Repository until you run batch indexing.
+                  Stage files in the Trained Repository, then click Index All to upload and index them.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -850,7 +860,7 @@ export const AdminUploadFile: React.FC = () => {
                     Upload Files
                   </h2>
                   <p className="text-sm text-slate-400 max-w-xl mb-5">
-                    Add PDF, DOCX, or TXT files. Uploaded files will stay in the waiting repository and will not be indexed automatically.
+                    Add PDF, DOCX, or TXT files. Files remain local until you click Index All, then the backend uploads and indexes them immediately.
                   </p>
                   <button
                     type="button"
@@ -929,7 +939,7 @@ export const AdminUploadFile: React.FC = () => {
                 <div>
                   <h2 className="font-headline text-lg font-bold text-slate-100">Upload Queue from Database</h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    Files move here only after you click Index All. Indexed means the pipeline has finished.
+                    Files appear here after Index All starts the backend pipeline. Indexed means parsing, chunking, embedding, and indexing are complete.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">

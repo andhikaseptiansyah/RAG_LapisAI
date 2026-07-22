@@ -5,7 +5,9 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-LOG_FILE = "./query_logs.json"
+from api.storage_paths import QUERY_LOG_FILE
+
+LOG_FILE = QUERY_LOG_FILE
 LEGACY_ADMIN_USER_ID = "dev-admin"
 LOG_LOCK = threading.RLock()
 VALID_QUERY_LOG_STATUSES = {
@@ -79,11 +81,11 @@ def resolve_query_log_status(
 
 def get_logs(user_id: str | None = None, include_all: bool = False) -> list[dict[str, Any]]:
     with LOG_LOCK:
-        if not os.path.exists(LOG_FILE):
+        if not LOG_FILE.exists():
             return []
 
         try:
-            with open(LOG_FILE, "r", encoding="utf-8") as f:
+            with LOG_FILE.open("r", encoding="utf-8") as f:
                 data = json.load(f)
                 logs = data if isinstance(data, list) else []
         except (json.JSONDecodeError, OSError):
@@ -101,8 +103,12 @@ def get_logs(user_id: str | None = None, include_all: bool = False) -> list[dict
 
 def write_logs(logs: list[dict[str, Any]]) -> None:
     with LOG_LOCK:
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temporary_file = LOG_FILE.with_suffix(".tmp")
+        with temporary_file.open("w", encoding="utf-8") as f:
             json.dump(logs, f, indent=2, ensure_ascii=False)
+        os.chmod(temporary_file, 0o600)
+        os.replace(temporary_file, LOG_FILE)
 
 
 def save_log(

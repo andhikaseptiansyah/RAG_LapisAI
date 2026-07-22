@@ -23,8 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
             ? 'border-white/15 bg-white/10 text-white'
             : 'border-white/10 bg-black/55 text-white/80 hover:border-white/20 hover:bg-white/[0.08]'
         }`}
-        title={isSidebarOpen ? 'Close main menu' : 'Open main menu'}
-        aria-label={isSidebarOpen ? 'Close main menu' : 'Open main menu'}
+        title={isSidebarOpen ? 'Tutup menu utama' : 'Buka menu utama'}
+        aria-label={isSidebarOpen ? 'Tutup menu utama' : 'Buka menu utama'}
         aria-expanded={isSidebarOpen}
       >
         <svg
@@ -59,8 +59,8 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={onToggleConversationNavigator}
           className="pointer-events-auto flex h-24 w-24 -translate-y-3 items-center justify-center bg-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none md:h-28 md:w-28 md:-translate-y-4"
-          title="Open chat contents"
-          aria-label="Open chat contents"
+          title="Buka isi percakapan"
+          aria-label="Buka isi percakapan"
           aria-expanded="false"
         >
           <img

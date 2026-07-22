@@ -41,6 +41,12 @@ const AdminUploadFile = lazy(() =>
   }))
 );
 
+const AdminStaffManagement = lazy(() =>
+  import('./components/AdminStaffManagement').then((module) => ({
+    default: module.AdminStaffManagement,
+  }))
+);
+
 const AdminPageFallback: React.FC = () => (
   <div
     role="status"
@@ -60,7 +66,7 @@ const renderAdminPage = (page: React.ReactNode): React.ReactNode => (
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('Elemen #root tidak ditemukan.');
+  throw new Error('The #root element was not found.');
 }
 
 ReactDOM.createRoot(rootElement).render(
@@ -88,6 +94,11 @@ ReactDOM.createRoot(rootElement).render(
           <Route
             path="/admin/upload"
             element={renderAdminPage(<AdminUploadFile />)}
+          />
+
+          <Route
+            path="/admin/staff"
+            element={renderAdminPage(<AdminStaffManagement />)}
           />
 
           <Route

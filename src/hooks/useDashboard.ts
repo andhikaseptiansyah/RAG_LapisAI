@@ -119,7 +119,7 @@ export const useDashboard = (
         const message =
           caughtError instanceof Error
             ? caughtError.message
-            : 'Gagal mengambil data dashboard';
+            : 'Failed to load dashboard data';
 
         setError(message);
       } finally {

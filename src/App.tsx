@@ -267,10 +267,10 @@ const CitationPanel: React.FC<{
   return (
     <section
       className="mt-5 pt-2 text-white"
-      aria-label="Answer sources"
+      aria-label="Sumber jawaban"
     >
       <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white md:text-[13px]">
-        Sources
+        Sumber
       </p>
 
       <div className="mt-3 grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
@@ -388,7 +388,7 @@ const GENERAL_THINKING_PHRASES = [
 ];
 
 const DOCUMENT_THINKING_PHRASES = [
-  'Reading the document...',
+  'Membaca dokumen...',
   'Finding the relevant section...',
   'Preparing the answer...',
 ];
@@ -605,7 +605,7 @@ const ThinkingIndicator: React.FC<{
           : 'opacity-100 translate-y-0'
       }`}
       aria-live="polite"
-      aria-label="AI is preparing an answer"
+      aria-label="AI sedang menyiapkan jawaban"
     >
       <div className="inline-flex min-h-6 max-w-full items-center text-[15px] md:text-[16px] leading-relaxed tracking-[0.005em] text-zinc-500">
         <span className="block max-w-[86vw] overflow-hidden text-ellipsis whitespace-nowrap md:max-w-[720px]">
@@ -990,7 +990,7 @@ export const App: React.FC = () => {
       event: any
     ) => {
       console.error(
-        'Error mikrofon:',
+        'Kesalahan mikrofon:',
         event.error
       );
 
@@ -1298,8 +1298,8 @@ export const App: React.FC = () => {
                   ? 'opacity-100 translate-y-0 scale-100'
                   : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
               }`}
-              aria-label="Scroll to latest message"
-              title="Scroll to latest message"
+              aria-label="Gulir ke pesan terbaru"
+              title="Gulir ke pesan terbaru"
             >
               <span className="material-symbols-outlined text-xl">
                 arrow_downward
@@ -1389,7 +1389,7 @@ export const App: React.FC = () => {
                         <div className="flex items-center gap-2 mb-3 md:mb-4 px-1">
                           <img
                             src="/icon-ungu.png"
-                            alt="Assistant Logo"
+                            alt="Logo Asisten"
                             className="h-16 md:h-20 w-auto object-contain"
                           />
                         </div>

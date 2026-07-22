@@ -35,8 +35,8 @@ export const TTSButton: React.FC<TTSButtonProps> = ({
           ? 'text-[#AFC7FF] animate-pulse'
           : 'text-white/60 hover:text-white'
       }`}
-      title={isPlaying ? 'Stop' : 'Dengarkan'}
-      aria-label={isPlaying ? 'Stop text-to-speech' : 'Play text-to-speech'}
+      title={isPlaying ? 'Hentikan' : 'Dengarkan'}
+      aria-label={isPlaying ? 'Hentikan pembacaan teks' : 'Putar pembacaan teks'}
     >
       <span className="material-symbols-outlined">
         {isPlaying ? 'stop_circle' : 'volume_up'}

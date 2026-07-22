@@ -14,11 +14,7 @@ type ProtectedRouteProps = {
 const isAdminRole = (
   role?: string
 ): boolean => {
-  return (
-    role === 'admin' ||
-    role === 'superadmin' ||
-    role === 'owner'
-  );
+  return role === 'admin';
 };
 
 export const ProtectedRoute: React.FC<
@@ -38,7 +34,7 @@ export const ProtectedRoute: React.FC<
   if (isInitializing) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black text-white">
-        Memeriksa sesi...
+        Checking session...
       </div>
     );
   }

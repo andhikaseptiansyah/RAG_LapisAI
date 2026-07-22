@@ -74,8 +74,9 @@ DEFAULT_DATASETS = [
     EVALUATION_DIR / "datasets" / "qna_english_50.csv",
     EVALUATION_DIR / "datasets" / "qna_indonesia_50.csv",
 ]
-CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/chat")
+CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/api/chat")
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
+LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
 CONTEXT_MODE = "source_locked_native_model_single_pass_v2"
 VALID_MODELS = ("ollama", "gemini", "groq")
@@ -103,12 +104,59 @@ def validate_provider_configuration(provider: str) -> None:
         )
 
 
+_AUTH_TOKEN: str | None = None
+
+
+def resolve_evaluation_token() -> str:
+    """Return an explicit token or authenticate with evaluation credentials."""
+    global _AUTH_TOKEN
+    if _AUTH_TOKEN:
+        return _AUTH_TOKEN
+
+    configured_token = os.getenv("LAPISAI_AUTH_TOKEN", "").strip()
+    if configured_token:
+        _AUTH_TOKEN = configured_token
+        return configured_token
+
+    username = os.getenv(
+        "LAPISAI_EVAL_USERNAME",
+        os.getenv("BOOTSTRAP_ADMIN_USERNAME", "admin"),
+    ).strip()
+    password = os.getenv(
+        "LAPISAI_EVAL_PASSWORD",
+        os.getenv("BOOTSTRAP_ADMIN_PASSWORD", ""),
+    ).strip()
+    if not username or not password:
+        raise RuntimeError(
+            "Evaluasi memerlukan autentikasi. Atur LAPISAI_AUTH_TOKEN, atau "
+            "atur LAPISAI_EVAL_USERNAME dan LAPISAI_EVAL_PASSWORD di .env."
+        )
+
+    response = requests.post(
+        LOGIN_URL,
+        json={"username": username, "password": password},
+        timeout=min(TIMEOUT_SECONDS, 30),
+    )
+    response.raise_for_status()
+    payload = response.json()
+    token = str(payload.get("token") or "").strip() if isinstance(payload, dict) else ""
+    if not token:
+        raise RuntimeError("Endpoint login tidak mengembalikan token autentikasi.")
+    _AUTH_TOKEN = token
+    return token
+
+
 def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
-    response = requests.post(url, json=payload, timeout=TIMEOUT_SECONDS)
+    response = requests.post(
+        url,
+        json=payload,
+        headers={"Authorization": f"Bearer {resolve_evaluation_token()}"},
+        timeout=TIMEOUT_SECONDS,
+    )
     response.raise_for_status()
     data = response.json()
     if not isinstance(data, dict):
-        raise ValueError(f"Unexpected response from {url}: expected JSON object")
+        raise ValueError(f"Respons tidak terduga dari {url}: objek JSON diperlukan")
     return data
 
 
@@ -118,11 +166,14 @@ def preflight() -> None:
         response.raise_for_status()
     except Exception as error:
         raise RuntimeError(
-            "LapisAI backend is not reachable. Start it with: "
+            "Backend LapisAI tidak dapat dijangkau. Jalankan: "
             "python -m uvicorn api.main:app --reload --host 127.0.0.1 "
             "--port 8000 --app-dir backend. "
-            f"Health check failed: {error}"
+            f"Pemeriksaan kesehatan gagal: {error}"
         ) from error
+
+    # Fail before a long benchmark when protected chat credentials are missing.
+    resolve_evaluation_token()
 
 
 def normalize_source(item: Any) -> dict[str, str] | None:

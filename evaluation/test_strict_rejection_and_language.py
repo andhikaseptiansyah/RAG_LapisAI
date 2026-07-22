@@ -68,7 +68,7 @@ def test_p1_question_rejects_p2_deadline_relation() -> None:
     assert assess_answerability(question, rows).answerable is False
 
 
-def test_clear_question_language_overrides_old_frontend_default() -> None:
+def test_explicit_ui_language_overrides_question_detection() -> None:
     assert detect_question_language(
         "What is the maximum file-upload size in the customer portal?",
         fallback="ID",
@@ -76,6 +76,10 @@ def test_clear_question_language_overrides_old_frontend_default() -> None:
     assert resolve_response_language(
         "Berapa batas ukuran file yang dapat diunggah?",
         "EN",
+    ) == "EN"
+    assert resolve_response_language(
+        "What is the maximum file-upload size in the customer portal?",
+        "ID",
     ) == "ID"
 
 
@@ -150,7 +154,7 @@ def test_chat_pipeline_rejects_mailbox_match_before_llm(monkeypatch) -> None:
     assert response["language"] == "EN"
 
 
-def test_chat_pipeline_uses_one_central_fallback_after_strict_acceptance(monkeypatch) -> None:
+def test_chat_pipeline_keeps_explicit_indonesian_output_after_strict_acceptance(monkeypatch) -> None:
     from api import chat_service
 
     question = "What is the maximum file-upload size in the customer portal?"
@@ -162,13 +166,44 @@ def test_chat_pipeline_uses_one_central_fallback_after_strict_acceptance(monkeyp
     assert accepted
 
     monkeypatch.setattr(chat_service, "hybrid_search", lambda *args, **kwargs: accepted)
-    monkeypatch.setattr(chat_service, "build_grounded_answer", lambda *args, **kwargs: "")
+    monkeypatch.setattr(
+        chat_service,
+        "build_grounded_answer",
+        lambda *args, **kwargs: "Batas maksimal unggahan file di portal pelanggan adalah 25 MB.",
+    )
     monkeypatch.setattr(chat_service, "build_dataset_follow_up_question", lambda **kwargs: None)
 
     response = chat_service.run_chat(question, language="ID", model="groq")
 
-    assert response["generation_mode"] == "extractive_fallback"
+    assert response["generation_mode"] == "native_model"
     assert response["model"] == "groq-rag"
-    assert response["language"] == "EN"
+    assert response["language"] == "ID"
     assert "25 MB" in response["answer"]
     assert response["sources"]
+
+
+def test_chat_pipeline_rejects_wrong_language_output(monkeypatch) -> None:
+    from api import chat_service
+
+    question = "Berapa batas maksimal unggahan file di portal pelanggan?"
+    rows = _verified_rows(
+        question,
+        ["The customer portal allows file uploads up to a maximum size of 25 MB."],
+    )
+    accepted = apply_answerability_gate(question, rows)
+    assert accepted
+
+    monkeypatch.setattr(chat_service, "hybrid_search", lambda *args, **kwargs: accepted)
+    monkeypatch.setattr(
+        chat_service,
+        "build_grounded_answer",
+        lambda *args, **kwargs: "The maximum file upload size is 25 MB.",
+    )
+    monkeypatch.setattr(chat_service, "build_dataset_follow_up_question", lambda **kwargs: None)
+
+    response = chat_service.run_chat(question, language="ID", model="groq")
+
+    assert response["generation_mode"] == "retrieval_refusal"
+    assert response["language"] == "ID"
+    assert response["sources"] == []
+    assert "The maximum" not in response["answer"]

@@ -316,12 +316,12 @@ const normalizeConversationDetail = (
 
   if (!isObject(payload)) {
     console.error(
-      'Response detail percakapan tidak valid:',
+      'Respons detail percakapan tidak valid:',
       response
     );
 
     throw new Error(
-      'Response detail percakapan tidak valid.'
+      'Respons detail percakapan tidak valid.'
     );
   }
 
@@ -343,12 +343,12 @@ const normalizeConversationDetail = (
 
   if (!conversation) {
     console.error(
-      'Response detail percakapan tidak punya conversation valid:',
+      'Respons detail percakapan tidak memiliki data percakapan yang valid:',
       response
     );
 
     throw new Error(
-      'Response detail percakapan tidak valid.'
+      'Respons detail percakapan tidak valid.'
     );
   }
 
@@ -483,7 +483,7 @@ export const conversationService = {
 
     if (!isObject(payload)) {
       throw new Error(
-        'Response bulk delete percakapan tidak valid.'
+        'Respons penghapusan massal percakapan tidak valid.'
       );
     }
 

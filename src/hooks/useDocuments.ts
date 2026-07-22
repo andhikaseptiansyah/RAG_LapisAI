@@ -5,12 +5,18 @@ import {
 } from 'react';
 
 import {
+  getDuplicateFilenamesFromApiError,
+  getAdminApiErrorMessage,
+} from '../services/api';
+
+import {
+  checkDocumentConflicts,
   deleteDocument,
   getDocuments,
   getTrainedDocuments,
   getUploadQueue,
   reindexDocument,
-  startDocumentIndexing,
+  reindexDocuments,
   uploadDocuments,
 } from '../services/documentService';
 
@@ -25,6 +31,11 @@ interface UseDocumentsOptions {
   initialPage?: number;
   initialLimit?: number;
   autoLoad?: boolean;
+}
+
+export interface UploadFilesResult {
+  success: boolean;
+  duplicateFilenames: string[];
 }
 
 export const useDocuments = (
@@ -99,12 +110,11 @@ export const useDocuments = (
           Math.max(result.totalPages, 1)
         );
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal mengambil daftar dokumen';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
       } finally {
         setIsLoading(false);
       }
@@ -120,12 +130,11 @@ export const useDocuments = (
 
         setUploadItems(result);
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal mengambil antrean upload';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
       }
     }, []);
 
@@ -139,12 +148,11 @@ export const useDocuments = (
           result.documents
         );
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal mengambil dokumen terindeks';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
       }
     }, []);
 
@@ -165,19 +173,37 @@ export const useDocuments = (
     async (
       files: File[],
       replaceFilenames: string[] = []
-    ): Promise<boolean> => {
+    ): Promise<UploadFilesResult> => {
       if (files.length === 0) {
         setError(
-          'Pilih minimal satu file untuk diunggah'
+          'Select at least one file to upload.'
         );
 
-        return false;
+        return {
+          success: false,
+          duplicateFilenames: [],
+        };
       }
 
       setIsUploading(true);
       setError(null);
 
       try {
+        if (replaceFilenames.length === 0) {
+          const conflictResult =
+            await checkDocumentConflicts(
+              files.map((file) => file.name)
+            );
+
+          if (conflictResult.duplicateFilenames.length > 0) {
+            return {
+              success: false,
+              duplicateFilenames:
+                conflictResult.duplicateFilenames,
+            };
+          }
+        }
+
         const result =
           await uploadDocuments(
             files,
@@ -194,16 +220,26 @@ export const useDocuments = (
           loadTrainedDocuments(),
         ]);
 
-        return true;
+        return {
+          success: true,
+          duplicateFilenames: [],
+        };
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal mengunggah dokumen';
+        const duplicateFilenames =
+          getDuplicateFilenamesFromApiError(
+            caughtError
+          );
 
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
 
-        return false;
+        return {
+          success: false,
+          duplicateFilenames,
+        };
       } finally {
         setIsUploading(false);
       }
@@ -215,7 +251,8 @@ export const useDocuments = (
     ]
   );
 
-  const startIndexing = useCallback(
+
+  const reindexSelected = useCallback(
     async (
       documentIds?: string[]
     ): Promise<boolean> => {
@@ -224,7 +261,7 @@ export const useDocuments = (
 
       try {
         const result =
-          await startDocumentIndexing(
+          await reindexDocuments(
             documentIds
           );
 
@@ -240,12 +277,11 @@ export const useDocuments = (
 
         return true;
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal memulai indexing';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
 
         return false;
       } finally {
@@ -301,12 +337,11 @@ export const useDocuments = (
 
         return true;
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal melakukan re-index dokumen';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
 
         return false;
       }
@@ -357,12 +392,11 @@ export const useDocuments = (
 
         return true;
       } catch (caughtError) {
-        const message =
-          caughtError instanceof Error
-            ? caughtError.message
-            : 'Gagal menghapus dokumen';
-
-        setError(message);
+        setError(
+          getAdminApiErrorMessage(
+            caughtError
+          )
+        );
 
         return false;
       }
@@ -488,7 +522,9 @@ export const useDocuments = (
     refreshAll,
 
     uploadFiles,
-    startIndexing,
+    reindexSelected,
+    // Compatibility alias used by the original Upload & Index interface.
+    startIndexing: reindexSelected,
     reindex,
     removeDocument,
   };
