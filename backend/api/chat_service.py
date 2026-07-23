@@ -150,22 +150,34 @@ def _refusal_payload(started_at: float, language: str) -> dict[str, Any]:
     }
 
 
+def _strict_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return only candidates that can safely be used for generation."""
+    return [candidate for candidate in candidates if _strict_chunk(candidate)]
+
+
 def _retrieve_with_language_fallback(
     question: str,
     *,
     top_k: int,
 ) -> tuple[list[dict[str, Any]], str, str]:
-    """Retrieve with the original question, then a natural English bridge.
+    """Retrieve in the user's language, then retry with an English bridge.
 
-    The second pass is attempted only when the normal multilingual pipeline
-    returns no accepted evidence. It uses the exact same retrieval, evidence,
-    and answerability thresholds. Returned bridge candidates are verified again
-    against the original user question before generation, so translated query
-    wording cannot weaken subject constraints such as P1 versus P2.
+    A multilingual retrieval pass can occasionally return candidates that are
+    related but fail the strict evidence bundle checks. The previous code only
+    retried when ``hybrid_search`` returned an empty list. That meant a weak,
+    non-generation-safe candidate could block the English fallback and cause a
+    false refusal for Indonesian questions.
+
+    The bridge pass therefore runs whenever the primary pass has no *strictly
+    answerable* candidate. It searches a wider candidate pool, skips the bridge
+    query's duplicate answerability gate, then re-runs evidence verification and
+    answerability against the original Indonesian question. No acceptance score
+    or evidence threshold is lowered.
     """
     requested_k = max(top_k, MAX_GENERATION_CONTEXTS)
     primary = hybrid_search(question, top_k=requested_k)
-    if primary:
+    primary_strict = _strict_candidates(primary)
+    if primary_strict:
         return primary, "original", question
 
     if not requires_language_bridge(question):
@@ -179,34 +191,47 @@ def _retrieve_with_language_fallback(
         return [], "original", question
 
     print(
-        "[RETRIEVAL] original query rejected; retrying natural language bridge: "
-        f"{bridge_query}"
+        "[RETRIEVAL] primary query has no strict evidence; retrying English "
+        f"bridge: {bridge_query}"
     )
+
+    # Search more candidates during the bridge pass. This increases recall only;
+    # MIN_RESULT_SCORE, evidence verification, and answerability thresholds stay
+    # unchanged. The bridge answerability gate is skipped because the candidates
+    # are validated below against the original user question.
+    bridge_top_k = max(requested_k * 2, 10)
+    bridge_candidate_k = max(bridge_top_k * 4, 40)
     bridge_candidates = hybrid_search(
         bridge_query,
-        top_k=requested_k,
+        top_k=bridge_top_k,
+        candidate_k=bridge_candidate_k,
+        apply_answerability=False,
     )
     if not bridge_candidates:
         return [], "natural_language_bridge", bridge_query
 
     # Re-run deterministic evidence and answerability checks using the original
-    # Indonesian question. This retains all existing thresholds and hard
-    # constraints while allowing the English retrieval representation to find
-    # the correct chunk.
+    # Indonesian question. This preserves identifiers, numbers, and mutually
+    # exclusive subjects such as P1 versus P2.
     reverified = _apply_evidence_verification(
         question,
         [dict(candidate) for candidate in bridge_candidates],
         min_score=MIN_RESULT_SCORE,
     )
     reverified = apply_answerability_gate(question, reverified)
-    if not reverified:
+    reverified_strict = _strict_candidates(reverified)
+    if not reverified_strict:
         print(
-            "[RETRIEVAL] natural bridge candidates failed original-question "
+            "[RETRIEVAL] English bridge candidates failed original-question "
             "evidence verification"
         )
         return [], "natural_language_bridge", bridge_query
 
-    return [
+    accepted_ids = {
+        str(candidate.get("chunkId") or "")
+        for candidate in reverified_strict
+    }
+    accepted = [
         {
             **candidate,
             "retrievalFallbackApplied": True,
@@ -214,7 +239,13 @@ def _retrieve_with_language_fallback(
             "retrievalBridgeQuery": bridge_query,
         }
         for candidate in reverified
-    ], "natural_language_bridge", bridge_query
+        if str(candidate.get("chunkId") or "") in accepted_ids
+    ]
+    accepted.sort(
+        key=lambda candidate: float(candidate.get("score") or 0.0),
+        reverse=True,
+    )
+    return accepted[:requested_k], "natural_language_bridge", bridge_query
 
 
 def run_chat(

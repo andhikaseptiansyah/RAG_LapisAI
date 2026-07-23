@@ -1,5 +1,435 @@
 [
   {
+    "id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "4918f7a9-6f7f-4eb8-bf34-d726ce1d2cbb",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:25:44.809263+00:00"
+      },
+      {
+        "id": "073ad847-81c7-4bd2-9d07-4653e318dce2",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:25:44.809263+00:00"
+      },
+      {
+        "id": "dbd63151-e00a-4121-8612-8e89eba32e6c",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Berapa persen pengurangan konsumsi air di kantor Cikarang pada 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:26:10.420607+00:00"
+      },
+      {
+        "id": "e660e6ee-d24e-4e20-b96f-0beb0e752b59",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:26:10.420607+00:00"
+      },
+      {
+        "id": "a1caf343-6ae1-40b8-a2db-16eca31e1b0c",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Berapa nilai RTO dan RPO pada rencana pemulihan bencana?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:26:34.574354+00:00"
+      },
+      {
+        "id": "3d8a2c7a-d12e-434c-a410-479a1670f41e",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "Nilai RTO adalah 4 jam dan RPO adalah 1 jam.",
+        "attachments": [],
+        "confidence": 0.8106,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "TECH_Disaster_Recovery.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9151,
+              "relevance_score": 0.9151,
+              "excerpt": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "TECH_Disaster_Recovery.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:26:34.574354+00:00"
+      },
+      {
+        "id": "d2471275-868e-437d-b965-c00bdebdef97",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Apa saja yang harus dibawa karyawan baru pada hari pertama kerja?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:26:59.775801+00:00"
+      },
+      {
+        "id": "e2655b8a-88f4-4413-be2c-17b9448920e1",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:26:59.775801+00:00"
+      },
+      {
+        "id": "96c29924-a6a2-499a-9aaf-fe7816ae4530",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Kapan lembur yang telah disetujui akan dibayarkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:27:13.244336+00:00"
+      },
+      {
+        "id": "8f97c42d-e953-4f67-847f-4b1dfdee7d2b",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:27:13.244336+00:00"
+      },
+      {
+        "id": "bad4f33f-3266-495d-a66b-83fe8936d355",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "user",
+        "content": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:27:48.485128+00:00"
+      },
+      {
+        "id": "e2a1ed35-62d5-4987-9d6c-fc38d1f6e931",
+        "conversation_id": "0a8330e3-f716-4a81-8cb8-5c0b323afb94",
+        "role": "assistant",
+        "content": "total headcount-nya mencapai 312.",
+        "attachments": [],
+        "confidence": 0.6135,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Hiring_H1_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "The company hired 37 employees in H1 2025; total headcount reached 312.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:27:48.485128+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T14:25:44.809263+00:00",
+    "updated_at": "2026-07-23T14:27:48.485128+00:00",
+    "last_message": "total headcount-nya mencapai 312.",
+    "last_user_message": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+    "last_message_at": "2026-07-23T14:27:48.485128+00:00"
+  },
+  {
+    "id": "5a0ec4ce-e307-4854-97d7-89700a6f80d0",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "How quickly must a P1 IT incident be resolved?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "131f073e-d150-4b42-911e-00ec720650a9",
+        "conversation_id": "5a0ec4ce-e307-4854-97d7-89700a6f80d0",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:24:45.422970+00:00"
+      },
+      {
+        "id": "eefa36f5-5dc3-4190-8078-63b327b40997",
+        "conversation_id": "5a0ec4ce-e307-4854-97d7-89700a6f80d0",
+        "role": "assistant",
+        "content": "P1 IT incidents must be resolved within 4 hours.",
+        "attachments": [],
+        "confidence": 0.8425,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8868,
+              "relevance_score": 0.8868,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:24:45.422970+00:00"
+      },
+      {
+        "id": "ca739eea-dd39-4661-b795-d3074a886b8c",
+        "conversation_id": "5a0ec4ce-e307-4854-97d7-89700a6f80d0",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:25:31.764722+00:00"
+      },
+      {
+        "id": "576ea427-ce01-4c2c-9eb5-ab6c87387599",
+        "conversation_id": "5a0ec4ce-e307-4854-97d7-89700a6f80d0",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:25:31.764722+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T14:24:45.422970+00:00",
+    "updated_at": "2026-07-23T14:25:31.764722+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "last_message_at": "2026-07-23T14:25:31.764722+00:00"
+  },
+  {
+    "id": "0e0f8ad5-05ac-42cd-bb02-0c577716b629",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "825590a4-c1ab-429f-bd7f-e96efb2dd7cf",
+        "conversation_id": "0e0f8ad5-05ac-42cd-bb02-0c577716b629",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:24:25.203984+00:00"
+      },
+      {
+        "id": "427733b4-1307-4b4c-9bdb-20bb3ef7e3a6",
+        "conversation_id": "0e0f8ad5-05ac-42cd-bb02-0c577716b629",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:24:25.203984+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T14:24:25.203984+00:00",
+    "updated_at": "2026-07-23T14:24:25.203984+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-23T14:24:25.203984+00:00"
+  },
+  {
+    "id": "bc75acdb-3405-4c43-b22c-ad88170b78c4",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "fdc6dd2e-bce6-4652-b194-9294860052dd",
+        "conversation_id": "bc75acdb-3405-4c43-b22c-ad88170b78c4",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T14:23:36.322807+00:00"
+      },
+      {
+        "id": "de0d7d1f-c645-4007-9f65-0c7904801a0a",
+        "conversation_id": "bc75acdb-3405-4c43-b22c-ad88170b78c4",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T14:23:36.322807+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T14:23:36.322807+00:00",
+    "updated_at": "2026-07-23T14:23:36.322807+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-23T14:23:36.322807+00:00"
+  },
+  {
     "id": "f4f7f43d-0c81-4278-b75c-1732dd555a85",
     "user_id": "dev-admin",
     "user_name": "Admin",

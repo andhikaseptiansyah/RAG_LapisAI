@@ -21,7 +21,7 @@ def test_bridge_query_is_independent_english_variant() -> None:
     assert "seberapa" not in bridge.casefold()
     assert variants[0] == QUESTION_ID
     assert bridge in variants
-    assert BUILD_VERSION == "rag-multilingual-v4-20260723"
+    assert BUILD_VERSION == "rag-multilingual-v5-20260723"
 
 
 class _FakeCollection:
