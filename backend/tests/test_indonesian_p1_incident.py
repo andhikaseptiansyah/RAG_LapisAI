@@ -159,7 +159,7 @@ def test_chat_returns_localized_verified_duration_when_model_repeats_english(mon
 
     response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
 
-    assert response["generation_mode"] == "extractive_fallback"
+    assert response["generation_mode"] == "verified_scalar"
     assert response["language"] == "ID"
     assert response["answer"] == "4 jam."
     assert response["sources"]

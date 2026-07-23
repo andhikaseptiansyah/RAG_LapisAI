@@ -70,7 +70,22 @@ def test_chat_retries_natural_bridge_after_original_retrieval_refusal(monkeypatc
 
     def fake_answerability(question: str, candidates: list[dict]):
         assert question == QUESTION_ID
-        return candidates
+        return [
+            {
+                **candidate,
+                "evidenceSupported": True,
+                "evidenceScore": 0.90,
+                "evidenceHardFailures": [],
+                "evidenceHardContradictions": [],
+                "answerabilityAccepted": True,
+                "answerabilityStrictlySupported": True,
+                "answerabilityEvidenceSelected": True,
+                "answerabilityRequiresCoherentEvidence": True,
+                "answerabilityCoherentEvidence": True,
+                "answerabilityScore": 0.86,
+            }
+            for candidate in candidates
+        ]
 
     monkeypatch.setattr(chat_service, "hybrid_search", fake_hybrid_search)
     monkeypatch.setattr(chat_service, "_apply_evidence_verification", fake_reverify)
@@ -108,7 +123,26 @@ def test_scalar_fallback_selects_p1_resolution_from_real_multi_priority_excerpt(
 
     monkeypatch.setattr(chat_service, "hybrid_search", fake_hybrid_search)
     monkeypatch.setattr(chat_service, "_apply_evidence_verification", lambda q, rows, **k: rows)
-    monkeypatch.setattr(chat_service, "apply_answerability_gate", lambda q, rows: rows)
+    monkeypatch.setattr(
+        chat_service,
+        "apply_answerability_gate",
+        lambda q, rows: [
+            {
+                **row,
+                "evidenceSupported": True,
+                "evidenceScore": 0.90,
+                "evidenceHardFailures": [],
+                "evidenceHardContradictions": [],
+                "answerabilityAccepted": True,
+                "answerabilityStrictlySupported": True,
+                "answerabilityEvidenceSelected": True,
+                "answerabilityRequiresCoherentEvidence": True,
+                "answerabilityCoherentEvidence": True,
+                "answerabilityScore": 0.86,
+            }
+            for row in rows
+        ],
+    )
     monkeypatch.setattr(chat_service, "select_context_bundle", lambda *args, **kwargs: args[1])
     monkeypatch.setattr(chat_service, "build_grounded_answer", lambda *args, **kwargs: evidence)
     monkeypatch.setattr(chat_service, "build_dataset_follow_up_question", lambda **kwargs: None)

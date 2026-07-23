@@ -9,6 +9,7 @@ from uploads.config import (
     MAX_SOURCE_CITATIONS,
 )
 from retrieval.requirements import (
+    canonical_unit,
     extract_evidence_requirements,
     requirement_satisfied,
 )
@@ -1368,12 +1369,11 @@ def _sentence_window(text: str, start: int, end: int) -> str:
 
 
 def _select_requested_duration_match(question: str, text: str):
-    """Select the duration matching both the requested action and subject.
+    """Select the duration matching the requested action and priority subject.
 
-    A policy chunk may contain acknowledgement and resolution targets for several
-    priority codes. Each duration is scored only inside its sentence-like segment.
-    A conflicting priority code is a hard local penalty, so a P2 resolution can
-    never win a P1 question merely because it uses the same action verb.
+    PDF extraction frequently removes punctuation and merges P1/P2 rows into one
+    long line. Selection therefore uses the nearest priority code before each
+    duration, not merely all codes found in the containing sentence.
     """
     matches = list(_SCALAR_DURATION_PATTERN.finditer(text))
     if len(matches) <= 1:
@@ -1384,27 +1384,47 @@ def _select_requested_duration_match(question: str, text: str):
     if not action_anchors and requested_code is None:
         return None
 
+    priority_pattern = re.compile(
+        r"\b(?:p(?P<pnum>[1-4])|priority\s+(?P<priority>[1-4])|"
+        r"prioritas\s+(?P<prioritas>[1-4]))\b",
+        flags=re.I,
+    )
+    priority_mentions: list[tuple[int, str]] = []
+    for item in priority_pattern.finditer(text):
+        number = item.group("pnum") or item.group("priority") or item.group("prioritas")
+        priority_mentions.append((item.start(), f"p{number}"))
+
     scored: list[tuple[int, int, object]] = []
     for index, match in enumerate(matches):
         sentence = normalize_text(_sentence_window(text, match.start(), match.end()))
-        # A short preceding window separates two actions in the same sentence,
-        # for example acknowledged within 15 minutes versus resolved within 4 hours.
-        start = max(0, match.start() - 100)
-        action_window = normalize_text(text[start:match.end()])
 
+        # Focus action matching on the text immediately preceding the scalar.
+        # The nearest action verb wins when acknowledgement and resolution are
+        # written in the same row.
+        action_start = max(0, match.start() - 140)
+        action_window = normalize_text(text[action_start:match.end()])
         score = 0
         for anchor in action_anchors:
             anchor_pos = action_window.rfind(normalize_text(anchor))
             if anchor_pos >= 0:
                 distance = max(len(action_window) - anchor_pos, 1)
-                score = max(score, 160 - min(distance, 145))
+                score = max(score, 190 - min(distance, 175))
 
-        sentence_tokens = set(re.findall(r"[a-z0-9]+", sentence))
         if requested_code:
-            if requested_code in sentence_tokens:
-                score += 300
-            if any(code in sentence_tokens for code in conflicting_codes):
-                score -= 600
+            preceding = [item for item in priority_mentions if item[0] <= match.start()]
+            nearest_code = preceding[-1][1] if preceding else None
+            if nearest_code == requested_code:
+                score += 420
+            elif nearest_code in conflicting_codes:
+                score -= 720
+            else:
+                # Fallback for prose where the code follows the value or appears
+                # only once in a short sentence.
+                sentence_tokens = set(re.findall(r"[a-z0-9]+", sentence))
+                if requested_code in sentence_tokens:
+                    score += 260
+                if any(code in sentence_tokens for code in conflicting_codes):
+                    score -= 520
 
         scored.append((score, -index, match))
 
@@ -1473,6 +1493,112 @@ def _localized_scalar_answer(question: str, answer: str, language: str) -> str:
             return _clean_text(value) + "."
 
     return clean
+
+
+def build_verified_scalar_answer(
+    question: str,
+    chunks: list[dict[str, Any]],
+    language: str = "ID",
+) -> str:
+    """Return one deterministic scalar from strictly verified evidence.
+
+    Local models sometimes translate an English source correctly, then the
+    generation validator rejects the translated wording because literal token
+    overlap is low. For questions that request exactly one duration, the safest
+    answer is not another model call. It is the exact value already present in a
+    strictly accepted evidence chunk, localized only at the unit level.
+
+    The function deliberately handles duration questions only. It does not
+    summarize prose, infer missing values, or combine unrelated chunks.
+    """
+    requirements = [
+        item
+        for item in extract_evidence_requirements(question)
+        if item.key.startswith("answer_")
+    ]
+    if len(requirements) != 1 or requirements[0].kind != "duration":
+        return ""
+
+    # Frequency/allowance questions such as "berapa hari per minggu" need the
+    # surrounding policy wording. Use this scalar-only path only when the user
+    # asks for a deadline tied to a concrete action such as resolution,
+    # acknowledgement, processing, reporting, or revocation.
+    if not _duration_intent_anchors(question):
+        return ""
+
+    target = "EN" if str(language).upper() == "EN" else "ID"
+    candidates: list[tuple[float, int, str, str]] = []
+
+    for rank, chunk in enumerate(chunks[:4]):
+        if chunk.get("answerabilityAccepted") is not True:
+            continue
+        if not chunk.get("answerabilityEvidenceSelected", True):
+            continue
+        if not chunk.get(
+            "answerabilityStrictlySupported",
+            chunk.get("evidenceSupported") is True,
+        ):
+            continue
+        if chunk.get("evidenceHardFailures") or chunk.get("evidenceHardContradictions"):
+            continue
+        if (
+            chunk.get("answerabilityRequiresCoherentEvidence")
+            and chunk.get("answerabilityCoherentEvidence") is not True
+        ):
+            continue
+
+        raw = str(chunk.get("content") or (chunk.get("metadata") or {}).get("content") or "")
+        if not raw.strip():
+            continue
+
+        match = _select_requested_duration_match(question, raw)
+        if match is None:
+            continue
+
+        raw_value = re.sub(r"\s+", " ", match.group("value").casefold()).strip()
+        value = _NUMBER_WORD_VALUES.get(raw_value, raw_value.replace("×", "x"))
+        raw_unit = re.sub(r"\s+", " ", match.group("unit").casefold()).strip()
+        unit_map = _DURATION_UNITS_EN if target == "EN" else _DURATION_UNITS_ID
+        unit = unit_map.get(raw_unit)
+        if not unit:
+            continue
+        if target == "EN" and value == "1":
+            unit = {
+                "minutes": "minute",
+                "hours": "hour",
+                "days": "day",
+                "working days": "working day",
+                "business days": "business day",
+                "weeks": "week",
+                "months": "month",
+                "years": "year",
+            }.get(unit, unit)
+
+        answer = f"{value} {unit}."
+        if not requirement_satisfied(requirements[0], [answer]):
+            continue
+
+        score = max(
+            clamp_score(chunk.get("answerabilityScore")),
+            clamp_score(chunk.get("evidenceScore")),
+            clamp_score(chunk.get("score")),
+        )
+        canonical = f"{value}|{canonical_unit(raw_unit)}"
+        candidates.append((score, -rank, answer, canonical))
+
+    if not candidates:
+        return ""
+
+    candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    top_score, _, top_answer, top_canonical = candidates[0]
+
+    # Conflicting scalar values with nearly equal evidence are ambiguous. Keep
+    # the existing refusal behavior rather than guessing which policy applies.
+    for score, _, _, canonical in candidates[1:]:
+        if canonical != top_canonical and top_score - score < 0.08:
+            return ""
+
+    return top_answer
 
 
 def _clean_extractive_text(value: str) -> str:

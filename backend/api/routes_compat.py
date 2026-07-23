@@ -740,8 +740,10 @@ async def compat_chat(request: Request):
         "model": result.get("model"),
         "generation_mode": result.get("generation_mode"),
         "buildVersion": result.get("buildVersion") or BUILD_VERSION,
+        "chatServiceSha256": public_build_info().get("chatServiceSha256"),
         "retrieval_mode": result.get("retrieval_mode"),
         "retrieval_query": result.get("retrieval_query"),
+        "failure_stage": result.get("failure_stage"),
     }
 
 

@@ -65,8 +65,10 @@ export interface ChatApiResponse {
   model?: string;
   generation_mode?: string;
   buildVersion?: string;
+  chatServiceSha256?: string;
   retrieval_mode?: string;
   retrieval_query?: string;
+  failure_stage?: string | null;
 }
 
 export interface ConversationSummary {
@@ -169,7 +171,12 @@ export const sendChatMessage = async (
       });
 
   if (response.buildVersion) {
-    console.info(`[LapisAI] backend build: ${response.buildVersion}`);
+    console.info(
+      `[LapisAI] backend build: ${response.buildVersion}; ` +
+      `chatService=${response.chatServiceSha256 ?? 'unknown'}; ` +
+      `retrieval=${response.retrieval_mode ?? 'unknown'}; ` +
+      `failureStage=${response.failure_stage ?? 'none'}`
+    );
   } else {
     console.warn('[LapisAI] backend response has no buildVersion; an older backend may still be active.');
   }

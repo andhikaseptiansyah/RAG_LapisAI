@@ -10,6 +10,7 @@ from api.answer_formatter import (
     build_safe_extractive_answer,
     build_small_talk_answer,
     build_sources,
+    build_verified_scalar_answer,
     has_answerable_evidence,
     is_refusal_answer,
     is_small_talk,
@@ -21,7 +22,11 @@ from api.language import answer_matches_requested_language, resolve_response_lan
 from api.model_router import build_grounded_answer, resolve_provider
 from retrieval.answerability import apply_answerability_gate
 from retrieval.context_selector import select_context_bundle
-from retrieval.hybrid_search import _apply_evidence_verification, hybrid_search
+from retrieval.hybrid_search import (
+    _apply_evidence_verification,
+    _base_hybrid_candidates,
+    hybrid_search,
+)
 from retrieval.query_expansion import (
     build_natural_bridge_query,
     normalize_text,
@@ -133,7 +138,12 @@ def _build_language_retry_chunks(
     return retry_chunks
 
 
-def _refusal_payload(started_at: float, language: str) -> dict[str, Any]:
+def _refusal_payload(
+    started_at: float,
+    language: str,
+    *,
+    failure_stage: str,
+) -> dict[str, Any]:
     return {
         "answer": build_refusal_answer(language),
         "confidence": 0.0,
@@ -147,6 +157,7 @@ def _refusal_payload(started_at: float, language: str) -> dict[str, Any]:
         "buildVersion": BUILD_VERSION,
         "retrieval_mode": "refused",
         "retrieval_query": "",
+        "failure_stage": failure_stage,
     }
 
 
@@ -155,26 +166,93 @@ def _strict_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]
     return [candidate for candidate in candidates if _strict_chunk(candidate)]
 
 
+def _strip_retrieval_annotations(candidate: dict[str, Any]) -> dict[str, Any]:
+    """Remove stale gate metadata before validating a candidate for a new query.
+
+    Bridge candidates may already carry evidence and answerability fields created
+    for the English retrieval query. Reusing those fields while checking the
+    original Indonesian question can preserve a rejection that no longer applies.
+    The raw retrieval scores and document metadata are retained.
+    """
+    cloned = dict(candidate)
+    for key in list(cloned):
+        if (
+            key.startswith("evidence")
+            or key.startswith("answerability")
+            or key.startswith("minimumEvidence")
+            or key.startswith("preRerankAnswerability")
+        ):
+            cloned.pop(key, None)
+    return cloned
+
+
+def _validate_for_original_question(
+    question: str,
+    candidates: list[dict[str, Any]],
+    *,
+    requested_k: int,
+    bridge_query: str,
+    stage: str,
+) -> list[dict[str, Any]]:
+    """Apply all safety gates again using the user's original question."""
+    if not candidates:
+        return []
+
+    clean_candidates = [
+        _strip_retrieval_annotations(candidate)
+        for candidate in candidates
+    ]
+    reverified = _apply_evidence_verification(
+        question,
+        clean_candidates,
+        min_score=MIN_RESULT_SCORE,
+    )
+    reverified = apply_answerability_gate(question, reverified)
+    strict = _strict_candidates(reverified)
+    if not strict:
+        return []
+
+    strict_ids = {
+        str(candidate.get("chunkId") or candidate.get("chunk_id") or "")
+        for candidate in strict
+    }
+    accepted = [
+        {
+            **candidate,
+            "retrievalFallbackApplied": stage != "original",
+            "retrievalFallbackStage": stage,
+            "retrievalOriginalQuestion": question,
+            "retrievalBridgeQuery": bridge_query,
+        }
+        for candidate in reverified
+        if str(candidate.get("chunkId") or candidate.get("chunk_id") or "")
+        in strict_ids
+    ]
+    accepted.sort(
+        key=lambda candidate: (
+            float(candidate.get("score") or 0.0),
+            float(candidate.get("evidenceScore") or 0.0),
+            float(candidate.get("baseScore") or 0.0),
+        ),
+        reverse=True,
+    )
+    return accepted[:requested_k]
+
+
 def _retrieve_with_language_fallback(
     question: str,
     *,
     top_k: int,
 ) -> tuple[list[dict[str, Any]], str, str]:
-    """Retrieve in the user's language, then retry with an English bridge.
+    """Retrieve normally, then replay a failing Indonesian query in English.
 
-    A multilingual retrieval pass can occasionally return candidates that are
-    related but fail the strict evidence bundle checks. The previous code only
-    retried when ``hybrid_search`` returned an empty list. That meant a weak,
-    non-generation-safe candidate could block the English fallback and cause a
-    false refusal for Indonesian questions.
-
-    The bridge pass therefore runs whenever the primary pass has no *strictly
-    answerable* candidate. It searches a wider candidate pool, skips the bridge
-    query's duplicate answerability gate, then re-runs evidence verification and
-    answerability against the original Indonesian question. No acceptance score
-    or evidence threshold is lowered.
+    The bridge pass uses the same complete pipeline as a direct English question,
+    because that exact path is known to work in the application. Before the
+    bridge candidates are validated against the original Indonesian question,
+    all stale evidence and answerability annotations are removed.
     """
     requested_k = max(top_k, MAX_GENERATION_CONTEXTS)
+
     primary = hybrid_search(question, top_k=requested_k)
     primary_strict = _strict_candidates(primary)
     if primary_strict:
@@ -184,68 +262,54 @@ def _retrieve_with_language_fallback(
         return [], "original", question
 
     bridge_query = build_natural_bridge_query(question)
-    if (
-        not bridge_query
-        or normalize_text(bridge_query) == normalize_text(question)
-    ):
+    if not bridge_query or normalize_text(bridge_query) == normalize_text(question):
         return [], "original", question
 
-    print(
-        "[RETRIEVAL] primary query has no strict evidence; retrying English "
-        f"bridge: {bridge_query}"
-    )
-
-    # Search more candidates during the bridge pass. This increases recall only;
-    # MIN_RESULT_SCORE, evidence verification, and answerability thresholds stay
-    # unchanged. The bridge answerability gate is skipped because the candidates
-    # are validated below against the original user question.
     bridge_top_k = max(requested_k * 2, 10)
     bridge_candidate_k = max(bridge_top_k * 4, 40)
+    print(
+        "[RETRIEVAL] primary Indonesian path has no strict evidence; "
+        f"replaying direct English path: {bridge_query}"
+    )
+
+    # This deliberately mirrors a successful user-entered English question,
+    # including reranking, evidence verification, and English answerability.
     bridge_candidates = hybrid_search(
         bridge_query,
         top_k=bridge_top_k,
         candidate_k=bridge_candidate_k,
-        apply_answerability=False,
+        apply_answerability=True,
     )
-    if not bridge_candidates:
-        return [], "natural_language_bridge", bridge_query
-
-    # Re-run deterministic evidence and answerability checks using the original
-    # Indonesian question. This preserves identifiers, numbers, and mutually
-    # exclusive subjects such as P1 versus P2.
-    reverified = _apply_evidence_verification(
+    accepted = _validate_for_original_question(
         question,
-        [dict(candidate) for candidate in bridge_candidates],
-        min_score=MIN_RESULT_SCORE,
+        bridge_candidates,
+        requested_k=requested_k,
+        bridge_query=bridge_query,
+        stage="bridge_direct_english_path",
     )
-    reverified = apply_answerability_gate(question, reverified)
-    reverified_strict = _strict_candidates(reverified)
-    if not reverified_strict:
-        print(
-            "[RETRIEVAL] English bridge candidates failed original-question "
-            "evidence verification"
-        )
-        return [], "natural_language_bridge", bridge_query
+    if accepted:
+        return accepted, "natural_language_bridge", bridge_query
 
-    accepted_ids = {
-        str(candidate.get("chunkId") or "")
-        for candidate in reverified_strict
-    }
-    accepted = [
-        {
-            **candidate,
-            "retrievalFallbackApplied": True,
-            "retrievalOriginalQuestion": question,
-            "retrievalBridgeQuery": bridge_query,
-        }
-        for candidate in reverified
-        if str(candidate.get("chunkId") or "") in accepted_ids
-    ]
-    accepted.sort(
-        key=lambda candidate: float(candidate.get("score") or 0.0),
-        reverse=True,
+    print(
+        "[RETRIEVAL] direct English path was not accepted after Indonesian "
+        "revalidation; checking raw English semantic+BM25 union"
     )
-    return accepted[:requested_k], "natural_language_bridge", bridge_query
+    raw_candidate_k = max(bridge_candidate_k * 2, 80)
+    raw_candidates = _base_hybrid_candidates(
+        bridge_query,
+        candidate_k=raw_candidate_k,
+    )
+    accepted = _validate_for_original_question(
+        question,
+        raw_candidates,
+        requested_k=requested_k,
+        bridge_query=bridge_query,
+        stage="bridge_raw_union",
+    )
+    if accepted:
+        return accepted, "natural_language_bridge_raw", bridge_query
+
+    return [], "natural_language_bridge_raw", bridge_query
 
 
 def run_chat(
@@ -291,7 +355,11 @@ def run_chat(
 
     bundle_answerable = has_answerable_evidence(chunks)
     if not chunks or not bundle_answerable:
-        payload = _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(
+            started_at,
+            normalized_language,
+            failure_stage="context_or_answerability",
+        )
         payload["retrieval_mode"] = retrieval_mode
         payload["retrieval_query"] = retrieval_query
         return payload
@@ -299,7 +367,11 @@ def run_chat(
     confidence = round(top_confidence(chunks, question=question), 4)
     generation_contexts = _build_generation_contexts(question, chunks)
     if confidence <= 0.0 or not generation_contexts:
-        payload = _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(
+            started_at,
+            normalized_language,
+            failure_stage="confidence_or_generation_context",
+        )
         payload["retrieval_mode"] = retrieval_mode
         payload["retrieval_query"] = retrieval_query
         return payload
@@ -309,63 +381,95 @@ def run_chat(
         f"contexts={len(generation_contexts)} confidence={confidence:.3f}"
     )
 
-    native_answer = answer_text_only(
-        build_grounded_answer(
-            question,
-            chunks,
-            language=normalized_language,
-            model=selected_provider,
-            evaluation_mode=evaluation_mode,
+    verified_scalar_answer = ""
+    if not evaluation_mode:
+        verified_scalar_answer = answer_text_only(
+            build_verified_scalar_answer(
+                question,
+                chunks,
+                language=normalized_language,
+            )
         )
-    )
 
     used_extractive_fallback = False
     used_language_retry = False
-    answer = native_answer
-    native_language_ok = bool(
-        answer and answer_matches_requested_language(answer, normalized_language)
-    )
-    if evaluation_mode:
-        if not answer:
-            raise RuntimeError("Native model generation returned an empty answer")
-        if not native_language_ok:
-            raise RuntimeError("Native model generation used the wrong output language")
-    elif not answer or is_refusal_answer(answer) or not native_language_ok:
-        retry_chunks = _build_language_retry_chunks(question, chunks)
-        if retry_chunks:
-            retry_answer = answer_text_only(
-                build_grounded_answer(
-                    question,
-                    retry_chunks,
-                    language=normalized_language,
-                    model=selected_provider,
-                    evaluation_mode=False,
-                )
-            )
-            if (
-                retry_answer
-                and not is_refusal_answer(retry_answer)
-                and answer_matches_requested_language(
-                    retry_answer,
-                    normalized_language,
-                )
-            ):
-                answer = retry_answer
-                used_language_retry = True
 
-        if not used_language_retry:
-            answer = answer_text_only(
-                build_safe_extractive_answer(question, chunks, language=normalized_language)
-            )
-            used_extractive_fallback = bool(answer and not is_refusal_answer(answer))
-
-    if answer and not answer_matches_requested_language(answer, normalized_language):
+    if verified_scalar_answer:
+        answer = verified_scalar_answer
+        generation_mode = "verified_scalar"
         print(
-            "[CHAT] extractive fallback rejected because it does not match "
-            f"requested language={normalized_language}"
+            "[CHAT] using deterministic verified scalar answer; "
+            f"language={normalized_language} answer={answer}"
         )
-        answer = ""
-        used_extractive_fallback = False
+    else:
+        native_answer = answer_text_only(
+            build_grounded_answer(
+                question,
+                chunks,
+                language=normalized_language,
+                model=selected_provider,
+                evaluation_mode=evaluation_mode,
+            )
+        )
+
+        answer = native_answer
+        native_language_ok = bool(
+            answer and answer_matches_requested_language(answer, normalized_language)
+        )
+        if evaluation_mode:
+            if not answer:
+                raise RuntimeError("Native model generation returned an empty answer")
+            if not native_language_ok:
+                raise RuntimeError("Native model generation used the wrong output language")
+        elif not answer or is_refusal_answer(answer) or not native_language_ok:
+            retry_chunks = _build_language_retry_chunks(question, chunks)
+            if retry_chunks:
+                retry_answer = answer_text_only(
+                    build_grounded_answer(
+                        question,
+                        retry_chunks,
+                        language=normalized_language,
+                        model=selected_provider,
+                        evaluation_mode=False,
+                    )
+                )
+                if (
+                    retry_answer
+                    and not is_refusal_answer(retry_answer)
+                    and answer_matches_requested_language(
+                        retry_answer,
+                        normalized_language,
+                    )
+                ):
+                    answer = retry_answer
+                    used_language_retry = True
+
+            if not used_language_retry:
+                answer = answer_text_only(
+                    build_safe_extractive_answer(
+                        question,
+                        chunks,
+                        language=normalized_language,
+                    )
+                )
+                used_extractive_fallback = bool(
+                    answer and not is_refusal_answer(answer)
+                )
+
+        if answer and not answer_matches_requested_language(answer, normalized_language):
+            print(
+                "[CHAT] fallback answer rejected because it does not match "
+                f"requested language={normalized_language}"
+            )
+            answer = ""
+            used_extractive_fallback = False
+
+        if used_language_retry:
+            generation_mode = "language_repair_retry"
+        elif used_extractive_fallback:
+            generation_mode = "extractive_fallback"
+        else:
+            generation_mode = "native_model"
 
     sources = build_sources(
         chunks,
@@ -374,7 +478,11 @@ def run_chat(
     )
 
     if not answer or is_refusal_answer(answer) or not sources:
-        payload = _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(
+            started_at,
+            normalized_language,
+            failure_stage="answer_or_source_build",
+        )
         payload["retrieval_mode"] = retrieval_mode
         payload["retrieval_query"] = retrieval_query
         return payload
@@ -385,13 +493,6 @@ def run_chat(
         sources=sources,
         language=normalized_language,
     )
-
-    if used_language_retry:
-        generation_mode = "language_repair_retry"
-    elif used_extractive_fallback:
-        generation_mode = "extractive_fallback"
-    else:
-        generation_mode = "native_model"
 
     return {
         "answer": answer,
@@ -406,4 +507,5 @@ def run_chat(
         "buildVersion": BUILD_VERSION,
         "retrieval_mode": retrieval_mode,
         "retrieval_query": retrieval_query,
+        "failure_stage": None,
     }

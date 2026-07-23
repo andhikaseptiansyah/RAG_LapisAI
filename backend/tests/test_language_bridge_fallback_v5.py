@@ -82,7 +82,7 @@ def test_bridge_runs_when_primary_candidates_exist_but_are_not_strict(monkeypatc
     assert rows[0]["retrievalFallbackApplied"] is True
     assert calls[0][0] == QUESTION_ID
     assert calls[1][0] == BRIDGE_QUERY
-    assert calls[1][1]["apply_answerability"] is False
+    assert calls[1][1]["apply_answerability"] is True
     assert calls[1][1]["candidate_k"] >= 40
 
 
@@ -105,3 +105,62 @@ def test_strict_primary_result_does_not_run_bridge(monkeypatch) -> None:
     assert mode == "original"
     assert retrieval_query == QUESTION_ID
     assert calls == [QUESTION_ID]
+
+
+def test_raw_bridge_union_runs_when_bridge_hybrid_drops_the_correct_candidate(monkeypatch) -> None:
+    calls: list[tuple[str, str]] = []
+    weak_primary = {
+        "chunkId": "weak",
+        "content": "General incident handling policy.",
+        "score": 0.55,
+        "answerabilityAccepted": False,
+    }
+    bridge_raw = {
+        "chunkId": "p1",
+        "content": P1_EVIDENCE,
+        "score": 0.72,
+        "baseScore": 0.61,
+        "metadata": {
+            "filename": "SOP_IT_Incident_Handling.pdf",
+            "page": 1,
+        },
+    }
+
+    def fake_hybrid_search(query: str, **kwargs):
+        calls.append(("hybrid", query))
+        if query == QUESTION_ID:
+            return [weak_primary]
+        if query == BRIDGE_QUERY:
+            # Simulate a bridge reranker/evidence pass that prematurely drops
+            # the passage even though the raw English union still contains it.
+            return []
+        return []
+
+    def fake_base_candidates(query: str, *, candidate_k: int):
+        calls.append(("raw", query))
+        assert candidate_k >= 80
+        return [bridge_raw] if query == BRIDGE_QUERY else []
+
+    monkeypatch.setattr(chat_service, "hybrid_search", fake_hybrid_search)
+    monkeypatch.setattr(chat_service, "_base_hybrid_candidates", fake_base_candidates)
+    monkeypatch.setattr(
+        chat_service,
+        "_apply_evidence_verification",
+        lambda question, candidates, min_score: [_strict_candidate()],
+    )
+    monkeypatch.setattr(
+        chat_service,
+        "apply_answerability_gate",
+        lambda question, candidates: candidates,
+    )
+
+    rows, mode, retrieval_query = chat_service._retrieve_with_language_fallback(
+        QUESTION_ID,
+        top_k=5,
+    )
+
+    assert mode == "natural_language_bridge_raw"
+    assert retrieval_query == BRIDGE_QUERY
+    assert rows and rows[0]["chunkId"] == "p1"
+    assert rows[0]["retrievalFallbackStage"] == "bridge_raw_union"
+    assert ("raw", BRIDGE_QUERY) in calls

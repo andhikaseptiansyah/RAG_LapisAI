@@ -40,9 +40,26 @@ def build_grounded_answer(
     provider = resolve_provider(model)
     print(f"[MODEL_ROUTER] provider={provider}")
 
-    return PROVIDERS[provider](
+    answer = PROVIDERS[provider](
         question,
         chunks,
         language=language,
         evaluation_mode=evaluation_mode,
+    )
+    if answer or evaluation_mode or provider == "ollama":
+        return answer
+
+    # Remote providers can temporarily return an empty answer when the API is
+    # overloaded, rate-limited, or unavailable. The local Ollama service is the
+    # safest production fallback because it receives the same already-verified
+    # evidence and does not weaken grounding or retrieval checks.
+    print(
+        f"[MODEL_ROUTER] provider={provider} returned no usable answer; "
+        "falling back to ollama"
+    )
+    return PROVIDERS["ollama"](
+        question,
+        chunks,
+        language=language,
+        evaluation_mode=False,
     )

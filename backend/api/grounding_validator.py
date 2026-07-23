@@ -12,7 +12,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from retrieval.query_expansion import concepts_in_text, normalize_text
+from retrieval.query_expansion import CONCEPT_ALIASES, concepts_in_text, normalize_text
 from retrieval.requirements import (
     EMAIL_PATTERN,
     URL_PATTERN,
@@ -424,6 +424,45 @@ def _claim_reference_units(claim: str, evidence_units: list[str]) -> list[str]:
     ]
 
 
+def _canonical_claim_token_coverage(
+    claim: str,
+    unit: str,
+    claim_concepts: set[str],
+    unit_concepts: set[str],
+) -> float:
+    """Measure bilingual claim coverage through canonical aliases and facts.
+
+    Literal token overlap is naturally low when the answer is Indonesian and the
+    indexed evidence is English. The retrieval layer already maps both languages
+    to the same domain concepts, so the grounding validator must reuse that same
+    canonical vocabulary instead of treating a faithful translation as an
+    unsupported claim.
+
+    The bridge remains strict: every concept in the claim must exist in the same
+    evidence unit, every explicit fact is already bound to that unit by
+    ``_claim_reference_units``, and almost every remaining content token must be
+    explainable by a known bilingual alias or an explicit fact. Unsupported tails
+    therefore do not receive this cross-language support floor.
+    """
+    claim_tokens = _tokenize(claim)
+    if not claim_tokens:
+        return 1.0
+    if not claim_concepts or not claim_concepts.issubset(unit_concepts):
+        return 0.0
+
+    covered = set(claim_tokens.intersection(_tokenize(unit)))
+
+    for concept in claim_concepts:
+        for alias in CONCEPT_ALIASES.get(concept, ()):
+            covered.update(claim_tokens.intersection(_tokenize(alias)))
+
+    for _, raw, canonical in _fact_entries(claim):
+        covered.update(claim_tokens.intersection(_tokenize(raw)))
+        covered.update(claim_tokens.intersection(_tokenize(canonical)))
+
+    return len(covered) / len(claim_tokens)
+
+
 def _claim_support(claim: str, evidence_units: list[str]) -> float:
     """Return support from one evidence unit, not a token soup across documents."""
     claim_tokens = _tokenize(claim)
@@ -453,14 +492,27 @@ def _claim_support(claim: str, evidence_units: list[str]) -> float:
             else 0.0
         )
 
-        # Concept aliases may bridge Indonesian/English wording, but they must not
-        # completely override missing lexical evidence for an added explanation.
+        # Concept aliases may bridge Indonesian/English wording. Literal overlap
+        # still remains the default, while a high canonical-token coverage allows
+        # a faithful translation to pass without lowering the global threshold.
         if claim_tokens and claim_concepts:
             score = max(lexical, 0.75 * lexical + 0.25 * concept)
         elif claim_concepts:
             score = concept
         else:
             score = lexical
+
+        canonical_coverage = _canonical_claim_token_coverage(
+            claim,
+            unit,
+            claim_concepts,
+            unit_concepts,
+        )
+        has_explicit_facts = bool(_fact_entries(claim))
+        required_coverage = 0.85 if has_explicit_facts else 0.95
+        if canonical_coverage + 1e-9 >= required_coverage:
+            score = max(score, canonical_coverage)
+
         scores.append(score)
     return max(scores, default=0.0)
 
