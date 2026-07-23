@@ -4,7 +4,7 @@
 
 | Directory | Purpose |
 |-----------|---------|
-| `api/` | FastAPI app (`main.py` entrypoint, `routes_admin.py`) |
+| `api/` | FastAPI app (`main.py` entrypoint, `routes_compat.py`) |
 | `ingestion/` | Pipeline: `parser.py` → `chunker.py` → `indexer.py` |
 | `uploads/` | Shared config, ingestion orchestrator (`ingest.py`) |
 
@@ -45,7 +45,7 @@ COLLECTION_NAME = "knowledge_base"
 UPLOAD_DIR = "./uploads"
 ```
 
-Both `api/routes_admin.py` and `ingestion/indexer.py` reference these values — keep them in sync.
+`api/routes_compat.py` and `ingestion/indexer.py` reference these values — keep them in sync.
 
 ## Ingestion pipeline
 
@@ -61,5 +61,5 @@ Run standalone: `python uploads/ingest.py <filepath>`
 
 ## Known placeholders
 
-- `api/routes_admin.py:35` — `GET /admin/logs` returns `{"logs": []}`
+- `api/routes_compat.py:35` — `GET /admin/logs` returns `{"logs": []}`
 - `api/main.py:12` — CORS origin `https://rag-lapis-ai.vercel.app/` needs real URL

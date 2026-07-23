@@ -7,8 +7,9 @@ from typing import Any
 from ingestion.indexer import embed_query, get_collection
 from retrieval.answerability import apply_answerability_gate, assess_answerability
 from retrieval.evidence_verifier import verify_chunks
-from retrieval.query_expansion import expand_query
+from retrieval.query_expansion import build_query_variants, expand_query
 from retrieval.reranker import rerank_candidates, warmup_reranker
+from retrieval.scoring import hybrid_base_score
 from uploads.config import (
     ANSWERABILITY_PRE_RERANK_VETO,
     ENABLE_ANSWERABILITY_GATE,
@@ -43,7 +44,17 @@ INVENTORY_FIELD_TERMS = [
 
 def _tokenize(text: str) -> list[str]:
     tokens = re.findall(r"[A-Za-zÀ-ÿ0-9]+", str(text or "").lower())
-    return [token for token in tokens if len(token) > 2 and token not in STOPWORDS]
+    meaningful_short_tokens = {"it", "ti", "ai", "hr", "qa", "id", "en"}
+    return [
+        token
+        for token in tokens
+        if token not in STOPWORDS
+        and (
+            len(token) > 2
+            or token in meaningful_short_tokens
+            or re.fullmatch(r"[a-z]+\d+", token) is not None
+        )
+    ]
 
 
 def _important_tokens(query: str) -> list[str]:
@@ -114,6 +125,7 @@ def _get_all_records() -> dict:
 
 
 def semantic_search(query: str, top_k: int = 20) -> list[dict]:
+    """Search every independent language variant and merge by best cosine score."""
     collection = get_collection()
 
     try:
@@ -124,45 +136,64 @@ def semantic_search(query: str, top_k: int = 20) -> list[dict]:
     if total_records <= 0:
         return []
 
-    search_query = expand_query(query)
-    query_embedding = embed_query(search_query)
-    if not query_embedding:
-        return []
+    variants = build_query_variants(query) or [str(query or "").strip()]
+    merged: dict[str, dict[str, Any]] = {}
+    per_variant_scores: dict[str, dict[str, float]] = defaultdict(dict)
 
-    result = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=min(top_k, total_records),
-        include=["documents", "metadatas", "distances"],
-    )
+    for variant_index, search_query in enumerate(variants):
+        query_embedding = embed_query(search_query)
+        if not query_embedding:
+            continue
 
-    ids = result.get("ids", [[]])[0] or []
-    documents = result.get("documents", [[]])[0] or []
-    metadatas = result.get("metadatas", [[]])[0] or []
-    distances = result.get("distances", [[]])[0] or []
-
-    rows: list[dict] = []
-    for index, chunk_id in enumerate(ids):
-        distance = _safe_float(
-            distances[index] if index < len(distances) else 1.0,
-            1.0,
+        result = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=min(top_k, total_records),
+            include=["documents", "metadatas", "distances"],
         )
-        score = _clamp(1.0 - distance)
-        metadata = metadatas[index] if index < len(metadatas) else {}
-        rows.append(
-            {
+
+        ids = result.get("ids", [[]])[0] or []
+        documents = result.get("documents", [[]])[0] or []
+        metadatas = result.get("metadatas", [[]])[0] or []
+        distances = result.get("distances", [[]])[0] or []
+
+        for rank, chunk_id in enumerate(ids):
+            distance = _safe_float(
+                distances[rank] if rank < len(distances) else 1.0,
+                1.0,
+            )
+            score = _clamp(1.0 - distance)
+            per_variant_scores[str(chunk_id)][search_query] = round(score, 6)
+            existing = merged.get(str(chunk_id))
+            if existing is not None and score <= _safe_float(existing.get("semanticScore")):
+                continue
+
+            metadata = metadatas[rank] if rank < len(metadatas) else {}
+            merged[str(chunk_id)] = {
                 "chunkId": chunk_id,
-                "content": documents[index] if index < len(documents) else "",
+                "content": documents[rank] if rank < len(documents) else "",
                 "metadata": metadata or {},
                 "semanticScore": score,
-                "semanticRank": index,
-                "expandedQuery": search_query,
+                "semanticRank": rank,
+                "semanticVariantIndex": variant_index,
+                "semanticQueryVariant": search_query,
+                "expandedQuery": expand_query(query),
             }
-        )
 
-    return rows
-
+    rows = list(merged.values())
+    rows.sort(
+        key=lambda row: (
+            _safe_float(row.get("semanticScore")),
+            -int(row.get("semanticRank") or 0),
+        ),
+        reverse=True,
+    )
+    for rank, row in enumerate(rows):
+        row["semanticRank"] = rank
+        row["semanticVariantScores"] = per_variant_scores.get(str(row.get("chunkId")), {})
+    return rows[:top_k]
 
 def bm25_search(query: str, top_k: int = 20) -> list[dict]:
+    """Run BM25 per language variant and keep each chunk's strongest score."""
     records = _get_all_records()
     ids = records.get("ids") or []
     documents = records.get("documents") or []
@@ -171,37 +202,47 @@ def bm25_search(query: str, top_k: int = 20) -> list[dict]:
     if not ids or not documents:
         return []
 
-    search_query = expand_query(query)
-    query_tokens = _tokenize(search_query)
-
     searchable_documents = []
     for doc, meta in zip(documents, metadatas):
         meta = meta or {}
         searchable_documents.append(
             f"{meta.get('filename', '')} page {meta.get('page', '')} {doc}"
         )
-
     corpus_tokens = [_tokenize(doc) for doc in searchable_documents]
 
-    if BM25Okapi is not None and query_tokens:
-        bm25 = BM25Okapi(corpus_tokens)
-        raw_scores = bm25.get_scores(query_tokens)
-        max_score = max(raw_scores) if len(raw_scores) else 0
-        normalized_scores = [
-            float(score) / float(max_score) if max_score else 0.0
-            for score in raw_scores
-        ]
-    else:
-        query_set = set(query_tokens)
-        normalized_scores = []
-        for tokens in corpus_tokens:
-            token_set = set(tokens)
-            overlap = len(query_set.intersection(token_set))
-            normalized_scores.append(overlap / max(len(query_set), 1))
+    variants = build_query_variants(query) or [str(query or "").strip()]
+    best_scores = [0.0 for _ in ids]
+    best_variants = ["" for _ in ids]
+    variant_scores: list[dict[str, float]] = [dict() for _ in ids]
+
+    bm25 = BM25Okapi(corpus_tokens) if BM25Okapi is not None else None
+    for search_query in variants:
+        query_tokens = _tokenize(search_query)
+        if bm25 is not None and query_tokens:
+            raw_scores = bm25.get_scores(query_tokens)
+            max_score = max(raw_scores) if len(raw_scores) else 0
+            normalized_scores = [
+                float(score) / float(max_score) if max_score else 0.0
+                for score in raw_scores
+            ]
+        else:
+            query_set = set(query_tokens)
+            normalized_scores = []
+            for tokens in corpus_tokens:
+                token_set = set(tokens)
+                overlap = len(query_set.intersection(token_set))
+                normalized_scores.append(overlap / max(len(query_set), 1))
+
+        for idx, raw_score in enumerate(normalized_scores):
+            score = _clamp(raw_score)
+            variant_scores[idx][search_query] = round(score, 6)
+            if score > best_scores[idx]:
+                best_scores[idx] = score
+                best_variants[idx] = search_query
 
     ranked_indexes = sorted(
         range(len(ids)),
-        key=lambda idx: normalized_scores[idx],
+        key=lambda idx: best_scores[idx],
         reverse=True,
     )[:top_k]
 
@@ -212,14 +253,15 @@ def bm25_search(query: str, top_k: int = 20) -> list[dict]:
                 "chunkId": ids[idx],
                 "content": documents[idx],
                 "metadata": metadatas[idx] or {},
-                "keywordScore": _clamp(normalized_scores[idx]),
+                "keywordScore": _clamp(best_scores[idx]),
                 "keywordRank": rank,
-                "expandedQuery": search_query,
+                "keywordQueryVariant": best_variants[idx],
+                "keywordVariantScores": variant_scores[idx],
+                "expandedQuery": expand_query(query),
             }
         )
 
     return rows
-
 
 def _base_hybrid_candidates(
     query: str,
@@ -242,16 +284,23 @@ def _base_hybrid_candidates(
     for row in semantic_rows:
         chunk_id = row["chunkId"]
         merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
-        weighted_scores[chunk_id] += 0.68 * _clamp(row.get("semanticScore", 0.0))
         tie_breakers[chunk_id] += _rrf_score(row.get("semanticRank", candidate_k))
 
     for row in keyword_rows:
         chunk_id = row["chunkId"]
         merged[chunk_id] = {**merged.get(chunk_id, {}), **row}
-        weighted_scores[chunk_id] += 0.32 * _clamp(row.get("keywordScore", 0.0))
         tie_breakers[chunk_id] += _rrf_score(row.get("keywordRank", candidate_k))
 
     for chunk_id, row in merged.items():
+        # Normalize over active signals. For a cross-language query, BM25 can be
+        # exactly zero while the multilingual embedding is strongly relevant.
+        # The old fixed weighted sum multiplied that semantic score by 0.68 and
+        # could trigger a false pre-rerank refusal. When both signals exist, this
+        # remains mathematically identical to the original 68/32 blend.
+        weighted_scores[chunk_id] = hybrid_base_score(
+            row.get("semanticScore", 0.0),
+            row.get("keywordScore", 0.0),
+        )
         metadata = row.get("metadata", {}) or {}
         searchable_text = f"{metadata.get('filename', '')} {row.get('content', '')}"
         exact_coverage = _exact_token_coverage(query, searchable_text)

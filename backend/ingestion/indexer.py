@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 
-import chromadb
 
 if TYPE_CHECKING:
     from sentence_transformers import SentenceTransformer
@@ -23,6 +22,8 @@ def get_embedding_model() -> "SentenceTransformer":
 
 
 def get_collection():
+    import chromadb
+
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     return client.get_or_create_collection(
         name=COLLECTION_NAME,
@@ -36,6 +37,8 @@ def reset_collection():
     Required after changing the embedding model so old and new vectors are never
     mixed in one collection.
     """
+    import chromadb
+
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     try:
         client.delete_collection(name=COLLECTION_NAME)

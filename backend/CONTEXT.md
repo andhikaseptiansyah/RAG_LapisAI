@@ -20,7 +20,7 @@ backend/
 ├── api/
 │   ├── __init__.py
 │   ├── main.py         # FastAPI app + CORS config
-│   └── routes_admin.py # POST /admin/upload, GET /admin/logs
+│   └── routes_compat.py # POST /admin/upload, GET /admin/logs
 ├── uploads/            # Temp storage for uploaded files
 ├── chroma_db/          # Auto-generated, do NOT commit to git
 ├── config.py           # Shared constants
@@ -85,7 +85,7 @@ UPLOAD_DIR = "./uploads"
 - Includes admin router under `/admin` prefix
 - `GET /health` — sanity check endpoint
 
-### `api/routes_admin.py`
+### `api/routes_compat.py`
 - `POST /admin/upload` — receives file, validates extension, saves to `uploads/`, calls `ingest()`
 - `GET /admin/logs` — stub, returns empty list until query logging is built
 

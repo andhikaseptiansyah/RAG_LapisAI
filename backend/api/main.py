@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.build_info import BUILD_VERSION, public_build_info
 from api.routes_compat import router as api_router
 from api.storage_paths import migrate_legacy_storage
 from retrieval.hybrid_search import warmup_retrieval
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
     if migrated:
         print(f"[STORAGE] migrated legacy records: {migrated}")
 
+    print(f"[BUILD] active_backend={BUILD_VERSION}")
     status = warmup_retrieval()
     print(
         "[RETRIEVAL] warm-up "
@@ -57,9 +59,10 @@ def root():
         "status": "ok",
         "message": "Enterprise Knowledge Assistant API is running",
         "apiBase": "/api",
+        **public_build_info(),
     }
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", **public_build_info()}

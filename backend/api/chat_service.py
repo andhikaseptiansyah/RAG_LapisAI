@@ -15,16 +15,24 @@ from api.answer_formatter import (
     is_small_talk,
     top_confidence,
 )
+from api.build_info import BUILD_VERSION
 from api.follow_up_service import build_dataset_follow_up_question
 from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
+from retrieval.answerability import apply_answerability_gate
 from retrieval.context_selector import select_context_bundle
-from retrieval.hybrid_search import hybrid_search
+from retrieval.hybrid_search import _apply_evidence_verification, hybrid_search
+from retrieval.query_expansion import (
+    build_natural_bridge_query,
+    normalize_text,
+    requires_language_bridge,
+)
 from uploads.config import (
     CONTEXT_REDUNDANCY_THRESHOLD,
     CONTEXT_SECONDARY_SCORE_RATIO,
     MAX_GENERATION_CONTEXTS,
     MAX_SOURCE_CITATIONS,
+    MIN_RESULT_SCORE,
 )
 
 
@@ -94,6 +102,37 @@ def _build_generation_contexts(
     return contexts
 
 
+def _build_language_retry_chunks(
+    question: str,
+    chunks: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Build a minimal evidence bundle for a language-only generation retry.
+
+    The first generation can fail when a local model copies the source language
+    from a long chunk. Retrying with the same verified facts in a smaller bundle
+    improves translation compliance without changing retrieval thresholds or
+    adding any outside information.
+    """
+    retry_chunks: list[dict[str, Any]] = []
+    for chunk in chunks[:2]:
+        raw_content = str(chunk.get("content") or "").strip()
+        excerpt = build_evidence_excerpt(
+            question,
+            raw_content,
+            max_chars=700,
+        ) or raw_content
+        if not excerpt:
+            continue
+
+        cloned = dict(chunk)
+        cloned["content"] = excerpt
+        metadata = dict(chunk.get("metadata") or {})
+        metadata["content"] = excerpt
+        cloned["metadata"] = metadata
+        retry_chunks.append(cloned)
+    return retry_chunks
+
+
 def _refusal_payload(started_at: float, language: str) -> dict[str, Any]:
     return {
         "answer": build_refusal_answer(language),
@@ -105,7 +144,77 @@ def _refusal_payload(started_at: float, language: str) -> dict[str, Any]:
         "model": "retrieval-refusal",
         "generation_mode": "retrieval_refusal",
         "language": language,
+        "buildVersion": BUILD_VERSION,
+        "retrieval_mode": "refused",
+        "retrieval_query": "",
     }
+
+
+def _retrieve_with_language_fallback(
+    question: str,
+    *,
+    top_k: int,
+) -> tuple[list[dict[str, Any]], str, str]:
+    """Retrieve with the original question, then a natural English bridge.
+
+    The second pass is attempted only when the normal multilingual pipeline
+    returns no accepted evidence. It uses the exact same retrieval, evidence,
+    and answerability thresholds. Returned bridge candidates are verified again
+    against the original user question before generation, so translated query
+    wording cannot weaken subject constraints such as P1 versus P2.
+    """
+    requested_k = max(top_k, MAX_GENERATION_CONTEXTS)
+    primary = hybrid_search(question, top_k=requested_k)
+    if primary:
+        return primary, "original", question
+
+    if not requires_language_bridge(question):
+        return [], "original", question
+
+    bridge_query = build_natural_bridge_query(question)
+    if (
+        not bridge_query
+        or normalize_text(bridge_query) == normalize_text(question)
+    ):
+        return [], "original", question
+
+    print(
+        "[RETRIEVAL] original query rejected; retrying natural language bridge: "
+        f"{bridge_query}"
+    )
+    bridge_candidates = hybrid_search(
+        bridge_query,
+        top_k=requested_k,
+    )
+    if not bridge_candidates:
+        return [], "natural_language_bridge", bridge_query
+
+    # Re-run deterministic evidence and answerability checks using the original
+    # Indonesian question. This retains all existing thresholds and hard
+    # constraints while allowing the English retrieval representation to find
+    # the correct chunk.
+    reverified = _apply_evidence_verification(
+        question,
+        [dict(candidate) for candidate in bridge_candidates],
+        min_score=MIN_RESULT_SCORE,
+    )
+    reverified = apply_answerability_gate(question, reverified)
+    if not reverified:
+        print(
+            "[RETRIEVAL] natural bridge candidates failed original-question "
+            "evidence verification"
+        )
+        return [], "natural_language_bridge", bridge_query
+
+    return [
+        {
+            **candidate,
+            "retrievalFallbackApplied": True,
+            "retrievalOriginalQuestion": question,
+            "retrievalBridgeQuery": bridge_query,
+        }
+        for candidate in reverified
+    ], "natural_language_bridge", bridge_query
 
 
 def run_chat(
@@ -134,9 +243,13 @@ def run_chat(
             "model": "system-small-talk",
             "generation_mode": "system_small_talk",
             "language": normalized_language,
+            "buildVersion": BUILD_VERSION,
         }
 
-    retrieved_chunks = hybrid_search(question, top_k=max(top_k, MAX_GENERATION_CONTEXTS))
+    retrieved_chunks, retrieval_mode, retrieval_query = _retrieve_with_language_fallback(
+        question,
+        top_k=top_k,
+    )
     chunks = select_context_bundle(
         question,
         retrieved_chunks,
@@ -147,12 +260,18 @@ def run_chat(
 
     bundle_answerable = has_answerable_evidence(chunks)
     if not chunks or not bundle_answerable:
-        return _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(started_at, normalized_language)
+        payload["retrieval_mode"] = retrieval_mode
+        payload["retrieval_query"] = retrieval_query
+        return payload
 
     confidence = round(top_confidence(chunks, question=question), 4)
     generation_contexts = _build_generation_contexts(question, chunks)
     if confidence <= 0.0 or not generation_contexts:
-        return _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(started_at, normalized_language)
+        payload["retrieval_mode"] = retrieval_mode
+        payload["retrieval_query"] = retrieval_query
+        return payload
 
     print(
         f"[CHAT] provider={selected_provider} language={normalized_language} "
@@ -170,6 +289,7 @@ def run_chat(
     )
 
     used_extractive_fallback = False
+    used_language_retry = False
     answer = native_answer
     native_language_ok = bool(
         answer and answer_matches_requested_language(answer, normalized_language)
@@ -180,10 +300,33 @@ def run_chat(
         if not native_language_ok:
             raise RuntimeError("Native model generation used the wrong output language")
     elif not answer or is_refusal_answer(answer) or not native_language_ok:
-        answer = answer_text_only(
-            build_safe_extractive_answer(question, chunks, language=normalized_language)
-        )
-        used_extractive_fallback = bool(answer and not is_refusal_answer(answer))
+        retry_chunks = _build_language_retry_chunks(question, chunks)
+        if retry_chunks:
+            retry_answer = answer_text_only(
+                build_grounded_answer(
+                    question,
+                    retry_chunks,
+                    language=normalized_language,
+                    model=selected_provider,
+                    evaluation_mode=False,
+                )
+            )
+            if (
+                retry_answer
+                and not is_refusal_answer(retry_answer)
+                and answer_matches_requested_language(
+                    retry_answer,
+                    normalized_language,
+                )
+            ):
+                answer = retry_answer
+                used_language_retry = True
+
+        if not used_language_retry:
+            answer = answer_text_only(
+                build_safe_extractive_answer(question, chunks, language=normalized_language)
+            )
+            used_extractive_fallback = bool(answer and not is_refusal_answer(answer))
 
     if answer and not answer_matches_requested_language(answer, normalized_language):
         print(
@@ -200,7 +343,10 @@ def run_chat(
     )
 
     if not answer or is_refusal_answer(answer) or not sources:
-        return _refusal_payload(started_at, normalized_language)
+        payload = _refusal_payload(started_at, normalized_language)
+        payload["retrieval_mode"] = retrieval_mode
+        payload["retrieval_query"] = retrieval_query
+        return payload
 
     follow_up_question = build_dataset_follow_up_question(
         question=question,
@@ -209,11 +355,12 @@ def run_chat(
         language=normalized_language,
     )
 
-    generation_mode = (
-        "native_model"
-        if evaluation_mode or not used_extractive_fallback
-        else "extractive_fallback"
-    )
+    if used_language_retry:
+        generation_mode = "language_repair_retry"
+    elif used_extractive_fallback:
+        generation_mode = "extractive_fallback"
+    else:
+        generation_mode = "native_model"
 
     return {
         "answer": answer,
@@ -225,4 +372,7 @@ def run_chat(
         "model": f"{selected_provider}-rag",
         "generation_mode": generation_mode,
         "language": normalized_language,
+        "buildVersion": BUILD_VERSION,
+        "retrieval_mode": retrieval_mode,
+        "retrieval_query": retrieval_query,
     }

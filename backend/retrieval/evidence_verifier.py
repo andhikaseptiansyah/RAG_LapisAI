@@ -29,6 +29,7 @@ class EvidenceDecision:
     missing_concepts: tuple[str, ...]
     hard_failures: tuple[str, ...]
     reason: str
+    semantic_support: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -100,7 +101,11 @@ STOPWORDS = {
 }
 
 TIME_PATTERN = re.compile(
-    r"\b(?:within\s+)?(?:\d+\s*x\s*\d+|\d+(?:[.,]\d+)?)\s*"
+    r"\b(?:within\s+)?(?:"
+    r"\d+\s*x\s*\d+|\d+(?:[.,]\d+)?|"
+    r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
+    r"satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas|dua\s+belas"
+    r")\s*"
     r"(?:minutes?|mins?|hours?|hrs?|days?|working\s+days?|business\s+days?|weeks?|months?|years?|"
     r"menit|jam|hari|minggu|bulan|tahun)\b",
     flags=re.I,
@@ -115,6 +120,14 @@ VERSION_PATTERN = re.compile(
     r"\b(?:version|versi|macos|windows|android|ios)\s*[v.]?\s*\d+(?:\.\d+)*\b",
     flags=re.I,
 )
+
+
+def _clamp_score(value: object) -> float:
+    try:
+        score = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return max(0.0, min(score, 1.0))
 
 
 def _tokenize(text: str) -> set[str]:
@@ -285,6 +298,7 @@ def verify_evidence(
     content: str,
     *,
     minimum_score: float = 0.58,
+    semantic_score: float | None = None,
 ) -> EvidenceDecision:
     """Evaluate one candidate chunk against the full question.
 
@@ -304,6 +318,7 @@ def verify_evidence(
             missing_concepts=(),
             hard_failures=("empty_content",),
             reason="Question or candidate content is empty.",
+            semantic_support=0.0,
         )
 
     required = concepts_in_text(question_text)
@@ -361,21 +376,45 @@ def verify_evidence(
             or VERSION_PATTERN.search(content_text)
         ) else 0.0
 
+    semantic_support = _clamp_score(semantic_score)
+
     if required:
-        concept_weight = 0.68
-        lexical_weight = 0.17
-        numeric_weight = 0.15
+        if semantic_support > 0.0:
+            # Concepts remain the primary guardrail. The multilingual semantic
+            # signal only replaces part of the literal-overlap weight, so a high
+            # embedding score can never override a missing hard concept.
+            concept_weight = 0.58
+            lexical_weight = 0.12
+            numeric_weight = 0.15
+            semantic_weight = 0.15
+        else:
+            concept_weight = 0.68
+            lexical_weight = 0.17
+            numeric_weight = 0.15
+            semantic_weight = 0.0
     else:
-        # Unknown topics are not rejected merely because they are absent from the
-        # enterprise lexicon; lexical support remains a safe fallback.
-        concept_weight = 0.25
-        lexical_weight = 0.60
-        numeric_weight = 0.15
+        if semantic_support > 0.0:
+            # Unknown vocabulary is the main multilingual failure mode. When a
+            # candidate comes from the configured multilingual embedding model,
+            # semantic relevance is the language-independent evidence signal.
+            # The acceptance threshold itself is unchanged.
+            concept_weight = 0.0
+            lexical_weight = 0.13
+            numeric_weight = 0.15
+            semantic_weight = 0.72
+        else:
+            # Standalone verification without a retrieval score preserves the
+            # original lexical fallback behavior.
+            concept_weight = 0.25
+            lexical_weight = 0.60
+            numeric_weight = 0.15
+            semantic_weight = 0.0
 
     score = (
         concept_weight * concept_coverage
         + lexical_weight * lexical_coverage
         + numeric_weight * numeric_support
+        + semantic_weight * semantic_support
     )
     score = max(0.0, min(float(score), 1.0))
 
@@ -397,6 +436,7 @@ def verify_evidence(
         missing_concepts=tuple(sorted(set(missing))),
         hard_failures=tuple(sorted(set(hard_failures))),
         reason=reason,
+        semantic_support=round(semantic_support, 6),
     )
 
 
@@ -413,6 +453,7 @@ def verify_chunks(
             question,
             str(chunk.get("content") or ""),
             minimum_score=minimum_score,
+            semantic_score=chunk.get("semanticScore"),
         )
         hard_failures = list(decision.hard_failures)
         contradictions = [
@@ -425,6 +466,7 @@ def verify_chunks(
                 "evidenceSupported": decision.supported,
                 "evidenceScore": decision.score,
                 "evidenceCoverage": decision.concept_coverage,
+                "evidenceSemanticSupport": decision.semantic_support,
                 "evidenceMissingConcepts": list(decision.missing_concepts),
                 # Missing evidence may be supplied by another chunk. A direct
                 # subject conflict, such as mailbox quota for a file-upload-size

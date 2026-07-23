@@ -64,6 +64,9 @@ export interface ChatApiResponse {
   language?: ChatLanguage;
   model?: string;
   generation_mode?: string;
+  buildVersion?: string;
+  retrieval_mode?: string;
+  retrieval_query?: string;
 }
 
 export interface ConversationSummary {
@@ -153,27 +156,25 @@ export const sendChatMessage = async (
   payload: SendChatPayload,
   signal?: AbortSignal
 ): Promise<ChatApiResponse> => {
-  if (
-    hasRealFiles(payload.attachments)
-  ) {
-    return apiRequest<
-      ChatApiResponse,
-      FormData
-    >('/api/chat', {
-      method: 'POST',
-      body: buildChatFormData(payload),
-      signal,
-    });
+  const response = hasRealFiles(payload.attachments)
+    ? await apiRequest<ChatApiResponse, FormData>('/api/chat', {
+        method: 'POST',
+        body: buildChatFormData(payload),
+        signal,
+      })
+    : await apiRequest<ChatApiResponse, SendChatPayload>('/api/chat', {
+        method: 'POST',
+        body: payload,
+        signal,
+      });
+
+  if (response.buildVersion) {
+    console.info(`[LapisAI] backend build: ${response.buildVersion}`);
+  } else {
+    console.warn('[LapisAI] backend response has no buildVersion; an older backend may still be active.');
   }
 
-  return apiRequest<
-    ChatApiResponse,
-    SendChatPayload
-  >('/api/chat', {
-    method: 'POST',
-    body: payload,
-    signal,
-  });
+  return response;
 };
 
 export const recordQueryFailure = async (

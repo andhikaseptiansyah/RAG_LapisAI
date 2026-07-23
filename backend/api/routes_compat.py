@@ -9,6 +9,7 @@ from typing import Any, Literal
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
+from api.build_info import BUILD_VERSION, public_build_info
 from api.conversation_store import (
     append_chat_turn,
     delete_conversation,
@@ -44,7 +45,14 @@ from api.user_store import (
     update_user_password,
 )
 from ingestion.indexer import delete_document_chunks, get_collection
-from uploads.config import UPLOAD_DIR, public_rag_config
+from retrieval.answerability import assess_answerability
+from retrieval.hybrid_search import (
+    _apply_evidence_verification,
+    _base_hybrid_candidates,
+    hybrid_search,
+)
+from retrieval.query_expansion import build_query_variants
+from uploads.config import MIN_RESULT_SCORE, UPLOAD_DIR, public_rag_config
 from uploads.ingest import ingest
 
 router = APIRouter()
@@ -106,6 +114,11 @@ class QueryFailurePayload(BaseModel):
     queryId: str
     question: str
     reason: str = "CLIENT_ERROR"
+
+
+class RetrievalDebugPayload(BaseModel):
+    question: str
+    topK: int = 5
 
 
 def _now_iso() -> str:
@@ -561,7 +574,71 @@ def compat_current_user(request: Request):
 
 @router.get("/health")
 def compat_health():
-    return {"status": "ok"}
+    return {"status": "ok", **public_build_info(), "ragConfig": public_rag_config()}
+
+
+@router.post("/admin/retrieval-debug")
+def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
+    """Return non-secret retrieval diagnostics for an administrator.
+
+    This endpoint makes false refusals observable without changing any score
+    threshold. It intentionally omits embeddings and document contents longer
+    than a compact preview.
+    """
+    _require_admin(request)
+    question = str(payload.question or "").strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question is required.")
+
+    top_k = max(1, min(int(payload.topK or 5), 20))
+    base_candidates = _base_hybrid_candidates(
+        question,
+        candidate_k=max(20, top_k),
+    )
+    baseline_verified = _apply_evidence_verification(
+        question,
+        [dict(candidate) for candidate in base_candidates],
+        min_score=MIN_RESULT_SCORE,
+    )
+    baseline_decision = assess_answerability(question, baseline_verified)
+    final_candidates = hybrid_search(question, top_k=top_k)
+
+    def compact(candidate: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "chunkId": candidate.get("chunkId"),
+            "documentName": candidate.get("documentName"),
+            "page": candidate.get("page"),
+            "score": candidate.get("score"),
+            "baseScore": candidate.get("baseScore"),
+            "semanticScore": candidate.get("semanticScore"),
+            "keywordScore": candidate.get("keywordScore"),
+            "semanticQueryVariant": candidate.get("semanticQueryVariant"),
+            "keywordQueryVariant": candidate.get("keywordQueryVariant"),
+            "rerankerQueryVariant": candidate.get("rerankerQueryVariant"),
+            "evidenceSupported": candidate.get("evidenceSupported"),
+            "evidenceScore": candidate.get("evidenceScore"),
+            "evidenceHardFailures": candidate.get("evidenceHardFailures"),
+            "answerabilityAccepted": candidate.get("answerabilityAccepted"),
+            "preview": str(candidate.get("content") or "")[:300],
+        }
+
+    return {
+        **public_build_info(),
+        "question": question,
+        "queryVariants": build_query_variants(question),
+        "thresholds": {
+            "minimumResultScore": MIN_RESULT_SCORE,
+            **{
+                key: value
+                for key, value in public_rag_config().items()
+                if key.startswith("answerability") or key.startswith("minimumEvidence")
+            },
+        },
+        "baselineDecision": baseline_decision.to_dict(),
+        "baseCandidates": [compact(item) for item in base_candidates[:10]],
+        "baselineVerified": [compact(item) for item in baseline_verified[:10]],
+        "finalCandidates": [compact(item) for item in final_candidates[:10]],
+    }
 
 
 @router.post("/chat")
@@ -662,6 +739,9 @@ async def compat_chat(request: Request):
         "language": resolved_language,
         "model": result.get("model"),
         "generation_mode": result.get("generation_mode"),
+        "buildVersion": result.get("buildVersion") or BUILD_VERSION,
+        "retrieval_mode": result.get("retrieval_mode"),
+        "retrieval_query": result.get("retrieval_query"),
     }
 
 

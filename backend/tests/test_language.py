@@ -46,6 +46,12 @@ class ResponseLanguageTests(unittest.TestCase):
         self.assertTrue(answer_matches_requested_language("PostgreSQL 16.", "ID"))
         self.assertTrue(answer_matches_requested_language("50 GB.", "EN"))
 
+    def test_short_wrong_language_answer_is_rejected(self) -> None:
+        self.assertFalse(answer_matches_requested_language("Two days per week.", "ID"))
+        self.assertFalse(answer_matches_requested_language("Dua hari per minggu.", "EN"))
+        self.assertTrue(answer_matches_requested_language("Dua hari per minggu.", "ID"))
+        self.assertTrue(answer_matches_requested_language("Two days per week.", "EN"))
+
     def test_prompts_repeat_mandatory_output_language(self) -> None:
         id_prompt = build_system_prompt("ID") + build_user_prompt(
             "Berapa lama masa percobaan?",

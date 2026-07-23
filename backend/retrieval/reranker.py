@@ -19,6 +19,7 @@ import math
 from functools import lru_cache
 from typing import Any, Iterable
 
+from retrieval.query_expansion import build_query_variants, requires_language_bridge
 from uploads.config import ENABLE_RERANKER, RERANKER_MODEL, RERANKER_WEIGHT
 
 _LOAD_ERROR_REPORTED = False
@@ -119,9 +120,15 @@ def rerank_candidates(
 
     try:
         model = get_reranker()
+        query_variants = (
+            build_query_variants(query)
+            if requires_language_bridge(query)
+            else [str(query or "")]
+        ) or [str(query or "")]
         pairs = [
-            [str(query or ""), str(candidate.get("content") or "")]
+            [variant, str(candidate.get("content") or "")]
             for candidate in candidates
+            for variant in query_variants
         ]
         predictions = model.predict(
             pairs,
@@ -137,12 +144,29 @@ def rerank_candidates(
             for candidate in candidates
         ]
 
-    raw_values: list[float] = []
+    flat_raw_values: list[float] = []
     for raw in predictions:
         try:
-            raw_values.append(float(raw))
+            flat_raw_values.append(float(raw))
         except (TypeError, ValueError):
-            raw_values.append(0.0)
+            flat_raw_values.append(0.0)
+
+    variant_count = max(len(query_variants), 1)
+    raw_values: list[float] = []
+    best_variant_by_candidate: list[str] = []
+    variant_raw_scores: list[dict[str, float]] = []
+    for candidate_index in range(len(candidates)):
+        start = candidate_index * variant_count
+        values = flat_raw_values[start:start + variant_count]
+        if not values:
+            values = [0.0]
+        best_index = max(range(len(values)), key=lambda index: values[index])
+        raw_values.append(values[best_index])
+        best_variant_by_candidate.append(query_variants[best_index])
+        variant_raw_scores.append({
+            query_variants[index]: round(values[index], 6)
+            for index in range(min(len(values), len(query_variants)))
+        })
 
     normalised_scores = _normalise_logits(raw_values)
     raw_order = sorted(
@@ -181,6 +205,8 @@ def rerank_candidates(
                 "rerankerWeight": round(safe_weight, 6),
                 "rerankerRawScore": round(raw_value, 6),
                 "rerankerRawRank": raw_rank_by_index[index],
+                "rerankerQueryVariant": best_variant_by_candidate[index],
+                "rerankerVariantRawScores": variant_raw_scores[index],
                 "rerankerScore": round(reranker_score, 6),
                 "score": round(max(0.0, min(blended_score, 1.0)), 6),
             }

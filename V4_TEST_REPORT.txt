@@ -1,0 +1,29 @@
+RAG LapisAI Multilingual V4 Final
+Build: rag-multilingual-v4-20260723
+
+Exact regression query:
+Seberapa cepat insiden IT P1 harus diselesaikan?
+
+Expected response:
+4 jam.
+
+Expected source:
+SOP_IT_Incident_Handling.pdf
+
+Validated behavior:
+- Original Indonesian retrieval is attempted first.
+- When it is rejected, retrieval retries the natural English query:
+  How quickly must a P1 IT incident be resolved?
+- Bridge candidates are reverified against the original Indonesian question.
+- Evidence containing P1 acknowledgement 15 minutes, P1 resolution 4 hours,
+  and P2 resolution 8 hours selects the P1 resolution value: 4 jam.
+- P1/P2 subject constraints remain active.
+- No configured threshold was reduced.
+
+Automated test result:
+125 passed, 4 subtests passed.
+
+Frontend build:
+Not rerun in the isolated packaging environment because Node dependencies were
+not available. The only frontend source change adds optional diagnostic response
+fields and does not alter rendering or request behavior.

@@ -12,6 +12,7 @@ from retrieval.requirements import (
     extract_evidence_requirements,
     requirement_satisfied,
 )
+from retrieval.query_expansion import concepts_in_text, normalize_text
 
 # Confidence dipisahkan antara gerbang jawaban dan gerbang sumber.
 # Nilainya dimuat melalui uploads.config supaya project-root .env selalu dibaca
@@ -575,6 +576,27 @@ def build_evidence_excerpt(
     asks_for_duration = bool(
         re.search(r"\b(berapa lama|maksimal|how long|duration|when|kapan)\b", question_lower)
     )
+
+    # Literal overlap can be zero for a valid cross-language match. In that
+    # situation, selecting a single sentence by lexical score is arbitrary and
+    # can remove the actual answer before it reaches the multilingual LLM. Keep
+    # the compact chunk evidence intact instead. The existing max_chars limit
+    # still controls context size.
+    if query_tokens:
+        segment_overlaps = [
+            len(query_tokens.intersection(set(_tokenize(segment))))
+            for segment in segments
+        ]
+        best_literal_coverage = max(segment_overlaps, default=0) / max(
+            len(query_tokens),
+            1,
+        )
+        if best_literal_coverage < 0.25:
+            excerpt = _clean_text(" ".join(segments))
+            if len(excerpt) <= max_chars:
+                return excerpt
+            shortened = excerpt[:max_chars].rsplit(" ", 1)[0].strip()
+            return shortened + "…"
 
     def score_segment(index: int) -> tuple[float, int]:
         segment = segments[index]
@@ -1247,6 +1269,212 @@ def _answerability_confidence(chunks: list[dict[str, Any]]) -> float:
     return max(values, default=0.0)
 
 
+_SCALAR_DURATION_PATTERN = re.compile(
+    r"\b(?:within\s+|up\s+to\s+|at\s+least\s+|maksimal\s+|minimal\s+|"
+    r"paling\s+lambat\s+|dalam\s+waktu\s+)?"
+    r"(?P<value>\d+\s*[x×]\s*\d+|\d+(?:[.,]\d+)?|"
+    r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
+    r"satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas|dua\s+belas)\s*"
+    r"(?P<unit>minutes?|mins?|hours?|hrs?|working\s+days?|business\s+days?|days?|"
+    r"weeks?|months?|years?|menit|jam|hari\s+kerja|hari|minggu|bulan|tahun)\b",
+    flags=re.I,
+)
+
+_SCALAR_STORAGE_PATTERN = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s*(?:KB|MB|GB|TB|kilobytes?|megabytes?|gigabytes?|terabytes?)\b",
+    flags=re.I,
+)
+_SCALAR_PERCENT_PATTERN = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s*(?:%(?=$|[^0-9])|percent\b|percentage\b|persen\b)",
+    flags=re.I,
+)
+
+_NUMBER_WORD_VALUES = {
+    "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+    "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+    "eleven": "11", "twelve": "12", "satu": "1", "dua": "2",
+    "tiga": "3", "empat": "4", "lima": "5", "enam": "6",
+    "tujuh": "7", "delapan": "8", "sembilan": "9", "sepuluh": "10",
+    "sebelas": "11", "dua belas": "12",
+}
+
+_DURATION_UNITS_ID = {
+    "minute": "menit", "minutes": "menit", "min": "menit", "mins": "menit",
+    "hour": "jam", "hours": "jam", "hr": "jam", "hrs": "jam",
+    "day": "hari", "days": "hari", "working day": "hari kerja",
+    "working days": "hari kerja", "business day": "hari kerja",
+    "business days": "hari kerja", "week": "minggu", "weeks": "minggu",
+    "month": "bulan", "months": "bulan", "year": "tahun", "years": "tahun",
+    "menit": "menit", "jam": "jam", "hari": "hari", "hari kerja": "hari kerja",
+    "minggu": "minggu", "bulan": "bulan", "tahun": "tahun",
+}
+
+_DURATION_UNITS_EN = {
+    "minute": "minutes", "minutes": "minutes", "min": "minutes", "mins": "minutes",
+    "hour": "hours", "hours": "hours", "hr": "hours", "hrs": "hours",
+    "day": "days", "days": "days", "working day": "working days",
+    "working days": "working days", "business day": "business days",
+    "business days": "business days", "week": "weeks", "weeks": "weeks",
+    "month": "months", "months": "months", "year": "years", "years": "years",
+    "menit": "minutes", "jam": "hours", "hari": "days", "hari kerja": "working days",
+    "minggu": "weeks", "bulan": "months", "tahun": "years",
+}
+
+
+def _duration_intent_anchors(question: str) -> tuple[str, ...]:
+    """Return action words that identify which duration the user requested."""
+    normalized = normalize_text(question)
+    if any(term in normalized for term in ("diselesaikan", "penyelesaian", "resolved", "resolution")):
+        return ("resolved", "resolution", "diselesaikan", "penyelesaian")
+    if any(term in normalized for term in ("diakui", "acknowledged", "acknowledgement")):
+        return ("acknowledged", "acknowledgement", "diakui")
+    if any(term in normalized for term in ("dilaporkan", "melaporkan", "reported", "report")):
+        return ("reported", "report", "dilaporkan", "melaporkan")
+    if any(term in normalized for term in ("diproses", "proses", "processed", "processing")):
+        return ("processed", "processing", "diproses", "proses")
+    if any(term in normalized for term in ("dicabut", "mencabut", "revoked", "revoke")):
+        return ("revoked", "revoke", "dicabut", "mencabut")
+    return ()
+
+
+def _duration_subject_codes(question: str) -> tuple[str | None, tuple[str, ...]]:
+    """Return the requested incident code and mutually exclusive alternatives.
+
+    Duration policies frequently place P1 and P2 targets in the same chunk. The
+    action verb alone is therefore insufficient because both clauses can contain
+    ``resolved within``. Subject codes are treated as hard local disambiguators,
+    not as score-threshold overrides.
+    """
+    concepts = set(concepts_in_text(question))
+    if "incident_p1" in concepts:
+        return "p1", ("p2", "p3", "p4")
+    if "incident_p2" in concepts:
+        return "p2", ("p1", "p3", "p4")
+    return None, ()
+
+
+def _sentence_window(text: str, start: int, end: int) -> str:
+    """Return the sentence-like segment containing one scalar match."""
+    boundaries = (".", "!", "?", "\n")
+    left_boundaries = [text.rfind(mark, 0, start) for mark in boundaries]
+    left = max(left_boundaries) + 1
+    right_candidates = [
+        position
+        for mark in boundaries
+        if (position := text.find(mark, end)) >= 0
+    ]
+    right = min(right_candidates) + 1 if right_candidates else len(text)
+    return text[left:right]
+
+
+def _select_requested_duration_match(question: str, text: str):
+    """Select the duration matching both the requested action and subject.
+
+    A policy chunk may contain acknowledgement and resolution targets for several
+    priority codes. Each duration is scored only inside its sentence-like segment.
+    A conflicting priority code is a hard local penalty, so a P2 resolution can
+    never win a P1 question merely because it uses the same action verb.
+    """
+    matches = list(_SCALAR_DURATION_PATTERN.finditer(text))
+    if len(matches) <= 1:
+        return matches[0] if matches else None
+
+    action_anchors = _duration_intent_anchors(question)
+    requested_code, conflicting_codes = _duration_subject_codes(question)
+    if not action_anchors and requested_code is None:
+        return None
+
+    scored: list[tuple[int, int, object]] = []
+    for index, match in enumerate(matches):
+        sentence = normalize_text(_sentence_window(text, match.start(), match.end()))
+        # A short preceding window separates two actions in the same sentence,
+        # for example acknowledged within 15 minutes versus resolved within 4 hours.
+        start = max(0, match.start() - 100)
+        action_window = normalize_text(text[start:match.end()])
+
+        score = 0
+        for anchor in action_anchors:
+            anchor_pos = action_window.rfind(normalize_text(anchor))
+            if anchor_pos >= 0:
+                distance = max(len(action_window) - anchor_pos, 1)
+                score = max(score, 160 - min(distance, 145))
+
+        sentence_tokens = set(re.findall(r"[a-z0-9]+", sentence))
+        if requested_code:
+            if requested_code in sentence_tokens:
+                score += 300
+            if any(code in sentence_tokens for code in conflicting_codes):
+                score -= 600
+
+        scored.append((score, -index, match))
+
+    scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    if not scored or scored[0][0] <= 0:
+        return None
+    if len(scored) > 1 and scored[0][0] == scored[1][0]:
+        return None
+    return scored[0][2]
+
+
+def _localized_scalar_answer(question: str, answer: str, language: str) -> str:
+    """Localize one explicit scalar when a verbatim fallback uses the source language.
+
+    This is intentionally narrow. It never translates free-form prose and never
+    creates a value. It only reformats a single duration, storage value, or
+    percentage that is already present in strictly verified evidence.
+    """
+    from api.language import answer_matches_requested_language
+
+    clean = _clean_text(answer)
+    if not clean or answer_matches_requested_language(clean, language):
+        return clean
+
+    answer_requirements = [
+        item for item in extract_evidence_requirements(question)
+        if item.key.startswith("answer_")
+    ]
+    if len(answer_requirements) != 1:
+        return clean
+
+    kind = answer_requirements[0].kind
+    target = "EN" if str(language).upper() == "EN" else "ID"
+
+    if kind == "duration":
+        match = _select_requested_duration_match(question, clean)
+        if match is None:
+            return clean
+        raw_value = re.sub(r"\s+", " ", match.group("value").casefold()).strip()
+        value = _NUMBER_WORD_VALUES.get(raw_value, raw_value.replace("×", "x"))
+        raw_unit = re.sub(r"\s+", " ", match.group("unit").casefold()).strip()
+        unit_map = _DURATION_UNITS_EN if target == "EN" else _DURATION_UNITS_ID
+        unit = unit_map.get(raw_unit)
+        if not unit:
+            return clean
+        # English singular is retained for an exact value of one. Indonesian
+        # units do not change between singular and plural.
+        if target == "EN" and value == "1":
+            unit = {
+                "minutes": "minute", "hours": "hour", "days": "day",
+                "working days": "working day", "business days": "business day",
+                "weeks": "week", "months": "month", "years": "year",
+            }.get(unit, unit)
+        return f"{value} {unit}."
+
+    if kind == "storage":
+        matches = _SCALAR_STORAGE_PATTERN.findall(clean)
+        if len(matches) == 1:
+            return _clean_text(matches[0]).upper() + "."
+
+    if kind == "percentage":
+        matches = list(_SCALAR_PERCENT_PATTERN.finditer(clean))
+        if len(matches) == 1:
+            value = matches[0].group(0)
+            value = re.sub(r"\s*(?:percent|percentage|persen)\b", "%", value, flags=re.I)
+            return _clean_text(value) + "."
+
+    return clean
+
+
 def _clean_extractive_text(value: str) -> str:
     text = _clean_text(value)
     # FAQ excerpts may include both Q: and A:. The final fallback must contain
@@ -1346,7 +1574,7 @@ def build_safe_extractive_answer(
     answer = " ".join(output)
     if len(answer) > MAX_TOTAL_ANSWER_CHARS:
         answer = answer[:MAX_TOTAL_ANSWER_CHARS].rsplit(" ", 1)[0].rstrip(" ,;:") + "."
-    return answer.strip()
+    return _localized_scalar_answer(question, answer.strip(), language)
 
 
 def has_reliable_context(chunks: list[dict[str, Any]], question: str = "") -> bool:

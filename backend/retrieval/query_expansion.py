@@ -43,13 +43,25 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "processing_time": (
         "processing time",
+        "resolution time",
+        "resolved within",
         "turnaround time",
         "processed within",
+        "resolution target",
+        "must be resolved",
         "how long",
+        "how quickly",
         "berapa lama",
+        "seberapa cepat",
+        "berapa cepat",
         "batas waktu",
         "waktu proses",
         "lama proses",
+        "waktu penyelesaian",
+        "target penyelesaian",
+        "batas penyelesaian",
+        "harus diselesaikan",
+        "diselesaikan dalam",
         "maksimal proses",
         "maksimal prosesnya",
         "paling lama",
@@ -248,18 +260,28 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "incident_p1": (
         "p1 incident",
+        "p1 it incident",
+        "p1 it incidents",
         "p1 incidents",
         "priority 1 incident",
         "priority one incident",
+        "it incident p1",
         "insiden p1",
+        "insiden it p1",
+        "insiden ti p1",
         "insiden prioritas 1",
     ),
     "incident_p2": (
         "p2 incident",
+        "p2 it incident",
+        "p2 it incidents",
         "p2 incidents",
         "priority 2 incident",
         "priority two incident",
+        "it incident p2",
         "insiden p2",
+        "insiden it p2",
+        "insiden ti p2",
         "insiden prioritas 2",
     ),
     "mailbox_quota": (
@@ -360,6 +382,24 @@ PHRASE_EXPANSIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "processing time",
         "processed within",
         "hours days",
+    )),
+    (r"\b(?:seberapa\s+cepat|berapa\s+cepat|waktu\s+penyelesaian|target\s+penyelesaian|batas\s+penyelesaian|harus\s+diselesaikan|diselesaikan\s+dalam)\b", (
+        "how quickly",
+        "resolution time",
+        "resolution target",
+        "resolved within",
+        "must be resolved",
+        "hours days",
+    )),
+    (r"\b(?:insiden\s+(?:it|ti)\s+p1|p1\s+(?:it|ti)\s+insiden)\b", (
+        "P1 IT incident",
+        "P1 IT incidents",
+        "priority 1 incident",
+    )),
+    (r"\b(?:insiden\s+(?:it|ti)\s+p2|p2\s+(?:it|ti)\s+insiden)\b", (
+        "P2 IT incident",
+        "P2 IT incidents",
+        "priority 2 incident",
     )),
     (r"\bsisa\s+cuti(?:\s+tahunan)?\b", (
         "unused annual leave",
@@ -513,3 +553,188 @@ def expand_query(query: str) -> str:
     if not unique:
         return original
     return f"{original} {' '.join(unique)}"
+
+# Preferred compact English aliases used to build a language bridge query.
+# These are retrieval hints only. They do not contain answers or source names.
+ENGLISH_BRIDGE_ALIASES: dict[str, tuple[str, ...]] = {
+    "password": ("password",),
+    "password_reset": ("password reset", "reset password"),
+    "helpdesk": ("IT Helpdesk", "IT Service Desk"),
+    "processing_time": ("resolution time", "resolved within", "must be resolved"),
+    "annual_leave": ("annual leave",),
+    "maternity_leave": ("maternity leave",),
+    "paternity_leave": ("paternity leave",),
+    "carryover": ("leave carryover", "unused leave"),
+    "next_year": ("next year",),
+    "expense": ("expense",),
+    "original_receipt": ("original receipt",),
+    "amount_threshold": ("amount threshold",),
+    "system_access": ("system access",),
+    "access_revocation": ("revoke access", "access revocation"),
+    "offboarding": ("employee offboarding",),
+    "revenue": ("revenue",),
+    "full_year": ("full year",),
+    "water": ("water consumption",),
+    "electricity": ("electricity consumption",),
+    "reduction": ("reduction",),
+    "lunch": ("lunch",),
+    "subsidy": ("subsidy", "allowance"),
+    "canteen": ("canteen",),
+    "macos": ("macOS",),
+    "minimum_version": ("minimum supported version",),
+    "supported": ("supported",),
+    "laptop": ("laptop",),
+    "office": ("office",),
+    "cikarang": ("Cikarang",),
+    "probation": ("probation period",),
+    "dependents": ("dependents",),
+    "health_insurance": ("health insurance",),
+    "file_upload": ("file upload", "upload size limit"),
+    "customer_portal": ("customer portal",),
+    "incident_p1": ("P1 IT incident", "P1 incidents"),
+    "incident_p2": ("P2 IT incident", "P2 incidents"),
+    "mailbox_quota": ("mailbox quota",),
+    "access_card": ("access card",),
+    "payslip": ("payslip",),
+    "salary_payment": ("salary payment",),
+    "data_breach": ("data breach",),
+    "information_classification": ("information classification",),
+    "audit_log": ("audit log",),
+    "deployment": ("production deployment",),
+    "rto": ("recovery time objective", "RTO"),
+    "rpo": ("recovery point objective", "RPO"),
+    "api_token": ("API token",),
+}
+
+
+def build_bridge_query(query: str) -> str:
+    """Build a compact English retrieval query from canonical concepts.
+
+    The bridge is deliberately separate from the user's original sentence. A
+    single mixed-language sentence can weaken both embeddings and BM25. Keeping
+    an English-only variant lets an English corpus match directly while final
+    answerability and evidence thresholds remain unchanged.
+    """
+    original = str(query or "").strip()
+    if not original:
+        return ""
+
+    terms: list[str] = []
+    for canonical in concepts_in_text(original):
+        terms.extend(ENGLISH_BRIDGE_ALIASES.get(canonical, ()))
+
+    normalized = normalize_text(original)
+    for pattern, expansions in PHRASE_EXPANSIONS:
+        if re.search(pattern, normalized, flags=re.I):
+            terms.extend(expansions)
+
+    # Preserve identifiers and explicit numbers that often carry the subject.
+    terms.extend(re.findall(r"\b(?:P\d+|RTO|RPO|API|IDR|SLA|\d+(?:[.,]\d+)?)\b", original, flags=re.I))
+
+    unique: list[str] = []
+    seen: set[str] = set()
+    for term in terms:
+        clean = str(term or "").strip()
+        key = normalize_text(clean)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        unique.append(clean)
+
+    return " ".join(unique)
+
+
+def build_natural_bridge_query(query: str) -> str:
+    """Build one concise English query that preserves the user's intent.
+
+    ``build_bridge_query`` intentionally emits compact aliases for lexical
+    retrieval. That representation is useful to BM25, but a long alias list can
+    be weaker than a normal sentence for embeddings and cross-encoders. This
+    function produces a natural, answer-free English question for the common
+    enterprise intents detected by the same canonical concept map.
+
+    The templates contain no policy values and do not bypass evidence checks.
+    They only restate the question so the existing English corpus can be searched
+    with the same thresholds.
+    """
+    original = str(query or "").strip()
+    if not original:
+        return ""
+
+    concepts = set(concepts_in_text(original))
+
+    if "incident_p1" in concepts and "processing_time" in concepts:
+        return "How quickly must a P1 IT incident be resolved?"
+    if "incident_p2" in concepts and "processing_time" in concepts:
+        return "How quickly must a P2 IT incident be resolved?"
+    if "password_reset" in concepts and "processing_time" in concepts:
+        return "How long does an IT password reset take?"
+    if "password_reset" in concepts:
+        return "What is the procedure for resetting an IT password?"
+    if "file_upload" in concepts and "customer_portal" in concepts:
+        return "What is the maximum file upload size in the customer portal?"
+    if "mailbox_quota" in concepts:
+        return "What is the mailbox size limit?"
+    if "data_breach" in concepts and "processing_time" in concepts:
+        return "Who must a suspected data breach be reported to and how quickly?"
+    if "annual_leave" in concepts and "carryover" in concepts:
+        return "How many unused annual leave days may be carried over to the next year?"
+    if "maternity_leave" in concepts and "processing_time" in concepts:
+        return "How long is maternity leave?"
+    if "paternity_leave" in concepts and "processing_time" in concepts:
+        return "How long is paternity leave?"
+    if "minimum_version" in concepts and "macos" in concepts:
+        return "What is the minimum supported macOS version?"
+    if "rto" in concepts:
+        return "What is the recovery time objective (RTO)?"
+    if "rpo" in concepts:
+        return "What is the recovery point objective (RPO)?"
+
+    return ""
+
+
+def build_query_variants(query: str) -> list[str]:
+    """Return independent retrieval queries ordered from literal to bridged.
+
+    Scores are later merged by candidate using the strongest valid signal. This
+    improves cross-language recall without lowering any acceptance threshold.
+    """
+    original = str(query or "").strip()
+    if not original:
+        return []
+
+    candidates = [
+        original,
+        build_natural_bridge_query(original),
+        build_bridge_query(original),
+        expand_query(original),
+    ]
+    variants: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        clean = str(candidate or "").strip()
+        key = normalize_text(clean)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        variants.append(clean)
+    return variants
+
+INDONESIAN_BRIDGE_MARKERS = {
+    "apa", "apakah", "berapa", "bagaimana", "mengapa", "kenapa", "kapan",
+    "dimana", "siapa", "yang", "dan", "atau", "untuk", "dengan", "dalam",
+    "pada", "dari", "tidak", "harus", "dapat", "bisa", "maksimal", "batas",
+    "seberapa", "cepat", "lama", "insiden", "diselesaikan", "penyelesaian",
+    "kata", "sandi", "karyawan", "pelanggan", "unggah", "cuti", "tahun",
+    "hari", "jam", "menit", "bulan", "minggu", "jumlah", "nilai",
+}
+
+
+def requires_language_bridge(query: str) -> bool:
+    """Return True when the user query carries clear Indonesian language cues."""
+    normalized = normalize_text(query)
+    tokens = set(re.findall(r"[a-z0-9à-ÿ]+", normalized))
+    marker_count = len(tokens.intersection(INDONESIAN_BRIDGE_MARKERS))
+    return marker_count >= 2 or normalized.startswith(
+        ("apa ", "apakah ", "berapa ", "bagaimana ", "seberapa ", "tolong ")
+    )

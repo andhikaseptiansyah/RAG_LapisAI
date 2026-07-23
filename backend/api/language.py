@@ -13,6 +13,8 @@ INDONESIAN_MARKERS = {
     "baru", "masa", "percobaan", "karyawan", "bulan", "minggu", "hari",
     "jam", "menit", "tahun", "sebelum", "setelah", "dilakukan", "selama",
     "berlaku", "memiliki", "menjadi", "jawaban", "informasi", "berdasarkan",
+    "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan",
+    "sembilan", "sepuluh", "sebelas", "hari", "minggu", "bulan", "tahun",
 }
 
 ENGLISH_MARKERS = {
@@ -25,7 +27,9 @@ ENGLISH_MARKERS = {
     "weeks", "week", "days", "day", "hours", "hour", "minutes", "minute",
     "years", "year", "before", "after", "conducted", "during", "applies",
     "has", "have", "becomes", "answer", "information", "based", "formal",
-    "performance", "evaluation", "confirmation",
+    "performance", "evaluation", "confirmation", "one", "two", "three",
+    "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+    "twelve", "days", "weeks", "months", "years",
 }
 
 INDONESIAN_PREFIXES = (
@@ -112,6 +116,30 @@ def answer_matches_requested_language(answer: str, requested_language: str) -> b
 
     if english_score == 0 and indonesian_score == 0:
         return True
+
+    alphabetic_tokens = [
+        token for token in re.findall(r"[a-zà-ÿ]+", normalized)
+        if len(token) >= 2
+    ]
+    enough_language_content = len(alphabetic_tokens) >= 2
+
     if target == "ID":
-        return not (english_score >= 2 and english_score >= indonesian_score + 2)
-    return not (indonesian_score >= 2 and indonesian_score >= english_score + 2)
+        clearly_english = (
+            english_score >= indonesian_score + 2
+            or (
+                enough_language_content
+                and indonesian_score == 0
+                and english_score >= 1
+            )
+        )
+        return not clearly_english
+
+    clearly_indonesian = (
+        indonesian_score >= english_score + 2
+        or (
+            enough_language_content
+            and english_score == 0
+            and indonesian_score >= 1
+        )
+    )
+    return not clearly_indonesian
