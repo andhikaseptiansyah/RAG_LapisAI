@@ -64,6 +64,7 @@ def select_context_bundle(
     candidates: list[dict[str, Any]],
     *,
     max_contexts: int = 3,
+    minimum_contexts: int = 1,
     redundancy_threshold: float = 0.82,
     secondary_score_ratio: float = 0.72,
 ) -> list[dict[str, Any]]:
@@ -77,9 +78,11 @@ def select_context_bundle(
         return []
 
     limit = max(1, int(max_contexts))
+    target_minimum = min(limit, max(1, int(minimum_contexts)))
     ranked = sorted(candidates, key=_score, reverse=True)
     requirements = extract_evidence_requirements(question)
     all_requirement_keys = {item.key for item in requirements}
+    question_tokens = _tokens(question)
 
     enriched: list[dict[str, Any]] = []
     for row in ranked:
@@ -119,6 +122,14 @@ def select_context_bundle(
             relative_score = _score(row) / top_score
             if selected and requirement_gain == 0 and relative_score < secondary_score_ratio:
                 continue
+            if selected and requirement_gain == 0 and len(selected) < target_minimum:
+                supports_existing_requirement = bool(
+                    set(row["contextRequirementCoverage"]) & all_requirement_keys
+                )
+                lexical_overlap = len(question_tokens & _tokens(content))
+                required_overlap = min(2, max(1, len(question_tokens)))
+                if not supports_existing_requirement and lexical_overlap < required_overlap:
+                    continue
 
             utility = (
                 2.4 * requirement_gain
@@ -140,11 +151,16 @@ def select_context_bundle(
         selected.append(chosen)
         covered.update(chosen["contextRequirementCoverage"])
 
-        # Once all explicit requirements are covered, one strong context is
-        # enough unless a second non-redundant context has already been selected.
-        if all_requirement_keys and covered >= all_requirement_keys:
+        # Keep up to the requested minimum when another strong, relevant,
+        # non-redundant passage exists. This gives generation enough evidence
+        # for a short explanatory paragraph without forcing unrelated sources.
+        if (
+            all_requirement_keys
+            and covered >= all_requirement_keys
+            and len(selected) >= target_minimum
+        ):
             break
-        if not all_requirement_keys and selected:
+        if not all_requirement_keys and len(selected) >= target_minimum:
             break
 
     # If requirements remain uncovered, add the strongest non-duplicate rows up

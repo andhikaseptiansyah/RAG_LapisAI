@@ -211,10 +211,10 @@ for _name, _value in (
 
 # Generation context selection and post-generation grounding. Retrieval still
 # returns top-k for evaluation, but only a compact evidence bundle reaches the LLM.
-MAX_GENERATION_CONTEXTS = _env_int("MAX_GENERATION_CONTEXTS", 3)
+MAX_GENERATION_CONTEXTS = _env_int("MAX_GENERATION_CONTEXTS", 4)
 CONTEXT_REDUNDANCY_THRESHOLD = _env_float("CONTEXT_REDUNDANCY_THRESHOLD", 0.82)
 CONTEXT_SECONDARY_SCORE_RATIO = _env_float("CONTEXT_SECONDARY_SCORE_RATIO", 0.72)
-MAX_SOURCE_CITATIONS = _env_int("MAX_SOURCE_CITATIONS", 2)
+MAX_SOURCE_CITATIONS = _env_int("MAX_SOURCE_CITATIONS", 3)
 ENABLE_GENERATION_GROUNDING_VALIDATION = _env_bool(
     "ENABLE_GENERATION_GROUNDING_VALIDATION",
     True,

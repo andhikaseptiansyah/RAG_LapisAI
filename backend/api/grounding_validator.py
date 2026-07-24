@@ -12,7 +12,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from retrieval.query_expansion import CONCEPT_ALIASES, concepts_in_text, normalize_text
+from retrieval.query_expansion import CONCEPT_ALIASES, normalize_text
 from retrieval.requirements import (
     EMAIL_PATTERN,
     URL_PATTERN,
@@ -60,6 +60,7 @@ GroundingValidation = GroundingDecision
 STOPWORDS = {
     "yang", "dan", "atau", "adalah", "dengan", "untuk", "dalam", "pada", "dari",
     "ke", "sebagai", "oleh", "ini", "itu", "tersebut", "harus", "dapat", "akan",
+    "juga", "kepada",
     "the", "and", "or", "is", "are", "was", "were", "with", "for", "to", "in",
     "on", "of", "by", "this", "that", "must", "can", "will", "a", "an",
     "according", "based", "berdasarkan", "document", "dokumen", "source", "sumber",
@@ -99,6 +100,90 @@ CLAUSE_SPLIT = re.compile(
     r"dan|tetapi|namun|karena|sehingga|sedangkan)\b)\s*",
     flags=re.I,
 )
+CONDITIONAL_COMMA_PREFIX = re.compile(
+    r"^\s*(?:if|when|once|before|after|unless|provided\s+that|"
+    r"jika|ketika|apabila|bila|sebelum|setelah)\b",
+    flags=re.I,
+)
+
+# Grounding needs a slightly richer bilingual vocabulary than retrieval.
+# These aliases do not add facts or retrieval hits. They only prove that an
+# Indonesian claim is a faithful rendering of the same English evidence unit.
+GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
+    **CONCEPT_ALIASES,
+    "probation": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("probation", ()),
+        "serve a probation period",
+        "serves a probation period",
+        "probation lasts",
+        "probation period lasts",
+        "masa percobaan berlangsung",
+        "masa percobaan selama",
+        "menjalani masa percobaan",
+        "berlangsung selama masa percobaan",
+    ))),
+    "new_employee": (
+        "new employee",
+        "new employees",
+        "new hire",
+        "new hires",
+        "karyawan baru",
+        "pegawai baru",
+    ),
+    "performance_evaluation": (
+        "performance evaluation",
+        "formal performance evaluation",
+        "performance review",
+        "evaluation is conducted",
+        "evaluasi kinerja",
+        "evaluasi kinerja formal",
+        "evaluasi formal",
+        "evaluasi dilakukan",
+        "dilakukan evaluasi",
+    ),
+    "employment_confirmation": (
+        "before confirmation",
+        "employee confirmation",
+        "confirmation decision",
+        "sebelum konfirmasi",
+        "konfirmasi karyawan",
+        "keputusan konfirmasi",
+    ),
+    "incident_acknowledgement": (
+        "incident acknowledgement",
+        "incident acknowledgment",
+        "must be acknowledged",
+        "acknowledged within",
+        "acknowledgement time",
+        "acknowledgment time",
+        "insiden harus diakui",
+        "harus diakui",
+        "diakui dalam",
+        "waktu pengakuan insiden",
+        "respons awal",
+        "respons awal diberikan",
+    ),
+    "incident_escalation": (
+        "incident escalation",
+        "is escalated",
+        "it is escalated",
+        "escalated to",
+        "if not resolved",
+        "not resolved within",
+        "eskalasi insiden",
+        "insiden dieskalasikan",
+        "akan dieskalasikan",
+        "dieskalasikan kepada",
+        "jika belum selesai",
+        "jika belum diselesaikan",
+        "belum terselesaikan",
+    ),
+    "infrastructure_head": (
+        "head of infrastructure",
+        "infrastructure head",
+        "kepala infrastruktur",
+    ),
+}
 
 # These qualifiers materially change the meaning of a claim. A generated claim
 # may use an Indonesian or English alias, but the same qualifier family must be
@@ -115,7 +200,9 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
         flags=re.I,
     ),
     "maximum": re.compile(
-        r"\b(?:up\s+to|maximum|maximal|maksimal|no\s+more\s+than|paling\s+banyak)\b",
+        r"\b(?:up\s+to|within|maximum|maximal|maksimal|no\s+more\s+than|"
+        r"no\s+later\s+than|paling\s+banyak|paling\s+lambat|selambat-lambatnya|"
+        r"dalam\s+waktu)\b",
         flags=re.I,
     ),
     "exception": re.compile(r"\b(?:except|unless|excluding|kecuali)\b", flags=re.I),
@@ -125,6 +212,12 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "approximate": re.compile(
         r"\b(?:about|approximately|roughly|around|sekitar|kurang\s+lebih)\b",
+        flags=re.I,
+    ),
+    "unmet_condition": re.compile(
+        r"\b(?:if\b.{0,45}\bnot\s+resolved|not\s+resolved\s+within|"
+        r"jika\b.{0,45}\bbelum\s+(?:selesai|diselesaikan|terselesaikan)|"
+        r"belum\s+(?:selesai|diselesaikan|terselesaikan))\b",
         flags=re.I,
     ),
 }
@@ -169,6 +262,27 @@ def _tokenize(value: str) -> set[str]:
         token
         for token in re.findall(r"[a-z0-9à-ÿ]+", normalize_text(value))
         if len(token) >= 3 and token not in STOPWORDS
+    }
+
+
+def _grounding_concepts(value: str) -> set[str]:
+    normalized = re.sub(r"[^a-z0-9à-ÿ]+", " ", normalize_text(value))
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    padded = f" {normalized} "
+    return {
+        canonical
+        for canonical, aliases in GROUNDING_CONCEPT_ALIASES.items()
+        if any(
+            (
+                candidate := re.sub(
+                    r"\s+",
+                    " ",
+                    re.sub(r"[^a-z0-9à-ÿ]+", " ", normalize_text(alias)),
+                ).strip()
+            )
+            and f" {candidate} " in padded
+            for alias in aliases
+        )
     }
 
 
@@ -363,7 +477,13 @@ def _atomic_claims(value: Any) -> list[str]:
         # yang berada di antara angka, misalnya 1,000.
         parts: list[str] = []
         for clause_part in clause_parts:
-            parts.extend(re.split(r"(?<!\d),(?!\d)|;", clause_part))
+            if CONDITIONAL_COMMA_PREFIX.search(clause_part):
+                # Keep conditional and temporal prefixes attached to the main
+                # clause. Splitting "Jika belum selesai, insiden dieskalasikan"
+                # creates two fragments that cannot be grounded independently.
+                parts.extend(re.split(r";", clause_part))
+            else:
+                parts.extend(re.split(r"(?<!\d),(?!\d)|;", clause_part))
 
         cleaned_parts: list[str] = []
 
@@ -453,7 +573,7 @@ def _canonical_claim_token_coverage(
     covered = set(claim_tokens.intersection(_tokenize(unit)))
 
     for concept in claim_concepts:
-        for alias in CONCEPT_ALIASES.get(concept, ()):
+        for alias in GROUNDING_CONCEPT_ALIASES.get(concept, ()):
             covered.update(claim_tokens.intersection(_tokenize(alias)))
 
     for _, raw, canonical in _fact_entries(claim):
@@ -463,10 +583,16 @@ def _canonical_claim_token_coverage(
     return len(covered) / len(claim_tokens)
 
 
-def _claim_support(claim: str, evidence_units: list[str]) -> float:
+def _claim_support(
+    claim: str,
+    evidence_units: list[str],
+    *,
+    question: str = "",
+) -> float:
     """Return support from one evidence unit, not a token soup across documents."""
     claim_tokens = _tokenize(claim)
-    claim_concepts = set(concepts_in_text(claim))
+    claim_concepts = _grounding_concepts(claim)
+    question_concepts = _grounding_concepts(question)
     claim_qualifiers = _qualifier_families(claim)
     if not claim_tokens and not claim_concepts:
         return 1.0
@@ -485,7 +611,7 @@ def _claim_support(claim: str, evidence_units: list[str]) -> float:
             if claim_tokens
             else 0.0
         )
-        unit_concepts = set(concepts_in_text(unit))
+        unit_concepts = _grounding_concepts(unit) | question_concepts
         concept = (
             len(claim_concepts.intersection(unit_concepts)) / len(claim_concepts)
             if claim_concepts
@@ -539,7 +665,10 @@ def prune_unsupported_claims(
         reference_units = _claim_reference_units(claim, evidence_units)
         if not reference_units:
             continue
-        if _claim_support(claim, reference_units) + 1e-9 < minimum_claim_support:
+        if (
+            _claim_support(claim, reference_units, question=question) + 1e-9
+            < minimum_claim_support
+        ):
             continue
         if claim not in kept:
             kept.append(claim)
@@ -612,7 +741,11 @@ def validate_grounded_answer(
         # A factual claim must be supported by the same evidence unit that
         # contains its explicit values. This prevents relation swapping across
         # chunks, such as attaching a P2 deadline to a P1 incident.
-        score = _claim_support(claim, fact_bound_units) if fact_bound_units else 0.0
+        score = (
+            _claim_support(claim, fact_bound_units, question=question)
+            if fact_bound_units
+            else 0.0
+        )
         claim_scores.append(score)
         if score + 1e-9 < minimum_claim_support:
             unsupported_claims.append(claim[:220])

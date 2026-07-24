@@ -238,7 +238,7 @@ const CitationPanel: React.FC<{
         (second.relevanceScore ?? 0) -
         (first.relevanceScore ?? 0)
     )
-    .slice(0, 2);
+    .slice(0, 3);
 
   if (visibleSources.length === 0) {
     return null;
@@ -1425,22 +1425,15 @@ export const App: React.FC = () => {
 
                           {message.shouldAnimate !== true &&
                             (message.sources?.length ?? 0) > 0 &&
-                            (message.confidence ?? 0) > 0 && (
+                            (message.confidence ?? 0) > 0 &&
+                            message.followUpQuestion && (
                               <p className="mt-3 text-[13px] leading-relaxed text-white/70 md:text-sm">
-                                {message.followUpQuestion ? (
-                                  <>
-                                    <span className="font-medium text-white/85">
-                                      {detectedLanguage === 'EN'
-                                        ? 'Related question: '
-                                        : 'Pertanyaan terkait: '}
-                                    </span>
-                                    {message.followUpQuestion}
-                                  </>
-                                ) : detectedLanguage === 'EN' ? (
-                                  'I hope this information helps. Please ask another question related to the available company documents.'
-                                ) : (
-                                  'Semoga informasi ini membantu. Silakan ajukan pertanyaan lain yang berkaitan dengan dokumen perusahaan.'
-                                )}
+                                <span className="font-medium text-white/85">
+                                  {detectedLanguage === 'EN'
+                                    ? 'Related question: '
+                                    : 'Pertanyaan terkait: '}
+                                </span>
+                                {message.followUpQuestion}
                               </p>
                             )}
 

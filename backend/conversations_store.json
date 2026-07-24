@@ -1,5 +1,500 @@
 [
   {
+    "id": "2418a977-22da-4d06-ad50-4b1d1a8638bb",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "708b52ce-e040-4155-a730-e6828ccc855f",
+        "conversation_id": "2418a977-22da-4d06-ad50-4b1d1a8638bb",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:55:07.007891+00:00"
+      },
+      {
+        "id": "95abfca0-fd70-4b5e-ad9c-e6f2f280fd92",
+        "conversation_id": "2418a977-22da-4d06-ad50-4b1d1a8638bb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:55:07.007891+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:55:07.007891+00:00",
+    "updated_at": "2026-07-23T19:55:07.007891+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-23T19:55:07.007891+00:00"
+  },
+  {
+    "id": "57355233-f111-43a2-906c-5f84fa0d449d",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "a721ae0c-b40e-4f1a-9955-775c0b2d4895",
+        "conversation_id": "57355233-f111-43a2-906c-5f84fa0d449d",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:53:45.172351+00:00"
+      },
+      {
+        "id": "93dbcae9-bf71-4039-b66d-560e6e334b55",
+        "conversation_id": "57355233-f111-43a2-906c-5f84fa0d449d",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:53:45.172351+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:53:45.172351+00:00",
+    "updated_at": "2026-07-23T19:53:45.172351+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-23T19:53:45.172351+00:00"
+  },
+  {
+    "id": "34492dfa-1d11-4da7-b02f-9e1f352950bc",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "85d19cb6-c0e4-4092-8837-6e82df0d6cdd",
+        "conversation_id": "34492dfa-1d11-4da7-b02f-9e1f352950bc",
+        "role": "user",
+        "content": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10.000.000?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:49:23.646410+00:00"
+      },
+      {
+        "id": "48594c15-949f-4867-aaba-b7ff17d78504",
+        "conversation_id": "34492dfa-1d11-4da7-b02f-9e1f352950bc",
+        "role": "assistant",
+        "content": "The manager approves purchases with values below IDR 10,000,000. According to the procurement thresholds. purchases up to this amount require manager approval. as stated in the Nusantara Dynamics SOP. which categorizes tiers of approval based on purchase value. with the manager being responsible for approvals below IDR 10,000,000. The approval process for higher-value purchases involves the department head for purchases between IDR 10-50 million. the Director for purchases above IDR 50,000,000, with additional requirements such as three vendor quotations.",
+        "attachments": [],
+        "confidence": 0.6217,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7451,
+              "relevance_score": 0.7451,
+              "excerpt": "Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:49:23.646410+00:00"
+      },
+      {
+        "id": "3535d872-219e-45b8-9b30-789397abf4ce",
+        "conversation_id": "34492dfa-1d11-4da7-b02f-9e1f352950bc",
+        "role": "user",
+        "content": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:51:42.197475+00:00"
+      },
+      {
+        "id": "dabc3351-6b45-4d66-8b0d-0e7218c63c46",
+        "conversation_id": "34492dfa-1d11-4da7-b02f-9e1f352950bc",
+        "role": "assistant",
+        "content": "The company hired 37 employees in the first semester of 2025. the total headcount reached 312. The hiring process took an average of 28 days to complete. This hiring activity is reported in the Nusantara Dynamics Hiring Report for the first half of 2025. The company's hiring. such as the Net Promoter Score. which reached 46 in 2025.",
+        "attachments": [],
+        "confidence": 0.6135,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Report_Hiring_H1_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "The company hired 37 employees in H1 2025; total headcount reached 312.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:51:42.197475+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:49:23.646410+00:00",
+    "updated_at": "2026-07-23T19:51:42.197475+00:00",
+    "last_message": "The company hired 37 employees in the first semester of 2025. the total headcount reached 312. The hiring process took an average of 28 days to complete. This hiring activity is reported in the Nusantara Dynamics Hiring Report for the first half of 2025. The company's hiring. such as the Net Promoter Score. which reached 46 in 2025.",
+    "last_user_message": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+    "last_message_at": "2026-07-23T19:51:42.197475+00:00"
+  },
+  {
+    "id": "dca4ae4a-6b86-4c72-852d-0e649ef9fabd",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "357caac3-168e-487f-be48-2d678a140f13",
+        "conversation_id": "dca4ae4a-6b86-4c72-852d-0e649ef9fabd",
+        "role": "user",
+        "content": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10.000.000?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:47:44.794622+00:00"
+      },
+      {
+        "id": "8ba96f3b-dbbd-4d54-a4c1-36a859a67e24",
+        "conversation_id": "dca4ae4a-6b86-4c72-852d-0e649ef9fabd",
+        "role": "assistant",
+        "content": "Manager. According to SOP_Procurement.pdf, purchases up to IDR 10,000,000 require manager approval. Policy_Procurement_Threshold.docx also states that amounts below IDR 10,000,000 are approved by the manager. Both documents confirm that the manager is the approver for purchases under IDR 10,000,000.",
+        "attachments": [],
+        "confidence": 0.6217,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7451,
+              "relevance_score": 0.7451,
+              "excerpt": "Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:47:44.794622+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:47:44.794622+00:00",
+    "updated_at": "2026-07-23T19:47:44.794622+00:00",
+    "last_message": "Manager. According to SOP_Procurement.pdf, purchases up to IDR 10,000,000 require manager approval. Policy_Procurement_Threshold.docx also states that amounts below IDR 10,000,000 are approved by the manager. Both documents confirm that the manager is the approver for purchases under IDR 10,000,000.",
+    "last_user_message": "Siapa yang menyetujui pembelian dengan nilai di bawah IDR 10.000.000?",
+    "last_message_at": "2026-07-23T19:47:44.794622+00:00"
+  },
+  {
+    "id": "478718ff-cc98-48a3-a487-ec975b375e1b",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Ada berapa level klasifikasi informasi di perusahaan dan apa...",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "99867bfc-ef3a-4d62-8ec5-c451b3cd47a7",
+        "conversation_id": "478718ff-cc98-48a3-a487-ec975b375e1b",
+        "role": "user",
+        "content": "Ada berapa level klasifikasi informasi di perusahaan dan apa saja?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:46:44.889309+00:00"
+      },
+      {
+        "id": "8d29f457-01ae-4007-b025-15ada32dc9ec",
+        "conversation_id": "478718ff-cc98-48a3-a487-ec975b375e1b",
+        "role": "assistant",
+        "content": "There are three levels of information classification in the company: Public.",
+        "attachments": [],
+        "confidence": 0.7415,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "Policy_Information_Classification.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9574,
+              "relevance_score": 0.9574,
+              "excerpt": "Information Classification Policy",
+              "chapter": "Information Classification Policy",
+              "section": "Information Classification Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2
+            }
+          ],
+          "source": "Policy_Information_Classification.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:46:44.889309+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:46:44.889309+00:00",
+    "updated_at": "2026-07-23T19:46:44.889309+00:00",
+    "last_message": "There are three levels of information classification in the company: Public.",
+    "last_user_message": "Ada berapa level klasifikasi informasi di perusahaan dan apa saja?",
+    "last_message_at": "2026-07-23T19:46:44.889309+00:00"
+  },
+  {
+    "id": "252fb1a1-d5d3-4072-8b54-ebf958a870b3",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Persetujuan apa yang diperlukan untuk pembelian di atas Rp 5...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "14d65dca-7a6a-48f2-8a12-ecf2bd2a56e4",
+        "conversation_id": "252fb1a1-d5d3-4072-8b54-ebf958a870b3",
+        "role": "user",
+        "content": "Persetujuan apa yang diperlukan untuk pembelian di atas Rp 50 juta?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:41:56.615474+00:00"
+      },
+      {
+        "id": "9c4338b2-b955-4a29-a782-389c91fedb1d",
+        "conversation_id": "252fb1a1-d5d3-4072-8b54-ebf958a870b3",
+        "role": "assistant",
+        "content": "Dokumen SOP_Procurement.pdf menyebutkan bahwa pembelian di atas IDR 50.000.000 memerlukan persetujuan Direktur. tiga penawaran dari vendor. Dalam dokumen Policy_Procurement_Threshold.docx.",
+        "attachments": [],
+        "confidence": 0.697,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.697,
+              "relevance_score": 0.697,
+              "excerpt": "Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:41:56.615474+00:00"
+      },
+      {
+        "id": "303a13bd-5014-4017-9fa5-84faf4954ccd",
+        "conversation_id": "252fb1a1-d5d3-4072-8b54-ebf958a870b3",
+        "role": "user",
+        "content": "Ada berapa level klasifikasi informasi di perusahaan dan apa saja?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:43:39.434976+00:00"
+      },
+      {
+        "id": "62fa16e0-d252-44bc-b759-ecf7a3e1cda1",
+        "conversation_id": "252fb1a1-d5d3-4072-8b54-ebf958a870b3",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:43:39.434976+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:41:56.615474+00:00",
+    "updated_at": "2026-07-23T19:43:39.434976+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Ada berapa level klasifikasi informasi di perusahaan dan apa saja?",
+    "last_message_at": "2026-07-23T19:43:39.434976+00:00"
+  },
+  {
+    "id": "7a1dd6fb-d2ae-424f-a3b0-5528e7eea6ff",
+    "user_id": "dev-admin",
+    "user_name": "Admin",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b418afac-3bc5-4de8-bbca-22d43f677918",
+        "conversation_id": "7a1dd6fb-d2ae-424f-a3b0-5528e7eea6ff",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin"
+        },
+        "created_at": "2026-07-23T19:40:42.241972+00:00"
+      },
+      {
+        "id": "d9fd2e51-d7c7-4053-89f1-2f65f4a3e751",
+        "conversation_id": "7a1dd6fb-d2ae-424f-a3b0-5528e7eea6ff",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Admin",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-23T19:40:42.241972+00:00"
+      }
+    ],
+    "created_at": "2026-07-23T19:40:42.241972+00:00",
+    "updated_at": "2026-07-23T19:40:42.241972+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-23T19:40:42.241972+00:00"
+  },
+  {
     "id": "8ac9809b-3008-4472-a9a7-197bea543354",
     "user_id": "dev-admin",
     "user_name": "Admin",

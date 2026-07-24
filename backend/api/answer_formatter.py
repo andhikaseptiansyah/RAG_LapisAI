@@ -20,9 +20,9 @@ from retrieval.query_expansion import concepts_in_text, normalize_text
 # sebelum threshold digunakan, terlepas dari urutan import modul FastAPI.
 EXACT_DEFINITION_CONFIDENCE = 0.90
 EXACT_TOKEN_CONFIDENCE = 0.84
-MAX_BULLETS = 2
-MAX_SENTENCE_CHARS = 220
-MAX_TOTAL_ANSWER_CHARS = 850
+MAX_BULLETS = 4
+MAX_SENTENCE_CHARS = 360
+MAX_TOTAL_ANSWER_CHARS = 1600
 
 STOPWORDS = {
     "apa", "apakah", "bagaimana", "gimana", "jelaskan", "sebutkan", "siapa", "kapan",
@@ -658,6 +658,38 @@ def build_evidence_excerpt(
 
     shortened = excerpt[:max_chars].rsplit(" ", 1)[0].strip()
     return shortened + "…"
+
+
+def build_generation_evidence(
+    question: str,
+    content: Any,
+    max_chars: int = 1400,
+) -> str:
+    """Return the grounded passage shown to the answer-generating model.
+
+    Citations should stay compact, but generation needs enough surrounding
+    evidence to explain a supported fact instead of repeating only its scalar
+    value. For normal chunks this keeps the complete retrieved passage. FAQ
+    chunks remain locked to the best matching Q/A pair so neighbouring entries
+    cannot leak into an answer.
+    """
+    clean = _clean_text(content)
+    if not clean:
+        return ""
+
+    limit = max(120, int(max_chars))
+    compact = build_evidence_excerpt(question, content, max_chars=limit)
+
+    if _extract_faq_pairs(content):
+        return compact
+
+    if len(clean) <= limit:
+        return clean
+
+    # Long chunks are narrowed to the strongest excerpt. This preserves the
+    # retrieval boundary and prevents unrelated sections from entering the
+    # model prompt merely to make an answer longer.
+    return compact
 
 
 def _detect_definition_target(question: str) -> str | None:
@@ -2061,4 +2093,3 @@ def top_confidence(chunks: list[dict[str, Any]], question: str = "") -> float:
         max(verified_source_quality, 0.01),
     )
     return round(confidence, 4)
-

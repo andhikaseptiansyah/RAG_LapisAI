@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-BUILD_VERSION = "rag-multilingual-v8-20260723"
+BUILD_VERSION = "rag-bilingual-grounding-v10-20260724"
 BUILD_FEATURES = (
     "english-corpus-first-retrieval-for-indonesian-queries",
     "direct-english-production-path-reused-for-language-bridge",

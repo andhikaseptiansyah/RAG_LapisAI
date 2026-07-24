@@ -71,23 +71,46 @@ def test_verified_scalar_selects_p1_resolution_from_merged_p1_p2_pdf_row() -> No
     ) == "4 jam."
 
 
-def test_chat_returns_verified_scalar_without_calling_ollama(monkeypatch) -> None:
+def test_chat_lets_model_expand_a_verified_scalar_with_supported_context(monkeypatch) -> None:
     chunk = _strict_chunk()
+    call_count = {"value": 0}
+
+    def fake_generation(*args, **kwargs):
+        call_count["value"] += 1
+        return (
+            "Insiden IT P1 harus diselesaikan dalam 4 jam. "
+            "Dokumen yang sama menetapkan bahwa insiden tersebut harus "
+            "diakui dalam waktu 15 menit."
+        )
+
     monkeypatch.setattr(chat_service, "hybrid_search", lambda *args, **kwargs: [chunk])
     monkeypatch.setattr(chat_service, "select_context_bundle", lambda *args, **kwargs: [chunk])
     monkeypatch.setattr(
         chat_service,
         "build_grounded_answer",
-        lambda *args, **kwargs: (_ for _ in ()).throw(
-            AssertionError("Ollama must not be called for one verified duration")
-        ),
+        fake_generation,
     )
     monkeypatch.setattr(chat_service, "build_dataset_follow_up_question", lambda **kwargs: None)
 
     response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
 
-    assert response["answer"] == "4 jam."
-    assert response["generation_mode"] == "verified_scalar"
+    assert call_count["value"] == 1
+    assert "4 jam" in response["answer"]
+    assert "15 menit" in response["answer"]
+    assert response["generation_mode"] == "native_model"
     assert response["language"] == "ID"
     assert response["failure_stage"] is None
     assert response["sources"][0]["document_name"] == "SOP_IT_Incident_Handling.pdf"
+
+
+def test_chat_keeps_verified_scalar_as_safe_fallback_when_generation_fails(monkeypatch) -> None:
+    chunk = _strict_chunk()
+    monkeypatch.setattr(chat_service, "hybrid_search", lambda *args, **kwargs: [chunk])
+    monkeypatch.setattr(chat_service, "select_context_bundle", lambda *args, **kwargs: [chunk])
+    monkeypatch.setattr(chat_service, "build_grounded_answer", lambda *args, **kwargs: "")
+    monkeypatch.setattr(chat_service, "build_dataset_follow_up_question", lambda **kwargs: None)
+
+    response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
+
+    assert response["answer"] == "4 jam."
+    assert response["generation_mode"] == "verified_scalar_fallback"

@@ -6,6 +6,7 @@ from typing import Any
 from api.answer_formatter import (
     answer_text_only,
     build_evidence_excerpt,
+    build_generation_evidence,
     build_refusal_answer,
     build_safe_extractive_answer,
     build_small_talk_answer,
@@ -79,7 +80,11 @@ def _build_generation_contexts(
         page = chunk.get("page", metadata.get("page"))
         raw_content = str(chunk.get("content") or metadata.get("content") or "").strip()
 
-        excerpt = build_evidence_excerpt(question, raw_content) or raw_content
+        excerpt = build_generation_evidence(
+            question,
+            raw_content,
+            max_chars=1400,
+        ) or raw_content
         if len(excerpt) > 1400:
             excerpt = excerpt[:1400].rsplit(" ", 1)[0].strip() + "…"
         if not excerpt:
@@ -349,6 +354,7 @@ def run_chat(
         question,
         retrieved_chunks,
         max_contexts=MAX_GENERATION_CONTEXTS,
+        minimum_contexts=min(2, MAX_GENERATION_CONTEXTS),
         redundancy_threshold=CONTEXT_REDUNDANCY_THRESHOLD,
         secondary_score_ratio=CONTEXT_SECONDARY_SCORE_RATIO,
     )
@@ -393,88 +399,98 @@ def run_chat(
 
     used_extractive_fallback = False
     used_language_retry = False
+    used_verified_scalar_fallback = False
 
-    if verified_scalar_answer:
-        answer = verified_scalar_answer
-        generation_mode = "verified_scalar"
-        print(
-            "[CHAT] using deterministic verified scalar answer; "
-            f"language={normalized_language} answer={answer}"
+    native_answer = answer_text_only(
+        build_grounded_answer(
+            question,
+            chunks,
+            language=normalized_language,
+            model=selected_provider,
+            evaluation_mode=evaluation_mode,
         )
-    else:
-        native_answer = answer_text_only(
-            build_grounded_answer(
-                question,
-                chunks,
-                language=normalized_language,
-                model=selected_provider,
-                evaluation_mode=evaluation_mode,
-            )
-        )
+    )
 
-        answer = native_answer
-        native_language_ok = bool(
-            answer and answer_matches_requested_language(answer, normalized_language)
-        )
-        if evaluation_mode:
-            if not answer:
-                raise RuntimeError("Native model generation returned an empty answer")
-            if not native_language_ok:
-                raise RuntimeError("Native model generation used the wrong output language")
-        elif not answer or is_refusal_answer(answer) or not native_language_ok:
-            retry_chunks = _build_language_retry_chunks(question, chunks)
-            if retry_chunks:
-                retry_answer = answer_text_only(
-                    build_grounded_answer(
-                        question,
-                        retry_chunks,
-                        language=normalized_language,
-                        model=selected_provider,
-                        evaluation_mode=False,
-                    )
+    answer = native_answer
+    native_language_ok = bool(
+        answer and answer_matches_requested_language(answer, normalized_language)
+    )
+    if evaluation_mode:
+        if not answer:
+            raise RuntimeError("Native model generation returned an empty answer")
+        if not native_language_ok:
+            raise RuntimeError("Native model generation used the wrong output language")
+    elif not answer or is_refusal_answer(answer) or not native_language_ok:
+        retry_chunks = _build_language_retry_chunks(question, chunks)
+        if retry_chunks:
+            retry_answer = answer_text_only(
+                build_grounded_answer(
+                    question,
+                    retry_chunks,
+                    language=normalized_language,
+                    model=selected_provider,
+                    evaluation_mode=False,
                 )
-                if (
-                    retry_answer
-                    and not is_refusal_answer(retry_answer)
-                    and answer_matches_requested_language(
-                        retry_answer,
-                        normalized_language,
-                    )
-                ):
-                    answer = retry_answer
-                    used_language_retry = True
+            )
+            if (
+                retry_answer
+                and not is_refusal_answer(retry_answer)
+                and answer_matches_requested_language(
+                    retry_answer,
+                    normalized_language,
+                )
+            ):
+                answer = retry_answer
+                used_language_retry = True
 
-            if not used_language_retry:
-                answer = answer_text_only(
+        if not used_language_retry:
+            if verified_scalar_answer:
+                answer = verified_scalar_answer
+                used_verified_scalar_fallback = True
+                print(
+                    "[CHAT] native expansion unavailable; using the verified "
+                    f"scalar fallback: {answer}"
+                )
+            else:
+                extractive_answer = answer_text_only(
                     build_safe_extractive_answer(
                         question,
                         chunks,
                         language=normalized_language,
                     )
                 )
+                answer = extractive_answer
                 used_extractive_fallback = bool(
-                    answer and not is_refusal_answer(answer)
+                    extractive_answer
+                    and not is_refusal_answer(extractive_answer)
+                    and answer_matches_requested_language(
+                        extractive_answer,
+                        normalized_language,
+                    )
                 )
 
-        if answer and not answer_matches_requested_language(answer, normalized_language):
-            print(
-                "[CHAT] fallback answer rejected because it does not match "
-                f"requested language={normalized_language}"
-            )
-            answer = ""
-            used_extractive_fallback = False
+    if answer and not answer_matches_requested_language(answer, normalized_language):
+        print(
+            "[CHAT] fallback answer rejected because it does not match "
+            f"requested language={normalized_language}"
+        )
+        answer = ""
+        used_extractive_fallback = False
+        used_verified_scalar_fallback = False
 
-        if used_language_retry:
-            generation_mode = "language_repair_retry"
-        elif used_extractive_fallback:
-            generation_mode = "extractive_fallback"
-        else:
-            generation_mode = "native_model"
+    if used_language_retry:
+        generation_mode = "language_repair_retry"
+    elif used_extractive_fallback:
+        generation_mode = "extractive_fallback"
+    elif used_verified_scalar_fallback:
+        generation_mode = "verified_scalar_fallback"
+    else:
+        generation_mode = "native_model"
 
     sources = build_sources(
         chunks,
         question=question,
-        limit=min(MAX_SOURCE_CITATIONS, 2),
+        limit=MAX_SOURCE_CITATIONS,
     )
 
     if not answer or is_refusal_answer(answer) or not sources:

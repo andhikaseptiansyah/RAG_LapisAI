@@ -7,7 +7,7 @@ from typing import Any
 
 from api.answer_formatter import (
     answer_text_only,
-    build_evidence_excerpt,
+    build_generation_evidence,
     build_refusal_answer,
     build_safe_extractive_answer,
     has_answerable_evidence,
@@ -34,7 +34,7 @@ OLLAMA_MAX_RETRIES = max(0, int(os.getenv("OLLAMA_MAX_RETRIES", "1")))
 
 MAX_CONTEXT_CHARS_PER_CHUNK = 1400
 MAX_CONTEXT_CHUNKS = MAX_GENERATION_CONTEXTS
-MAX_ANSWER_CHARS = 900
+MAX_ANSWER_CHARS = 1600
 
 
 def _clean_text(value: Any) -> str:
@@ -47,7 +47,13 @@ def _build_context(question: str, chunks: list[dict[str, Any]]) -> str:
         raw_content = _clean_text(chunk.get("content"))
         if not raw_content:
             continue
-        content = _clean_text(build_evidence_excerpt(question, raw_content)) or raw_content
+        content = _clean_text(
+            build_generation_evidence(
+                question,
+                raw_content,
+                max_chars=MAX_CONTEXT_CHARS_PER_CHUNK,
+            )
+        ) or raw_content
         if len(content) > MAX_CONTEXT_CHARS_PER_CHUNK:
             content = content[:MAX_CONTEXT_CHARS_PER_CHUNK].rsplit(" ", 1)[0] + "…"
 
@@ -91,9 +97,10 @@ def _build_grounding_chunks(
             continue
 
         excerpt = _clean_text(
-            build_evidence_excerpt(
+            build_generation_evidence(
                 question,
                 raw_content,
+                max_chars=MAX_CONTEXT_CHARS_PER_CHUNK,
             )
         ) or raw_content
 
@@ -330,9 +337,10 @@ def _repair_prompt(
         "MANDATORY CORRECTION:\n"
         f"{diagnostic_text}\n"
         "Rewrite the answer from the beginning. Use only facts explicitly stated in the evidence. "
-        "Answer every requested part, but do not add explanations, assumptions, identifiers, numbers, "
-        "conditions, exceptions, causal reasons, benefits, or implications that are absent from the evidence. "
-        "Do not defend or explain the answer. Keep it concise.\n\n"
+        "Answer every requested part and retain relevant supporting details that are explicitly stated, but "
+        "do not add assumptions, identifiers, numbers, conditions, exceptions, causal reasons, benefits, or "
+        "implications that are absent from the evidence. Use a connected 2-to-4-sentence paragraph when the "
+        "evidence supports it; otherwise stop after the supported fact. Do not add filler or a generic closing.\n\n"
         f"PREVIOUS ANSWER TO REPLACE:\n{previous_answer or '(empty)'}"
     )
 
@@ -381,13 +389,13 @@ def build_ollama_grounded_answer(
         language_rule
         + "You are a strict enterprise Retrieval-Augmented Generation assistant. "
         "Use only the supplied evidence. Do not use outside knowledge. "
-        "Return the direct answer only. Use the evidence facts, but translate ordinary wording into the "
-        "mandatory output language. "
-        "For a single-fact question, write one concise sentence. For a multi-part or list question, "
-        "write only the minimum sentences or bullets needed to cover every requested part. "
-        "Do not add an introduction, rationale, recommendation, citation, confidence, heading, label, "
-        "assumption, example, condition, exception, background detail, causal explanation, benefit, or "
-        "implication unless the question explicitly asks for it and the evidence explicitly states it. "
+        "Start with the direct answer. Use the evidence facts, but translate ordinary wording into the "
+        "mandatory output language. When useful supporting details exist, continue with a coherent paragraph "
+        "of 2 to 4 informative sentences. Explain only definitions, relationships, scope, conditions, or "
+        "consequences explicitly stated in the evidence. Prefer complementary facts from two or more evidence "
+        "blocks when relevant. If only one fact is supported, stop instead of padding the answer. "
+        "Do not add an introduction, recommendation, citation, confidence, heading, label, assumption, "
+        "example, outside inference, repetition, or a generic closing sentence. "
         "Never replace a supported answer with a refusal. "
         "Do not combine details from different evidence blocks into one claim unless the question explicitly "
         "requires both details."
@@ -405,8 +413,10 @@ def build_ollama_grounded_answer(
             f"EVIDENCE:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Translate any Indonesian evidence needed for the answer. Write the shortest complete "
-            "answer in English. Output answer text only. ENGLISH ONLY."
+            "Translate any Indonesian evidence needed for the answer. Start with the direct answer, then "
+            "write 2 to 4 connected sentences when the evidence supports relevant explanation. Use multiple "
+            "evidence blocks when they add complementary facts. Do not repeat facts, add filler, or infer "
+            "anything absent from the evidence. Output answer text only. ENGLISH ONLY."
         )
     else:
         user_prompt = (
@@ -414,8 +424,11 @@ def build_ollama_grounded_answer(
             f"BUKTI:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Terjemahkan bukti berbahasa Inggris yang diperlukan. Tulis jawaban lengkap yang paling "
-            "singkat dalam Bahasa Indonesia. Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
+            "Terjemahkan bukti berbahasa Inggris yang diperlukan. Mulai dengan jawaban langsung, lalu tulis "
+            "2 sampai 4 kalimat yang saling terhubung jika bukti mendukung penjelasan relevan. Gabungkan "
+            "beberapa blok bukti bila masing-masing menambahkan fakta yang saling melengkapi. Jangan "
+            "mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
+            "Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
             "nama produk, kode, dan akronim. Keluarkan teks jawaban saja. BAHASA INDONESIA SAJA."
         )
 

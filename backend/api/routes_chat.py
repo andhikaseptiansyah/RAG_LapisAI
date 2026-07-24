@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from api.answer_formatter import build_evidence_excerpt
+from api.answer_formatter import build_generation_evidence
 from api.chat_service import run_chat
 from api.logger import save_log
 from retrieval.context_selector import select_context_bundle
@@ -76,15 +76,17 @@ def query_documents(payload: QueryRequest):
                 payload.query,
                 chunks,
                 max_contexts=MAX_GENERATION_CONTEXTS,
+                minimum_contexts=min(2, MAX_GENERATION_CONTEXTS),
                 redundancy_threshold=CONTEXT_REDUNDANCY_THRESHOLD,
                 secondary_score_ratio=CONTEXT_SECONDARY_SCORE_RATIO,
             )
             chunks = [
                 {
                     **chunk,
-                    "content": build_evidence_excerpt(
+                    "content": build_generation_evidence(
                         payload.query,
                         str(chunk.get("content") or ""),
+                        max_chars=1400,
                     ) or str(chunk.get("content") or ""),
                     "generationContext": True,
                 }
