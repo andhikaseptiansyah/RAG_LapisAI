@@ -3,6 +3,7 @@ from typing import Any
 
 import requests
 
+from api.cancellation import raise_if_cancelled
 from api.answer_formatter import build_refusal_answer, has_answerable_evidence, is_refusal_answer, top_confidence
 from api.grounding_validator import prune_unsupported_claims, validate_grounded_answer
 from api.language import answer_matches_requested_language
@@ -47,13 +48,16 @@ def _groq_chat(system_prompt: str, user_prompt: str) -> str:
 
     last_error: Exception | None = None
     for attempt in range(GROQ_MAX_RETRIES + 1):
+        raise_if_cancelled()
         try:
+            raise_if_cancelled()
             response = requests.post(
                 endpoint,
                 headers=headers,
                 json=payload,
                 timeout=GROQ_TIMEOUT_SECONDS,
             )
+            raise_if_cancelled()
             if response.status_code == 429 or response.status_code >= 500:
                 if attempt < GROQ_MAX_RETRIES:
                     retry_after = response.headers.get("retry-after")

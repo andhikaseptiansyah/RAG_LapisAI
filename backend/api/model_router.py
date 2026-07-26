@@ -1,6 +1,7 @@
 from typing import Any
 
 from api.ollama_client import build_ollama_grounded_answer
+from api.cancellation import raise_if_cancelled
 from api.gemini_client import build_gemini_grounded_answer
 from api.groq_client import build_groq_grounded_answer
 from uploads.config import DEFAULT_LLM_PROVIDER
@@ -40,12 +41,14 @@ def build_grounded_answer(
     provider = resolve_provider(model)
     print(f"[MODEL_ROUTER] provider={provider}")
 
+    raise_if_cancelled()
     answer = PROVIDERS[provider](
         question,
         chunks,
         language=language,
         evaluation_mode=evaluation_mode,
     )
+    raise_if_cancelled()
     if answer or evaluation_mode or provider == "ollama":
         return answer
 
@@ -53,6 +56,7 @@ def build_grounded_answer(
     # overloaded, rate-limited, or unavailable. The local Ollama service is the
     # safest production fallback because it receives the same already-verified
     # evidence and does not weaken grounding or retrieval checks.
+    raise_if_cancelled()
     print(
         f"[MODEL_ROUTER] provider={provider} returned no usable answer; "
         "falling back to ollama"

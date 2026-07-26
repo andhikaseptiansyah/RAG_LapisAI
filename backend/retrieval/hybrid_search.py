@@ -432,6 +432,24 @@ def _apply_evidence_verification(
     )
 
 
+
+
+def _pre_rerank_may_defer(decision) -> bool:
+    """Defer only soft chunking/bundle failures to the final gate.
+
+    Missing concepts, values, years, contradictions, and weak base retrieval
+    remain hard rejections. The final post-rerank answerability gate is still
+    authoritative.
+    """
+    failed = set(getattr(decision, "failed_checks", ()) or ())
+    soft_failures = {
+        "supported_evidence",
+        "no_coherent_single_chunk_evidence",
+        "ambiguous_top_margin",
+    }
+    return bool(failed) and failed.issubset(soft_failures)
+
+
 def hybrid_search(
     query: str,
     top_k: int = 5,
@@ -487,11 +505,17 @@ def hybrid_search(
             baseline_verified,
         )
         if not pre_rerank_decision.answerable:
-            print(
-                "[ANSWERABILITY] Pre-rerank veto rejected query: "
-                f"{pre_rerank_decision.reason}"
-            )
-            return []
+            if _pre_rerank_may_defer(pre_rerank_decision):
+                print(
+                    "[ANSWERABILITY] Pre-rerank soft failure deferred to final gate: "
+                    f"{pre_rerank_decision.reason}"
+                )
+            else:
+                print(
+                    "[ANSWERABILITY] Pre-rerank veto rejected query: "
+                    f"{pre_rerank_decision.reason}"
+                )
+                return []
 
     if use_reranker:
         # The configured MMARCO cross-encoder is multilingual, so score the

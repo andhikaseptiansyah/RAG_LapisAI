@@ -161,6 +161,6 @@ def test_chat_returns_localized_verified_duration_when_model_repeats_english(mon
 
     assert response["generation_mode"] == "verified_scalar_fallback"
     assert response["language"] == "ID"
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
     assert response["sources"]
     assert response["sources"][0]["document_name"] == "SOP_IT_Incident_Handling.pdf"

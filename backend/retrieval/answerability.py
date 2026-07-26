@@ -12,7 +12,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from retrieval.evidence_verifier import HARD_CONCEPTS, _concept_match
+from retrieval.evidence_verifier import HARD_CONCEPTS, _concept_match, verify_evidence
 from retrieval.query_expansion import concepts_in_text
 from retrieval.requirements import (
     EvidenceRequirement,
@@ -102,12 +102,13 @@ def _legacy_requirement_name(key: str) -> str:
     return mapping.get(key, key)
 
 
-def _candidate_location(candidate: dict[str, Any]) -> tuple[str, str, str]:
+def _candidate_location(candidate: dict[str, Any]) -> tuple[str, str, str, str]:
     metadata = candidate.get("metadata") or {}
     return (
         str(candidate.get("documentName") or metadata.get("filename") or "").casefold(),
         str(candidate.get("page", metadata.get("page")) or ""),
         str(metadata.get("paragraph_start") or candidate.get("paragraphStart") or ""),
+        str(candidate.get("chunkIndex", metadata.get("chunk_index")) or ""),
     )
 
 
@@ -117,7 +118,7 @@ def _select_evidence_candidates(
 ) -> list[dict[str, Any]]:
     selected: list[dict[str, Any]] = []
     seen_chunks: set[str] = set()
-    seen_locations: set[tuple[str, str, str]] = set()
+    seen_locations: set[tuple[str, str, str, str]] = set()
 
     for candidate in ranked:
         if candidate.get("evidenceHardFailures"):
@@ -176,11 +177,188 @@ def _candidate_satisfies_all(
     text = str(candidate.get("content") or "")
     if not text or candidate.get("evidenceHardContradictions"):
         return False
+    if candidate.get("evidenceSupported") is not True:
+        return False
+    if candidate.get("evidenceMissingRequirements"):
+        return False
+    if candidate.get("evidenceHardFailures"):
+        return False
     if any(not _concept_match(concept, text) for concept in required_concepts):
         return False
     if any(not requirement_satisfied(requirement, [text]) for requirement in requirements):
         return False
     return True
+
+
+
+
+def _candidate_document_key(candidate: dict[str, Any]) -> str:
+    metadata = candidate.get("metadata") or {}
+    return str(
+        candidate.get("documentName")
+        or candidate.get("document_name")
+        or metadata.get("filename")
+        or ""
+    ).casefold().strip()
+
+
+def _candidate_chunk_index(candidate: dict[str, Any]) -> int | None:
+    metadata = candidate.get("metadata") or {}
+    value = candidate.get("chunkIndex", metadata.get("chunk_index"))
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _candidate_paragraph_bounds(
+    candidate: dict[str, Any],
+) -> tuple[int | None, int | None]:
+    metadata = candidate.get("metadata") or {}
+    start = candidate.get("paragraphStart", metadata.get("paragraph_start"))
+    end = candidate.get("paragraphEnd", metadata.get("paragraph_end", start))
+    try:
+        start_value = int(start) if start is not None else None
+    except (TypeError, ValueError):
+        start_value = None
+    try:
+        end_value = int(end) if end is not None else start_value
+    except (TypeError, ValueError):
+        end_value = start_value
+    return start_value, end_value
+
+
+def _candidates_are_adjacent(
+    left: dict[str, Any],
+    right: dict[str, Any],
+) -> bool:
+    left_document = _candidate_document_key(left)
+    if not left_document or left_document != _candidate_document_key(right):
+        return False
+
+    left_meta = left.get("metadata") or {}
+    right_meta = right.get("metadata") or {}
+    left_page = str(left.get("page", left_meta.get("page")) or "")
+    right_page = str(right.get("page", right_meta.get("page")) or "")
+    if left_page and right_page and left_page != right_page:
+        return False
+
+    left_index = _candidate_chunk_index(left)
+    right_index = _candidate_chunk_index(right)
+    if left_index is not None and right_index is not None:
+        return abs(left_index - right_index) <= 1
+
+    left_start, left_end = _candidate_paragraph_bounds(left)
+    right_start, right_end = _candidate_paragraph_bounds(right)
+    if left_start is None or right_start is None:
+        return False
+    left_end = left_end if left_end is not None else left_start
+    right_end = right_end if right_end is not None else right_start
+    return right_start <= left_end + 1 and left_start <= right_end + 1
+
+
+def _coherent_evidence_group(
+    question: str,
+    selected: list[dict[str, Any]],
+    required_concepts: set[str],
+    requirements: list[EvidenceRequirement],
+    min_evidence_score: float,
+) -> tuple[list[dict[str, Any]], float]:
+    """Select one safe evidence group from one source.
+
+    FAQ and policy text may be split between a question/heading and its answer.
+    Only adjacent chunks from the same document may be combined. Cross-document
+    stitching is still forbidden.
+    """
+    groups: list[list[dict[str, Any]]] = [[candidate] for candidate in selected]
+    by_document: dict[str, list[dict[str, Any]]] = {}
+
+    for candidate in selected:
+        key = _candidate_document_key(candidate)
+        if key:
+            by_document.setdefault(key, []).append(candidate)
+
+    for document_candidates in by_document.values():
+        ordered = sorted(
+            document_candidates,
+            key=lambda item: (
+                _candidate_chunk_index(item)
+                if _candidate_chunk_index(item) is not None
+                else 10**9,
+                _candidate_paragraph_bounds(item)[0]
+                if _candidate_paragraph_bounds(item)[0] is not None
+                else 10**9,
+            ),
+        )
+        for start in range(len(ordered)):
+            group = [ordered[start]]
+            for offset in (1, 2):
+                position = start + offset
+                if position >= len(ordered):
+                    break
+                if not _candidates_are_adjacent(group[-1], ordered[position]):
+                    break
+                group.append(ordered[position])
+                groups.append(list(group))
+
+    best_group: list[dict[str, Any]] = []
+    best_score = 0.0
+    seen_ids: set[tuple[str, ...]] = set()
+
+    for group in groups:
+        identifiers = tuple(
+            str(item.get("chunkId") or f"anon:{index}")
+            for index, item in enumerate(group)
+        )
+        if identifiers in seen_ids:
+            continue
+        seen_ids.add(identifiers)
+
+        if any(item.get("evidenceHardContradictions") for item in group):
+            continue
+        combined = "\n".join(
+            str(item.get("content") or "").strip()
+            for item in group
+        ).strip()
+        if not combined:
+            continue
+        if any(
+            not _concept_match(concept, combined)
+            for concept in required_concepts
+        ):
+            continue
+        if any(
+            not requirement_satisfied(requirement, [combined])
+            for requirement in requirements
+        ):
+            continue
+
+        semantic_score = max(
+            (_clamp(item.get("semanticScore")) for item in group),
+            default=0.0,
+        )
+        verification = verify_evidence(
+            question,
+            combined,
+            minimum_score=min_evidence_score,
+            semantic_score=semantic_score,
+        )
+        if not verification.supported:
+            continue
+
+        retrieval_score = max(
+            (_clamp(item.get("score")) for item in group),
+            default=0.0,
+        )
+        group_score = (
+            0.60 * verification.score
+            + 0.40 * retrieval_score
+        )
+        if group_score > best_score:
+            best_group = group
+            best_score = group_score
+
+    return best_group, _clamp(best_score)
 
 
 def assess_answerability(
@@ -257,11 +435,13 @@ def assess_answerability(
         and not multi_part
     )
 
-    coherent = [
-        candidate
-        for candidate in selected
-        if _candidate_satisfies_all(candidate, required_concepts, requirements)
-    ]
+    coherent, coherent_group_score = _coherent_evidence_group(
+        question,
+        selected,
+        required_concepts,
+        requirements,
+        min_evidence_score,
+    )
     coherent_chunk_ids = tuple(
         str(item.get("chunkId") or "")
         for item in coherent
@@ -290,7 +470,9 @@ def assess_answerability(
 
     coverage_complete = requirement_coverage >= 1.0 and concept_coverage >= 1.0
     coherent_complete = bool(coherent) or not requires_coherent_evidence
-    evidence_supported = supporting_candidate_count > 0
+    evidence_supported = supporting_candidate_count > 0 or bool(coherent)
+    if coherent and supporting_candidate_count == 0:
+        supporting_candidate_count = len(coherent)
     strictly_supported = coverage_complete and coherent_complete and evidence_supported
 
     strongest_exact_coverage = max(
@@ -352,6 +534,8 @@ def assess_answerability(
 
     support_signal = min(supporting_candidate_count / 2.0, 1.0)
     mean_evidence = sum(_clamp(item.get("evidenceScore")) for item in selected) / len(selected)
+    if coherent_group_score > 0.0:
+        mean_evidence = max(mean_evidence, coherent_group_score)
     coherence_signal = 1.0 if coherent_complete else 0.0
     answerability_score = _clamp(
         0.24 * top_score
@@ -373,9 +557,14 @@ def assess_answerability(
         else "Retrieval rejected: " + ", ".join(unique_failed)
     )
 
+    evidence_source = (
+        coherent
+        if requires_coherent_evidence and coherent
+        else supporting or selected
+    )
     evidence_chunk_ids = tuple(
         str(item.get("chunkId") or "")
-        for item in selected
+        for item in evidence_source
         if item.get("chunkId")
     )
 
@@ -418,7 +607,18 @@ def apply_answerability_gate(
         {
             **candidate,
             "answerabilityAccepted": True,
-            "answerabilityStrictlySupported": decision.strictly_supported,
+            "answerabilityStrictlySupported": bool(
+                decision.strictly_supported
+                and (
+                    candidate.get("evidenceSupported") is True
+                    or str(candidate.get("chunkId") or "") in coherent_ids
+                )
+                and (not selected_ids or str(candidate.get("chunkId") or "") in selected_ids)
+                and (
+                    not decision.requires_coherent_evidence
+                    or str(candidate.get("chunkId") or "") in coherent_ids
+                )
+            ),
             "answerabilityScore": decision.score,
             "answerabilityReason": decision.reason,
             "answerabilityScoreMargin": decision.score_margin,

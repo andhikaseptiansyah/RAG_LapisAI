@@ -81,7 +81,7 @@ MONEY_PATTERN = re.compile(
     flags=re.I,
 )
 PERCENT_PATTERN = re.compile(
-    rf"\b{NUMBER_CORE}\s*(?:%|persen|percent|percentage)\b",
+    rf"\b{NUMBER_CORE}\s*(?:%(?=$|[\s.,;:!?\)\]}}])|(?:persen|percent|percentage)\b)",
     flags=re.I,
 )
 NUMBER_UNIT_PATTERN = re.compile(
@@ -105,12 +105,68 @@ CONDITIONAL_COMMA_PREFIX = re.compile(
     r"jika|ketika|apabila|bila|sebelum|setelah)\b",
     flags=re.I,
 )
+GROUNDING_PREAMBLE = re.compile(
+    r"^\s*(?:"
+    r"berdasarkan\s+(?:ketentuan\s+pada\s+)?(?:dokumen|sumber)(?:\s+yang\s+tersedia)?"
+    r"|menurut\s+(?:dokumen|sumber)"
+    r"|according\s+to\s+(?:the\s+)?(?:document|source|evidence)"
+    r"|based\s+on\s+(?:the\s+)?(?:document|source|evidence)"
+    r")\s*[:,]?\s*",
+    flags=re.I,
+)
 
 # Grounding needs a slightly richer bilingual vocabulary than retrieval.
 # These aliases do not add facts or retrieval hits. They only prove that an
 # Indonesian claim is a faithful rendering of the same English evidence unit.
 GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     **CONCEPT_ALIASES,
+    # GROUNDING_ID_NATIVE_V1: natural Indonesian grounding aliases.
+    # FINANCIAL_METRIC_GROUNDING_V1: bilingual net-profit-margin aliases.
+    # These aliases validate equivalent wording only; they do not add facts or
+    # retrieval hits.
+    "net_profit_margin": (
+        "net profit margin",
+        "the net profit margin",
+        "company net profit margin",
+        "company's net profit margin",
+        "net margin",
+        "margin laba bersih",
+        "margin laba bersih perusahaan",
+        "marjin laba bersih",
+        "marjin laba bersih perusahaan",
+        "margin keuntungan bersih",
+        "marjin keuntungan bersih",
+    ),
+    "processing_time": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("processing_time", ()),
+        "jangka waktu",
+        "jangka waktu tersebut",
+        "merupakan batas penyelesaian",
+        "batas penyelesaian yang ditetapkan",
+        "batas waktu penyelesaian yang ditetapkan",
+        "waktu yang ditetapkan",
+        "target waktu yang ditetapkan",
+        "completion deadline",
+        "defined resolution limit",
+    ))),
+    "incident_p1": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("incident_p1", ()),
+        "insiden prioritas p1",
+        "insiden it prioritas p1",
+        "insiden ti prioritas p1",
+        "insiden it prioritas 1",
+        "insiden ti prioritas 1",
+        "p1 priority incident",
+    ))),
+    "incident_p2": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("incident_p2", ()),
+        "insiden prioritas p2",
+        "insiden it prioritas p2",
+        "insiden ti prioritas p2",
+        "insiden it prioritas 2",
+        "insiden ti prioritas 2",
+        "p2 priority incident",
+    ))),
     "probation": tuple(dict.fromkeys((
         *CONCEPT_ALIASES.get("probation", ()),
         "serve a probation period",
@@ -448,6 +504,10 @@ def _atomic_claims(value: Any) -> list[str]:
 
     for raw_sentence in SENTENCE_SPLIT.split(raw_text):
         sentence = _clean(raw_sentence).lstrip("-? ")
+        # Attribution is presentation text, not an independent factual claim.
+        # Removing it before comma splitting prevents false rejection of
+        # sentences such as 'Berdasarkan dokumen, ...'.
+        sentence = GROUNDING_PREAMBLE.sub("", sentence).strip()
 
         if not sentence:
             continue
@@ -533,15 +593,72 @@ def _atomic_claims(value: Any) -> list[str]:
     return claims
 
 
+_INCIDENT_CODE_PATTERN = re.compile(
+    r"\b(?:p(?P<pnum>[1-4])|priority\s+(?P<priority>[1-4])|"
+    r"prioritas\s+(?P<prioritas>[1-4]))\b",
+    flags=re.I,
+)
+
+
+def _incident_relation_is_coherent(claim: str, unit: str) -> bool:
+    """Bind an incident priority to the quantity in its own local row.
+
+    PDF extraction can flatten P1 and P2 SLA rows into one passage. The quantity
+    must occur after the requested priority code and before the next code, so a P2
+    value cannot accidentally be attached to P1, or vice versa.
+    """
+    claim_entries = _fact_entries(claim)
+    claim_codes = [
+        key.split(":", 1)[1].casefold()
+        for key, _, _ in claim_entries
+        if key.startswith("identifier:P")
+    ]
+    claim_quantities = {
+        key for key, _, _ in claim_entries
+        if key.startswith("quantity:")
+    }
+    if len(claim_codes) != 1 or not claim_quantities:
+        return True
+
+    requested_code = claim_codes[0]
+    mentions = list(_INCIDENT_CODE_PATTERN.finditer(unit))
+    if not mentions:
+        return True
+
+    for index, mention in enumerate(mentions):
+        number = (
+            mention.group("pnum")
+            or mention.group("priority")
+            or mention.group("prioritas")
+        )
+        if f"p{number}" != requested_code:
+            continue
+        end = mentions[index + 1].start() if index + 1 < len(mentions) else len(unit)
+        local_row = unit[mention.start():end]
+        local_keys = {key for key, _, _ in _fact_entries(local_row)}
+        if claim_quantities.issubset(local_keys):
+            return True
+    return False
+
+
 def _claim_reference_units(claim: str, evidence_units: list[str]) -> list[str]:
     claim_fact_keys = {key for key, _, _ in _fact_entries(claim)}
     if not claim_fact_keys:
         return list(evidence_units)
-    return [
+
+    matched = [
         unit
         for unit in evidence_units
         if claim_fact_keys.issubset({key for key, _, _ in _fact_entries(unit)})
+        and _incident_relation_is_coherent(claim, unit)
     ]
+    if not matched:
+        return []
+
+    # Prefer precise evidence units while retaining flattened PDF rows when no
+    # shorter sentence contains all required facts.
+    shortest = min(len(unit) for unit in matched)
+    return [unit for unit in matched if len(unit) <= shortest + 160]
 
 
 def _canonical_claim_token_coverage(

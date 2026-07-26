@@ -1,3 +1,5 @@
+import asyncio
+import contextlib
 import json
 import os
 import time
@@ -10,6 +12,13 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from api.build_info import BUILD_VERSION, public_build_info
+from api.cancellation import (
+    ChatCancelled,
+    cancel_query,
+    raise_if_cancelled,
+    register_query,
+    unregister_query,
+)
 from api.conversation_store import (
     append_chat_turn,
     delete_conversation,
@@ -641,6 +650,15 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
     }
 
 
+async def _watch_chat_disconnect(request: Request, cancel_event) -> None:
+    """Batalkan pekerjaan server ketika browser memutus request."""
+    while not cancel_event.is_set():
+        if await request.is_disconnected():
+            cancel_event.set()
+            return
+        await asyncio.sleep(0.10)
+
+
 @router.post("/chat")
 async def compat_chat(request: Request):
     content_type = request.headers.get("content-type", "")
@@ -650,14 +668,14 @@ async def compat_chat(request: Request):
         question = str(form.get("message") or form.get("question") or "").strip()
         conversation_id = str(form.get("conversationId") or "").strip() or None
         language = str(form.get("language") or "AUTO").strip() or "AUTO"
-        query_id = str(form.get("queryId") or "").strip() or None
+        query_id = str(form.get("queryId") or "").strip() or str(uuid.uuid4())
         model = str(form.get("model") or "").strip() or None
     else:
         payload = await request.json()
         question = str(payload.get("message") or payload.get("question") or "").strip()
         conversation_id = payload.get("conversationId") or None
         language = payload.get("language") or "AUTO"
-        query_id = str(payload.get("queryId") or "").strip() or None
+        query_id = str(payload.get("queryId") or "").strip() or str(uuid.uuid4())
         model = str(payload.get("model") or "").strip() or None
 
     if not question:
@@ -665,15 +683,143 @@ async def compat_chat(request: Request):
 
     current_user = _require_user(request)
     started_at = time.perf_counter()
+    cancel_event = register_query(query_id, current_user["id"])
+    disconnect_task = asyncio.create_task(
+        _watch_chat_disconnect(request, cancel_event)
+    )
 
     try:
-        result = run_chat(
+        # run_chat bersifat sinkron dan berat. Jalankan di worker thread agar
+        # event loop tetap bisa menerima endpoint pembatalan.
+        result = await asyncio.to_thread(
+            run_chat,
             question,
             top_k=5,
             language=language,
             model=model,
+            cancel_event=cancel_event,
         )
+        raise_if_cancelled(cancel_event)
+
+        answer = str(result.get("answer") or "")
+        sources = result.get("sources") or []
+        confidence = result.get("confidence") or 0.0
+        response_time_ms = result.get("response_time_ms") or ((time.perf_counter() - started_at) * 1000)
+        follow_up_question = result.get("follow_up_question")
+        resolved_language = str(result.get("language") or language or "ID").upper()
+
+        # Jangan simpan hasil atau percakapan bila stop terjadi sesaat setelah
+        # model selesai tetapi sebelum response dikirim ke browser.
+        raise_if_cancelled(cancel_event)
+        save_log(
+            query_id=query_id,
+            question=question,
+            answer=answer,
+            sources=sources,
+            latency_ms=response_time_ms,
+            confidence=confidence,
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            user_role=current_user["role"],
+        )
+        raise_if_cancelled(cancel_event)
+        conversation, assistant_message = append_chat_turn(
+            question=question,
+            answer=answer,
+            confidence=confidence,
+            sources=sources,
+            conversation_id=conversation_id,
+            language=resolved_language,
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            follow_up_question=follow_up_question,
+        )
+        raise_if_cancelled(cancel_event)
+
+        primary_source = sources[0] if sources else None
+        return {
+            "conversationId": conversation["id"],
+            "messageId": assistant_message["id"],
+            "answer": answer,
+            "confidence": confidence,
+            "sources": sources,
+            "follow_up_question": follow_up_question,
+            "followUpQuestion": follow_up_question,
+            "response_time_ms": response_time_ms,
+            "source": primary_source.get("document_name") if primary_source else None,
+            "page": primary_source.get("page") if primary_source else None,
+            "createdAt": assistant_message["created_at"],
+            "language": resolved_language,
+            "model": result.get("model"),
+            "generation_mode": result.get("generation_mode"),
+            "buildVersion": result.get("buildVersion") or BUILD_VERSION,
+            "chatServiceSha256": public_build_info().get("chatServiceSha256"),
+            "retrieval_mode": result.get("retrieval_mode"),
+            "retrieval_query": result.get("retrieval_query"),
+            "failure_stage": result.get("failure_stage"),
+        }
+    except ChatCancelled:
+        save_log(
+            query_id=query_id,
+            question=question,
+            answer="",
+            sources=[],
+            latency_ms=(time.perf_counter() - started_at) * 1000,
+            confidence=0.0,
+            status="NOT_FOUND",
+            failure_reason="USER_STOPPED",
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            user_role=current_user["role"],
+        )
+        raise HTTPException(
+            status_code=499,
+            detail={
+                "code": "CHAT_CANCELLED",
+                "message": "Permintaan dihentikan oleh pengguna.",
+            },
+        )
+    except asyncio.CancelledError:
+        cancel_event.set()
+        save_log(
+            query_id=query_id,
+            question=question,
+            answer="",
+            sources=[],
+            latency_ms=(time.perf_counter() - started_at) * 1000,
+            confidence=0.0,
+            status="NOT_FOUND",
+            failure_reason="CLIENT_DISCONNECTED",
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            user_role=current_user["role"],
+        )
+        raise
+    except HTTPException:
+        raise
     except Exception as exc:
+        if cancel_event.is_set():
+            save_log(
+                query_id=query_id,
+                question=question,
+                answer="",
+                sources=[],
+                latency_ms=(time.perf_counter() - started_at) * 1000,
+                confidence=0.0,
+                status="NOT_FOUND",
+                failure_reason="USER_STOPPED",
+                user_id=current_user["id"],
+                user_name=current_user["name"],
+                user_role=current_user["role"],
+            )
+            raise HTTPException(
+                status_code=499,
+                detail={
+                    "code": "CHAT_CANCELLED",
+                    "message": "Permintaan dihentikan.",
+                },
+            ) from exc
+
         save_log(
             query_id=query_id,
             question=question,
@@ -688,69 +834,22 @@ async def compat_chat(request: Request):
             user_role=current_user["role"],
         )
         raise HTTPException(status_code=500, detail=f"Proses chat gagal: {str(exc)}") from exc
-
-    answer = str(result.get("answer") or "")
-    sources = result.get("sources") or []
-    confidence = result.get("confidence") or 0.0
-    response_time_ms = result.get("response_time_ms") or ((time.perf_counter() - started_at) * 1000)
-    follow_up_question = result.get("follow_up_question")
-    resolved_language = str(result.get("language") or language or "ID").upper()
-
-    save_log(
-        query_id=query_id,
-        question=question,
-        answer=answer,
-        sources=sources,
-        latency_ms=response_time_ms,
-        confidence=confidence,
-        user_id=current_user["id"],
-        user_name=current_user["name"],
-        user_role=current_user["role"],
-    )
-    conversation, assistant_message = append_chat_turn(
-        question=question,
-        answer=answer,
-        confidence=confidence,
-        sources=sources,
-        conversation_id=conversation_id,
-        language=resolved_language,
-        user_id=current_user["id"],
-        user_name=current_user["name"],
-        follow_up_question=follow_up_question,
-    )
-
-    primary_source = sources[0] if sources else None
-
-    return {
-        # Compatibility identifiers are kept until the frontend migration step.
-        "conversationId": conversation["id"],
-        "messageId": assistant_message["id"],
-        # Canonical chat response contract.
-        "answer": answer,
-        "confidence": confidence,
-        "sources": sources,
-        "follow_up_question": follow_up_question,
-        "followUpQuestion": follow_up_question,
-        "response_time_ms": response_time_ms,
-        # Temporary compatibility fields used by the current frontend.
-        "source": primary_source.get("document_name") if primary_source else None,
-        "page": primary_source.get("page") if primary_source else None,
-        "createdAt": assistant_message["created_at"],
-        "language": resolved_language,
-        "model": result.get("model"),
-        "generation_mode": result.get("generation_mode"),
-        "buildVersion": result.get("buildVersion") or BUILD_VERSION,
-        "chatServiceSha256": public_build_info().get("chatServiceSha256"),
-        "retrieval_mode": result.get("retrieval_mode"),
-        "retrieval_query": result.get("retrieval_query"),
-        "failure_stage": result.get("failure_stage"),
-    }
+    finally:
+        disconnect_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await disconnect_task
+        unregister_query(query_id, current_user["id"], cancel_event)
 
 
 @router.post("/query-logs/failure")
 def compat_record_query_failure(payload: QueryFailurePayload, request: Request):
     current_user = _require_user(request)
     reason = str(payload.reason or "CLIENT_ERROR").strip().upper()
+
+    # USER_STOPPED dan NETWORK_OFFLINE bukan hanya status log. Keduanya juga
+    # mengirim sinyal pembatalan ke worker chat yang sedang aktif.
+    if reason in {"USER_STOPPED", "NETWORK_OFFLINE", "CLIENT_DISCONNECTED"}:
+        cancel_query(payload.queryId, current_user["id"])
 
     log = save_log(
         query_id=payload.queryId,

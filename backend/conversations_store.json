@@ -1,5 +1,1997 @@
 [
   {
+    "id": "47a1ffd6-dd4f-432c-af66-c615e44a18c7",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "91242675-4211-4778-b709-757d9b863d29",
+        "conversation_id": "47a1ffd6-dd4f-432c-af66-c615e44a18c7",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T21:03:28.084313+00:00"
+      },
+      {
+        "id": "45142572-f900-4533-86b1-3deb07756a31",
+        "conversation_id": "47a1ffd6-dd4f-432c-af66-c615e44a18c7",
+        "role": "assistant",
+        "content": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T21:03:28.084313+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T21:03:28.084313+00:00",
+    "updated_at": "2026-07-25T21:03:28.084313+00:00",
+    "last_message": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-25T21:03:28.084313+00:00"
+  },
+  {
+    "id": "b44f023c-ecb9-45c8-981a-46ee2a7ae812",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "44481792-4412-4cd5-aa5f-243e43b2d297",
+        "conversation_id": "b44f023c-ecb9-45c8-981a-46ee2a7ae812",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T20:25:20.661980+00:00"
+      },
+      {
+        "id": "e4e39554-badb-4588-bbb6-f34955dbb1e1",
+        "conversation_id": "b44f023c-ecb9-45c8-981a-46ee2a7ae812",
+        "role": "assistant",
+        "content": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah. sertifikat TLS yang telah kedaluwarsa pada API gateway. memengaruhi portal pelanggan.",
+        "attachments": [],
+        "confidence": 0.7617,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7617,
+              "relevance_score": 0.7617,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway. A certificate auto-renewal job was implemented as a corrective action.",
+              "citation_validated": true,
+              "citation_support_score": 0.8263,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T20:25:20.661980+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T20:25:20.661980+00:00",
+    "updated_at": "2026-07-25T20:25:20.661980+00:00",
+    "last_message": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah. sertifikat TLS yang telah kedaluwarsa pada API gateway. memengaruhi portal pelanggan.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "last_message_at": "2026-07-25T20:25:20.661980+00:00"
+  },
+  {
+    "id": "f90c3619-afa1-4bec-8d4e-57db5e6eb3df",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "2a612fa4-2f92-41ad-9a6f-1396b74ce5f4",
+        "conversation_id": "f90c3619-afa1-4bec-8d4e-57db5e6eb3df",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T20:24:50.094796+00:00"
+      },
+      {
+        "id": "1041a58c-5341-4539-a0b4-2b46ac073df7",
+        "conversation_id": "f90c3619-afa1-4bec-8d4e-57db5e6eb3df",
+        "role": "assistant",
+        "content": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah sertifikat TLS yang kedaluwarsa pada API gateway.",
+        "attachments": [],
+        "confidence": 0.7617,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7617,
+              "relevance_score": 0.7617,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway. A certificate auto-renewal job was implemented as a corrective action.",
+              "citation_validated": true,
+              "citation_support_score": 0.8263,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T20:24:50.094796+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T20:24:50.094796+00:00",
+    "updated_at": "2026-07-25T20:24:50.094796+00:00",
+    "last_message": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah sertifikat TLS yang kedaluwarsa pada API gateway.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "last_message_at": "2026-07-25T20:24:50.094796+00:00"
+  },
+  {
+    "id": "53f9d3f3-0da2-41d4-8a08-dd0ecf571b89",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "6fbf3ad1-5d0a-47a4-acbe-6eff0e509e8d",
+        "conversation_id": "53f9d3f3-0da2-41d4-8a08-dd0ecf571b89",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T20:09:53.443658+00:00"
+      },
+      {
+        "id": "890373d5-c4fd-4641-9f56-6f2ba1cf7835",
+        "conversation_id": "53f9d3f3-0da2-41d4-8a08-dd0ecf571b89",
+        "role": "assistant",
+        "content": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah. sertifikat TLS yang telah kedaluwarsa pada API gateway. memengaruhi portal pelanggan.",
+        "attachments": [],
+        "confidence": 0.7617,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7617,
+              "relevance_score": 0.7617,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway. A certificate auto-renewal job was implemented as a corrective action.",
+              "citation_validated": true,
+              "citation_support_score": 0.8263,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T20:09:53.443658+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T20:09:53.443658+00:00",
+    "updated_at": "2026-07-25T20:09:53.443658+00:00",
+    "last_message": "Penyebab utama gangguan portal pelanggan pada 14 Oktober adalah. sertifikat TLS yang telah kedaluwarsa pada API gateway. memengaruhi portal pelanggan.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober",
+    "last_message_at": "2026-07-25T20:09:53.443658+00:00"
+  },
+  {
+    "id": "c7fc3f1d-1145-4348-a247-2cbcc969a3f1",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "3d90d355-8457-4702-86b8-430d0fef043d",
+        "conversation_id": "c7fc3f1d-1145-4348-a247-2cbcc969a3f1",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T20:09:07.247294+00:00"
+      },
+      {
+        "id": "43306571-1ce8-4ca5-8cac-08090ea6f5bc",
+        "conversation_id": "c7fc3f1d-1145-4348-a247-2cbcc969a3f1",
+        "role": "assistant",
+        "content": "Penyebab utama gangguan portal pelanggan pada 14 Oktober 2025 adalah sertifikat TLS pada API gateway yang telah kedaluwarsa.",
+        "attachments": [],
+        "confidence": 0.7927,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7927,
+              "relevance_score": 0.7927,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal.",
+              "citation_validated": true,
+              "citation_support_score": 0.8479,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T20:09:07.247294+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T20:09:07.247294+00:00",
+    "updated_at": "2026-07-25T20:09:07.247294+00:00",
+    "last_message": "Penyebab utama gangguan portal pelanggan pada 14 Oktober 2025 adalah sertifikat TLS pada API gateway yang telah kedaluwarsa.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "last_message_at": "2026-07-25T20:09:07.247294+00:00"
+  },
+  {
+    "id": "5dd1bee0-86e7-4af1-9dcd-0d1e8bcb39e7",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "446a7310-f630-439d-8588-f5eb3fdbe90d",
+        "conversation_id": "5dd1bee0-86e7-4af1-9dcd-0d1e8bcb39e7",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T20:06:29.607296+00:00"
+      },
+      {
+        "id": "cfd76b71-4aa0-463e-ae1c-fcaef06b08ab",
+        "conversation_id": "5dd1bee0-86e7-4af1-9dcd-0d1e8bcb39e7",
+        "role": "assistant",
+        "content": "Penyebab utama gangguan portal pelanggan pada 14 Oktober 2025 adalah sertifikat TLS pada API gateway yang telah kedaluwarsa.",
+        "attachments": [],
+        "confidence": 0.7927,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Incident_Postmortem.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7927,
+              "relevance_score": 0.7927,
+              "excerpt": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal.",
+              "citation_validated": true,
+              "citation_support_score": 0.8479,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T20:06:29.607296+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T20:06:29.607296+00:00",
+    "updated_at": "2026-07-25T20:06:29.607296+00:00",
+    "last_message": "Penyebab utama gangguan portal pelanggan pada 14 Oktober 2025 adalah sertifikat TLS pada API gateway yang telah kedaluwarsa.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "last_message_at": "2026-07-25T20:06:29.607296+00:00"
+  },
+  {
+    "id": "57d107b8-100b-4fa2-9dda-0ea695e4034e",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "df64a752-3e6b-499e-b28f-3c0aa6225091",
+        "conversation_id": "57d107b8-100b-4fa2-9dda-0ea695e4034e",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:50:18.199777+00:00"
+      },
+      {
+        "id": "38163088-80d4-4823-8660-82c0ac13fd46",
+        "conversation_id": "57d107b8-100b-4fa2-9dda-0ea695e4034e",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:50:18.199777+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T19:50:18.199777+00:00",
+    "updated_at": "2026-07-25T19:50:18.199777+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "last_message_at": "2026-07-25T19:50:18.199777+00:00"
+  },
+  {
+    "id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ab6cdc06-9f83-4bc3-80c6-ef21a3ee5705",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "user",
+        "content": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:45:20.732071+00:00"
+      },
+      {
+        "id": "d320de4e-3e0d-409f-bdb3-16f8e48146b5",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:45:20.732071+00:00"
+      },
+      {
+        "id": "da2aebf7-2177-4beb-a551-79b5ad40915e",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "user",
+        "content": "Untuk pengeluaran sebesar berapa bukti pembayaran asli wajib disertakan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:46:09.963913+00:00"
+      },
+      {
+        "id": "bb4c10ee-415a-4bd3-8e05-5cca30aa45c2",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "assistant",
+        "content": "Bukti pembayaran asli wajib disertakan untuk pengeluaran sebesar IDR 150.000 atau lebih.",
+        "attachments": [],
+        "confidence": 0.8045,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Expense_Reimbursement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8045,
+              "relevance_score": 0.8045,
+              "excerpt": "Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Original receipts are required for any single expense above IDR 150,000. Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+              "citation_validated": true,
+              "citation_support_score": 0.8209,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:46:09.963913+00:00"
+      },
+      {
+        "id": "de95db13-15cd-4ec3-80b6-0cf969975520",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "user",
+        "content": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:47:11.473781+00:00"
+      },
+      {
+        "id": "af50a2f1-8e60-479f-a59b-3555cea3ec23",
+        "conversation_id": "6f0b8a54-31ad-4f53-a065-32eb830d227d",
+        "role": "assistant",
+        "content": "Berdasarkan ketentuan pada dokumen, proses yang ditanyakan harus dicabut dalam waktu 2 jam. Jangka waktu tersebut merupakan batas pencabutan yang ditetapkan dalam dokumen.",
+        "attachments": [],
+        "confidence": 0.794,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.794,
+              "relevance_score": 0.794,
+              "excerpt": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+              "citation_validated": true,
+              "citation_support_score": 0.8171,
+              "paragraph_start": 1,
+              "paragraph_end": 6
+            }
+          ],
+          "source": "SOP_Offboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:47:11.473781+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T19:45:20.732071+00:00",
+    "updated_at": "2026-07-25T19:47:11.473781+00:00",
+    "last_message": "Berdasarkan ketentuan pada dokumen, proses yang ditanyakan harus dicabut dalam waktu 2 jam. Jangka waktu tersebut merupakan batas pencabutan yang ditetapkan dalam dokumen.",
+    "last_user_message": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+    "last_message_at": "2026-07-25T19:47:11.473781+00:00"
+  },
+  {
+    "id": "bbf310f4-ce39-42af-8c86-b75cecd13844",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa pendapatan tahun 2025 dan margin laba bersih perusaha...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "52a2ca58-5add-4925-a6aa-0591ecd13793",
+        "conversation_id": "bbf310f4-ce39-42af-8c86-b75cecd13844",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:41:07.319926+00:00"
+      },
+      {
+        "id": "b6f90300-9530-4196-a1c7-bd0307b1bc90",
+        "conversation_id": "bbf310f4-ce39-42af-8c86-b75cecd13844",
+        "role": "assistant",
+        "content": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar. Margin laba bersih perusahaan adalah 14%. Untuk tahun 2025 perusahaan mencatat pendapatan IDR 158 miliar dengan margin laba bersih 14%.",
+        "attachments": [],
+        "confidence": 0.837,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.837,
+              "relevance_score": 0.837,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "citation_validated": true,
+              "citation_support_score": 0.8689,
+              "paragraph_start": 1,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:41:07.319926+00:00"
+      },
+      {
+        "id": "389cdba0-8c46-4ccb-82a2-3f5bc380949f",
+        "conversation_id": "bbf310f4-ce39-42af-8c86-b75cecd13844",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:42:51.637007+00:00"
+      },
+      {
+        "id": "638eaa7e-9bfb-4f12-b9bf-940bd0bb9794",
+        "conversation_id": "bbf310f4-ce39-42af-8c86-b75cecd13844",
+        "role": "assistant",
+        "content": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar. Margin laba bersih perusahaan adalah 14%. Untuk tahun 2025 perusahaan mencatat pendapatan IDR 158 miliar dengan margin laba bersih 14%.",
+        "attachments": [],
+        "confidence": 0.837,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.837,
+              "relevance_score": 0.837,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "citation_validated": true,
+              "citation_support_score": 0.8689,
+              "paragraph_start": 1,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:42:51.637007+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T19:41:07.319926+00:00",
+    "updated_at": "2026-07-25T19:42:51.637007+00:00",
+    "last_message": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar. Margin laba bersih perusahaan adalah 14%. Untuk tahun 2025 perusahaan mencatat pendapatan IDR 158 miliar dengan margin laba bersih 14%.",
+    "last_user_message": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "last_message_at": "2026-07-25T19:42:51.637007+00:00"
+  },
+  {
+    "id": "2ca560d6-d263-42e5-90b7-b5ef8f9d52cc",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa pendapatan tahun 2025 dan margin laba bersih perusaha...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "72795d8a-64a5-46d0-97c2-c73307a80390",
+        "conversation_id": "2ca560d6-d263-42e5-90b7-b5ef8f9d52cc",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:20:15.253769+00:00"
+      },
+      {
+        "id": "38025741-cb10-4314-9843-2a459bd539fb",
+        "conversation_id": "2ca560d6-d263-42e5-90b7-b5ef8f9d52cc",
+        "role": "assistant",
+        "content": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar. Margin laba bersih perusahaan adalah 14%.",
+        "attachments": [],
+        "confidence": 0.837,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.837,
+              "relevance_score": 0.837,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "citation_validated": true,
+              "citation_support_score": 0.8689,
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.77,
+              "relevance_score": 0.77,
+              "excerpt": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "citation_validated": true,
+              "citation_support_score": 0.8345,
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:20:15.253769+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T19:20:15.253769+00:00",
+    "updated_at": "2026-07-25T19:20:15.253769+00:00",
+    "last_message": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar. Margin laba bersih perusahaan adalah 14%.",
+    "last_user_message": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "last_message_at": "2026-07-25T19:20:15.253769+00:00"
+  },
+  {
+    "id": "946e213e-bae2-4b27-b0ce-ca0e8cc67cea",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa pendapatan tahun 2025 dan margin laba bersih perusaha...",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "97afb1e0-d128-4efc-83e3-c58f0ce0d697",
+        "conversation_id": "946e213e-bae2-4b27-b0ce-ca0e8cc67cea",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T19:07:07.515169+00:00"
+      },
+      {
+        "id": "b14ff235-93f2-4339-85ac-b6a8a06e737c",
+        "conversation_id": "946e213e-bae2-4b27-b0ce-ca0e8cc67cea",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T19:07:07.515169+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T19:07:07.515169+00:00",
+    "updated_at": "2026-07-25T19:07:07.515169+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "last_message_at": "2026-07-25T19:07:07.515169+00:00"
+  },
+  {
+    "id": "e0fdea9a-f748-4469-9898-f417474526fb",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "0d9395b7-de8c-4e66-8b95-3c61083aa199",
+        "conversation_id": "e0fdea9a-f748-4469-9898-f417474526fb",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T18:55:33.021751+00:00"
+      },
+      {
+        "id": "5b6407d3-af66-439e-bda8-a30ae95ebe5e",
+        "conversation_id": "e0fdea9a-f748-4469-9898-f417474526fb",
+        "role": "assistant",
+        "content": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 0.8716,
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T18:55:33.021751+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T18:55:33.021751+00:00",
+    "updated_at": "2026-07-25T18:55:33.021751+00:00",
+    "last_message": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-25T18:55:33.021751+00:00"
+  },
+  {
+    "id": "e14069e5-1cb2-4f15-a875-67b222426166",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ae66e126-1edc-4011-bb73-1e6a4abe211c",
+        "conversation_id": "e14069e5-1cb2-4f15-a875-67b222426166",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T18:40:23.018106+00:00"
+      },
+      {
+        "id": "a2239b4f-9b9a-4a47-b19a-5071709d2ecd",
+        "conversation_id": "e14069e5-1cb2-4f15-a875-67b222426166",
+        "role": "assistant",
+        "content": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 0.8716,
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T18:40:23.018106+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T18:40:23.018106+00:00",
+    "updated_at": "2026-07-25T18:40:23.018106+00:00",
+    "last_message": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-25T18:40:23.018106+00:00"
+  },
+  {
+    "id": "3efadbdf-706c-42cd-b797-984a7908a857",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "97620792-bc01-4039-a59d-de1dc766c367",
+        "conversation_id": "3efadbdf-706c-42cd-b797-984a7908a857",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T18:28:18.766435+00:00"
+      },
+      {
+        "id": "bcb138e5-4b6d-48a4-aaaa-5f071597751d",
+        "conversation_id": "3efadbdf-706c-42cd-b797-984a7908a857",
+        "role": "assistant",
+        "content": "Berdasarkan dokumen sumber, insiden IT prioritas P1 harus diselesaikan dalam waktu Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan dalam dokumen.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 0.8716,
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T18:28:18.766435+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T18:28:18.766435+00:00",
+    "updated_at": "2026-07-25T18:28:18.766435+00:00",
+    "last_message": "Berdasarkan dokumen sumber, insiden IT prioritas P1 harus diselesaikan dalam waktu Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan dalam dokumen.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-25T18:28:18.766435+00:00"
+  },
+  {
+    "id": "dd5f8a3c-8103-474a-a687-b5398290706b",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "64771562-b4e0-4a7f-afab-aae0f1a21558",
+        "conversation_id": "dd5f8a3c-8103-474a-a687-b5398290706b",
+        "role": "user",
+        "content": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T18:02:34.084033+00:00"
+      },
+      {
+        "id": "680dc470-27b9-4302-af22-f556f709f3f2",
+        "conversation_id": "dd5f8a3c-8103-474a-a687-b5398290706b",
+        "role": "assistant",
+        "content": "Perusahaan memberikan manfaat pensiun bagi karyawan berupa kontribusi terhadap BPJS Ketenagakerjaan. BPJS Ketenagakerjaan merupakan program pensiun yang dikelola pemerintah. Kontribusi perusahaan terhadap BPJS Ketenagakerjaan berlaku untuk seluruh karyawan.",
+        "attachments": [],
+        "confidence": 0.7535,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "FAQ_Benefits.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8044,
+              "relevance_score": 0.8044,
+              "excerpt": "Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_Benefits.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T18:02:34.084033+00:00"
+      },
+      {
+        "id": "2f0f167a-b3a1-4f55-8873-4a855d3f964f",
+        "conversation_id": "dd5f8a3c-8103-474a-a687-b5398290706b",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T18:04:10.193373+00:00"
+      },
+      {
+        "id": "deaf3804-5ff2-4912-aad2-490a59cffdae",
+        "conversation_id": "dd5f8a3c-8103-474a-a687-b5398290706b",
+        "role": "assistant",
+        "content": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar dan margin laba bersih adalah 14%. Pendapatan tersebut mencakup seluruh tahun 2025, sedangkan margin laba bersih mencerminkan rasio laba bersih terhadap pendapatan tahunan.",
+        "attachments": [],
+        "confidence": 0.8306,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.837,
+              "relevance_score": 0.837,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.77,
+              "relevance_score": 0.77,
+              "excerpt": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T18:04:10.193373+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T18:02:34.084033+00:00",
+    "updated_at": "2026-07-25T18:04:10.193373+00:00",
+    "last_message": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar dan margin laba bersih adalah 14%. Pendapatan tersebut mencakup seluruh tahun 2025, sedangkan margin laba bersih mencerminkan rasio laba bersih terhadap pendapatan tahunan.",
+    "last_user_message": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "last_message_at": "2026-07-25T18:04:10.193373+00:00"
+  },
+  {
+    "id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "07381feb-4eef-45c7-a524-2256d5e4919f",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T17:41:49.127127+00:00"
+      },
+      {
+        "id": "e575f38b-b171-4069-ab19-fc98afb8a336",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T17:41:49.127127+00:00"
+      },
+      {
+        "id": "e8c82831-6119-4bb1-95e2-da9c998a7dc0",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "user",
+        "content": "Berapa pendapatan resmi perusahaan untuk tahun penuh 2026?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T17:44:11.982163+00:00"
+      },
+      {
+        "id": "3fef25c1-5fcb-4d29-8f6c-04df8b821701",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T17:44:11.982163+00:00"
+      },
+      {
+        "id": "e2f1312f-a7e5-4bf9-afba-ca1c892d74f8",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "user",
+        "content": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T17:44:27.169068+00:00"
+      },
+      {
+        "id": "bb8fe739-947f-4612-85f2-0858be63d742",
+        "conversation_id": "698106be-b6a0-47af-8e63-fbeb816dd67e",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T17:44:27.169068+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T17:41:49.127127+00:00",
+    "updated_at": "2026-07-25T17:44:27.169068+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+    "last_message_at": "2026-07-25T17:44:27.169068+00:00"
+  },
+  {
+    "id": "12a9e7c2-fc62-49b9-adab-94fa8a1b0ec3",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d993b0c6-7a90-449c-8d10-44c8e3ee442f",
+        "conversation_id": "12a9e7c2-fc62-49b9-adab-94fa8a1b0ec3",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-25T17:16:47.968561+00:00"
+      },
+      {
+        "id": "f57d7e79-66f6-42aa-ab13-e5ec6ada16b5",
+        "conversation_id": "12a9e7c2-fc62-49b9-adab-94fa8a1b0ec3",
+        "role": "assistant",
+        "content": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+        "attachments": [],
+        "confidence": 0.8312,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-25T17:16:47.968561+00:00"
+      }
+    ],
+    "created_at": "2026-07-25T17:16:47.968561+00:00",
+    "updated_at": "2026-07-25T17:16:47.968561+00:00",
+    "last_message": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-25T17:16:47.968561+00:00"
+  },
+  {
+    "id": "2177eb63-5463-4f62-954b-8ec982e6dff1",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Kapan lembur yang telah disetujui akan dibayarkan?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "cc67c2b2-a422-41d7-8620-0675ca1d4ed4",
+        "conversation_id": "2177eb63-5463-4f62-954b-8ec982e6dff1",
+        "role": "user",
+        "content": "Kapan lembur yang telah disetujui akan dibayarkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T21:11:12.071983+00:00"
+      },
+      {
+        "id": "d99fed1c-3c70-44f9-97ec-35d8ae5cc477",
+        "conversation_id": "2177eb63-5463-4f62-954b-8ec982e6dff1",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T21:11:12.071983+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T21:11:12.071983+00:00",
+    "updated_at": "2026-07-24T21:11:12.071983+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "Kapan lembur yang telah disetujui akan dibayarkan?",
+    "last_message_at": "2026-07-24T21:11:12.071983+00:00"
+  },
+  {
+    "id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Di mana karyawan dapat menemukan slip gaji mereka?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "fd0f5e1f-2e22-45f7-bf6f-0effbf1bdd93",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "user",
+        "content": "Di mana karyawan dapat menemukan slip gaji mereka?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T21:09:45.874096+00:00"
+      },
+      {
+        "id": "4848b86d-e032-4fea-be57-9f7858567301",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "assistant",
+        "content": "Karyawan dapat menemukan slip gaji mereka di portal HR dalam bagian My Documents setelah tanggal 25. dapat diakses melalui portal HR.",
+        "attachments": [],
+        "confidence": 0.7297,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "FAQ_HR.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7571,
+              "relevance_score": 0.7571,
+              "excerpt": "Nusantara Dynamics HR FAQ ====== ## Payslip Q: Where do I find my payslip? A: Payslips are available in the HR portal under My Documents after the 25th. ## Update Bank Q: How do I update my bank account? A: Submit the change in the HR portal; changes apply from the next payroll cycle.",
+              "paragraph_start": 1,
+              "paragraph_end": 3
+            }
+          ],
+          "source": "FAQ_HR.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T21:09:45.874096+00:00"
+      },
+      {
+        "id": "372ece73-94e1-4ecf-9128-981ae36f1053",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "user",
+        "content": "Kapan lembur yang telah disetujui akan dibayarkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T21:10:40.982528+00:00"
+      },
+      {
+        "id": "31de2efc-4a9a-4f26-8dda-908b9c36806d",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T21:10:40.982528+00:00"
+      },
+      {
+        "id": "994bdc94-9510-4f6c-8a5c-7d4e0c9a568e",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "user",
+        "content": "Kapan lembur yang telah disetujui akan dibayarkan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T21:10:56.398965+00:00"
+      },
+      {
+        "id": "c2450f83-f14f-423b-ad44-e23b8b6656f5",
+        "conversation_id": "92b34171-ef6e-4e0f-9c56-1d54f63f3b9f",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T21:10:56.398965+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T21:09:45.874096+00:00",
+    "updated_at": "2026-07-24T21:10:56.398965+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Kapan lembur yang telah disetujui akan dibayarkan?",
+    "last_message_at": "2026-07-24T21:10:56.398965+00:00"
+  },
+  {
+    "id": "d811537a-e90e-4336-807a-7ab3a7e9ecb5",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "67594f20-013d-4b33-a34c-979fb8c20e32",
+        "conversation_id": "d811537a-e90e-4336-807a-7ab3a7e9ecb5",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:50:52.854261+00:00"
+      },
+      {
+        "id": "6aa49f79-1fb7-4dff-8db0-a53ef323c68c",
+        "conversation_id": "d811537a-e90e-4336-807a-7ab3a7e9ecb5",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan. karyawan baru akan ditemani oleh buddy program selama 30 hari pertama. Karyawan baru juga akan diberikan laptop.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:50:52.854261+00:00"
+      },
+      {
+        "id": "b86712b0-5f49-4414-85a5-26750867797b",
+        "conversation_id": "d811537a-e90e-4336-807a-7ab3a7e9ecb5",
+        "role": "user",
+        "content": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:53:17.276924+00:00"
+      },
+      {
+        "id": "26f1c81d-afa4-4727-9984-4c7fcf9df232",
+        "conversation_id": "d811537a-e90e-4336-807a-7ab3a7e9ecb5",
+        "role": "assistant",
+        "content": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar dan margin laba bersih adalah 14%. Pendapatan tersebut mencakup seluruh tahun 2025, sedangkan margin laba bersih mencerminkan rasio laba bersih terhadap pendapatan tahunan.",
+        "attachments": [],
+        "confidence": 0.8306,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Financial_FY2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.837,
+              "relevance_score": 0.837,
+              "excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+              "paragraph_start": 1,
+              "paragraph_end": 4
+            },
+            {
+              "document_name": "Report_Q3_2025_Performance.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.77,
+              "relevance_score": 0.77,
+              "excerpt": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:53:17.276924+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:50:52.854261+00:00",
+    "updated_at": "2026-07-24T20:53:17.276924+00:00",
+    "last_message": "Pendapatan tahun 2025 perusahaan adalah IDR 158 miliar dan margin laba bersih adalah 14%. Pendapatan tersebut mencakup seluruh tahun 2025, sedangkan margin laba bersih mencerminkan rasio laba bersih terhadap pendapatan tahunan.",
+    "last_user_message": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "last_message_at": "2026-07-24T20:53:17.276924+00:00"
+  },
+  {
+    "id": "c0210839-fbac-4aed-b68d-52a344f8b5bd",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "2ebf53bb-d8e3-41fc-b916-f6610f7e5530",
+        "conversation_id": "c0210839-fbac-4aed-b68d-52a344f8b5bd",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:50:07.231598+00:00"
+      },
+      {
+        "id": "3169e4c6-0ce2-43ff-a466-3f74b79b4d36",
+        "conversation_id": "c0210839-fbac-4aed-b68d-52a344f8b5bd",
+        "role": "assistant",
+        "content": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+        "attachments": [],
+        "confidence": 0.8312,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:50:07.231598+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:50:07.231598+00:00",
+    "updated_at": "2026-07-24T20:50:07.231598+00:00",
+    "last_message": "Berdasarkan ketentuan pada dokumen, insiden IT prioritas P1 harus diselesaikan dalam waktu 4 jam. Jangka waktu tersebut merupakan batas penyelesaian yang ditetapkan untuk insiden IT prioritas P1.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-24T20:50:07.231598+00:00"
+  },
+  {
+    "id": "18024a91-9dfb-4232-b03b-7c7b2408d6b1",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ee7ba6a3-2003-43ed-b5e5-1df2e7a21fad",
+        "conversation_id": "18024a91-9dfb-4232-b03b-7c7b2408d6b1",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:29:10.103440+00:00"
+      },
+      {
+        "id": "aa75cf0a-1761-4053-8828-74d150a764d5",
+        "conversation_id": "18024a91-9dfb-4232-b03b-7c7b2408d6b1",
+        "role": "assistant",
+        "content": "4 jam.",
+        "attachments": [],
+        "confidence": 0.8312,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "paragraph_start": 1,
+              "paragraph_end": 8
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:29:10.103440+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:29:10.103440+00:00",
+    "updated_at": "2026-07-24T20:29:10.103440+00:00",
+    "last_message": "4 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-24T20:29:10.103440+00:00"
+  },
+  {
+    "id": "b97f5b52-f5a2-40bc-90fa-8f271d06cc7b",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "fd0e479b-0ef4-4af7-bde4-84f7b3c7f19f",
+        "conversation_id": "b97f5b52-f5a2-40bc-90fa-8f271d06cc7b",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:25:42.691852+00:00"
+      },
+      {
+        "id": "824a62b2-a25b-4e8c-b883-a545cb61f775",
+        "conversation_id": "b97f5b52-f5a2-40bc-90fa-8f271d06cc7b",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:25:42.691852+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:25:42.691852+00:00",
+    "updated_at": "2026-07-24T20:25:42.691852+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-24T20:25:42.691852+00:00"
+  },
+  {
+    "id": "aca408f9-e802-4ff4-bd4c-4e6ad6f79127",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "17c046eb-6127-4fa7-8560-e9f80d777527",
+        "conversation_id": "aca408f9-e802-4ff4-bd4c-4e6ad6f79127",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:13:43.747865+00:00"
+      },
+      {
+        "id": "bb4ebe3e-d5e9-4c85-bd83-fda46769b46a",
+        "conversation_id": "aca408f9-e802-4ff4-bd4c-4e6ad6f79127",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:13:43.747865+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:13:43.747865+00:00",
+    "updated_at": "2026-07-24T20:13:43.747865+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-24T20:13:43.747865+00:00"
+  },
+  {
+    "id": "0080a3b7-0189-4150-bfca-a5d3f1bf4c13",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "2a764b69-b2de-4e69-9d27-8a6981161915",
+        "conversation_id": "0080a3b7-0189-4150-bfca-a5d3f1bf4c13",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T20:11:54.906197+00:00"
+      },
+      {
+        "id": "0e403cf2-9477-4752-a9de-c3b828bc3bba",
+        "conversation_id": "0080a3b7-0189-4150-bfca-a5d3f1bf4c13",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T20:11:54.906197+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T20:11:54.906197+00:00",
+    "updated_at": "2026-07-24T20:11:54.906197+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-24T20:11:54.906197+00:00"
+  },
+  {
+    "id": "618855b9-dc32-4c54-9ca4-fdfc72e2a8e2",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "995bdfce-151e-463a-afd6-fb65a97f69dc",
+        "conversation_id": "618855b9-dc32-4c54-9ca4-fdfc72e2a8e2",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T19:31:49.620242+00:00"
+      },
+      {
+        "id": "1840b3d4-d3af-451f-9767-56621809c7c9",
+        "conversation_id": "618855b9-dc32-4c54-9ca4-fdfc72e2a8e2",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T19:31:49.620242+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T19:31:49.620242+00:00",
+    "updated_at": "2026-07-24T19:31:49.620242+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-24T19:31:49.620242+00:00"
+  },
+  {
+    "id": "8477eddd-9b5b-45b9-b054-7ef60c7f7a21",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "812c2ba2-0491-4f5d-bfc2-6b47b256250f",
+        "conversation_id": "8477eddd-9b5b-45b9-b054-7ef60c7f7a21",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-24T19:30:13.848791+00:00"
+      },
+      {
+        "id": "1bf2e985-eea6-41b2-9fd7-ee5ae56d4596",
+        "conversation_id": "8477eddd-9b5b-45b9-b054-7ef60c7f7a21",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+        "attachments": [],
+        "confidence": 0.6957,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6957,
+              "relevance_score": 0.6957,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "paragraph_start": 1,
+              "paragraph_end": 10
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-24T19:30:13.848791+00:00"
+      }
+    ],
+    "created_at": "2026-07-24T19:30:13.848791+00:00",
+    "updated_at": "2026-07-24T19:30:13.848791+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi. Selama masa percobaan, karyawan baru akan diberikan laptop pada hari pertama. Program buddy diberikan selama 30 hari pertama.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-24T19:30:13.848791+00:00"
+  },
+  {
     "id": "2418a977-22da-4d06-ad50-4b1d1a8638bb",
     "user_id": "dev-admin",
     "user_name": "Admin",

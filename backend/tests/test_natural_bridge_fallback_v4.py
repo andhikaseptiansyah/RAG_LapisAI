@@ -99,7 +99,7 @@ def test_chat_retries_natural_bridge_after_original_retrieval_refusal(monkeypatc
     assert calls == [QUESTION_ID, QUESTION_EN]
     assert response["retrieval_mode"] == "natural_language_bridge"
     assert response["retrieval_query"] == QUESTION_EN
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
     assert response["sources"][0]["document_name"] == "SOP_IT_Incident_Handling.pdf"
 
 
@@ -150,7 +150,7 @@ def test_scalar_fallback_selects_p1_resolution_from_real_multi_priority_excerpt(
     response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
 
     assert calls == [QUESTION_ID, QUESTION_EN]
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
     assert response["retrieval_mode"] == "natural_language_bridge"
 
 
@@ -192,7 +192,7 @@ def test_real_evidence_and_answerability_gates_accept_bridge_candidate(monkeypat
 
     response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
 
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
     assert response["retrieval_mode"] == "natural_language_bridge"
     assert response["retrieval_query"] == QUESTION_EN
     assert response["confidence"] >= 0.50

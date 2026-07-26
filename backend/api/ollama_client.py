@@ -5,6 +5,7 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from api.cancellation import raise_if_cancelled
 from api.answer_formatter import (
     answer_text_only,
     build_generation_evidence,
@@ -158,6 +159,37 @@ def _requirements_complete(question: str, answer: str) -> bool:
     )
 
 
+def _log_grounding_decision(stage: str, answer: str, grounding: Any) -> None:
+    """Print the exact native answer and grounding diagnostics.
+
+    This is intentionally concise enough for normal development logs while still
+    exposing which clause caused rejection. It does not alter the decision.
+    """
+    if grounding is None:
+        return
+    print(
+        f"[GROUNDING_DEBUG] stage={stage} supported={grounding.supported} "
+        f"score={grounding.score:.3f} answer={answer!r}"
+    )
+    if grounding.reasons:
+        print(f"[GROUNDING_DEBUG] reasons={list(grounding.reasons)!r}")
+    if grounding.unsupported_facts:
+        print(
+            "[GROUNDING_DEBUG] unsupported_facts="
+            f"{list(grounding.unsupported_facts)!r}"
+        )
+    if grounding.unsupported_claims:
+        print(
+            "[GROUNDING_DEBUG] unsupported_claims="
+            f"{list(grounding.unsupported_claims)!r}"
+        )
+    if grounding.missing_answer_requirements:
+        print(
+            "[GROUNDING_DEBUG] missing_requirements="
+            f"{list(grounding.missing_answer_requirements)!r}"
+        )
+
+
 def _requirement_instruction(question: str) -> str:
     descriptions = [requirement.description for requirement in _answer_requirements(question)]
     if not descriptions:
@@ -176,6 +208,7 @@ def _ollama_chat(
     Qwen3 thinking is explicitly disabled so the output budget is used for the
     visible answer. The done_reason is retained to detect token-limit truncation.
     """
+    raise_if_cancelled()
     payload = {
         "model": OLLAMA_MODEL,
         "stream": False,
@@ -199,9 +232,11 @@ def _ollama_chat(
         method="POST",
     )
 
+    raise_if_cancelled()
     with urllib.request.urlopen(request, timeout=OLLAMA_TIMEOUT_SECONDS) as response:
         data = json.loads(response.read().decode("utf-8"))
 
+    raise_if_cancelled()
     message = data.get("message") or {}
     content = message.get("content") or data.get("response") or ""
     done_reason = str(data.get("done_reason") or "").strip().lower()
@@ -260,6 +295,8 @@ def _answer_numeric_values(answer: str) -> list[str]:
             seen.add(value)
             values.append(value)
     return values
+
+
 
 
 def _is_likely_incomplete_answer(
@@ -390,10 +427,12 @@ def build_ollama_grounded_answer(
         + "You are a strict enterprise Retrieval-Augmented Generation assistant. "
         "Use only the supplied evidence. Do not use outside knowledge. "
         "Start with the direct answer. Use the evidence facts, but translate ordinary wording into the "
-        "mandatory output language. When useful supporting details exist, continue with a coherent paragraph "
-        "of 2 to 4 informative sentences. Explain only definitions, relationships, scope, conditions, or "
-        "consequences explicitly stated in the evidence. Prefer complementary facts from two or more evidence "
-        "blocks when relevant. If only one fact is supported, stop instead of padding the answer. "
+        "mandatory output language. When the question requests one fact, answer in 1 or 2 sentences and do not "
+        "add other policy facts merely because they appear nearby in the evidence. Use 2 to 4 sentences only "
+        "when the question explicitly requests multiple parts or a supported explanation is necessary. Explain "
+        "only definitions, relationships, scope, conditions, or consequences explicitly stated in the evidence. "
+        "Prefer complementary facts from two or more evidence blocks only when they answer the question. If only "
+        "one fact is requested, stop after that fact and one faithful clarification at most. "
         "Do not add an introduction, recommendation, citation, confidence, heading, label, assumption, "
         "example, outside inference, repetition, or a generic closing sentence. "
         "Never replace a supported answer with a refusal. "
@@ -413,9 +452,11 @@ def build_ollama_grounded_answer(
             f"EVIDENCE:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Translate any Indonesian evidence needed for the answer. Start with the direct answer, then "
-            "write 2 to 4 connected sentences when the evidence supports relevant explanation. Use multiple "
-            "evidence blocks when they add complementary facts. Do not repeat facts, add filler, or infer "
+            "Translate any Indonesian evidence needed for the answer. Start with the direct answer. For a "
+            "single-fact question, use 1 or 2 sentences and do not add unrelated nearby policy details. Use "
+            "2 to 4 connected sentences only when the question asks multiple parts or the evidence directly "
+            "supports a necessary explanation. Use multiple evidence blocks only when they answer the question. "
+            "Do not repeat facts, add filler, or infer "
             "anything absent from the evidence. Output answer text only. ENGLISH ONLY."
         )
     else:
@@ -424,9 +465,11 @@ def build_ollama_grounded_answer(
             f"BUKTI:\n{context}\n\n"
             f"{requirement_instruction}\n"
             f"{completeness_instruction}"
-            "Terjemahkan bukti berbahasa Inggris yang diperlukan. Mulai dengan jawaban langsung, lalu tulis "
-            "2 sampai 4 kalimat yang saling terhubung jika bukti mendukung penjelasan relevan. Gabungkan "
-            "beberapa blok bukti bila masing-masing menambahkan fakta yang saling melengkapi. Jangan "
+            "Terjemahkan bukti berbahasa Inggris yang diperlukan. Mulai dengan jawaban langsung. Untuk "
+            "pertanyaan yang meminta satu fakta, gunakan 1 atau 2 kalimat dan jangan menambahkan ketentuan lain "
+            "yang kebetulan berada di sekitar bukti. Gunakan 2 sampai 4 kalimat hanya jika pertanyaan meminta "
+            "beberapa bagian atau bukti memang mendukung penjelasan yang diperlukan. Gabungkan beberapa blok "
+            "bukti hanya jika semuanya menjawab pertanyaan. Jangan "
             "mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
             "Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
             "nama produk, kode, dan akronim. Keluarkan teks jawaban saja. BAHASA INDONESIA SAJA."
@@ -461,6 +504,7 @@ def build_ollama_grounded_answer(
 
         retry_count = 0
         while retry_count < OLLAMA_MAX_RETRIES:
+            raise_if_cancelled()
             incomplete = _is_likely_incomplete_answer(question, llm_answer, done_reason)
             wrong_language = bool(
                 llm_answer
@@ -471,6 +515,12 @@ def build_ollama_grounded_answer(
                 if ENABLE_GENERATION_GROUNDING_VALIDATION and llm_answer and not wrong_language
                 else None
             )
+            if grounding is not None and not grounding.supported:
+                _log_grounding_decision(
+                    f"retry_{retry_count}",
+                    llm_answer,
+                    grounding,
+                )
             if (
                 not incomplete
                 and not wrong_language
@@ -525,14 +575,15 @@ def build_ollama_grounded_answer(
     if ENABLE_GENERATION_GROUNDING_VALIDATION:
         grounding = validate_grounded_answer(question, llm_answer, grounding_chunks)
         if not grounding.supported:
+            _log_grounding_decision("final", llm_answer, grounding)
             # Preserve the supported part of a useful answer before falling back.
             # This removes hallucinated explanatory tails without converting an
             # answerable question into a refusal.
             pruned_answer = _clean_model_answer(
-                prune_unsupported_claims(question, llm_answer, chunks)
+                prune_unsupported_claims(question, llm_answer, grounding_chunks)
             )
             if pruned_answer:
-                pruned_grounding = validate_grounded_answer(question, pruned_answer, chunks)
+                pruned_grounding = validate_grounded_answer(question, pruned_answer, grounding_chunks)
                 if (
                     pruned_grounding.supported
                     and not _is_likely_incomplete_answer(question, pruned_answer)
@@ -550,6 +601,7 @@ def build_ollama_grounded_answer(
                 + ", ".join(grounding.reasons)
             )
             return ""
+
 
     if is_refusal_answer(llm_answer):
         # Retrieval and answerability already established evidence. A model-level

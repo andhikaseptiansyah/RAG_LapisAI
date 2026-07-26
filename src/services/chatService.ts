@@ -20,6 +20,7 @@ export interface SendChatPayload {
 export type QueryFailureReason =
   | 'USER_STOPPED'
   | 'CLIENT_ERROR'
+  | 'NETWORK_OFFLINE'
   | 'EMPTY_RESPONSE';
 
 type RawMessageSource = {

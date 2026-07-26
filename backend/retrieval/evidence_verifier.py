@@ -68,6 +68,8 @@ HARD_CONCEPTS = {
     "mailbox_quota",
     "incident_p1",
     "incident_p2",
+    "overtime_payment",
+    "retirement_benefit",
 }
 
 # Generic concepts help scoring but should not independently reject a candidate.
@@ -118,6 +120,19 @@ NUMBER_PATTERN = re.compile(
 
 VERSION_PATTERN = re.compile(
     r"\b(?:version|versi|macos|windows|android|ios)\s*[v.]?\s*\d+(?:\.\d+)*\b",
+    flags=re.I,
+)
+
+RELATIVE_DATE_TIME_PATTERN = re.compile(
+    r"\b(?:"
+    r"(?:the\s+)?(?:next|following|previous|prior)\s+(?:working\s+day|business\s+day|"
+    r"day|week|month|year|payroll(?:\s+cycle)?)|"
+    r"(?:next|following)\s+month(?:'s)?\s+payroll|"
+    r"payroll\s+(?:cycle\s+)?(?:of\s+)?(?:the\s+)?(?:next|following)\s+month|"
+    r"(?:hari\s+kerja|hari|minggu|bulan|tahun|payroll)\s+(?:sebelumnya|berikutnya)|"
+    r"siklus\s+payroll\s+(?:bulan\s+)?berikutnya|"
+    r"payroll\s+bulan\s+berikutnya"
+    r")\b",
     flags=re.I,
 )
 
@@ -254,6 +269,53 @@ def _concept_match(canonical: str, content: str) -> bool:
     return contains_alias(content, CONCEPT_ALIASES[canonical])
 
 
+
+
+def _has_unanswered_relevant_faq_question(
+    required: list[str],
+    content: str,
+) -> bool:
+    """Reject a FAQ chunk that contains the relevant Q: but not its paired A:.
+
+    Long TXT FAQ files can be split exactly between a question and its answer.
+    A neighbouring answer chunk may still be retrievable, but the question-only
+    chunk must not be marked as supporting evidence merely because its wording
+    overlaps the user query.
+    """
+    if not required:
+        return False
+
+    text = str(content or "")
+    question_markers = list(
+        re.finditer(r"(?:^|\s)Q:\s*", text, flags=re.I)
+    )
+    if not question_markers:
+        return False
+
+    for index, marker in enumerate(question_markers):
+        segment_end = (
+            question_markers[index + 1].start()
+            if index + 1 < len(question_markers)
+            else len(text)
+        )
+        segment = text[marker.end():segment_end]
+        answer_marker = re.search(r"(?:^|\s)A:\s*", segment, flags=re.I)
+        question_part = (
+            segment[:answer_marker.start()]
+            if answer_marker
+            else segment
+        )
+        relevant = any(
+            _concept_match(canonical, question_part)
+            for canonical in required
+            if canonical in HARD_CONCEPTS
+        )
+        if relevant and answer_marker is None:
+            return True
+
+    return False
+
+
 def _lexical_coverage(question: str, content: str) -> float:
     query_tokens = _tokenize(question)
     if not query_tokens:
@@ -350,6 +412,9 @@ def verify_evidence(
         if canonical in HARD_CONCEPTS:
             hard_failures.append(f"missing_concept:{canonical}")
 
+    if _has_unanswered_relevant_faq_question(required, content_text):
+        hard_failures.append("faq_question_without_answer")
+
     hard_failures.extend(_subject_conflicts(required, content_text))
 
     if _duration_requested(question_text) and not TIME_PATTERN.search(content_text):
@@ -373,6 +438,7 @@ def verify_evidence(
         numeric_support = 1.0 if (
             NUMBER_PATTERN.search(content_text)
             or TIME_PATTERN.search(content_text)
+            or RELATIVE_DATE_TIME_PATTERN.search(content_text)
             or VERSION_PATTERN.search(content_text)
         ) else 0.0
 

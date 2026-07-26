@@ -64,11 +64,14 @@ def test_grounding_still_rejects_an_unsupported_explanatory_tail() -> None:
 
 
 def test_verified_scalar_selects_p1_resolution_from_merged_p1_p2_pdf_row() -> None:
-    assert build_verified_scalar_answer(
+    answer = build_verified_scalar_answer(
         QUESTION_ID,
         [_strict_chunk()],
         language="ID",
-    ) == "4 jam."
+    )
+    assert "4 jam" in answer
+    assert "insiden IT prioritas P1" in answer
+    assert "batas penyelesaian" in answer
 
 
 def test_chat_lets_model_expand_a_verified_scalar_with_supported_context(monkeypatch) -> None:
@@ -112,5 +115,6 @@ def test_chat_keeps_verified_scalar_as_safe_fallback_when_generation_fails(monke
 
     response = chat_service.run_chat(QUESTION_ID, language="ID", model="ollama")
 
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
+    assert "insiden IT prioritas P1" in response["answer"]
     assert response["generation_mode"] == "verified_scalar_fallback"

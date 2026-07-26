@@ -55,7 +55,7 @@ def test_indonesian_p1_reuses_successful_english_path_and_returns_localized_answ
 
     assert calls[0][0] == QUESTION_ID
     assert calls[1] == (QUESTION_EN, True)
-    assert response["answer"] == "4 jam."
+    assert "4 jam" in response["answer"]
     assert response["language"] == "ID"
     assert response["retrieval_mode"] == "natural_language_bridge"
     assert response["retrieval_query"] == QUESTION_EN

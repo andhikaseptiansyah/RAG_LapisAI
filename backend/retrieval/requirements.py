@@ -71,6 +71,18 @@ TIME_PATTERN = re.compile(
     r"menit|jam|hari\s+kerja|hari|minggu|bulan|tahun)\b",
     flags=re.I,
 )
+RELATIVE_DATE_TIME_PATTERN = re.compile(
+    r"\b(?:"
+    r"(?:the\s+)?(?:next|following|previous|prior)\s+(?:working\s+day|business\s+day|"
+    r"day|week|month|year|payroll(?:\s+cycle)?)|"
+    r"(?:next|following)\s+month(?:'s)?\s+payroll|"
+    r"payroll\s+(?:cycle\s+)?(?:of\s+)?(?:the\s+)?(?:next|following)\s+month|"
+    r"(?:hari\s+kerja|hari|minggu|bulan|tahun|payroll)\s+(?:sebelumnya|berikutnya)|"
+    r"siklus\s+payroll\s+(?:bulan\s+)?berikutnya|"
+    r"payroll\s+bulan\s+berikutnya"
+    r")\b",
+    flags=re.I,
+)
 NUMBER_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?\b")
 YEAR_PATTERN = re.compile(r"\b(?:19|20)\d{2}\b")
 QUOTED_PATTERN = re.compile(r"['\"“”‘’*]([^'\"“”‘’*]{8,160})['\"“”‘’*]")
@@ -394,6 +406,7 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
     if requirement.kind == "date_or_time":
         return bool(
             TIME_PATTERN.search(combined)
+            or RELATIVE_DATE_TIME_PATTERN.search(combined)
             or re.search(r"\b(?:the\s+)?\d{1,2}(?:st|nd|rd|th)?\b", combined, flags=re.I)
             or re.search(r"\b\d{1,2}[:.]\d{2}\b", combined)
             or YEAR_PATTERN.search(combined)

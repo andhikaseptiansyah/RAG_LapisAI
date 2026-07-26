@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from typing import Any
 
@@ -18,6 +19,7 @@ from api.answer_formatter import (
     top_confidence,
 )
 from api.build_info import BUILD_VERSION
+from api.cancellation import raise_if_cancelled
 from api.follow_up_service import build_dataset_follow_up_question
 from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
@@ -41,12 +43,107 @@ from uploads.config import (
     MIN_RESULT_SCORE,
 )
 
+def _sanitize_verified_scalar_answer(answer: str) -> str:
+    """Clean malformed or duplicated deterministic scalar fallbacks.
+
+    Some formatter patches may accidentally wrap an already formatted answer
+    inside another template, producing text such as:
+
+        "... dalam waktu Berdasarkan ketentuan pada dokumen, ... 4 jam."
+
+    The chat service treats ``build_verified_scalar_answer`` as the final
+    formatter. This guard keeps the innermost complete answer, removes repeated
+    sentences, and limits deterministic fallbacks to two concise sentences.
+    It does not invent or change any fact extracted from the evidence.
+    """
+    clean = re.sub(r"\s+", " ", str(answer or "")).strip()
+    if not clean:
+        return ""
+
+    # Locate repeated answer-opening markers. If a formatter wrapped an answer
+    # that was already complete, the later marker begins the valid inner answer.
+    markers = (
+        "Berdasarkan ketentuan pada dokumen,",
+        "Berdasarkan dokumen sumber,",
+        "Berdasarkan dokumen yang telah diindeks,",
+        "According to the source document,",
+        "According to the indexed document,",
+        "According to the document,",
+    )
+    marker_positions: list[int] = []
+    lowered = clean.casefold()
+
+    for marker in markers:
+        marker_lower = marker.casefold()
+        start = 0
+        while True:
+            position = lowered.find(marker_lower, start)
+            if position < 0:
+                break
+            marker_positions.append(position)
+            start = position + len(marker_lower)
+
+    marker_positions = sorted(set(marker_positions))
+    if len(marker_positions) >= 2:
+        clean = clean[marker_positions[-1]:].strip()
+
+    # Remove exact and near-duplicate explanatory sentences while preserving
+    # the factual sentence and one short explanation.
+    sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+", clean)
+        if sentence.strip()
+    ]
+
+    kept: list[str] = []
+    normalized_kept: list[str] = []
+    for sentence in sentences:
+        normalized = re.sub(r"[^a-z0-9]+", " ", sentence.casefold()).strip()
+        if not normalized:
+            continue
+
+        duplicate = False
+        for existing in normalized_kept:
+            # Treat sentences as duplicates when one largely contains the
+            # other. This catches repeated "Jangka waktu tersebut..." clauses.
+            shorter, longer = sorted((normalized, existing), key=len)
+            if shorter == longer or (
+                len(shorter) >= 35
+                and shorter in longer
+            ):
+                duplicate = True
+                break
+
+            sentence_tokens = set(normalized.split())
+            existing_tokens = set(existing.split())
+            overlap = len(sentence_tokens & existing_tokens)
+            union = len(sentence_tokens | existing_tokens)
+            if union and overlap / union >= 0.72:
+                duplicate = True
+                break
+
+        if duplicate:
+            continue
+
+        kept.append(sentence)
+        normalized_kept.append(normalized)
+
+        if len(kept) >= 2:
+            break
+
+    return " ".join(kept).strip() if kept else clean
+
+
 
 def _strict_chunk(chunk: dict[str, Any]) -> bool:
     return bool(
         chunk.get("answerabilityAccepted") is True
         and chunk.get("answerabilityEvidenceSelected", True)
-        and chunk.get("answerabilityStrictlySupported", chunk.get("evidenceSupported") is True)
+        and chunk.get(
+            "answerabilityStrictlySupported",
+            chunk.get("evidenceSupported") is True
+            or chunk.get("answerabilityCoherentEvidence") is True,
+        )
         and not chunk.get("evidenceHardFailures")
         and not chunk.get("evidenceHardContradictions")
         and (
@@ -258,6 +355,7 @@ def _retrieve_with_language_fallback(
     """
     requested_k = max(top_k, MAX_GENERATION_CONTEXTS)
 
+    raise_if_cancelled()
     primary = hybrid_search(question, top_k=requested_k)
     primary_strict = _strict_candidates(primary)
     if primary_strict:
@@ -279,6 +377,7 @@ def _retrieve_with_language_fallback(
 
     # This deliberately mirrors a successful user-entered English question,
     # including reranking, evidence verification, and English answerability.
+    raise_if_cancelled()
     bridge_candidates = hybrid_search(
         bridge_query,
         top_k=bridge_top_k,
@@ -300,6 +399,7 @@ def _retrieve_with_language_fallback(
         "revalidation; checking raw English semantic+BM25 union"
     )
     raw_candidate_k = max(bridge_candidate_k * 2, 80)
+    raise_if_cancelled()
     raw_candidates = _base_hybrid_candidates(
         bridge_query,
         candidate_k=raw_candidate_k,
@@ -324,9 +424,11 @@ def run_chat(
     language: str = "AUTO",
     model: str | None = None,
     evaluation_mode: bool = False,
+    cancel_event: Any | None = None,
 ) -> dict[str, Any]:
     """Run one grounded chat turn using a strict evidence-first pipeline."""
     started_at = time.perf_counter()
+    raise_if_cancelled(cancel_event)
     requested_language = str(language or "AUTO").upper()
     normalized_language = resolve_response_language(question, requested_language)
     selected_provider = resolve_provider(model)
@@ -346,10 +448,12 @@ def run_chat(
             "buildVersion": BUILD_VERSION,
         }
 
+    raise_if_cancelled(cancel_event)
     retrieved_chunks, retrieval_mode, retrieval_query = _retrieve_with_language_fallback(
         question,
         top_k=top_k,
     )
+    raise_if_cancelled(cancel_event)
     chunks = select_context_bundle(
         question,
         retrieved_chunks,
@@ -389,18 +493,30 @@ def run_chat(
 
     verified_scalar_answer = ""
     if not evaluation_mode:
-        verified_scalar_answer = answer_text_only(
+        raw_verified_scalar_answer = answer_text_only(
             build_verified_scalar_answer(
                 question,
                 chunks,
                 language=normalized_language,
             )
         )
+        verified_scalar_answer = _sanitize_verified_scalar_answer(
+            raw_verified_scalar_answer
+        )
+        if (
+            raw_verified_scalar_answer
+            and verified_scalar_answer != raw_verified_scalar_answer
+        ):
+            print(
+                "[CHAT] cleaned duplicated verified scalar fallback: "
+                f"{verified_scalar_answer}"
+            )
 
     used_extractive_fallback = False
     used_language_retry = False
     used_verified_scalar_fallback = False
 
+    raise_if_cancelled(cancel_event)
     native_answer = answer_text_only(
         build_grounded_answer(
             question,
@@ -411,6 +527,7 @@ def run_chat(
         )
     )
 
+    raise_if_cancelled(cancel_event)
     answer = native_answer
     native_language_ok = bool(
         answer and answer_matches_requested_language(answer, normalized_language)
@@ -487,10 +604,12 @@ def run_chat(
     else:
         generation_mode = "native_model"
 
+    raise_if_cancelled(cancel_event)
     sources = build_sources(
         chunks,
         question=question,
         limit=MAX_SOURCE_CITATIONS,
+        answer=answer,
     )
 
     if not answer or is_refusal_answer(answer) or not sources:
@@ -503,6 +622,7 @@ def run_chat(
         payload["retrieval_query"] = retrieval_query
         return payload
 
+    raise_if_cancelled(cancel_event)
     follow_up_question = build_dataset_follow_up_question(
         question=question,
         answer=answer,

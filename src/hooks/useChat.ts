@@ -20,6 +20,7 @@ import {
 
 import type {
   ChatLanguage,
+  QueryFailureReason,
 } from '../services/chatService';
 
 import {
@@ -241,6 +242,41 @@ export function useChat(
         return false;
       }
 
+      if (
+        typeof navigator !== 'undefined' &&
+        !navigator.onLine
+      ) {
+        const queryId = createLocalId();
+        const selectedLanguage = languageOverride ?? language;
+        const userMessage: Message = {
+          id: queryId,
+          role: 'user',
+          content: normalizedContent,
+          time: getCurrentTime(),
+          attachments:
+            attachments.length > 0
+              ? attachments
+              : undefined,
+        };
+        const offlineMessage =
+          selectedLanguage === 'EN'
+            ? 'No internet connection. The request was stopped and no answer was generated.'
+            : 'Tidak ada koneksi internet. Permintaan dihentikan dan jawaban tidak dibuat.';
+
+        setMessages((currentMessages) => [
+          ...currentMessages,
+          userMessage,
+          {
+            id: createLocalId(),
+            role: 'system',
+            content: offlineMessage,
+            time: getCurrentTime(),
+          },
+        ]);
+        setError(offlineMessage);
+        return false;
+      }
+
       if (isGenerating) {
         return false;
       }
@@ -293,6 +329,15 @@ export function useChat(
           controller.signal
         );
 
+        // Abort fetch tidak selalu menang terhadap response yang tiba pada saat
+        // bersamaan. Jangan pernah menambahkan jawaban dari query yang sudah stop.
+        if (
+          controller.signal.aborted ||
+          activeQueryRef.current?.queryId !== queryId
+        ) {
+          return false;
+        }
+
         const assistantMessage = {
           ...convertChatResponseToMessage(response),
           shouldAnimate: true,
@@ -332,7 +377,10 @@ export function useChat(
           await recordQueryFailure(
             queryId,
             normalizedContent,
-            'CLIENT_ERROR'
+            caughtError instanceof ApiError &&
+              caughtError.code === 'NETWORK_ERROR'
+              ? 'NETWORK_OFFLINE'
+              : 'CLIENT_ERROR'
           );
         } catch (loggingError) {
           console.error(
@@ -440,27 +488,61 @@ export function useChat(
     []
   );
 
-  const stopGenerating = useCallback(() => {
+  const stopGenerating = useCallback((
+    reason: QueryFailureReason = 'USER_STOPPED'
+  ) => {
     const activeQuery = activeQueryRef.current;
+
+    // Kirim sinyal pembatalan ke backend. Request ini memakai koneksi terpisah
+    // dari fetch chat yang akan di-abort.
+    if (activeQuery) {
+      void recordQueryFailure(
+        activeQuery.queryId,
+        activeQuery.question,
+        reason
+      ).catch((loggingError) => {
+        console.error(
+          'Gagal mencatat atau membatalkan query aktif:',
+          loggingError
+        );
+      });
+    }
 
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
     activeQueryRef.current = null;
     setIsGenerating(false);
-
-    if (activeQuery) {
-      void recordQueryFailure(
-        activeQuery.queryId,
-        activeQuery.question,
-        'USER_STOPPED'
-      ).catch((loggingError) => {
-        console.error(
-          'Gagal mencatat query yang dihentikan pengguna:',
-          loggingError
-        );
-      });
-    }
   }, []);
+
+
+
+  useEffect(() => {
+    const handleOffline = () => {
+      if (!activeQueryRef.current) {
+        return;
+      }
+
+      stopGenerating('NETWORK_OFFLINE');
+      const message =
+        language === 'EN'
+          ? 'Internet connection was lost. The request was stopped and no answer was generated.'
+          : 'Koneksi internet terputus. Permintaan dihentikan dan jawaban tidak dibuat.';
+
+      setError(message);
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          id: createLocalId(),
+          role: 'system',
+          content: message,
+          time: getCurrentTime(),
+        },
+      ]);
+    };
+
+    window.addEventListener('offline', handleOffline);
+    return () => window.removeEventListener('offline', handleOffline);
+  }, [language, stopGenerating]);
 
   const clearChat = useCallback(() => {
     abortControllerRef.current?.abort();

@@ -232,6 +232,19 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "medical insurance",
         "asuransi kesehatan",
     ),
+    "retirement_benefit": (
+        "pension benefit",
+        "retirement benefit",
+        "employee pension",
+        "pension plan",
+        "pension",
+        "manfaat pensiun",
+        "program pensiun",
+        "jaminan pensiun",
+        "bpjs ketenagakerjaan",
+        "contributes to bpjs ketenagakerjaan",
+        "kontribusi ke bpjs ketenagakerjaan",
+    ),
     "file_upload": (
         "file upload",
         "file-upload",
@@ -316,6 +329,20 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "payment is the prior working day",
         "pembayaran gaji",
         "gaji dibayar",
+    ),
+    "overtime_payment": (
+        "overtime",
+        "approved overtime",
+        "overtime payment",
+        "overtime paid",
+        "how is overtime paid",
+        "lembur",
+        "jam lembur",
+        "lembur disetujui",
+        "lembur yang telah disetujui",
+        "pembayaran lembur",
+        "lembur dibayar",
+        "lembur dibayarkan",
     ),
     "data_breach": (
         "data breach",
@@ -440,10 +467,20 @@ PHRASE_EXPANSIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bversi\s+minimum\s+mac\s*os\b", (
         "minimum supported macOS version",
     )),
+    (r"\b(?:(?:manfaat|program|jaminan)\s+)?pensiun\b", (
+        "pension benefit",
+        "retirement benefit",
+        "employee pension",
+    )),
     (r"\b(?:maximum|max|maksimal|batas|ukuran)\s+(?:file[- ]?upload|upload|unggahan)\s+(?:size|file)?\b", (
         "file upload size limit",
         "maximum file upload size",
         "attachment size limit",
+    )),
+    (r"\b(?:lembur|jam\s+lembur)(?:\s+yang\s+telah\s+disetujui)?\b", (
+        "approved overtime",
+        "overtime payment",
+        "how is overtime paid",
     )),
     (r"\b(?:customer|client|pelanggan|nasabah)\s+portal\b", (
         "customer portal",
@@ -488,9 +525,20 @@ def contains_alias(text: str, aliases: Iterable[str]) -> bool:
     if not normalized:
         return False
 
-    padded = f" {normalized} "
+    # ALIAS_PUNCTUATION_BOUNDARY_V1
+    # Concept aliases are ordinary phrases, not paths or version identifiers.
+    # Convert punctuation to word separators before boundary matching. Without
+    # this, an alias at the end of a sentence such as ``customer portal.`` does
+    # not match ``customer portal`` because normalize_text deliberately keeps
+    # periods for URLs, filenames, and version-like values.
+    phrase_text = re.sub(r"[^a-z0-9à-ÿ%]+", " ", normalized)
+    phrase_text = re.sub(r"\s+", " ", phrase_text).strip()
+    padded = f" {phrase_text} "
+
     for alias in aliases:
         candidate = normalize_text(alias)
+        candidate = re.sub(r"[^a-z0-9à-ÿ%]+", " ", candidate)
+        candidate = re.sub(r"\s+", " ", candidate).strip()
         if candidate and f" {candidate} " in padded:
             return True
     return False
@@ -589,6 +637,7 @@ ENGLISH_BRIDGE_ALIASES: dict[str, tuple[str, ...]] = {
     "probation": ("probation period",),
     "dependents": ("dependents",),
     "health_insurance": ("health insurance",),
+    "retirement_benefit": ("pension benefit", "retirement benefit"),
     "file_upload": ("file upload", "upload size limit"),
     "customer_portal": ("customer portal",),
     "incident_p1": ("P1 IT incident", "P1 incidents"),
@@ -597,6 +646,11 @@ ENGLISH_BRIDGE_ALIASES: dict[str, tuple[str, ...]] = {
     "access_card": ("access card",),
     "payslip": ("payslip",),
     "salary_payment": ("salary payment",),
+    "overtime_payment": (
+        "approved overtime",
+        "overtime payment",
+        "how overtime is paid",
+    ),
     "data_breach": ("data breach",),
     "information_classification": ("information classification",),
     "audit_log": ("audit log",),
@@ -675,6 +729,10 @@ def build_natural_bridge_query(query: str) -> str:
         return "What is the maximum file upload size in the customer portal?"
     if "mailbox_quota" in concepts:
         return "What is the mailbox size limit?"
+    if "retirement_benefit" in concepts:
+        return "Does the company provide a pension benefit to employees?"
+    if "overtime_payment" in concepts:
+        return "When is approved overtime paid?"
     if "data_breach" in concepts and "processing_time" in concepts:
         return "Who must a suspected data breach be reported to and how quickly?"
     if "annual_leave" in concepts and "carryover" in concepts:

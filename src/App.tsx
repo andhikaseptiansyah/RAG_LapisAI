@@ -1028,7 +1028,7 @@ export const App: React.FC = () => {
             id: `stopped-${Date.now()}`,
             role: 'system',
             content:
-              '[ Generation Stopped by User ]',
+              'Permintaan dihentikan oleh pengguna. Jawaban tidak dibuat.',
           },
         ]
       );
