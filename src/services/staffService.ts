@@ -1,7 +1,7 @@
 import { apiRequest } from './api';
 import type { AuthRole } from './authService';
 
-export type ManagedAccountRole = 'user' | 'staff';
+export type ManagedAccountRole = 'staff';
 
 export interface ManagedUser {
   id: string;

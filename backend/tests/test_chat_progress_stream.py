@@ -133,3 +133,52 @@ def test_chat_stream_sends_progress_then_result(monkeypatch) -> None:
     assert result["answer"] == "Jawaban uji."
     assert result["source"] == "SOP_IT_Incident_Handling.pdf"
     assert result["page"] == 1
+
+
+def test_admin_evaluation_chat_uses_native_mode_without_persistence(monkeypatch) -> None:
+    monkeypatch.setattr(
+        routes,
+        "_require_admin",
+        lambda request: {"id": "admin-1", "name": "Admin", "role": "admin"},
+    )
+    calls: list[dict] = []
+
+    def fake_run_chat(question: str, **kwargs):
+        calls.append({"question": question, **kwargs})
+        return {
+            "answer": "Jawaban benchmark.",
+            "confidence": 0.9,
+            "sources": [],
+            "generation_contexts": [],
+            "response_time_ms": 12,
+            "model": "groq-rag",
+            "generation_mode": "native_model",
+            "language": "ID",
+        }
+
+    monkeypatch.setattr(routes, "run_chat", fake_run_chat)
+    app = FastAPI()
+    app.include_router(routes.router, prefix="/api")
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/admin/evaluation/chat",
+        json={
+            "question": "Berapa target P1?",
+            "language": "ID",
+            "model": "groq",
+            "topK": 7,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["answer"] == "Jawaban benchmark."
+    assert calls == [
+        {
+            "question": "Berapa target P1?",
+            "top_k": 7,
+            "language": "ID",
+            "model": "groq",
+            "evaluation_mode": True,
+        }
+    ]

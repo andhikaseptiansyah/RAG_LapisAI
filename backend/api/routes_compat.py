@@ -81,13 +81,13 @@ class StaffCreatePayload(BaseModel):
     username: str
     name: str
     password: str
-    role: Literal["user", "staff"] = "staff"
+    role: Literal["staff"] = "staff"
 
 
 class StaffUpdatePayload(BaseModel):
     username: str | None = None
     name: str | None = None
-    role: Literal["user", "staff"] | None = None
+    role: Literal["staff"] | None = None
 
 
 class StaffPasswordPayload(BaseModel):
@@ -128,6 +128,13 @@ class QueryFailurePayload(BaseModel):
 
 class RetrievalDebugPayload(BaseModel):
     question: str
+    topK: int = 5
+
+
+class EvaluationChatPayload(BaseModel):
+    question: str
+    language: str = "AUTO"
+    model: Literal["ollama", "gemini", "groq"]
     topK: int = 5
 
 
@@ -647,8 +654,26 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
         "baselineDecision": baseline_decision.to_dict(),
         "baseCandidates": [compact(item) for item in base_candidates[:10]],
         "baselineVerified": [compact(item) for item in baseline_verified[:10]],
-        "finalCandidates": [compact(item) for item in final_candidates[:10]],
+        "finalCandidates": [compact(item) for item in final_candidates[:top_k]],
     }
+
+
+@router.post("/admin/evaluation/chat")
+def compat_evaluation_chat(payload: EvaluationChatPayload, request: Request):
+    """Run one native-model benchmark turn without polluting chat history or logs."""
+    _require_admin(request)
+    question = str(payload.question or "").strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question is required.")
+
+    top_k = max(1, min(int(payload.topK or 5), 20))
+    return run_chat(
+        question,
+        top_k=top_k,
+        language=str(payload.language or "AUTO"),
+        model=payload.model,
+        evaluation_mode=True,
+    )
 
 
 async def _watch_chat_disconnect(request: Request, cancel_event) -> None:

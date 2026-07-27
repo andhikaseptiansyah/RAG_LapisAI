@@ -36,18 +36,14 @@ const formatAccountDate = (value: string): string => {
 
 const roleLabel = (role: string): string => {
   if (role === 'admin') return 'Administrator';
-  if (role === 'staff') return 'Staff';
-  return 'User';
+  return 'Staff';
 };
 
 const roleClassName = (role: string): string => {
   if (role === 'admin') {
     return 'border-violet-400/20 bg-violet-500/10 text-violet-300';
   }
-  if (role === 'staff') {
-    return 'border-cyan-400/20 bg-cyan-500/10 text-cyan-300';
-  }
-  return 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300';
+  return 'border-cyan-400/20 bg-cyan-500/10 text-cyan-300';
 };
 
 interface ModalShellProps {
@@ -145,11 +141,15 @@ const AccountFields: React.FC<{
       <select
         value={role}
         onChange={(event) => onRoleChange(event.target.value as ManagedAccountRole)}
-        className="mt-2 w-full rounded-xl border border-white/10 bg-[#050918] px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/50"
+        disabled
+        aria-label="Account role"
+        className="mt-2 w-full cursor-not-allowed rounded-xl border border-white/10 bg-[#050918] px-4 py-3 text-sm text-slate-300 outline-none opacity-80"
       >
-        <option value="user">User</option>
         <option value="staff">Staff</option>
       </select>
+      <span className="mt-1 block text-xs text-slate-600">
+        All managed accounts use the Staff role.
+      </span>
     </label>
   </>
 );
@@ -206,11 +206,10 @@ export const AdminStaffManagement: React.FC = () => {
   }, [loadUsers]);
 
   const summary = useMemo(() => {
-    const regularUsers = users.filter((item) => item.role === 'user').length;
-    const staff = users.filter((item) => item.role === 'staff').length;
+    const staff = users.filter((item) => item.role !== 'admin').length;
     const admins = users.filter((item) => item.role === 'admin').length;
     const totalChats = users.reduce((total, item) => total + Number(item.totalChats || 0), 0);
-    return { total: users.length, regularUsers, staff, admins, totalChats };
+    return { total: users.length, staff, admins, totalChats };
   }, [users]);
 
   const clearNotices = (): void => {
@@ -232,7 +231,7 @@ export const AdminStaffManagement: React.FC = () => {
     setEditTarget(managedUser);
     setEditName(managedUser.name);
     setEditUsername(managedUser.username);
-    setEditRole(managedUser.role === 'user' ? 'user' : 'staff');
+    setEditRole('staff');
   };
 
   const handleCreateAccount = async (event: FormEvent): Promise<void> => {
@@ -351,7 +350,7 @@ export const AdminStaffManagement: React.FC = () => {
                 <p className="font-mono text-xs uppercase tracking-[0.24em] text-cyan-400">Alat Admin</p>
                 <h1 className="mt-2 text-2xl font-black tracking-tight text-white md:text-3xl">Account Management</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                  Create user or staff accounts, edit identity and roles, reset passwords, and revoke account access.
+                  Create and manage staff accounts, edit identity, reset passwords, and revoke account access.
                 </p>
               </div>
 
@@ -393,10 +392,9 @@ export const AdminStaffManagement: React.FC = () => {
               </div>
             )}
 
-            <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 { label: 'Total Accounts', value: summary.total, icon: 'group' },
-                { label: 'Users', value: summary.regularUsers, icon: 'person' },
                 { label: 'Staff', value: summary.staff, icon: 'badge' },
                 { label: 'Administrator', value: summary.admins, icon: 'admin_panel_settings' },
                 { label: 'Total Chats', value: summary.totalChats, icon: 'forum' },

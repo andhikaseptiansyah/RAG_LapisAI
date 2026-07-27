@@ -1,0 +1,38 @@
+{
+  "files": {
+    "EN": {
+      "input": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/raw_user/qna_english.csv",
+      "output": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/qna_english_user.csv",
+      "original_rows": 75,
+      "cleaned": {
+        "total": 74,
+        "answerable": 69,
+        "unanswerable": 5
+      }
+    },
+    "ID": {
+      "input": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/raw_user/qna_indonesia.csv",
+      "output": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/qna_indonesia_user.csv",
+      "original_rows": 15,
+      "cleaned": {
+        "total": 15,
+        "answerable": 10,
+        "unanswerable": 5
+      }
+    }
+  },
+  "duplicates_removed": [
+    {
+      "language": "EN",
+      "question": "How long are audit logs retained?",
+      "kept_row": 23,
+      "merged_row": 66,
+      "source_document": "TECH_Data_Retention.txt"
+    }
+  ],
+  "combined": {
+    "total": 89,
+    "answerable": 79,
+    "unanswerable": 10
+  }
+}

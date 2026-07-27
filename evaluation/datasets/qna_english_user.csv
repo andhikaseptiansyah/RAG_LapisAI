@@ -1,0 +1,75 @@
+﻿question,expected_answer,source_document,answerable,expected_answer_keywords
+How long is the probation period for new employees?,"3 months, with a performance evaluation in week 12.",SOP_Onboarding.pdf,TRUE,None
+How quickly must a P1 IT incident be resolved?,"Within 4 hours, acknowledged within 15 minutes.",SOP_IT_Incident_Handling.pdf,TRUE,None
+What approval is needed for a purchase above IDR 50 million?,Director approval plus three vendor quotations.,SOP_Procurement.pdf,TRUE,None
+What is the deadline to submit an expense claim?,Within 30 days of the expense date.,SOP_Expense_Reimbursement.pdf,TRUE,None
+How much advance notice is required for annual leave?,At least 5 working days via the HR portal.,SOP_Leave_Request.pdf,TRUE,None
+How often are full database backups taken?,"Nightly at 01:00 WIB, with incremental backups every 6 hours.",SOP_Data_Backup.pdf,TRUE,None
+When must IT revoke a departing employee's access?,Within 2 hours of the employee's exit time.,SOP_Offboarding.pdf,TRUE,None
+How many days per week can employees work from home?,Up to 2 days per week with manager approval.,Policy_WFH.docx,TRUE,None
+Who must a suspected data breach be reported to and how fast?,security@nusantaradynamics.co.id within 1 hour.,Policy_Data_Security.docx,TRUE,None
+How many annual leave days do employees get?,"12 days per year, accruing monthly.",Policy_Leave.docx,TRUE,None
+What are the password requirements?,"At least 12 characters with upper, lower, number, and symbol; changed every 90 days.",Policy_Password.docx,TRUE,None
+What is the domestic meal per diem?,"IDR 250,000 per day.",Policy_Travel_Expense.docx,TRUE,None
+What was Q3 2025 revenue?,"IDR 42.5 billion, up 12% over Q2 2025.",Report_Q3_2025_Performance.pdf,TRUE,None
+What was the root cause of the October 2025 outage?,An expired TLS certificate on the API gateway.,Report_Incident_Postmortem.pdf,TRUE,None
+What was the 2025 overall CSAT score?,"87%, up from 83% in 2024.",Report_CSAT_2025.pdf,TRUE,None
+How many security incidents occurred in 2025?,"3 reportable incidents, none resulting in data loss.",Report_Security_Review_2025.pdf,TRUE,None
+What was full-year 2025 revenue?,"IDR 158 billion, with a 14% net profit margin.",Report_Financial_FY2025.pdf,TRUE,None
+What database does the platform use?,"PostgreSQL 15, with Redis for caching.",TECH_System_Architecture.txt,TRUE,None
+How long are internal API tokens valid?,60 minutes.,TECH_Internal_API_Guide.txt,TRUE,None
+What are the RTO and RPO?,RTO is 4 hours and RPO is 1 hour.,TECH_Disaster_Recovery.txt,TRUE,None
+What is the API availability SLO?,99.9% per month.,TECH_Monitoring_Guide.txt,TRUE,None
+How long are audit logs retained?,Audit logs are retained for seven years.,TECH_Data_Retention.txt,TRUE,7 years | audit logs
+What unit-test coverage is required to merge code?,At least 80%.,TECH_CICD_Pipeline.txt,TRUE,None
+How do I reset my password?,Raise a ticket to the IT Helpdesk via the portal; processed within 1x24 hours.,FAQ_IT_Support.txt,TRUE,None
+When is payday?,The 25th of each month (prior working day if a holiday).,FAQ_Payroll.txt,TRUE,None
+What is the mailbox size limit?,50 GB.,FAQ_Email_Calendar.txt,TRUE,None
+What should I bring on my first day?,"A valid ID, NPWP (tax ID), and bank account details.",FAQ_Onboarding.txt,TRUE,None
+Is there a home-office allowance?,"Yes, a one-time allowance of IDR 1,500,000.",FAQ_Remote_Work.txt,TRUE,None
+What is the replacement fee for an access card?,"IDR 50,000.",FAQ_Facilities.txt,TRUE,None
+How many new enterprise customers were added in Q3 2025?,"18, bringing the total to 214.",Report_Q3_2025_Performance.pdf,TRUE,None
+How many dependents are covered by the company health insurance plan?,The company health insurance plan covers employees and up to three dependents.,FAQ_Benefits.txt,TRUE,up to 3 dependents | health insurance
+What is the standard employee mailbox quota?,The standard mailbox quota is 50 GB.,FAQ_Email_Calendar.txt,TRUE,50 GB | mailbox quota
+How much does a replacement employee access card cost?,"A replacement access card costs IDR 50,000.",FAQ_Facilities.txt,TRUE,"IDR 50,000 | replacement access card"
+Where and when can employees find their payslips?,Payslips are available after the 25th in the HR portal under My Documents.,FAQ_HR.txt,TRUE,HR portal | My Documents | after the 25th
+What documents or details should a new employee bring on the first day?,"A new employee should bring a valid ID, a tax ID or NPWP, and bank account details.",FAQ_Onboarding.txt,TRUE,valid ID | NPWP | bank account details
+When is salary paid if the 25th falls on a holiday?,Salary is paid on the prior working day when the 25th is a holiday.,FAQ_Payroll.txt,TRUE,prior working day | 25th | holiday
+What should an employee do after receiving a suspicious email?,The employee should not click any links and should report the email using the Report Phishing button.,FAQ_Security_Awareness.txt,TRUE,do not click links | Report Phishing button
+Who approves an employee request for access to a software tool?,The system owner approves the software access request submitted through the IT Service Desk.,FAQ_Software_Access.txt,TRUE,system owner | IT Service Desk | approves
+Through which channels can an employee confidentially report harassment?,Harassment can be reported confidentially to HR or through the whistleblower channel.,Policy_Anti_Harassment.docx,TRUE,HR | whistleblower channel | confidentially
+What must happen before a personal device is used for work email?,The personal device must be enrolled in the mobile device management or MDM system.,Policy_BYOD.docx,TRUE,enrolled | MDM | mobile device management
+How must a potential conflict of interest be disclosed?,A potential conflict of interest must be disclosed to HR in writing.,Policy_Code_of_Conduct.docx,TRUE,HR | in writing | conflict of interest
+"How quickly must a suspected data breach be reported, and to which address?",A suspected data breach must be reported within one hour to security@nusantaradynamics.co.id.,Policy_Data_Security.docx,TRUE,within 1 hour | security@nusantaradynamics.co.id
+What are the four information-classification levels?,"The four levels are Public, Internal, Confidential, and Restricted.",Policy_Information_Classification.docx,TRUE,Public | Internal | Confidential | Restricted
+"What are the password length, complexity, and rotation requirements?","Passwords must be at least 12 characters, include uppercase and lowercase letters, a number, and a symbol, and be changed every 90 days.",Policy_Password.docx,TRUE,12 characters | upper case | lower case | number | symbol | 90 days
+Who approves a purchase valued between IDR 10 million and IDR 50 million?,A department head approves purchases valued from IDR 10 million to IDR 50 million.,Policy_Procurement_Threshold.docx,TRUE,department head | IDR 10-50 million
+What is the domestic meal per diem for business travel?,"The domestic meal per diem is IDR 250,000 per day.",Policy_Travel_Expense.docx,TRUE,"IDR 250,000 | per day | meal per diem"
+What were the overall CSAT score and Net Promoter Score in 2025?,"The 2025 CSAT score was 87%, and the Net Promoter Score was 46.",Report_CSAT_2025.pdf,TRUE,87% | 46 | CSAT | Net Promoter Score
+"How many employees were hired in the first half of 2025, and what was the resulting headcount?","The company hired 37 employees in H1 2025, bringing total headcount to 312.",Report_Hiring_H1_2025.pdf,TRUE,37 employees | 312 | H1 2025
+"How many IT audit findings were raised in 2025, and how were they distributed by severity?","The audit raised 14 findings: 2 high, 5 medium, and 7 low.",Report_IT_Audit_2025.pdf,TRUE,14 findings | 2 high | 5 medium | 7 low
+"What was the peak network utilization, and in which month did it occur?",Peak network utilization reached 72% of capacity in November 2025.,Report_Network_Capacity.pdf,TRUE,72% | November 2025 | network utilization
+How did customer churn change from Q2 to Q3 2025?,"Customer churn decreased from 2.8% in Q2 2025 to 2.1% in Q3 2025, a decline of 0.7 percentage points.",Report_Q3_2025_Performance.pdf,TRUE,2.8% | 2.1% | down | 0.7 percentage points
+"How many reportable security incidents occurred in 2025, and did any cause data loss?","There were three reportable security incidents, and none resulted in data loss.",Report_Security_Review_2025.pdf,TRUE,3 | none | data loss
+By what percentage did the Cikarang office reduce electricity consumption in 2025?,The Cikarang office reduced electricity consumption by 9% in 2025.,Report_Sustainability_2025.pdf,TRUE,9% | Cikarang | electricity consumption
+"Which vendor received the highest rating in the 2025 vendor evaluation, and what was its score?","PT Sumber Makmur received the highest rating, with a score of 4.6 out of 5.",Report_Vendor_Evaluation.pdf,TRUE,PT Sumber Makmur | 4.6 out of 5
+"How often are internal-system access rights reviewed, and when are dormant accounts disabled?","Access rights are reviewed every six months, and accounts inactive for 90 days are disabled.",SOP_Access_Provisioning.pdf,TRUE,every 6 months | 90 days inactive | disabled
+Within how long must a customer complaint receive its first response?,A customer complaint must receive a first response within one business day.,SOP_Customer_Complaint.pdf,TRUE,within 1 business day | first response
+"How often are production databases backed up, and when does the nightly full backup run?","Production databases are backed up every six hours, and the nightly full backup runs at 01:00 WIB.",SOP_Data_Backup.pdf,TRUE,every 6 hours | 01:00 WIB | full backups
+What are the acknowledgement and resolution targets for a P1 incident?,A P1 incident must be acknowledged within 15 minutes and resolved within four hours.,SOP_IT_Incident_Handling.pdf,TRUE,15 minutes | 4 hours | P1
+What additional approval is required for leave longer than five consecutive days?,Leave longer than five consecutive days also requires department-head approval.,SOP_Leave_Request.pdf,TRUE,department head approval | longer than 5 consecutive days
+For how long is an onboarding buddy assigned to a new hire?,An onboarding buddy is assigned for the first 30 days.,SOP_Onboarding.pdf,TRUE,first 30 days | onboarding buddy
+What information must a new vendor submit before the first purchase order is issued?,A new vendor must submit a tax ID or NPWP and bank details before the first purchase order is issued.,SOP_Procurement.pdf,TRUE,NPWP | bank details | first purchase order
+"How far in advance must a domestic flight be booked, and through whom?",A domestic flight must be booked at least seven days in advance through the appointed travel agent.,SOP_Travel_Booking.pdf,TRUE,at least 7 days | appointed travel agent | domestic flights
+What minimum unit-test coverage is required before code can be merged?,A minimum of 80% unit-test coverage is required to merge.,TECH_CICD_Pipeline.txt,TRUE,80% | unit-test coverage | merge
+How many approving reviews does a pull request require?,Every pull request requires at least one approving review.,TECH_Coding_Standards.txt,TRUE,at least one | approving review | pull request
+Which field links the orders table to the customers table?,The orders table links to the customers table through the customer_id field.,TECH_Database_Schema.txt,TRUE,customer_id | orders | customers
+On which days and during what time window are production deployments scheduled?,Production deployments are scheduled on Tuesdays and Thursdays from 20:00 to 22:00 WIB.,TECH_Deployment_Runbook.txt,TRUE,Tuesdays | Thursdays | 20:00-22:00 WIB
+"How long does an internal API token remain valid, and what is the default client rate limit?","An internal API token expires after 60 minutes, and the default rate limit is 100 requests per minute per client.",TECH_Internal_API_Guide.txt,TRUE,60 minutes | 100 requests per minute per client
+What is the monthly API availability SLO?,The API availability SLO is 99.9% per month.,TECH_Monitoring_Guide.txt,TRUE,99.9% | per month | API availability SLO
+What architecture and primary data technologies does the platform use?,"The platform uses a microservices architecture on Kubernetes, with PostgreSQL 15 as the primary datastore and Redis for caching.",TECH_System_Architecture.txt,TRUE,microservices | Kubernetes | PostgreSQL 15 | Redis
+What is the direct password-reset URL?,The indexed documents do not provide a direct password-reset URL; they only instruct employees to raise an IT Helpdesk ticket through the portal.,,FALSE,None
+What is the full street address of the company headquarters?,The company headquarters address is not available in the indexed documents.,,FALSE,None
+How often is a full disaster-recovery failover exercise conducted?,The indexed documents do not state a schedule for a full disaster-recovery failover exercise.,,FALSE,None
+What is the maximum permitted email attachment size?,The maximum email attachment size is not stated in the indexed documents.,,FALSE,None
+What is the maximum file-upload size in the customer portal?,The indexed documents do not specify a maximum file-upload size for the customer portal.,,FALSE,None

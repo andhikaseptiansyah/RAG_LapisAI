@@ -29,8 +29,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / ".env")
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 DEFAULT_DATASETS = [
-    EVALUATION_DIR / "datasets" / "qna_english_50.csv",
-    EVALUATION_DIR / "datasets" / "qna_indonesia_50.csv",
+    EVALUATION_DIR / "datasets" / "qna_english_user.csv",
+    EVALUATION_DIR / "datasets" / "qna_indonesia_user.csv",
 ]
 LLM_BASE_URL = os.getenv("EVAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_API_KEY = os.getenv("EVAL_LLM_API_KEY", "ollama")
@@ -158,6 +158,63 @@ def source_metrics(
         "context_recall": len(intersection) / len(expected_units),
         "citation_accuracy": len(expected_units & cited_units) / len(expected_units),
         "retrieval_no_result": 1.0 if not retrieved_units else 0.0,
+    }
+
+
+def ranked_retrieval_metrics(
+    ranked_candidates: list[Any],
+    expected_sources: list[Any],
+    *,
+    answerable: bool,
+    top_k: int,
+) -> dict[str, float | None]:
+    """Compute document-level Precision@K, Recall@K, Hit@K, and MRR."""
+    if not answerable:
+        return {
+            "precision_at_k": None,
+            "recall_at_k": None,
+            "hit_at_k": None,
+            "mrr": None,
+            "first_relevant_rank": None,
+        }
+
+    expected_documents = {document for document, _ in source_set(expected_sources)}
+    if not expected_documents:
+        return {
+            "precision_at_k": None,
+            "recall_at_k": None,
+            "hit_at_k": None,
+            "mrr": None,
+            "first_relevant_rank": None,
+        }
+
+    ranked_documents: list[str] = []
+    seen: set[str] = set()
+    for candidate in ranked_candidates or []:
+        if not isinstance(candidate, dict):
+            continue
+        document = normalize_document(
+            candidate.get("document")
+            or candidate.get("documentName")
+            or candidate.get("document_name")
+        )
+        if document and document not in seen:
+            seen.add(document)
+            ranked_documents.append(document)
+
+    k = max(1, int(top_k or 5))
+    top_documents = ranked_documents[:k]
+    relevant_in_top_k = expected_documents.intersection(top_documents)
+    first_rank = next(
+        (index for index, document in enumerate(ranked_documents, start=1) if document in expected_documents),
+        None,
+    )
+    return {
+        "precision_at_k": len(relevant_in_top_k) / k,
+        "recall_at_k": len(relevant_in_top_k) / len(expected_documents),
+        "hit_at_k": 1.0 if relevant_in_top_k else 0.0,
+        "mrr": (1.0 / first_rank) if first_rank else 0.0,
+        "first_relevant_rank": float(first_rank) if first_rank else None,
     }
 
 
@@ -409,6 +466,12 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "context_precision": mean(row["Context Precision"] for row in answerable_rows),
         "context_recall": mean(row["Context Recall"] for row in answerable_rows),
         "citation_accuracy": mean(row["Citation Accuracy"] for row in answerable_rows),
+        "precision_at_k": mean(row["Precision@K"] for row in answerable_rows),
+        "recall_at_k": mean(row["Recall@K"] for row in answerable_rows),
+        "hit_at_k": mean(row["Hit@K"] for row in answerable_rows),
+        "mrr": mean(row["MRR"] for row in answerable_rows),
+        "retrieval_debug_coverage": mean(row["Retrieval Debug Available"] for row in rows),
+        "average_retrieval_time_ms": mean(row["Retrieval Time (ms)"] for row in rows),
         "false_refusal_rate": mean(row["False Refusal"] for row in answerable_rows),
         "unanswerable_safety_rate": mean(row["Correct Unanswerable Refusal"] for row in unanswerable_rows),
         "unanswerable_no_citation_rate": mean(row["No Citation On Unanswerable"] for row in unanswerable_rows),
@@ -492,6 +555,13 @@ def main() -> None:
             gt.get("references") or [],
             item.get("citation") or [],
             answerable=answerable,
+        )
+        retrieval_top_k = int(item.get("retrieval_top_k") or 5)
+        ranked_metrics = ranked_retrieval_metrics(
+            item.get("ranked_candidates") or [],
+            gt.get("references") or [],
+            answerable=answerable,
+            top_k=retrieval_top_k,
         )
         em = exact_match(expected_answer, generated_answer) if answerable else None
         f1 = token_f1(expected_answer, generated_answer) if answerable else None
@@ -579,6 +649,30 @@ def main() -> None:
                 if metadata["citation_accuracy"] is not None
                 else None
             ),
+            "Retrieval Top K": retrieval_top_k,
+            "Precision@K": (
+                round(ranked_metrics["precision_at_k"], 4)
+                if ranked_metrics["precision_at_k"] is not None
+                else None
+            ),
+            "Recall@K": (
+                round(ranked_metrics["recall_at_k"], 4)
+                if ranked_metrics["recall_at_k"] is not None
+                else None
+            ),
+            "Hit@K": (
+                round(ranked_metrics["hit_at_k"], 4)
+                if ranked_metrics["hit_at_k"] is not None
+                else None
+            ),
+            "MRR": (
+                round(ranked_metrics["mrr"], 4)
+                if ranked_metrics["mrr"] is not None
+                else None
+            ),
+            "First Relevant Rank": ranked_metrics["first_relevant_rank"],
+            "Retrieval Debug Available": int(bool(item.get("ranked_candidates"))),
+            "Retrieval Time (ms)": item.get("retrieval_time_ms"),
             "Retrieval No Result": metadata["retrieval_no_result"],
             "Hallucination": (
                 int(semantic["is_hallucination"])
@@ -611,7 +705,8 @@ def main() -> None:
             for language in ("EN", "ID")
         },
         "notes": [
-            "All answerable source metrics are evaluated at document level because the CSV has no page labels.",
+            "Precision@K, Recall@K, Hit@K, and MRR are evaluated at document level because the CSV has no page labels.",
+            "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
             "Unanswerable safety requires a refusal and no citation.",
             "The same configured judge model must be used for all three evaluated models.",
         ],

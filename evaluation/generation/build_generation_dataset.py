@@ -71,14 +71,17 @@ def load_ground_truth(path: Path) -> list[dict[str, Any]]:
 load_dotenv(PROJECT_ROOT / ".env")
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 DEFAULT_DATASETS = [
-    EVALUATION_DIR / "datasets" / "qna_english_50.csv",
-    EVALUATION_DIR / "datasets" / "qna_indonesia_50.csv",
+    EVALUATION_DIR / "datasets" / "qna_english_user.csv",
+    EVALUATION_DIR / "datasets" / "qna_indonesia_user.csv",
 ]
-CHAT_URL = os.getenv("LAPISAI_CHAT_URL", "http://localhost:8000/api/chat")
+CHAT_URL = os.getenv(
+    "LAPISAI_EVALUATION_CHAT_URL",
+    "http://localhost:8000/api/admin/evaluation/chat",
+)
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
-CONTEXT_MODE = "source_locked_native_model_single_pass_v2"
+CONTEXT_MODE = "source_locked_native_model_single_pass_v3"
 VALID_MODELS = ("ollama", "gemini", "groq")
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
@@ -299,6 +302,20 @@ def retrieved_sources_from_contexts(contexts: list[dict[str, Any]]) -> list[dict
     return output
 
 
+def load_retrieval_snapshot(path: Path | None) -> dict[str, dict[str, Any]]:
+    if path is None:
+        return {}
+    payload = json.loads(path.resolve().read_text(encoding="utf-8"))
+    items = payload.get("items") if isinstance(payload, dict) else None
+    if not isinstance(items, list):
+        raise ValueError("Retrieval snapshot must contain an items array")
+    return {
+        str(item.get("id") or ""): item
+        for item in items
+        if isinstance(item, dict) and item.get("id")
+    }
+
+
 def _existing_results(output: Path, model: str) -> dict[str, dict[str, Any]]:
     if not output.exists():
         return {}
@@ -328,6 +345,7 @@ def build_dataset(
     top_k: int,
     resume: bool,
     retries: int,
+    retrieval_snapshot: dict[str, dict[str, Any]] | None = None,
 ) -> None:
     if model not in VALID_MODELS:
         raise ValueError(f"Unsupported model {model!r}; choose from {VALID_MODELS}")
@@ -340,6 +358,7 @@ def build_dataset(
     summary = dataset_summary(ground_truth)
     print(f"Dataset: {summary}")
     print(f"Generate {len(ground_truth)} answers with model={model} ({CONTEXT_MODE})")
+    retrieval_snapshot = retrieval_snapshot or {}
 
     for index, item in enumerate(ground_truth, start=1):
         qid = str(item["id"])
@@ -351,6 +370,8 @@ def build_dataset(
         question = str(item["question"])
         language = str(item.get("language") or "EN").upper()
         print(f"[{index}/{len(ground_truth)}] {qid} ({language}, {model})")
+        retrieval_item = retrieval_snapshot.get(qid, {})
+        ranked_candidates = list(retrieval_item.get("ranked_candidates") or [])
 
         last_error: Exception | None = None
         last_answer = ""
@@ -363,7 +384,7 @@ def build_dataset(
                     CHAT_URL,
                     {
                         "question": question,
-                        "top_k": top_k,
+                        "topK": top_k,
                         "language": language,
                         "model": model,
                         "evaluation_mode": True,
@@ -435,6 +456,10 @@ def build_dataset(
                         "client_response_time_ms": client_elapsed_ms,
                         "evaluation_context_mode": CONTEXT_MODE,
                         "source_dataset": item.get("source_dataset"),
+                        "retrieval_top_k": retrieval_item.get("top_k", top_k),
+                        "ranked_candidates": ranked_candidates,
+                        "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
+                        "retrieval_snapshot_build": retrieval_item.get("build_version"),
                     }
                 )
                 last_error = None
@@ -482,6 +507,10 @@ def build_dataset(
                     "client_response_time_ms": last_client_elapsed_ms,
                     "evaluation_context_mode": CONTEXT_MODE,
                     "source_dataset": item.get("source_dataset"),
+                    "retrieval_top_k": retrieval_item.get("top_k", top_k),
+                    "ranked_candidates": ranked_candidates,
+                    "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
+                    "retrieval_snapshot_build": retrieval_item.get("build_version"),
                     "generation_failed": True,
                     "generation_error": str(last_error),
                 }
@@ -528,6 +557,7 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--retries", type=int, default=2)
+    parser.add_argument("--retrieval-snapshot", type=Path)
     parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args()
 
@@ -548,6 +578,7 @@ def main() -> None:
         top_k=max(1, args.top_k),
         resume=args.resume,
         retries=max(0, args.retries),
+        retrieval_snapshot=load_retrieval_snapshot(args.retrieval_snapshot),
     )
 
 

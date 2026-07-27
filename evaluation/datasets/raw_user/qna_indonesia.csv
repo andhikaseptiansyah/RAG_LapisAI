@@ -1,0 +1,16 @@
+question,expected_answer,source_document,answerable,expected_answer_keywords
+Bagaimana cara mereset kata sandi dan berapa lama prosesnya?,Ajukan tiket ke IT Helpdesk melalui portal. Reset diproses dalam waktu 1x24 jam.,FAQ_IT_Support.txt,TRUE,IT Helpdesk | portal | 1x24 jam
+Berapa tunjangan satu kali untuk perlengkapan kerja dari rumah?,Tunjangan satu kali untuk home office adalah IDR 1.500.000.,FAQ_Remote_Work.txt,TRUE,"IDR 1,500,000 | home-office allowance"
+Berapa maksimum sisa cuti tahunan yang boleh dibawa ke tahun berikutnya?,Maksimum enam hari cuti yang tidak terpakai dapat dibawa ke tahun berikutnya.,Policy_Leave.docx,TRUE,6 days | carried over | next year
+Pada jam berapa pekerja remote wajib tersedia selama core hours?,Pekerja remote wajib tersedia pada pukul 10.00 sampai 16.00 WIB.,Policy_WFH.docx,TRUE,10:00-16:00 WIB | core hours
+Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?,Pendapatan tahun 2025 adalah IDR 158 miliar dengan margin laba bersih 14%.,Report_Financial_FY2025.pdf,TRUE,IDR 158 billion | 14% | net profit margin
+Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?,Penyebab utamanya adalah sertifikat TLS yang kedaluwarsa pada API gateway.,Report_Incident_Postmortem.pdf,TRUE,expired TLS certificate | API gateway
+Untuk pengeluaran sebesar berapa bukti pembayaran asli wajib disertakan?,Bukti pembayaran asli wajib disertakan untuk setiap satu pengeluaran di atas IDR 150.000.,SOP_Expense_Reimbursement.pdf,TRUE,"above IDR 150,000 | original receipts"
+Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?,IT harus mencabut seluruh akses sistem dalam waktu dua jam sejak waktu keluar karyawan.,SOP_Offboarding.pdf,TRUE,within 2 hours | exit time | revokes all system access
+Berapa nilai RTO dan RPO pada rencana pemulihan bencana?,RTO adalah empat jam dan RPO adalah satu jam.,TECH_Disaster_Recovery.txt,TRUE,RTO | 4 hours | RPO | 1 hour
+Aplikasi apa yang digunakan untuk koneksi VPN dan apakah MFA diwajibkan?,"Karyawan menggunakan klien WireGuard, dan akses VPN wajib memakai autentikasi multifaktor.",TECH_VPN_Setup.txt,TRUE,WireGuard | multi-factor authentication | VPN
+Berapa lama cuti melahirkan yang diberikan perusahaan?,Informasi mengenai durasi cuti melahirkan tidak tersedia dalam dokumen yang diindeks.,None,FALSE,None
+Apakah perusahaan memberikan subsidi makan siang di kantin?,Informasi mengenai subsidi makan siang di kantin tidak tersedia dalam dokumen yang diindeks.,None,FALSE,None
+Berapa pendapatan resmi perusahaan untuk tahun penuh 2026?,Laporan pendapatan tahun penuh 2026 tidak tersedia dalam dokumen yang diindeks.,None,FALSE,None
+Berapa persen pengurangan konsumsi air di kantor Cikarang pada 2025?,Informasi mengenai pengurangan konsumsi air di kantor Cikarang tidak tersedia; dokumen hanya menyebut konsumsi listrik.,None,FALSE,None
+Versi minimum macOS apa yang didukung untuk laptop perusahaan?,Informasi mengenai versi minimum macOS tidak tersedia dalam dokumen yang diindeks.,None,FALSE,None

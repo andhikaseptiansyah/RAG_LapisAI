@@ -1,6 +1,6 @@
 param(
-    [string]$English = ".\evaluation\datasets\qna_english_50.csv",
-    [string]$Indonesian = ".\evaluation\datasets\qna_indonesia_50.csv",
+    [string]$English = ".\evaluation\datasets\qna_english_user.csv",
+    [string]$Indonesian = ".\evaluation\datasets\qna_indonesia_user.csv",
     [int]$TopK = 5,
     [switch]$Resume,
     [switch]$SkipLlmJudge,

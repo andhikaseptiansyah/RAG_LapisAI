@@ -11,8 +11,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EVALUATION_DIR = PROJECT_ROOT / "evaluation"
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_ENGLISH = EVALUATION_DIR / "datasets" / "qna_english_50.csv"
-DEFAULT_INDONESIAN = EVALUATION_DIR / "datasets" / "qna_indonesia_50.csv"
+DEFAULT_ENGLISH = EVALUATION_DIR / "datasets" / "qna_english_user.csv"
+DEFAULT_INDONESIAN = EVALUATION_DIR / "datasets" / "qna_indonesia_user.csv"
 VALID_MODELS = ("ollama", "gemini", "groq")
 
 
@@ -56,6 +56,18 @@ def main() -> None:
     raw_dir = output_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
+    retrieval_snapshot = output_dir / "retrieval_snapshot.json"
+    retrieval_command = [
+        sys.executable,
+        str(SCRIPT_DIR / "build_retrieval_snapshot.py"),
+        *common_dataset_args,
+        "--output", str(retrieval_snapshot),
+        "--top-k", str(max(1, args.top_k)),
+    ]
+    if args.resume:
+        retrieval_command.append("--resume")
+    run(retrieval_command)
+
     summary_paths: list[Path] = []
     for model in args.models:
         raw_output = raw_dir / f"input_answers_{model}.json"
@@ -67,6 +79,7 @@ def main() -> None:
             "--output", str(raw_output),
             "--top-k", str(max(1, args.top_k)),
             "--retries", str(max(0, args.retries)),
+            "--retrieval-snapshot", str(retrieval_snapshot),
         ]
         if args.resume:
             build_command.append("--resume")
@@ -94,9 +107,19 @@ def main() -> None:
         compare_command.extend(["--summary", str(summary)])
     run(compare_command)
 
+    charts_dir = output_dir / "charts"
+    run([
+        sys.executable,
+        str(SCRIPT_DIR / "generate_evaluation_charts.py"),
+        "--comparison", str(output_dir / "comparison_3_models.csv"),
+        "--output-dir", str(charts_dir),
+    ])
+
     print("\nEvaluation completed.")
     print(f"Results directory: {output_dir}")
     print(f"Main comparison : {output_dir / 'comparison_3_models.csv'}")
+    print(f"Charts          : {charts_dir}")
+    print(f"HTML dashboard  : {charts_dir / 'evaluation_dashboard.html'}")
 
 
 if __name__ == "__main__":
