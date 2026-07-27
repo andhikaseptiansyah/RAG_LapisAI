@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Any
 
 from ingestion.indexer import embed_query, get_collection
+from api.progress import emit_progress
 from retrieval.answerability import apply_answerability_gate, assess_answerability
 from retrieval.evidence_verifier import verify_chunks
 from retrieval.query_expansion import build_query_variants, expand_query
@@ -274,8 +275,35 @@ def _base_hybrid_candidates(
     promote. Final thresholding therefore happens only after reranking and
     evidence verification.
     """
+    emit_progress(
+        "semantic_search",
+        "active",
+        "Menjalankan semantic search",
+        detail=f"Memeriksa hingga {candidate_k} kandidat per varian kueri.",
+    )
     semantic_rows = semantic_search(query, top_k=candidate_k)
+    emit_progress(
+        "semantic_search",
+        "completed",
+        "Semantic search selesai",
+        detail=f"Ditemukan {len(semantic_rows)} kandidat semantik.",
+        metadata={"candidateCount": len(semantic_rows)},
+    )
+
+    emit_progress(
+        "bm25_search",
+        "active",
+        "Menjalankan BM25 keyword search",
+        detail=f"Memeriksa hingga {candidate_k} kandidat berbasis kata kunci.",
+    )
     keyword_rows = bm25_search(query, top_k=candidate_k)
+    emit_progress(
+        "bm25_search",
+        "completed",
+        "BM25 keyword search selesai",
+        detail=f"Ditemukan {len(keyword_rows)} kandidat kata kunci.",
+        metadata={"candidateCount": len(keyword_rows)},
+    )
 
     merged: dict[str, dict] = {}
     weighted_scores: dict[str, float] = defaultdict(float)
@@ -363,6 +391,17 @@ def _base_hybrid_candidates(
             }
         )
 
+    emit_progress(
+        "hybrid_search",
+        "completed",
+        "Pencarian hybrid selesai",
+        detail=f"Gabungan semantic search dan BM25 menghasilkan {len(results)} kandidat unik.",
+        metadata={
+            "candidateCount": len(results),
+            "semanticCount": len(semantic_rows),
+            "keywordCount": len(keyword_rows),
+        },
+    )
     return results
 
 
@@ -495,6 +534,13 @@ def hybrid_search(
         # cannot establish that the corpus contains an answer, reranking may not
         # resurrect the query. This guarantees that a reranker can improve order
         # but cannot introduce a new false positive on its own.
+        emit_progress(
+            "answerability_precheck",
+            "active",
+            "Memeriksa answerability awal",
+            detail=f"Memvalidasi {len(candidates)} kandidat sebelum reranking.",
+            metadata={"candidateCount": len(candidates)},
+        )
         baseline_verified = _apply_evidence_verification(
             clean_query,
             [dict(candidate) for candidate in candidates],
@@ -504,8 +550,33 @@ def hybrid_search(
             clean_query,
             baseline_verified,
         )
+        pre_rerank_deferred = (
+            not pre_rerank_decision.answerable
+            and _pre_rerank_may_defer(pre_rerank_decision)
+        )
+        emit_progress(
+            "answerability_precheck",
+            "completed"
+            if pre_rerank_decision.answerable or pre_rerank_deferred
+            else "failed",
+            "Answerability awal selesai",
+            detail=(
+                f"{len(baseline_verified)} kandidat lolos pemeriksaan awal."
+                if pre_rerank_decision.answerable
+                else (
+                    "Pemeriksaan awal bersifat lunak dan diteruskan ke reranking."
+                    if pre_rerank_deferred
+                    else f"Pemeriksaan awal menolak kandidat: {pre_rerank_decision.reason}"
+                )
+            ),
+            metadata={
+                "candidateCount": len(baseline_verified),
+                "answerable": bool(pre_rerank_decision.answerable),
+                "deferred": pre_rerank_deferred,
+            },
+        )
         if not pre_rerank_decision.answerable:
-            if _pre_rerank_may_defer(pre_rerank_decision):
+            if pre_rerank_deferred:
                 print(
                     "[ANSWERABILITY] Pre-rerank soft failure deferred to final gate: "
                     f"{pre_rerank_decision.reason}"
@@ -521,16 +592,44 @@ def hybrid_search(
         # The configured MMARCO cross-encoder is multilingual, so score the
         # original user question. Semantic/BM25 retrieval still uses expansion,
         # while reranking avoids extra expansion terms that can dilute intent.
+        emit_progress(
+            "reranking",
+            "active",
+            "Melakukan reranking",
+            detail=f"Memeriksa {len(candidates)} kandidat dokumen.",
+            metadata={"candidateCount": len(candidates)},
+        )
         candidates = rerank_candidates(
             clean_query,
             candidates,
         )
+        emit_progress(
+            "reranking",
+            "completed",
+            "Reranking selesai",
+            detail=f"{len(candidates)} kandidat telah diurutkan ulang berdasarkan relevansi.",
+            metadata={"candidateCount": len(candidates)},
+        )
 
     if verify_evidence:
+        emit_progress(
+            "evidence_validation",
+            "active",
+            "Memvalidasi bukti",
+            detail=f"Memeriksa kesesuaian konsep, tanggal, angka, dan istilah pada {len(candidates)} kandidat.",
+            metadata={"candidateCount": len(candidates)},
+        )
         candidates = _apply_evidence_verification(
             clean_query,
             candidates,
             min_score=min_score,
+        )
+        emit_progress(
+            "evidence_validation",
+            "completed",
+            "Validasi bukti selesai",
+            detail=f"{len(candidates)} kandidat lolos pemeriksaan bukti.",
+            metadata={"candidateCount": len(candidates)},
         )
     else:
         candidates = [
@@ -543,7 +642,25 @@ def hybrid_search(
     # improve order, but this final gate can reject the entire result set when
     # the corpus lacks an exact detail requested by the user.
     if apply_answerability and verify_evidence:
+        emit_progress(
+            "answerability",
+            "active",
+            "Memeriksa answerability",
+            detail=f"Menilai apakah {len(candidates)} bukti cukup untuk menjawab pertanyaan.",
+            metadata={"candidateCount": len(candidates)},
+        )
         candidates = apply_answerability_gate(clean_query, candidates)
+        emit_progress(
+            "answerability",
+            "completed" if candidates else "failed",
+            "Pemeriksaan answerability selesai",
+            detail=(
+                f"{len(candidates)} kandidat memenuhi syarat jawaban."
+                if candidates
+                else "Tidak ada kandidat yang memenuhi syarat jawaban."
+            ),
+            metadata={"candidateCount": len(candidates), "answerable": bool(candidates)},
+        )
 
     if candidates and pre_rerank_decision is not None:
         pre_metadata = pre_rerank_decision.to_dict()

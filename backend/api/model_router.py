@@ -4,6 +4,7 @@ from api.ollama_client import build_ollama_grounded_answer
 from api.cancellation import raise_if_cancelled
 from api.gemini_client import build_gemini_grounded_answer
 from api.groq_client import build_groq_grounded_answer
+from api.progress import emit_progress
 from uploads.config import DEFAULT_LLM_PROVIDER
 
 PROVIDERS = {
@@ -60,6 +61,13 @@ def build_grounded_answer(
     print(
         f"[MODEL_ROUTER] provider={provider} returned no usable answer; "
         "falling back to ollama"
+    )
+    emit_progress(
+        "generate",
+        "active",
+        "Mengalihkan model ke Ollama",
+        detail=f"{provider.title()} tidak menghasilkan jawaban yang dapat digunakan. Ollama mencoba bukti terverifikasi yang sama.",
+        metadata={"provider": "ollama", "fallbackFrom": provider},
     )
     return PROVIDERS["ollama"](
         question,

@@ -16,6 +16,8 @@ BUILD_FEATURES = (
     "remote-provider-empty-answer-fallback-to-local-ollama",
     "merged-pdf-p1-p2-row-duration-disambiguation",
     "failure-stage-diagnostics",
+    "real-time-rag-progress-sse",
+    "progress-cancellation-and-offline-lifecycle",
     "strict-evidence-thresholds-unchanged",
 )
 

@@ -23,6 +23,7 @@ from api.cancellation import raise_if_cancelled
 from api.follow_up_service import build_dataset_follow_up_question
 from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
+from api.progress import emit_progress, progress_scope
 from retrieval.answerability import apply_answerability_gate
 from retrieval.context_selector import select_context_bundle
 from retrieval.hybrid_search import (
@@ -368,6 +369,13 @@ def _retrieve_with_language_fallback(
     if not bridge_query or normalize_text(bridge_query) == normalize_text(question):
         return [], "original", question
 
+    emit_progress(
+        "bilingual_query",
+        "active",
+        "Menjalankan query bilingual",
+        detail="Bukti ketat belum ditemukan pada kueri awal. Sistem mencoba jalur pencarian Inggris lalu memvalidasinya kembali terhadap pertanyaan asli.",
+    )
+
     bridge_top_k = max(requested_k * 2, 10)
     bridge_candidate_k = max(bridge_top_k * 4, 40)
     print(
@@ -392,6 +400,13 @@ def _retrieve_with_language_fallback(
         stage="bridge_direct_english_path",
     )
     if accepted:
+        emit_progress(
+            "bilingual_query",
+            "completed",
+            "Query bilingual selesai",
+            detail=f"{len(accepted)} kandidat diterima setelah validasi ulang terhadap pertanyaan asli.",
+            metadata={"candidateCount": len(accepted)},
+        )
         return accepted, "natural_language_bridge", bridge_query
 
     print(
@@ -412,12 +427,80 @@ def _retrieve_with_language_fallback(
         stage="bridge_raw_union",
     )
     if accepted:
+        emit_progress(
+            "bilingual_query",
+            "completed",
+            "Query bilingual selesai",
+            detail=f"{len(accepted)} kandidat diterima dari gabungan semantic search dan BM25 bilingual.",
+            metadata={"candidateCount": len(accepted)},
+        )
         return accepted, "natural_language_bridge_raw", bridge_query
 
+    emit_progress(
+        "bilingual_query",
+        "failed",
+        "Query bilingual selesai tanpa bukti",
+        detail="Tidak ada kandidat bilingual yang lolos validasi terhadap pertanyaan asli.",
+        metadata={"candidateCount": 0},
+    )
     return [], "natural_language_bridge_raw", bridge_query
 
 
-def run_chat(
+def _progress_source_metadata(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    sources: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for chunk in chunks:
+        metadata = chunk.get("metadata") or {}
+        document_name = str(
+            chunk.get("documentName")
+            or chunk.get("document_name")
+            or metadata.get("filename")
+            or "-"
+        ).strip()
+        page = chunk.get("page", metadata.get("page"))
+        paragraph_start = chunk.get("paragraphStart", metadata.get("paragraph_start"))
+        paragraph_end = chunk.get("paragraphEnd", metadata.get("paragraph_end"))
+        key = (document_name.casefold(), str(page or ""), str(paragraph_start or ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        try:
+            confidence = round(max(0.0, min(float(chunk.get("score") or 0.0), 1.0)), 4)
+        except (TypeError, ValueError):
+            confidence = 0.0
+        sources.append({
+            "documentName": document_name,
+            "page": page,
+            "paragraphStart": paragraph_start,
+            "paragraphEnd": paragraph_end,
+            "confidence": confidence,
+        })
+    return sources
+
+
+def _format_progress_sources(sources: list[dict[str, Any]]) -> str:
+    labels: list[str] = []
+    for source in sources[:3]:
+        location: list[str] = []
+        if source.get("page") not in (None, "", "-"):
+            location.append(f"halaman {source['page']}")
+        start = source.get("paragraphStart")
+        end = source.get("paragraphEnd")
+        if start not in (None, ""):
+            location.append(
+                f"paragraf {start}"
+                if end in (None, "", start)
+                else f"paragraf {start}-{end}"
+            )
+        confidence = source.get("confidence")
+        if isinstance(confidence, (int, float)) and confidence > 0:
+            location.append(f"confidence {round(float(confidence) * 100)}%")
+        suffix = f", {', '.join(location)}" if location else ""
+        labels.append(f"{source['documentName']}{suffix}")
+    return "; ".join(labels)
+
+
+def _run_chat_impl(
     question: str,
     *,
     top_k: int = 5,
@@ -432,9 +515,32 @@ def run_chat(
     requested_language = str(language or "AUTO").upper()
     normalized_language = resolve_response_language(question, requested_language)
     selected_provider = resolve_provider(model)
+    language_label = "Indonesia" if normalized_language == "ID" else "Inggris"
+    emit_progress(
+        "analyze",
+        "completed",
+        "Pertanyaan berhasil dianalisis",
+        detail=f"Bahasa: {language_label}. Model yang dipilih: {selected_provider.title()}.",
+        metadata={
+            "language": normalized_language,
+            "provider": selected_provider,
+        },
+    )
 
     if is_small_talk(question):
+        emit_progress(
+            "generate",
+            "active",
+            "Menyiapkan jawaban langsung",
+            detail="Pertanyaan dikenali sebagai percakapan ringan sehingga retrieval dokumen tidak dijalankan.",
+        )
         answer = answer_text_only(build_small_talk_answer(question, language=normalized_language))
+        emit_progress(
+            "generate",
+            "completed",
+            "Jawaban langsung selesai",
+            detail="Jawaban sistem telah disiapkan tanpa pencarian dokumen.",
+        )
         return {
             "answer": answer,
             "confidence": 1.0,
@@ -449,11 +555,38 @@ def run_chat(
         }
 
     raise_if_cancelled(cancel_event)
+    emit_progress(
+        "retrieval",
+        "active",
+        "Mencari dokumen relevan",
+        detail="Menjalankan pencarian hybrid pada indeks dokumen yang sudah tersedia.",
+    )
     retrieved_chunks, retrieval_mode, retrieval_query = _retrieve_with_language_fallback(
         question,
         top_k=top_k,
     )
     raise_if_cancelled(cancel_event)
+    emit_progress(
+        "retrieval",
+        "completed" if retrieved_chunks else "failed",
+        "Pencarian dokumen selesai",
+        detail=(
+            f"Pencarian menghasilkan {len(retrieved_chunks)} kandidat terverifikasi."
+            if retrieved_chunks
+            else "Pencarian selesai tanpa kandidat yang lolos seluruh pemeriksaan."
+        ),
+        metadata={
+            "candidateCount": len(retrieved_chunks),
+            "retrievalMode": retrieval_mode,
+        },
+    )
+    emit_progress(
+        "context_selection",
+        "active",
+        "Memilih konteks",
+        detail=f"Menyeleksi konteks dari {len(retrieved_chunks)} kandidat terverifikasi.",
+        metadata={"candidateCount": len(retrieved_chunks)},
+    )
     chunks = select_context_bundle(
         question,
         retrieved_chunks,
@@ -461,6 +594,23 @@ def run_chat(
         minimum_contexts=min(2, MAX_GENERATION_CONTEXTS),
         redundancy_threshold=CONTEXT_REDUNDANCY_THRESHOLD,
         secondary_score_ratio=CONTEXT_SECONDARY_SCORE_RATIO,
+    )
+
+    selected_source_metadata = _progress_source_metadata(chunks)
+    selected_source_label = _format_progress_sources(selected_source_metadata)
+    emit_progress(
+        "context_selection",
+        "completed" if chunks else "failed",
+        "Pemilihan konteks selesai",
+        detail=(
+            f"Ditemukan {len(selected_source_metadata)} sumber relevan: {selected_source_label}."
+            if selected_source_metadata
+            else "Tidak ada konteks yang memenuhi kriteria pemilihan."
+        ),
+        metadata={
+            "sourceCount": len(selected_source_metadata),
+            "sources": selected_source_metadata,
+        },
     )
 
     bundle_answerable = has_answerable_evidence(chunks)
@@ -517,6 +667,16 @@ def run_chat(
     used_verified_scalar_fallback = False
 
     raise_if_cancelled(cancel_event)
+    emit_progress(
+        "generate",
+        "active",
+        "Menyusun jawaban",
+        detail=f"{selected_provider.title()} sedang menyusun jawaban dari {len(generation_contexts)} bukti terpilih.",
+        metadata={
+            "provider": selected_provider,
+            "contextCount": len(generation_contexts),
+        },
+    )
     native_answer = answer_text_only(
         build_grounded_answer(
             question,
@@ -604,12 +764,92 @@ def run_chat(
     else:
         generation_mode = "native_model"
 
+    if used_extractive_fallback or used_verified_scalar_fallback:
+        emit_progress(
+            "grounding",
+            "completed",
+            "Grounding deterministik selesai",
+            detail=(
+                "Jawaban dibentuk langsung dari bukti terpilih tanpa menambahkan klaim bebas dari model."
+            ),
+            metadata={
+                "supported": True,
+                "mode": generation_mode,
+            },
+        )
+
+    emit_progress(
+        "generate",
+        "completed" if answer and not is_refusal_answer(answer) else "failed",
+        "Penyusunan jawaban selesai",
+        detail=f"Mode jawaban: {generation_mode.replace('_', ' ')}.",
+        metadata={
+            "provider": selected_provider,
+            "generationMode": generation_mode,
+        },
+    )
+
     raise_if_cancelled(cancel_event)
+    emit_progress(
+        "citations",
+        "active",
+        "Menyiapkan sitasi",
+        detail="Menyusun nama dokumen, halaman, paragraf, dan confidence dari bukti terpilih.",
+    )
     sources = build_sources(
         chunks,
         question=question,
         limit=MAX_SOURCE_CITATIONS,
         answer=answer,
+    )
+
+    citation_metadata = [
+        {
+            "documentName": source.get("document_name") or source.get("documentName") or "-",
+            "page": source.get("page"),
+            "paragraphStart": source.get("paragraph_start") or source.get("paragraphStart"),
+            "paragraphEnd": source.get("paragraph_end") or source.get("paragraphEnd"),
+            "confidence": source.get("score") or source.get("relevance_score") or source.get("relevanceScore"),
+        }
+        for source in sources
+    ]
+    citation_labels: list[str] = []
+    for source in citation_metadata[:3]:
+        location: list[str] = []
+        if source.get("page") not in (None, "", "-"):
+            location.append(f"halaman {source['page']}")
+        paragraph_start = source.get("paragraphStart")
+        paragraph_end = source.get("paragraphEnd")
+        if paragraph_start not in (None, ""):
+            location.append(
+                f"paragraf {paragraph_start}"
+                if paragraph_end in (None, "", paragraph_start)
+                else f"paragraf {paragraph_start}-{paragraph_end}"
+            )
+        confidence_value = source.get("confidence")
+        try:
+            confidence_percent = round(float(confidence_value) * 100)
+        except (TypeError, ValueError):
+            confidence_percent = 0
+        if confidence_percent > 0:
+            location.append(f"confidence {confidence_percent}%")
+        citation_labels.append(
+            f"{source['documentName']}{', ' + ', '.join(location) if location else ''}"
+        )
+
+    emit_progress(
+        "citations",
+        "completed" if sources else "failed",
+        "Sitasi selesai disiapkan",
+        detail=(
+            f"{len(sources)} sitasi: {'; '.join(citation_labels)}."
+            if sources
+            else "Tidak ada sitasi valid yang dapat ditampilkan."
+        ),
+        metadata={
+            "sourceCount": len(sources),
+            "sources": citation_metadata,
+        },
     )
 
     if not answer or is_refusal_answer(answer) or not sources:
@@ -645,3 +885,25 @@ def run_chat(
         "retrieval_query": retrieval_query,
         "failure_stage": None,
     }
+
+
+def run_chat(
+    question: str,
+    *,
+    top_k: int = 5,
+    language: str = "AUTO",
+    model: str | None = None,
+    evaluation_mode: bool = False,
+    cancel_event: Any | None = None,
+    progress_callback: Any | None = None,
+) -> dict[str, Any]:
+    """Run one chat turn and optionally stream safe operational progress."""
+    with progress_scope(progress_callback):
+        return _run_chat_impl(
+            question,
+            top_k=top_k,
+            language=language,
+            model=model,
+            evaluation_mode=evaluation_mode,
+            cancel_event=cancel_event,
+        )

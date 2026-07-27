@@ -1,5 +1,688 @@
 [
   {
+    "id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "What is the maximum file-upload size in the customer portal?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "625676b8-a12f-4f47-84c9-4cab7bdb2eab",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "user",
+        "content": "What is the maximum file-upload size in the customer portal?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:23:09.803634+00:00"
+      },
+      {
+        "id": "56c939d4-985a-4139-9d5a-a9594402e2a4",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:23:09.803634+00:00"
+      },
+      {
+        "id": "7c56cf29-e610-409c-b87c-5827439280a9",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "user",
+        "content": "What is the maximum file-upload size in the customer portal?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:23:19.136326+00:00"
+      },
+      {
+        "id": "f807e453-2a79-4f71-a82f-4774db3a65a4",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:23:19.136326+00:00"
+      },
+      {
+        "id": "5743f92e-afe4-44b2-b343-a9249ff3213b",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "user",
+        "content": "What is the maximum file-upload size in the customer portal?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:23:25.000043+00:00"
+      },
+      {
+        "id": "43b4a18c-a223-4c27-bedf-02840aff7593",
+        "conversation_id": "7438fb9f-4a8e-4b5c-9047-ed11b96ae7cd",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:23:25.000043+00:00"
+      }
+    ],
+    "created_at": "2026-07-27T14:23:09.803634+00:00",
+    "updated_at": "2026-07-27T14:23:25.000043+00:00",
+    "last_message": "The requested information was not found with sufficient evidence in the indexed documents.",
+    "last_user_message": "What is the maximum file-upload size in the customer portal?",
+    "last_message_at": "2026-07-27T14:23:25.000043+00:00"
+  },
+  {
+    "id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "What is the domestic meal per diem?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "809637e1-cadf-41e5-95d1-3baab624775b",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "What is the domestic meal per diem?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:16:00.047065+00:00"
+      },
+      {
+        "id": "ab1acfb1-3ace-4f38-b2b3-d0af2f91cf67",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "Per diem makanan domestik adalah IDR 250.000 per hari.",
+        "attachments": [],
+        "confidence": 0.01,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9164,
+              "relevance_score": 0.9164,
+              "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+              "citation_validated": true,
+              "citation_support_score": 0.9701,
+              "chapter": "Per Diem",
+              "section": "Per Diem",
+              "paragraph_start": 3,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_Travel_Expense.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:16:00.047065+00:00"
+      },
+      {
+        "id": "1f565e9c-3bfc-4a09-a028-efd4a54c585a",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "What is the domestic meal per diem?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:16:33.849517+00:00"
+      },
+      {
+        "id": "7070a3e5-18a7-4b3c-9f2c-39f2ae601a13",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "The domestic meal per diem is IDR 250,000 per day.",
+        "attachments": [],
+        "confidence": 0.01,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9164,
+              "relevance_score": 0.9164,
+              "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "chapter": "Per Diem",
+              "section": "Per Diem",
+              "paragraph_start": 3,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_Travel_Expense.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:16:33.849517+00:00"
+      },
+      {
+        "id": "0f992968-4614-4013-bcf2-78e812f0bfc8",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "What are the password length, complexity, and rotation requirements?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:17:04.551862+00:00"
+      },
+      {
+        "id": "49c50e00-538f-4f50-874c-e95723469d97",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:17:04.551862+00:00"
+      },
+      {
+        "id": "e957a140-5c75-4f74-9528-8f7779ef5fec",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "What is the replacement fee for an access card?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:17:57.939569+00:00"
+      },
+      {
+        "id": "8f4ab3de-ace5-4887-a122-040b8f792f79",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "The replacement fee for an access card is IDR 50,000. This fee applies when requesting a replacement at the front desk.",
+        "attachments": [],
+        "confidence": 0.9046,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "FAQ_Facilities.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9046,
+              "relevance_score": 0.9046,
+              "excerpt": "Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+              "citation_validated": true,
+              "citation_support_score": 0.9332,
+              "paragraph_start": 1,
+              "paragraph_end": 3,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "FAQ_Facilities.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:17:57.939569+00:00"
+      },
+      {
+        "id": "66750052-3d1c-4e5d-a5d6-f4a3ef137261",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:19:04.966174+00:00"
+      },
+      {
+        "id": "35697038-c395-4b5c-ba80-4828ab9275dd",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "P1 IT incidents must be acknowledged within 15 minutes and resolved within 4 hours. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "attachments": [],
+        "confidence": 0.8868,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8868,
+              "relevance_score": 0.8868,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:19:04.966174+00:00"
+      },
+      {
+        "id": "d7f8a167-4980-4323-bec7-aaa052f57912",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "Berapa lama log audit disimpan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:20:09.498629+00:00"
+      },
+      {
+        "id": "c0ff2015-280e-47f4-84c3-042f69d9f8f5",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "Audit logs are retained for 7 years.",
+        "attachments": [],
+        "confidence": 0.8433,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8433,
+              "relevance_score": 0.8433,
+              "excerpt": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 3,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "TECH_Data_Retention.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:20:09.498629+00:00"
+      },
+      {
+        "id": "3b2392fb-1fa1-4085-aa46-e07896538e0c",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "Berapa lama log audit disimpan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:20:26.905877+00:00"
+      },
+      {
+        "id": "1cd77279-1cf3-490b-93d6-c63dd2783680",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "Log audit disimpan selama 7 tahun.",
+        "attachments": [],
+        "confidence": 0.8433,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "TECH_Data_Retention.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8433,
+              "relevance_score": 0.8433,
+              "excerpt": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+              "citation_validated": true,
+              "citation_support_score": 0.8712,
+              "paragraph_start": 1,
+              "paragraph_end": 3,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "TECH_Data_Retention.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:20:26.905877+00:00"
+      },
+      {
+        "id": "d4c14fa6-f883-46ba-bf7c-69dd64800764",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "Siapa yang menyetujui pembelian senilai antara IDR 10 juta dan IDR 50 juta?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:21:09.643935+00:00"
+      },
+      {
+        "id": "ae8a8321-c5b9-4afe-ad76-720c88ce4ebc",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:21:09.643935+00:00"
+      },
+      {
+        "id": "a19e5fc4-3cc7-4266-b471-05e4055580e5",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:21:57.402063+00:00"
+      },
+      {
+        "id": "4a14c284-e4db-48f6-be64-dfa9d2d050b8",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:21:57.402063+00:00"
+      },
+      {
+        "id": "328d656d-3d80-4cd3-86a2-74bc4f9596fa",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "user",
+        "content": "When is salary paid if the 25th falls on a holiday?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:22:18.661034+00:00"
+      },
+      {
+        "id": "7adf285a-800e-4e4d-8477-81bc1294a026",
+        "conversation_id": "6b70405a-f569-4fc5-b2c4-dda175c8f6d4",
+        "role": "assistant",
+        "content": "If the 25th falls on a holiday, salary is paid on the prior working day.",
+        "attachments": [],
+        "confidence": 0.8269,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "FAQ_Payroll.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8269,
+              "relevance_score": 0.8269,
+              "excerpt": "If the 25th is a holiday, payment is the prior working day. ## Overtime Q: How is overtime paid? A: Approved overtime is paid in the following month's payroll.",
+              "citation_validated": true,
+              "citation_support_score": 0.92,
+              "paragraph_start": 1,
+              "paragraph_end": 3,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "FAQ_Payroll.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:22:18.661034+00:00"
+      }
+    ],
+    "created_at": "2026-07-27T14:16:00.047065+00:00",
+    "updated_at": "2026-07-27T14:22:18.661034+00:00",
+    "last_message": "If the 25th falls on a holiday, salary is paid on the prior working day.",
+    "last_user_message": "When is salary paid if the 25th falls on a holiday?",
+    "last_message_at": "2026-07-27T14:22:18.661034+00:00"
+  },
+  {
+    "id": "a01b56f6-dd18-4243-b494-7feaa7e01e18",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "052288cd-cfae-4149-89e6-596b88b1e738",
+        "conversation_id": "a01b56f6-dd18-4243-b494-7feaa7e01e18",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:15:06.059194+00:00"
+      },
+      {
+        "id": "b0b36196-8477-46c5-b33d-91f525999519",
+        "conversation_id": "a01b56f6-dd18-4243-b494-7feaa7e01e18",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi.",
+        "attachments": [],
+        "confidence": 0.6953,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.6953,
+              "relevance_score": 0.6953,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "citation_validated": true,
+              "citation_support_score": 0.8214,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:15:06.059194+00:00"
+      }
+    ],
+    "created_at": "2026-07-27T14:15:06.059194+00:00",
+    "updated_at": "2026-07-27T14:15:06.059194+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah 3 bulan. Evaluasi kinerja formal dilakukan pada minggu ke-12 sebelum konfirmasi.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-07-27T14:15:06.059194+00:00"
+  },
+  {
+    "id": "fe5a0a41-84bd-47ab-9269-87f4cc2d56ce",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "what is SOP",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "8baec6f2-68d1-4a9b-b51a-142c71ba12e5",
+        "conversation_id": "fe5a0a41-84bd-47ab-9269-87f4cc2d56ce",
+        "role": "user",
+        "content": "what is SOP",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-27T14:14:23.805063+00:00"
+      },
+      {
+        "id": "e03e68cf-1499-44e2-a31c-c58f2e090f1f",
+        "conversation_id": "fe5a0a41-84bd-47ab-9269-87f4cc2d56ce",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-27T14:14:23.805063+00:00"
+      }
+    ],
+    "created_at": "2026-07-27T14:14:23.805063+00:00",
+    "updated_at": "2026-07-27T14:14:23.805063+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "what is SOP",
+    "last_message_at": "2026-07-27T14:14:23.805063+00:00"
+  },
+  {
     "id": "47a1ffd6-dd4f-432c-af66-c615e44a18c7",
     "user_id": "dev-admin",
     "user_name": "Administrator",

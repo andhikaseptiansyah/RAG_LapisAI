@@ -20,6 +20,7 @@ import {
 
 import type {
   ChatLanguage,
+  ChatProgressEvent,
   QueryFailureReason,
 } from '../services/chatService';
 
@@ -215,6 +216,9 @@ export function useChat(
   const [error, setError] =
     useState<string | null>(null);
 
+  const [progressEvents, setProgressEvents] =
+    useState<ChatProgressEvent[]>([]);
+
   const abortControllerRef =
     useRef<AbortController | null>(null);
 
@@ -273,6 +277,7 @@ export function useChat(
             time: getCurrentTime(),
           },
         ]);
+        setProgressEvents([]);
         setError(offlineMessage);
         return false;
       }
@@ -314,6 +319,7 @@ export function useChat(
       ]);
 
       setIsGenerating(true);
+      setProgressEvents([]);
       setError(null);
 
       try {
@@ -326,7 +332,31 @@ export function useChat(
             model,
             attachments,
           },
-          controller.signal
+          controller.signal,
+          (progressEvent) => {
+            if (
+              controller.signal.aborted ||
+              activeQueryRef.current?.queryId !== queryId
+            ) {
+              return;
+            }
+
+            setProgressEvents((currentEvents) => {
+              const existingIndex = currentEvents.findIndex(
+                (event) => event.step === progressEvent.step
+              );
+
+              if (existingIndex < 0) {
+                return [...currentEvents, progressEvent];
+              }
+
+              return currentEvents.map((event, index) =>
+                index === existingIndex
+                  ? progressEvent
+                  : event
+              );
+            });
+          }
         );
 
         // Abort fetch tidak selalu menang terhadap response yang tiba pada saat
@@ -337,6 +367,8 @@ export function useChat(
         ) {
           return false;
         }
+
+        setProgressEvents([]);
 
         const assistantMessage = {
           ...convertChatResponseToMessage(response),
@@ -411,6 +443,7 @@ export function useChat(
         ) {
           abortControllerRef.current = null;
           setIsGenerating(false);
+          setProgressEvents([]);
         }
 
         if (activeQueryRef.current?.queryId === queryId) {
@@ -435,6 +468,7 @@ export function useChat(
       abortControllerRef.current?.abort();
       abortControllerRef.current = null;
       setIsGenerating(false);
+      setProgressEvents([]);
       setError(null);
 
       try {
@@ -512,6 +546,7 @@ export function useChat(
     abortControllerRef.current = null;
     activeQueryRef.current = null;
     setIsGenerating(false);
+    setProgressEvents([]);
   }, []);
 
 
@@ -550,6 +585,7 @@ export function useChat(
     setMessages([]);
     setConversationId(undefined);
     setIsGenerating(false);
+    setProgressEvents([]);
     setError(null);
   }, []);
 
@@ -568,6 +604,7 @@ export function useChat(
     model,
     setModel,
     isGenerating,
+    progressEvents,
     error,
     clearError,
     sendMessage,

@@ -188,6 +188,11 @@ def _log_grounding_decision(stage: str, answer: str, grounding: Any) -> None:
             "[GROUNDING_DEBUG] missing_requirements="
             f"{list(grounding.missing_answer_requirements)!r}"
         )
+    if grounding.missing_evidence_requirements:
+        print(
+            "[GROUNDING_DEBUG] missing_evidence_requirements="
+            f"{list(grounding.missing_evidence_requirements)!r}"
+        )
 
 
 def _requirement_instruction(question: str) -> str:
@@ -521,6 +526,10 @@ def build_ollama_grounded_answer(
                     llm_answer,
                     grounding,
                 )
+                if grounding.missing_evidence_requirements:
+                    # The selected source cannot be repaired by asking the model
+                    # to rewrite the same unsupported fact.
+                    break
             if (
                 not incomplete
                 and not wrong_language

@@ -93,6 +93,7 @@ def _legacy_requirement_name(key: str) -> str:
         "answer_approval": "explicit_approval",
         "answer_contact": "explicit_reporting_contact",
         "answer_supporting_document": "explicit_supporting_document",
+        "answer_definition": "explicit_definition",
     }
     if key.startswith("quoted:"):
         return "quoted_phrase:" + key.split(":", 1)[1]

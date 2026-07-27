@@ -4,6 +4,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+} from 'framer-motion';
 
 import type {
   AttachedFile,
@@ -12,6 +17,7 @@ import type {
 } from './types';
 
 import { useChat } from './hooks/useChat';
+import type { ChatProgressEvent } from './services/chatService';
 import { sanitizeMarkdown } from './utils/sanitizeMarkdown';
 import { Sidebar } from './components/Sidebar';
 import { ConversationNavigatorPanel } from './components/ConversationNavigatorPanel';
@@ -381,239 +387,192 @@ const CitationPanel: React.FC<{
 };
 
 
-const GENERAL_THINKING_PHRASES = [
-  'Understanding your question...',
-  'Reviewing the context...',
-  'Preparing the answer...',
-];
+const ProgressStatusIcon: React.FC<{
+  status: ChatProgressEvent['status'];
+}> = ({ status }) => {
+  const reduceMotion = useReducedMotion();
 
-const DOCUMENT_THINKING_PHRASES = [
-  'Membaca dokumen...',
-  'Finding the relevant section...',
-  'Preparing the answer...',
-];
-
-const getCommonPrefixLength = (
-  firstText: string,
-  secondText: string
-) => {
-  let prefixLength = 0;
-
-  while (
-    prefixLength < firstText.length &&
-    prefixLength < secondText.length &&
-    firstText[prefixLength] ===
-      secondText[prefixLength]
-  ) {
-    prefixLength += 1;
+  if (status === 'completed') {
+    return (
+      <motion.span
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.72 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
+        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-blue-200/45 text-blue-100"
+        aria-hidden="true"
+      >
+        <svg
+          className="h-2.5 w-2.5"
+          viewBox="0 0 12 12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <motion.path
+            d="M2.3 6.2 4.7 8.4 9.6 3.4"
+            initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.28, delay: 0.05, ease: 'easeOut' }}
+          />
+        </svg>
+      </motion.span>
+    );
   }
 
-  return prefixLength;
+  if (status === 'failed') {
+    return (
+      <motion.span
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.72 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-amber-200/45 text-[10px] font-semibold text-amber-100"
+        aria-hidden="true"
+      >
+        !
+      </motion.span>
+    );
+  }
+
+  if (status === 'skipped') {
+    return (
+      <span
+        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-white/15 text-[10px] text-white/35"
+        aria-hidden="true"
+      >
+        –
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="relative flex h-4 w-4 shrink-0 items-center justify-center"
+      aria-hidden="true"
+    >
+      <span className="absolute inset-[1px] rounded-full border border-blue-100/20" />
+      <span
+        className={`absolute inset-[1px] rounded-full border border-transparent border-t-blue-100 border-r-blue-300/70 ${
+          reduceMotion ? '' : 'animate-spin'
+        }`}
+      />
+      <span className="h-1 w-1 rounded-full bg-blue-100 shadow-[0_0_7px_rgba(191,219,254,0.9)]" />
+    </span>
+  );
 };
 
-const getTypingDelay = (
-  nextCharacter: string,
-  isDeleting: boolean
-) => {
-  if (isDeleting) {
-    return 20 + Math.floor(Math.random() * 18);
-  }
-
-  if (
-    nextCharacter === '.' ||
-    nextCharacter === ','
-  ) {
-    return 120 + Math.floor(Math.random() * 90);
-  }
-
-  return 30 + Math.floor(Math.random() * 36);
-};
-
-const ThinkingIndicator: React.FC<{
+const ProgressIndicator: React.FC<{
   active: boolean;
-  hasAttachments?: boolean;
+  events: ChatProgressEvent[];
 }> = ({
   active,
-  hasAttachments = false,
+  events,
 }) => {
-  const phrases = hasAttachments
-    ? DOCUMENT_THINKING_PHRASES
-    : GENERAL_THINKING_PHRASES;
+  const reduceMotion = useReducedMotion();
 
-  const [phraseIndex, setPhraseIndex] =
-    useState(0);
-
-  const [visibleText, setVisibleText] =
-    useState('');
-
-  const [isDeleting, setIsDeleting] =
-    useState(false);
-
-  const [isMounted, setIsMounted] =
-    useState(active);
-
-  const [isFadingOut, setIsFadingOut] =
-    useState(false);
-
-  const previousActiveRef =
-    useRef(active);
-
-  useEffect(() => {
-    if (
-      active &&
-      !previousActiveRef.current
-    ) {
-      setPhraseIndex(0);
-      setVisibleText('');
-      setIsDeleting(false);
-    }
-
-    previousActiveRef.current = active;
-  }, [active]);
-
-  useEffect(() => {
-    if (active) {
-      setIsMounted(true);
-      setIsFadingOut(false);
-      return;
-    }
-
-    if (!isMounted) {
-      return;
-    }
-
-    setIsFadingOut(true);
-
-    const hideTimeout = window.setTimeout(
-      () => {
-        setIsMounted(false);
-        setIsFadingOut(false);
-      },
-      220
-    );
-
-    return () => {
-      window.clearTimeout(hideTimeout);
-    };
-  }, [active, isMounted]);
-
-  useEffect(() => {
-    setPhraseIndex(0);
-    setVisibleText('');
-    setIsDeleting(false);
-  }, [hasAttachments]);
-
-  useEffect(() => {
-    if (!active) {
-      return;
-    }
-
-    const currentPhrase =
-      phrases[phraseIndex];
-
-    const nextPhraseIndex =
-      (phraseIndex + 1) % phrases.length;
-
-    const nextPhrase =
-      phrases[nextPhraseIndex];
-
-    const retainedPrefixLength =
-      getCommonPrefixLength(
-        currentPhrase,
-        nextPhrase
-      );
-
-    const isTypingComplete =
-      visibleText === currentPhrase;
-
-    const isDeletionComplete =
-      isDeleting &&
-      visibleText.length <=
-        retainedPrefixLength;
-
-    let delay = getTypingDelay(
-      currentPhrase[visibleText.length] ?? '',
-      isDeleting
-    );
-
-    if (!isDeleting && isTypingComplete) {
-      delay = 760 + Math.floor(
-        Math.random() * 420
-      );
-    }
-
-    if (isDeletionComplete) {
-      delay = 120;
-    }
-
-    const animationTimeout =
-      window.setTimeout(() => {
-        if (
-          !isDeleting &&
-          isTypingComplete
-        ) {
-          setIsDeleting(true);
-          return;
-        }
-
-        if (isDeletionComplete) {
-          setPhraseIndex(nextPhraseIndex);
-          setIsDeleting(false);
-          return;
-        }
-
-        setVisibleText((previousText) => {
-          if (isDeleting) {
-            return currentPhrase.slice(
-              0,
-              Math.max(
-                previousText.length - 1,
-                retainedPrefixLength
-              )
-            );
-          }
-
-          return currentPhrase.slice(
-            0,
-            previousText.length + 1
-          );
-        });
-      }, delay);
-
-    return () => {
-      window.clearTimeout(
-        animationTimeout
-      );
-    };
-  }, [
-    active,
-    isDeleting,
-    phraseIndex,
-    phrases,
-    visibleText,
-  ]);
-
-  if (!isMounted) {
+  if (!active || events.length === 0) {
     return null;
   }
 
   return (
-    <div
-      className={`flex justify-start px-1 md:px-2 transition-all duration-200 ease-out ${
-        isFadingOut
-          ? 'opacity-0 translate-y-1'
-          : 'opacity-100 translate-y-0'
-      }`}
+    <section
+      className="mx-1 max-w-[720px] bg-transparent px-1 py-2 md:mx-2 md:px-0"
       aria-live="polite"
-      aria-label="AI sedang menyiapkan jawaban"
+      aria-label="Progres penyusunan jawaban"
     >
-      <div className="inline-flex min-h-6 max-w-full items-center text-[15px] md:text-[16px] leading-relaxed tracking-[0.005em] text-zinc-500">
-        <span className="block max-w-[86vw] overflow-hidden text-ellipsis whitespace-nowrap md:max-w-[720px]">
-          {visibleText}
-          <span className="ml-1 inline-block h-[1.05em] w-[6px] rounded-[1px] bg-zinc-600/80 align-[-2px] animate-pulse" />
-        </span>
+      <div className="mb-2.5 flex items-center justify-between gap-3 border-b border-white/[0.07] pb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-white/58 md:text-[11px]">
+          Progres jawaban
+        </p>
+
+        <div className="flex items-center gap-1.5 text-[9px] text-white/35 md:text-[10px]">
+          <motion.span
+            className="h-1.5 w-1.5 rounded-full bg-blue-200"
+            animate={
+              reduceMotion
+                ? undefined
+                : { opacity: [0.35, 1, 0.35], scale: [0.9, 1.15, 0.9] }
+            }
+            transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
+            aria-hidden="true"
+          />
+          Tahap backend aktual
+        </div>
       </div>
-    </div>
+
+      <div className="space-y-2.5">
+        <AnimatePresence initial={false}>
+          {events.map((event, index) => {
+            const isCurrent = event.status === 'active';
+            const isLast = index === events.length - 1;
+
+            return (
+              <motion.div
+                layout
+                key={event.step}
+                initial={
+                  reduceMotion
+                    ? false
+                    : { opacity: 0, x: -7, y: 3, filter: 'blur(3px)' }
+                }
+                animate={{
+                  opacity: isCurrent ? 1 : 0.82,
+                  x: 0,
+                  y: 0,
+                  filter: 'blur(0px)',
+                }}
+                exit={
+                  reduceMotion
+                    ? undefined
+                    : { opacity: 0, x: 5, transition: { duration: 0.14 } }
+                }
+                transition={{ duration: 0.24, ease: 'easeOut' }}
+                className="flex items-start gap-2.5"
+              >
+                <div className="relative flex w-4 shrink-0 justify-center self-stretch pt-0.5">
+                  <ProgressStatusIcon status={event.status} />
+
+                  {!isLast && (
+                    <motion.span
+                      initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
+                      animate={{ scaleY: 1, opacity: 1 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute bottom-[-0.7rem] top-[1.22rem] w-px origin-top bg-gradient-to-b from-blue-200/30 via-blue-200/12 to-transparent"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1 pb-0.5">
+                  <p
+                    className={`text-[12px] font-medium leading-[1.45] md:text-[13px] ${
+                      isCurrent
+                        ? 'rag-progress-active-title'
+                        : event.status === 'failed'
+                          ? 'text-amber-100'
+                          : 'text-white/78'
+                    }`}
+                  >
+                    {event.title}
+                  </p>
+
+                  {event.detail && (
+                    <motion.p
+                      initial={reduceMotion ? false : { opacity: 0, y: 2 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: 0.04 }}
+                      className="mt-0.5 text-[10.5px] leading-[1.5] text-white/43 md:text-[11.5px]"
+                    >
+                      {event.detail}
+                    </motion.p>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+    </section>
   );
 };
 
@@ -645,6 +604,7 @@ export const App: React.FC = () => {
     messages,
     setMessages,
     isGenerating,
+    progressEvents,
     sendMessage,
     loadConversation,
     setLanguage,
@@ -1472,16 +1432,9 @@ export const App: React.FC = () => {
                 )
               )}
 
-              <ThinkingIndicator
+              <ProgressIndicator
                 active={isGenerating}
-                hasAttachments={Boolean(
-                  [...messages]
-                    .reverse()
-                    .find(
-                      (message) =>
-                        message.role === 'user'
-                    )?.attachments?.length
-                )}
+                events={progressEvents}
               />
             </div>
           )}

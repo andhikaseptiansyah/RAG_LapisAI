@@ -10,6 +10,7 @@ from uploads.config import (
 )
 from retrieval.requirements import (
     canonical_unit,
+    extract_definition_target,
     extract_evidence_requirements,
     requirement_satisfied,
 )
@@ -693,13 +694,7 @@ def build_generation_evidence(
 
 
 def _detect_definition_target(question: str) -> str | None:
-    q = question.strip()
-    for pattern in DEFINITION_PATTERNS:
-        match = re.search(pattern, q, flags=re.I)
-        if match:
-            target = match.group(1).strip("?.!,;:()[]{} ")
-            return target if target else None
-    return None
+    return extract_definition_target(question)
 
 
 def _is_exact_token_present(text: str, token: str) -> bool:
@@ -749,6 +744,17 @@ def _extract_definition_from_text(text: str, target: str) -> str | None:
 
     target_re = re.escape(target)
 
+    # Contoh: "SOP (Standard Operating Procedure)".
+    after_parentheses = re.search(
+        rf"\b{target_re}\b\s*\(\s*([^)]{{3,180}})\s*\)",
+        clean,
+        flags=re.I,
+    )
+    if after_parentheses:
+        expansion = _clean_text(after_parentheses.group(1)).strip(" -–—|,:;")
+        if expansion:
+            return f"{target.upper()} adalah singkatan/nama dari {expansion}"
+
     # Contoh: "Jurnal Ilmiah Teknik Informatika dan Elektro (JITEK) | ISSN ..."
     before_parentheses = re.search(
         rf"([A-ZÀ-Ý][^.|:;]{{5,150}}\(\s*{target_re}\s*\))",
@@ -771,18 +777,7 @@ def _extract_definition_from_text(text: str, target: str) -> str | None:
     if after_definition:
         return f"{target.upper()} adalah {_clean_text(after_definition.group(1)).strip(' -–—|,:;')}"
 
-    # Fallback: ambil segmen terpendek yang mengandung target.
-    for separator in ["|", ".", ";", ":"]:
-        segments = [_clean_text(segment) for segment in clean.split(separator)]
-        containing = [segment for segment in segments if re.search(target_re, segment, flags=re.I)]
-        containing = sorted(containing, key=len)
-        for segment in containing:
-            if 12 <= len(segment) <= 180:
-                return segment.strip(" -–—|,:;")
-
-    window = _window_around_keyword(clean, target, radius=120)
-    if window:
-        return window[:180].rsplit(" ", 1)[0].strip() + ("…" if len(window) > 180 else "")
+    # Judul atau nama file yang sekadar memuat istilah bukan definisi.
     return None
 
 
@@ -790,6 +785,15 @@ def _definition_answer(question: str, chunks: list[dict[str, Any]], language: st
     target = _detect_definition_target(question)
     if not target:
         return None
+
+    definition_requirement = next(
+        (
+            requirement
+            for requirement in extract_evidence_requirements(question)
+            if requirement.key == "answer_definition"
+        ),
+        None,
+    )
 
     # Strict: kalau user nulis JITAK dan dokumen cuma punya JITEK, jangan jawab seolah-olah JITAK ada.
     exact_found = any(_is_exact_token_present(str(chunk.get("content") or ""), target) for chunk in chunks[:6])
@@ -819,6 +823,11 @@ def _definition_answer(question: str, chunks: list[dict[str, Any]], language: st
     for chunk in chunks[:6]:
         content = str(chunk.get("content") or "")
         if not _is_exact_token_present(content, target):
+            continue
+        if definition_requirement and not requirement_satisfied(
+            definition_requirement,
+            [content],
+        ):
             continue
         definition = _extract_definition_from_text(content, target)
         if definition:
@@ -2485,9 +2494,29 @@ def build_sources(
 
         answer_claims = _atomic_claims(clean_answer)
         total_claim_chars = sum(len(claim) for claim in answer_claims) or 1
+        answer_requirements = [
+            requirement
+            for requirement in extract_evidence_requirements(question)
+            if requirement.key.startswith("answer_")
+        ]
 
         for group_key, source in grouped_sources.items():
             evidence_group = grouped_chunks[group_key]
+            definition_requirements = [
+                requirement
+                for requirement in answer_requirements
+                if requirement.kind == "definition"
+            ]
+            if definition_requirements and any(
+                not requirement_satisfied(
+                    requirement,
+                    [str(chunk.get("content") or "") for chunk in evidence_group],
+                )
+                for requirement in definition_requirements
+            ):
+                # A definition answer must cite a source that explicitly defines
+                # the term. A title containing the term is not enough.
+                continue
             supported_claims: list[str] = []
             claim_scores: list[float] = []
 
@@ -2500,6 +2529,7 @@ def build_sources(
                 if (
                     not claim_decision.unsupported_facts
                     and not claim_decision.unsupported_claims
+                    and not claim_decision.missing_evidence_requirements
                 ):
                     supported_claims.append(claim)
                     claim_scores.append(claim_decision.support_score)
@@ -2532,29 +2562,35 @@ def build_sources(
     # One complete source is preferable to several merely topically similar
     # sources. This removes Q3 reports from a full-year answer when the annual
     # report alone supports every generated claim.
-    if full_support:
-        best = max(
-            full_support,
-            key=lambda source: (
-                source.get("citation_support_score", 0.0),
-                source.get("relevance_score", 0.0),
-            ),
-        )
-        return [best]
+    if clean_answer:
+        if full_support:
+            best = max(
+                full_support,
+                key=lambda source: (
+                    source.get("citation_support_score", 0.0),
+                    source.get("relevance_score", 0.0),
+                ),
+            )
+            return [best]
 
-    effective_limit = min(max(1, int(limit)), MAX_SOURCE_CITATIONS)
-    if partial_support:
-        return sorted(
-            partial_support,
-            key=lambda source: (
-                source.get("citation_answer_coverage", 0.0),
-                source.get("citation_support_score", 0.0),
-                source.get("relevance_score", 0.0),
-            ),
-            reverse=True,
-        )[:effective_limit]
+        effective_limit = min(max(1, int(limit)), MAX_SOURCE_CITATIONS)
+        if partial_support:
+            return sorted(
+                partial_support,
+                key=lambda source: (
+                    source.get("citation_answer_coverage", 0.0),
+                    source.get("citation_support_score", 0.0),
+                    source.get("relevance_score", 0.0),
+                ),
+                reverse=True,
+            )[:effective_limit]
+
+        # The answer has no supporting source. Do not display a merely topical
+        # citation as if it proved the generated claim.
+        return []
 
     # Compatibility path for callers that do not yet pass the final answer.
+    effective_limit = min(max(1, int(limit)), MAX_SOURCE_CITATIONS)
     return sorted(
         grouped_sources.values(),
         key=lambda source: source.get("relevance_score", 0.0),

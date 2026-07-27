@@ -4,9 +4,29 @@ import type {
   MessageSource,
 } from '../types';
 
-import { apiRequest } from './api';
+import { ApiError, apiRequest } from './api';
+import { clearStoredAuth, getStoredAuthToken } from './authStorage';
 
 export type ChatLanguage = 'ID' | 'EN';
+
+export type ChatProgressStatus =
+  | 'active'
+  | 'completed'
+  | 'skipped'
+  | 'failed';
+
+export interface ChatProgressEvent {
+  step: string;
+  status: ChatProgressStatus;
+  title: string;
+  detail?: string;
+  timestamp?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export type ChatProgressHandler = (
+  event: ChatProgressEvent
+) => void;
 
 export interface SendChatPayload {
   message: string;
@@ -155,34 +175,279 @@ const buildChatFormData = (
   return formData;
 };
 
+const CHAT_API_BASE_URL = (
+  import.meta.env.VITE_API_URL ||
+  'http://127.0.0.1:8000'
+).replace(/\/+$/, '');
+
+type StreamEnvelope = {
+  event: string;
+  data: unknown;
+};
+
+const parseSseBlock = (block: string): StreamEnvelope | null => {
+  let event = 'message';
+  const dataLines: string[] = [];
+
+  block.split('\n').forEach((line) => {
+    if (line.startsWith('event:')) {
+      event = line.slice(6).trim();
+    } else if (line.startsWith('data:')) {
+      dataLines.push(line.slice(5).trimStart());
+    }
+  });
+
+  if (dataLines.length === 0) {
+    return null;
+  }
+
+  const rawData = dataLines.join('\n');
+  try {
+    return {
+      event,
+      data: JSON.parse(rawData) as unknown,
+    };
+  } catch {
+    return { event, data: rawData };
+  }
+};
+
+const isProgressEvent = (
+  value: unknown
+): value is ChatProgressEvent => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const candidate = value as Partial<ChatProgressEvent>;
+  return (
+    typeof candidate.step === 'string' &&
+    typeof candidate.title === 'string' &&
+    (candidate.status === 'active' ||
+      candidate.status === 'completed' ||
+      candidate.status === 'skipped' ||
+      candidate.status === 'failed')
+  );
+};
+
+const buildStreamRequestBody = (
+  payload: SendChatPayload,
+  headers: Headers
+): BodyInit => {
+  if (hasRealFiles(payload.attachments)) {
+    return buildChatFormData(payload);
+  }
+
+  headers.set('Content-Type', 'application/json');
+  return JSON.stringify(payload);
+};
+
+const parseStreamHttpError = async (
+  response: Response
+): Promise<ApiError> => {
+  const rawPayload = await response.text().catch(() => '');
+  let payload: unknown = rawPayload || null;
+  if (rawPayload) {
+    try {
+      payload = JSON.parse(rawPayload) as unknown;
+    } catch {
+      payload = rawPayload;
+    }
+  }
+
+  const data = (
+    typeof payload === 'object' &&
+    payload !== null
+  )
+    ? payload as Record<string, unknown>
+    : null;
+  const detail = (
+    data &&
+    typeof data.detail === 'object' &&
+    data.detail !== null
+  )
+    ? data.detail as Record<string, unknown>
+    : null;
+  const message =
+    (typeof data?.message === 'string' && data.message) ||
+    (typeof detail?.message === 'string' && detail.message) ||
+    (typeof data?.detail === 'string' && data.detail) ||
+    `Request failed with status ${response.status}`;
+  const code = response.status === 401
+    ? 'AUTH_EXPIRED'
+    : response.status === 429
+      ? 'RATE_LIMITED'
+      : response.status >= 500
+        ? 'INTERNAL_SERVER_ERROR'
+        : 'UNKNOWN_ERROR';
+
+  return new ApiError(
+    message,
+    response.status,
+    payload,
+    code
+  );
+};
+
 export const sendChatMessage = async (
   payload: SendChatPayload,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onProgress?: ChatProgressHandler
 ): Promise<ChatApiResponse> => {
-  const response = hasRealFiles(payload.attachments)
-    ? await apiRequest<ChatApiResponse, FormData>('/api/chat', {
-        method: 'POST',
-        body: buildChatFormData(payload),
-        signal,
-      })
-    : await apiRequest<ChatApiResponse, SendChatPayload>('/api/chat', {
-        method: 'POST',
-        body: payload,
-        signal,
-      });
+  const headers = new Headers({
+    Accept: 'text/event-stream',
+  });
+  const authToken = getStoredAuthToken();
+  if (authToken) {
+    headers.set('Authorization', `Bearer ${authToken}`);
+  }
 
-  if (response.buildVersion) {
+  let response: Response;
+  try {
+    response = await fetch(
+      `${CHAT_API_BASE_URL}/api/chat/stream`,
+      {
+        method: 'POST',
+        headers,
+        body: buildStreamRequestBody(payload, headers),
+        signal,
+        credentials: 'include',
+      }
+    );
+  } catch (error) {
+    if (
+      error instanceof DOMException &&
+      error.name === 'AbortError'
+    ) {
+      throw error;
+    }
+
+    throw new ApiError(
+      error instanceof Error
+        ? error.message
+        : 'Unable to connect to the server.',
+      0,
+      null,
+      'NETWORK_ERROR'
+    );
+  }
+
+  if (!response.ok) {
+    const streamError = await parseStreamHttpError(response);
+    if (response.status === 401) {
+      clearStoredAuth();
+      if (window.location.pathname !== '/login') {
+        const currentPath =
+          window.location.pathname + window.location.search;
+        window.location.href = `/login?redirect=${encodeURIComponent(
+          currentPath
+        )}`;
+      }
+    }
+    throw streamError;
+  }
+
+  if (!response.body) {
+    throw new ApiError(
+      'Server did not provide a progress stream.',
+      500,
+      null,
+      'INTERNAL_SERVER_ERROR'
+    );
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalResponse: ChatApiResponse | null = null;
+
+  const handleEnvelope = (envelope: StreamEnvelope): void => {
+    if (envelope.event === 'progress' && isProgressEvent(envelope.data)) {
+      onProgress?.(envelope.data);
+      return;
+    }
+
+    if (envelope.event === 'result') {
+      finalResponse = envelope.data as ChatApiResponse;
+      return;
+    }
+
+    if (envelope.event === 'error') {
+      const streamError = (
+        typeof envelope.data === 'object' &&
+        envelope.data !== null
+      )
+        ? envelope.data as Record<string, unknown>
+        : {};
+      throw new ApiError(
+        typeof streamError.message === 'string'
+          ? streamError.message
+          : 'Proses chat gagal.',
+        typeof streamError.statusCode === 'number'
+          ? streamError.statusCode
+          : 500,
+        envelope.data,
+        streamError.code === 'CHAT_CANCELLED'
+          ? 'UNKNOWN_ERROR'
+          : 'INTERNAL_SERVER_ERROR'
+      );
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      buffer += decoder.decode();
+      break;
+    }
+
+    buffer += decoder.decode(value, { stream: true });
+    buffer = buffer.replace(/\r\n/g, '\n');
+
+    let separatorIndex = buffer.indexOf('\n\n');
+    while (separatorIndex >= 0) {
+      const block = buffer.slice(0, separatorIndex).trim();
+      buffer = buffer.slice(separatorIndex + 2);
+      if (block) {
+        const envelope = parseSseBlock(block);
+        if (envelope) {
+          handleEnvelope(envelope);
+        }
+      }
+      separatorIndex = buffer.indexOf('\n\n');
+    }
+  }
+
+  const trailingBlock = buffer.trim();
+  if (trailingBlock) {
+    const envelope = parseSseBlock(trailingBlock);
+    if (envelope) {
+      handleEnvelope(envelope);
+    }
+  }
+
+  if (!finalResponse) {
+    throw new ApiError(
+      'Progress stream ended before the answer was received.',
+      500,
+      null,
+      'INTERNAL_SERVER_ERROR'
+    );
+  }
+
+  const completedResponse = finalResponse as ChatApiResponse;
+  if (completedResponse.buildVersion) {
     console.info(
-      `[LapisAI] backend build: ${response.buildVersion}; ` +
-      `chatService=${response.chatServiceSha256 ?? 'unknown'}; ` +
-      `retrieval=${response.retrieval_mode ?? 'unknown'}; ` +
-      `failureStage=${response.failure_stage ?? 'none'}`
+      `[LapisAI] backend build: ${completedResponse.buildVersion}; ` +
+      `chatService=${completedResponse.chatServiceSha256 ?? 'unknown'}; ` +
+      `retrieval=${completedResponse.retrieval_mode ?? 'unknown'}; ` +
+      `failureStage=${completedResponse.failure_stage ?? 'none'}`
     );
   } else {
     console.warn('[LapisAI] backend response has no buildVersion; an older backend may still be active.');
   }
 
-  return response;
+  return completedResponse;
 };
 
 export const recordQueryFailure = async (

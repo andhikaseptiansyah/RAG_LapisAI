@@ -42,6 +42,7 @@ class EvidenceDecision:
 # Missing one of these usually changes the subject of the answer, not merely its
 # wording. They therefore act as hard constraints when explicitly asked.
 HARD_CONCEPTS = {
+    "remote_work",
     "password_reset",
     "maternity_leave",
     "paternity_leave",

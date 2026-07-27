@@ -99,6 +99,9 @@ def _grounding_repair_prompt(
     missing_requirements = list(
         getattr(grounding, "missing_answer_requirements", ()) or ()
     )
+    missing_evidence_requirements = list(
+        getattr(grounding, "missing_evidence_requirements", ()) or ()
+    )
     reasons = list(getattr(grounding, "reasons", ()) or ())
 
     diagnostics: list[str] = []
@@ -118,6 +121,11 @@ def _grounding_repair_prompt(
         diagnostics.append(
             "Still required by the question: "
             + ", ".join(missing_requirements)
+        )
+    if missing_evidence_requirements:
+        diagnostics.append(
+            "The selected evidence does not contain: "
+            + ", ".join(missing_evidence_requirements)
         )
 
     language_instruction = (
@@ -158,6 +166,10 @@ def _log_grounding(stage: str, answer: str, grounding: Any) -> None:
     print(
         "[GEMINI_GROUNDING_DEBUG] unsupported_claims="
         f"{list(getattr(grounding, 'unsupported_claims', ()) or ())!r}"
+    )
+    print(
+        "[GEMINI_GROUNDING_DEBUG] missing_evidence_requirements="
+        f"{list(getattr(grounding, 'missing_evidence_requirements', ()) or ())!r}"
     )
 
 
@@ -224,6 +236,13 @@ def build_gemini_grounded_answer(
 
             if not grounding.supported:
                 _log_grounding("initial", llm_answer, grounding)
+
+                if grounding.missing_evidence_requirements:
+                    print(
+                        "[GEMINI] selected evidence lacks the requested answer type; "
+                        "skipping model repair"
+                    )
+                    return ""
 
                 # First attempt: let Gemini rewrite only the unsupported clauses.
                 repair_raw = _gemini_chat(

@@ -12,6 +12,8 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from api.progress import emit_progress
+
 from retrieval.query_expansion import CONCEPT_ALIASES, normalize_text
 from retrieval.requirements import (
     EMAIL_PATTERN,
@@ -33,6 +35,7 @@ class GroundingDecision:
     unsupported_facts: tuple[str, ...]
     unsupported_claims: tuple[str, ...] = ()
     missing_answer_requirements: tuple[str, ...] = ()
+    missing_evidence_requirements: tuple[str, ...] = ()
     checked_claims: int = 0
 
     @property
@@ -48,6 +51,7 @@ class GroundingDecision:
             "unsupported_facts",
             "unsupported_claims",
             "missing_answer_requirements",
+            "missing_evidence_requirements",
         ):
             payload[key] = list(payload[key])
         return payload
@@ -277,6 +281,12 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
         flags=re.I,
     ),
 }
+
+RELATIONAL_CLAIM_PATTERN = re.compile(
+    r"\b(?:used\s+to|is\s+used|governs?|regulates?|covers?|includes?|defines?|"
+    r"digunakan|berfungsi|mengatur|mencakup|meliputi|mendefinisikan)\b",
+    flags=re.I,
+)
 
 IGNORED_ACRONYMS = {
     "IDR", "USD", "EUR", "WIB", "GB", "MB", "TB", "KB", "FAQ", "SOP",
@@ -760,6 +770,24 @@ def _claim_support(
     return max(scores, default=0.0)
 
 
+def _required_claim_support(claim: str, base_threshold: float) -> float:
+    """Use a stricter floor for broad relational claims without exact facts.
+
+    A weak title overlap may contain ``SOP``, a company name, and ``business``
+    while still not supporting the relation "SOP is used to govern business
+    processes". These fluent relational tails need more than the global 0.32
+    lexical floor.
+    """
+
+    if (
+        RELATIONAL_CLAIM_PATTERN.search(claim)
+        and len(_tokenize(claim)) >= 5
+        and not _fact_entries(claim)
+    ):
+        return max(float(base_threshold), 0.45)
+    return float(base_threshold)
+
+
 def prune_unsupported_claims(
     question: str,
     answer: str,
@@ -777,14 +805,23 @@ def prune_unsupported_claims(
     if is_scenario_comparison(question):
         evidence_units = [*evidence_units, question]
 
+    # A generated answer cannot repair an answer-type gap in the source. A
+    # title containing "SOP" does not prove what SOP stands for.
+    for requirement in extract_evidence_requirements(question):
+        if not requirement.key.startswith("answer_"):
+            continue
+        if not requirement_satisfied(requirement, evidence_units):
+            return ""
+
     kept: list[str] = []
     for claim in _atomic_claims(answer):
         reference_units = _claim_reference_units(claim, evidence_units)
         if not reference_units:
             continue
+        required_support = _required_claim_support(claim, minimum_claim_support)
         if (
             _claim_support(claim, reference_units, question=question) + 1e-9
-            < minimum_claim_support
+            < required_support
         ):
             continue
         if claim not in kept:
@@ -829,13 +866,28 @@ def validate_grounded_answer(
     clean_answer = _clean(answer)
     evidence_units = _evidence_units(chunks)
     context = "\n".join(evidence_units)
+    emit_progress(
+        "grounding",
+        "active",
+        "Memeriksa grounding",
+        detail=f"Memastikan klaim jawaban didukung oleh {len(evidence_units)} unit bukti terpilih.",
+        metadata={"evidenceUnitCount": len(evidence_units)},
+    )
     if not clean_answer or not context:
-        return GroundingDecision(
+        decision = GroundingDecision(
             supported=False,
             score=0.0,
             reasons=("empty_answer_or_context",),
             unsupported_facts=(),
         )
+        emit_progress(
+            "grounding",
+            "failed",
+            "Pemeriksaan grounding gagal",
+            detail="Jawaban atau konteks bukti kosong.",
+            metadata={"supported": False, "score": 0.0},
+        )
+        return decision
 
     context_entries = _fact_entries(context)
     question_entries = _fact_entries(question) if is_scenario_comparison(question) else []
@@ -864,15 +916,21 @@ def validate_grounded_answer(
             else 0.0
         )
         claim_scores.append(score)
-        if score + 1e-9 < minimum_claim_support:
+        required_support = _required_claim_support(claim, minimum_claim_support)
+        if score + 1e-9 < required_support:
             unsupported_claims.append(claim[:220])
 
     missing_requirements: list[str] = []
+    missing_evidence_requirements: list[str] = []
     for requirement in extract_evidence_requirements(question):
         if not requirement.key.startswith("answer_"):
             continue
-        if not requirement_satisfied(requirement, [clean_answer]):
+        answer_has_requirement = requirement_satisfied(requirement, [clean_answer])
+        if not answer_has_requirement:
             missing_requirements.append(requirement.key)
+            continue
+        if not requirement_satisfied(requirement, evidence_units):
+            missing_evidence_requirements.append(requirement.key)
 
     reasons: list[str] = []
     if unsupported_facts:
@@ -881,25 +939,46 @@ def validate_grounded_answer(
         reasons.append("unsupported_claims")
     if missing_requirements:
         reasons.append("incomplete_answer_type")
+    if missing_evidence_requirements:
+        reasons.append("missing_evidence_requirement")
 
     unique_facts = tuple(dict.fromkeys(unsupported_facts))
     unique_claims = tuple(dict.fromkeys(unsupported_claims))
     unique_missing = tuple(dict.fromkeys(missing_requirements))
+    unique_missing_evidence = tuple(dict.fromkeys(missing_evidence_requirements))
     mean_claim = sum(claim_scores) / len(claim_scores) if claim_scores else 1.0
     penalty = min(
         1.0,
         0.28 * len(unique_facts)
         + 0.22 * len(unique_claims)
-        + 0.25 * len(unique_missing),
+        + 0.25 * len(unique_missing)
+        + 0.30 * len(unique_missing_evidence),
     )
     score = max(0.0, min(mean_claim * (1.0 - penalty), 1.0))
 
-    return GroundingDecision(
+    decision = GroundingDecision(
         supported=not reasons,
         score=round(score, 6),
         reasons=tuple(reasons),
         unsupported_facts=unique_facts,
         unsupported_claims=unique_claims,
         missing_answer_requirements=unique_missing,
+        missing_evidence_requirements=unique_missing_evidence,
         checked_claims=len(claim_scores),
     )
+    emit_progress(
+        "grounding",
+        "completed" if decision.supported else "failed",
+        "Pemeriksaan grounding selesai",
+        detail=(
+            f"{decision.checked_claims} klaim diperiksa dan seluruhnya didukung dokumen."
+            if decision.supported
+            else f"{decision.checked_claims} klaim diperiksa; jawaban memerlukan perbaikan grounding."
+        ),
+        metadata={
+            "supported": decision.supported,
+            "score": decision.score,
+            "checkedClaims": decision.checked_claims,
+        },
+    )
+    return decision

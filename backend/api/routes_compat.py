@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from api.build_info import BUILD_VERSION, public_build_info
@@ -659,8 +660,7 @@ async def _watch_chat_disconnect(request: Request, cancel_event) -> None:
         await asyncio.sleep(0.10)
 
 
-@router.post("/chat")
-async def compat_chat(request: Request):
+async def _read_chat_payload(request: Request) -> tuple[str, str | None, str, str, str | None]:
     content_type = request.headers.get("content-type", "")
 
     if "multipart/form-data" in content_type:
@@ -681,6 +681,225 @@ async def compat_chat(request: Request):
     if not question:
         raise HTTPException(status_code=400, detail="Pesan wajib diisi.")
 
+    return question, conversation_id, str(language), query_id, model
+
+
+def _persist_chat_result(
+    *,
+    result: dict[str, Any],
+    question: str,
+    query_id: str,
+    conversation_id: str | None,
+    language: str,
+    current_user: dict[str, Any],
+    started_at: float,
+    cancel_event,
+) -> dict[str, Any]:
+    raise_if_cancelled(cancel_event)
+    answer = str(result.get("answer") or "")
+    sources = result.get("sources") or []
+    confidence = result.get("confidence") or 0.0
+    response_time_ms = result.get("response_time_ms") or (
+        (time.perf_counter() - started_at) * 1000
+    )
+    follow_up_question = result.get("follow_up_question")
+    resolved_language = str(result.get("language") or language or "ID").upper()
+
+    save_log(
+        query_id=query_id,
+        question=question,
+        answer=answer,
+        sources=sources,
+        latency_ms=response_time_ms,
+        confidence=confidence,
+        user_id=current_user["id"],
+        user_name=current_user["name"],
+        user_role=current_user["role"],
+    )
+    raise_if_cancelled(cancel_event)
+    conversation, assistant_message = append_chat_turn(
+        question=question,
+        answer=answer,
+        confidence=confidence,
+        sources=sources,
+        conversation_id=conversation_id,
+        language=resolved_language,
+        user_id=current_user["id"],
+        user_name=current_user["name"],
+        follow_up_question=follow_up_question,
+    )
+    raise_if_cancelled(cancel_event)
+
+    primary_source = sources[0] if sources else None
+    return {
+        "conversationId": conversation["id"],
+        "messageId": assistant_message["id"],
+        "answer": answer,
+        "confidence": confidence,
+        "sources": sources,
+        "follow_up_question": follow_up_question,
+        "followUpQuestion": follow_up_question,
+        "response_time_ms": response_time_ms,
+        "source": primary_source.get("document_name") if primary_source else None,
+        "page": primary_source.get("page") if primary_source else None,
+        "createdAt": assistant_message["created_at"],
+        "language": resolved_language,
+        "model": result.get("model"),
+        "generation_mode": result.get("generation_mode"),
+        "buildVersion": result.get("buildVersion") or BUILD_VERSION,
+        "chatServiceSha256": public_build_info().get("chatServiceSha256"),
+        "retrieval_mode": result.get("retrieval_mode"),
+        "retrieval_query": result.get("retrieval_query"),
+        "failure_stage": result.get("failure_stage"),
+    }
+
+
+def _sse_message(event: str, payload: dict[str, Any]) -> str:
+    return (
+        f"event: {event}\n"
+        f"data: {json.dumps(payload, ensure_ascii=False, default=str)}\n\n"
+    )
+
+
+@router.post("/chat/stream")
+async def compat_chat_stream(request: Request):
+    question, conversation_id, language, query_id, model = await _read_chat_payload(request)
+    current_user = _require_user(request)
+    started_at = time.perf_counter()
+    cancel_event = register_query(query_id, current_user["id"])
+    loop = asyncio.get_running_loop()
+    event_queue: asyncio.Queue[tuple[str, dict[str, Any]]] = asyncio.Queue()
+
+    def publish_progress(event: dict[str, Any]) -> None:
+        if cancel_event.is_set():
+            return
+        loop.call_soon_threadsafe(event_queue.put_nowait, ("progress", event))
+
+    async def run_worker() -> None:
+        try:
+            result = await asyncio.to_thread(
+                run_chat,
+                question,
+                top_k=5,
+                language=language,
+                model=model,
+                cancel_event=cancel_event,
+                progress_callback=publish_progress,
+            )
+            response_payload = _persist_chat_result(
+                result=result,
+                question=question,
+                query_id=query_id,
+                conversation_id=conversation_id,
+                language=language,
+                current_user=current_user,
+                started_at=started_at,
+                cancel_event=cancel_event,
+            )
+            await event_queue.put(("result", response_payload))
+        except ChatCancelled:
+            save_log(
+                query_id=query_id,
+                question=question,
+                answer="",
+                sources=[],
+                latency_ms=(time.perf_counter() - started_at) * 1000,
+                confidence=0.0,
+                status="NOT_FOUND",
+                failure_reason="USER_STOPPED",
+                user_id=current_user["id"],
+                user_name=current_user["name"],
+                user_role=current_user["role"],
+            )
+            await event_queue.put((
+                "error",
+                {
+                    "code": "CHAT_CANCELLED",
+                    "message": "Permintaan dihentikan oleh pengguna.",
+                    "statusCode": 499,
+                },
+            ))
+        except Exception as exc:
+            if cancel_event.is_set():
+                await event_queue.put((
+                    "error",
+                    {
+                        "code": "CHAT_CANCELLED",
+                        "message": "Permintaan dihentikan.",
+                        "statusCode": 499,
+                    },
+                ))
+            else:
+                save_log(
+                    query_id=query_id,
+                    question=question,
+                    answer="",
+                    sources=[],
+                    latency_ms=(time.perf_counter() - started_at) * 1000,
+                    confidence=0.0,
+                    status="NOT_FOUND",
+                    failure_reason="SERVER_ERROR",
+                    user_id=current_user["id"],
+                    user_name=current_user["name"],
+                    user_role=current_user["role"],
+                )
+                print(f"[CHAT_STREAM] request failed: {exc}")
+                await event_queue.put((
+                    "error",
+                    {
+                        "code": "INTERNAL_SERVER_ERROR",
+                        "message": "Proses chat gagal di server.",
+                        "statusCode": 500,
+                    },
+                ))
+        finally:
+            unregister_query(query_id, current_user["id"], cancel_event)
+
+    worker_task = asyncio.create_task(run_worker())
+
+    async def stream_events():
+        try:
+            yield _sse_message(
+                "ready",
+                {"queryId": query_id, "buildVersion": BUILD_VERSION},
+            )
+            while True:
+                if await request.is_disconnected():
+                    cancel_event.set()
+                    break
+
+                try:
+                    event_name, payload = await asyncio.wait_for(
+                        event_queue.get(),
+                        timeout=0.10,
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+                yield _sse_message(event_name, payload)
+                if event_name in {"result", "error"}:
+                    break
+        except asyncio.CancelledError:
+            cancel_event.set()
+            raise
+        finally:
+            if not worker_task.done():
+                cancel_event.set()
+
+    return StreamingResponse(
+        stream_events(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.post("/chat")
+async def compat_chat(request: Request):
+    question, conversation_id, language, query_id, model = await _read_chat_payload(request)
     current_user = _require_user(request)
     started_at = time.perf_counter()
     cancel_event = register_query(query_id, current_user["id"])

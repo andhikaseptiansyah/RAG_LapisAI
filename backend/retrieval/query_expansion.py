@@ -15,6 +15,17 @@ from collections.abc import Iterable
 # Canonical concepts and their Indonesian/English surface forms. The same mapping
 # is reused by evidence verification so expansion and validation do not disagree.
 CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
+    "remote_work": (
+        "remote work",
+        "work remotely",
+        "working remotely",
+        "work from home",
+        "wfh",
+        "bekerja dari rumah",
+        "kerja dari rumah",
+        "bekerja jarak jauh",
+        "kerja jarak jauh",
+    ),
     "password": (
         "password",
         "kata sandi",

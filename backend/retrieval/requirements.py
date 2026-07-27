@@ -94,6 +94,161 @@ NUMBER_WITH_UNIT_PATTERN = re.compile(
 )
 
 
+DEFINITION_QUESTION_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(
+        r"^\s*(?:apa\s+itu|apa\s+yang\s+dimaksud\s+dengan)\s+(.+?)\s*[?.!]*$",
+        flags=re.I,
+    ),
+    re.compile(
+        r"^\s*what\s+does\s+(.+?)\s+(?:mean|stand\s+for)\s*[?.!]*$",
+        flags=re.I,
+    ),
+    re.compile(
+        r"^\s*(?:kepanjangan|arti)\s+(?:dari\s+)?(.+?)(?:\s+apa)?\s*[?.!]*$",
+        flags=re.I,
+    ),
+    re.compile(
+        r"^\s*(.+?)\s+(?:singkatan|kepanjangan)\s+dari\s+apa\s*[?.!]*$",
+        flags=re.I,
+    ),
+    # ``what is`` is ambiguous for value questions. Restrict this form to one
+    # compact term so "what is my mailbox size limit" is not misclassified.
+    re.compile(
+        r"^\s*what\s+is\s+([A-Za-z0-9][A-Za-z0-9_.\-/]{1,31})\s*[?.!]*$",
+        flags=re.I,
+    ),
+)
+
+
+def extract_definition_target(question: str) -> str | None:
+    """Return the exact term requested by a clear definition question."""
+
+    raw = str(question or "").strip()
+    if not raw:
+        return None
+
+    for pattern in DEFINITION_QUESTION_PATTERNS:
+        match = pattern.search(raw)
+        if not match:
+            continue
+        target = match.group(1).strip(" \t\r\n?.!,;:()[]{}\"'“”‘’")
+        target = re.sub(r"\s+", " ", target)
+        if not target or len(target) > 80:
+            return None
+        return target
+    return None
+
+
+def _definition_value_is_substantive(value: str, target: str) -> bool:
+    normalized_value = normalize_text(value)
+    normalized_target = normalize_text(target)
+    if not normalized_value or normalized_value == normalized_target:
+        return False
+    tokens = [
+        token
+        for token in re.findall(r"[a-z0-9à-ÿ]+", normalized_value)
+        if len(token) >= 2
+    ]
+    return len(tokens) >= 2
+
+
+def _acronym_matches_expansion(target: str, expansion: str) -> bool:
+    """Reject parenthetical labels that merely group a topic under an acronym."""
+
+    acronym = re.sub(r"[^A-Za-z0-9]", "", str(target or "")).upper()
+    words = re.findall(r"[A-Za-zÀ-ÿ0-9]+", str(expansion or ""))
+    if len(acronym) < 2 or len(words) < 2:
+        return False
+
+    stopwords = {"and", "of", "the", "for", "dan", "dari", "yang", "untuk"}
+    significant = [word for word in words if normalize_text(word) not in stopwords]
+    if len(significant) < 2:
+        significant = words
+
+    initials = "".join(word[0] for word in significant if word).upper()
+    all_initials = "".join(word[0] for word in words if word).upper()
+    return acronym in {initials, all_initials}
+
+
+def has_explicit_definition(text: str, target: str, *, acronym_mode: bool = False) -> bool:
+    """Return True only when one evidence unit explicitly defines ``target``.
+
+    A title such as ``Nusantara Dynamics SOP - Travel Booking`` and a sentence
+    such as ``This SOP defines onboarding`` are topical mentions, not definitions.
+    """
+
+    raw = re.sub(r"\s+", " ", str(text or "")).strip()
+    clean_target = str(target or "").strip()
+    if not raw or not clean_target:
+        return False
+
+    target_re = re.escape(clean_target)
+    value_patterns: list[re.Pattern[str]] = [
+        re.compile(
+            rf"\b{target_re}\b\s*,?\s*(?:stands\s+for|means|is\s+short\s+for|"
+            rf"is\s+an?\s+acronym\s+for|singkatan\s+dari|kepanjangan\s+dari|"
+            rf"(?:adalah|merupakan)\s+(?:singkatan|kepanjangan)\s+dari|"
+            rf"berarti|didefinisikan\s+sebagai)\s+([^.;|]{{3,220}})",
+            flags=re.I,
+        ),
+        re.compile(
+            rf"\b{target_re}\b\s*\(\s*([^)]{{3,180}})\s*\)",
+            flags=re.I,
+        ),
+    ]
+
+    # ``X is Y`` is valid for ordinary terms, but too loose for acronym mode.
+    # For example, "RTO is 4 hours" states a value, not what RTO stands for.
+    if not acronym_mode:
+        value_patterns.append(
+            re.compile(
+                rf"\b{target_re}\b\s*(?:adalah|merupakan|yaitu|merujuk\s+pada|"
+                rf"is|refers\s+to|is\s+defined\s+as)\s+([^.;|]{{3,220}})",
+                flags=re.I,
+            )
+        )
+
+    for pattern in value_patterns:
+        match = pattern.search(raw)
+        if not match:
+            continue
+        value = match.group(1).strip(" ,.;:|-_")
+        if not _definition_value_is_substantive(value, clean_target):
+            continue
+        if acronym_mode and "(" in match.group(0) and not _acronym_matches_expansion(clean_target, value):
+            continue
+        return True
+
+    # Expansion before acronym: ``Standard Operating Procedure (SOP)``.
+    before_parentheses = re.search(
+        rf"([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9/&,.\- ]{{3,180}}?)\s*"
+        rf"\(\s*{target_re}\s*\)",
+        raw,
+        flags=re.I,
+    )
+    if before_parentheses:
+        value = before_parentheses.group(1).strip(" ,.;:|-_")
+        if (
+            _definition_value_is_substantive(value, clean_target)
+            and (not acronym_mode or _acronym_matches_expansion(clean_target, value))
+        ):
+            return True
+
+    abbreviated_as = re.search(
+        rf"([A-Za-zÀ-ÿ][^.;|]{{3,180}}?)\s*,?\s*"
+        rf"(?:abbreviated\s+as|disingkat\s+(?:sebagai|menjadi)?)\s+"
+        rf"\b{target_re}\b",
+        raw,
+        flags=re.I,
+    )
+    if abbreviated_as:
+        value = abbreviated_as.group(1).strip(" ,.;:|-_")
+        if _definition_value_is_substantive(value, clean_target):
+            return True
+
+    return False
+
+
 def _contains_phrase(text: str, phrases: Iterable[str]) -> bool:
     padded = f" {normalize_text(text)} "
     return any(
@@ -179,6 +334,34 @@ def extract_evidence_requirements(question: str) -> list[EvidenceRequirement]:
     def add(requirement: EvidenceRequirement) -> None:
         if requirement.key not in {item.key for item in requirements}:
             requirements.append(requirement)
+
+    definition_target = extract_definition_target(question)
+    if definition_target:
+        explicit_acronym_intent = _contains_phrase(
+            query,
+            (
+                "stand for",
+                "singkatan dari",
+                "kepanjangan dari",
+                "kepanjangan",
+            ),
+        )
+        letters = re.sub(r"[^A-Za-z]", "", definition_target)
+        acronym_mode = bool(
+            explicit_acronym_intent
+            or (
+                letters
+                and 2 <= len(letters) <= 12
+                and letters.upper() == letters
+            )
+        )
+        add(EvidenceRequirement(
+            "answer_definition",
+            f"an explicit definition of {definition_target}",
+            "definition",
+            value=definition_target,
+            unit="acronym" if acronym_mode else "term",
+        ))
 
     if _contains_phrase(query, ("url", "endpoint", "link", "alamat web")):
         add(EvidenceRequirement(
@@ -381,6 +564,15 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
             if matched >= min(2, len(requirement.same_chunk_terms)):
                 return True
         return False
+    if requirement.kind == "definition":
+        return any(
+            has_explicit_definition(
+                text,
+                requirement.value,
+                acronym_mode=requirement.unit == "acronym",
+            )
+            for text in texts
+        )
     if requirement.kind == "version":
         return bool(VERSION_PATTERN.search(combined))
     if requirement.kind == "cadence":
