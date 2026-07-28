@@ -1,38 +1,30 @@
 {
   "files": {
     "EN": {
-      "input": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/raw_user/qna_english.csv",
-      "output": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/qna_english_user.csv",
-      "original_rows": 75,
+      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_english.csv",
+      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_english_user.csv",
+      "original_rows": 50,
       "cleaned": {
-        "total": 74,
-        "answerable": 69,
+        "total": 50,
+        "answerable": 45,
         "unanswerable": 5
       }
     },
     "ID": {
-      "input": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/raw_user/qna_indonesia.csv",
-      "output": "/mnt/data/work_eval_3models/RAG_LapisAI-main/evaluation/datasets/qna_indonesia_user.csv",
-      "original_rows": 15,
+      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_indonesia.csv",
+      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_indonesia_user.csv",
+      "original_rows": 50,
       "cleaned": {
-        "total": 15,
-        "answerable": 10,
+        "total": 50,
+        "answerable": 45,
         "unanswerable": 5
       }
     }
   },
-  "duplicates_removed": [
-    {
-      "language": "EN",
-      "question": "How long are audit logs retained?",
-      "kept_row": 23,
-      "merged_row": 66,
-      "source_document": "TECH_Data_Retention.txt"
-    }
-  ],
+  "duplicates_removed": [],
   "combined": {
-    "total": 89,
-    "answerable": 79,
+    "total": 100,
+    "answerable": 90,
     "unanswerable": 10
   }
 }

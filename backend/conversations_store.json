@@ -1,5 +1,563 @@
 [
   {
+    "id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "halo",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d071782a-6e9f-4bd0-8453-f317d49084cb",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T10:59:48.876825+00:00"
+      },
+      {
+        "id": "8c11e4c0-32e4-4f87-b143-6c7be57d3459",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T10:59:48.876825+00:00"
+      },
+      {
+        "id": "9ec059c4-d8f4-4cd7-9123-f3d2fc398500",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "hi",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T10:59:53.236116+00:00"
+      },
+      {
+        "id": "116febf8-5cf9-4bbb-9a0a-d70df6b9d92b",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Hai! Aku siap bantu menjawab pertanyaan berdasarkan dokumen yang sudah kamu upload dan index. Silakan tanya isi dokumennya.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T10:59:53.236116+00:00"
+      },
+      {
+        "id": "090957a5-c851-4660-af1d-5a1b35da6966",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "hasi",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T10:59:58.534735+00:00"
+      },
+      {
+        "id": "083f0fe9-cae8-43e9-97b7-b6e2b4783735",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T10:59:58.534735+00:00"
+      },
+      {
+        "id": "d86a0912-465f-490c-a916-763a61914e0e",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "hia",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:00:04.917702+00:00"
+      },
+      {
+        "id": "0806a559-8da4-4f4e-a1dc-a8131480da57",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:00:04.917702+00:00"
+      },
+      {
+        "id": "c9166bdc-e62a-4e11-a334-94ee9ed99f16",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "hyundai",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:00:14.123029+00:00"
+      },
+      {
+        "id": "04bb7018-385d-4461-a0ae-89364dbe2a01",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:00:14.123029+00:00"
+      },
+      {
+        "id": "23aaf2ee-5961-44c9-adaf-cb425433786b",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "nama kamu siapa?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:00:24.581023+00:00"
+      },
+      {
+        "id": "91e40f98-4a8d-497b-9cc8-aae744c2d83b",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:00:24.581023+00:00"
+      },
+      {
+        "id": "b2e8e8e9-bb24-4a8f-a393-0dc57c3f1d06",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "nama aku siapa?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:00:33.813886+00:00"
+      },
+      {
+        "id": "32cc1c94-d9e9-40d2-abc4-2205b07d9696",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:00:33.813886+00:00"
+      },
+      {
+        "id": "a9770357-d933-4e21-8d5c-94e7055970fa",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Berapa lama cuti melahirkan yang diberikan perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:01:17.718019+00:00"
+      },
+      {
+        "id": "c404722e-91e3-420d-afd4-5d271839f651",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:01:17.718019+00:00"
+      },
+      {
+        "id": "e6b1c0c1-3ae4-4ba8-9378-e0c457ae9d90",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Apakah perusahaan berhak menghapus data dari perangkat pribadi karyawan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:03:54.992562+00:00"
+      },
+      {
+        "id": "7ce56d7a-6e2e-4aeb-84a8-4eeb4c1ca742",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:03:54.992562+00:00"
+      },
+      {
+        "id": "2e602ce4-f72c-46bb-aa1a-67d4fd4530a9",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Apa saja persyaratan panjang dan kompleksitas kata sandi perusahaan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:05:01.909946+00:00"
+      },
+      {
+        "id": "815eb95f-70b5-4ca8-acc6-18be879a134c",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Password Policy.",
+        "attachments": [],
+        "confidence": 0.8593,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Policy_Password.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8646,
+              "relevance_score": 0.8646,
+              "excerpt": "Password Policy",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "chapter": "Password Policy",
+              "section": "Password Policy",
+              "paragraph_start": 2,
+              "paragraph_end": 2,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_Password.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:05:01.909946+00:00"
+      },
+      {
+        "id": "7c018d97-941a-4cf0-97c3-bc4f40580eb0",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Berapa nilai uang makan (per diem) harian untuk perjalanan dinas domestik?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:08:19.201552+00:00"
+      },
+      {
+        "id": "2e7905e8-8070-4fff-b7de-246bb7a41488",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Nilai uang makan (per diem) harian untuk perjalanan dinas domestik adalah IDR 250.000 per hari.",
+        "attachments": [],
+        "confidence": 0.5975,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Policy_Travel_Expense.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.7763,
+              "relevance_score": 0.7763,
+              "excerpt": "The domestic meal per diem is IDR 250,000 per day.",
+              "citation_validated": true,
+              "citation_support_score": 0.7763,
+              "chapter": "Per Diem",
+              "section": "Per Diem",
+              "paragraph_start": 3,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_Travel_Expense.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:08:19.201552+00:00"
+      },
+      {
+        "id": "e35bd8de-97f8-40a0-9cb6-d46eef73f52a",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Berapa jumlah karyawan yang direkrut pada semester pertama 2025 dan berapa total headcount-nya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:09:12.502906+00:00"
+      },
+      {
+        "id": "ec1e4815-62d5-4330-a38a-724304e21ec9",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "total headcount mencapai 312.",
+        "attachments": [],
+        "confidence": 0.6135,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "Report_Hiring_H1_2025.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "The company hired 37 employees in H1 2025; total headcount reached 312.",
+              "citation_validated": true,
+              "citation_support_score": 0.7838,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:09:12.502906+00:00"
+      },
+      {
+        "id": "05edc63f-c648-46c0-afb8-de57dc79c291",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "user",
+        "content": "Berapa maksimum sisa cuti tahunan yang boleh dibawa ke tahun berikutnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T11:10:15.099739+00:00"
+      },
+      {
+        "id": "0a77982e-e304-4ab2-8579-428848a41693",
+        "conversation_id": "aed8df85-e8ca-4a38-8b50-fb0dbd77a0cb",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T11:10:15.099739+00:00"
+      }
+    ],
+    "created_at": "2026-07-28T10:59:48.876825+00:00",
+    "updated_at": "2026-07-28T11:10:15.099739+00:00",
+    "last_message": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+    "last_user_message": "Berapa maksimum sisa cuti tahunan yang boleh dibawa ke tahun berikutnya?",
+    "last_message_at": "2026-07-28T11:10:15.099739+00:00"
+  },
+  {
+    "id": "e2c103ed-40f4-452b-83ff-f966b2c931e4",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5a190a55-ad85-4f46-a9e0-790e04d7fb71",
+        "conversation_id": "e2c103ed-40f4-452b-83ff-f966b2c931e4",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator"
+        },
+        "created_at": "2026-07-28T10:56:20.239336+00:00"
+      },
+      {
+        "id": "dbc88956-d11b-43bb-968c-80e188cb5a54",
+        "conversation_id": "e2c103ed-40f4-452b-83ff-f966b2c931e4",
+        "role": "assistant",
+        "content": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-07-28T10:56:20.239336+00:00"
+      }
+    ],
+    "created_at": "2026-07-28T10:56:20.239336+00:00",
+    "updated_at": "2026-07-28T10:56:20.239336+00:00",
+    "last_message": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-07-28T10:56:20.239336+00:00"
+  },
+  {
     "id": "47a1ffd6-dd4f-432c-af66-c615e44a18c7",
     "user_id": "dev-admin",
     "user_name": "Administrator",
