@@ -12,3 +12,4 @@ env/
 query_logs.json
 users_store.json
 .auth_secret
+node_modules/
