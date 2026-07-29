@@ -1,0 +1,51 @@
+question,expected_answer,source_document,answerable,expected_answer_keywords
+How long is the probation period for new employees?,"3 months, with a performance evaluation in week 12.",SOP_Onboarding.pdf,TRUE,3 months | probation | week 12
+How quickly must a P1 IT incident be resolved?,"Within 4 hours, acknowledged within 15 minutes.",SOP_IT_Incident_Handling.pdf,TRUE,P1 | 4 hours | 15 minutes
+What approval is needed for a purchase above IDR 50 million?,Director approval plus three vendor quotations.,SOP_Procurement.pdf,TRUE,Director approval | 3 vendor quotations | above IDR 50 million
+What is the deadline to submit an expense claim?,Within 30 days of the expense date.,SOP_Expense_Reimbursement.pdf,TRUE,30 days | expense claim deadline
+How much advance notice is required for annual leave?,At least 5 working days via the HR portal.,SOP_Leave_Request.pdf,TRUE,5 working days | annual leave | HR portal
+How often are full database backups taken?,"Nightly at 01:00 WIB, with incremental backups every 6 hours.",SOP_Data_Backup.pdf,TRUE,nightly 01:00 WIB | full backup | 6 hours incremental
+When must IT revoke a departing employee's access?,Within 2 hours of the employee's exit time.,SOP_Offboarding.pdf,TRUE,2 hours | offboarding | access revocation
+How many days per week can employees work from home?,Up to 2 days per week with manager approval.,Policy_WFH.docx,TRUE,2 days per week | WFH | manager approval
+Who must a suspected data breach be reported to and how fast?,security@nusantaradynamics.co.id within 1 hour.,Policy_Data_Security.docx,TRUE,security@nusantaradynamics.co.id | 1 hour | data breach
+How many annual leave days do employees get?,"12 days per year, accruing monthly.",Policy_Leave.docx,TRUE,12 days | annual leave | accruing monthly
+What are the password requirements?,"At least 12 characters with upper, lower, number, and symbol; changed every 90 days.",Policy_Password.docx,TRUE,12 characters | upper lower number symbol | 90 days
+What is the domestic meal per diem?,"IDR 250,000 per day.",Policy_Travel_Expense.docx,TRUE,"IDR 250,000 | per day | meal per diem"
+What was Q3 2025 revenue?,"IDR 42.5 billion, up 12% over Q2 2025.",Report_Q3_2025_Performance.pdf,TRUE,IDR 42.5 billion | 12% | Q3 2025
+What was the root cause of the October 2025 outage?,An expired TLS certificate on the API gateway.,Report_Incident_Postmortem.pdf,TRUE,expired TLS certificate | API gateway
+What was the 2025 overall CSAT score?,"87%, up from 83% in 2024.",Report_CSAT_2025.pdf,TRUE,87% | 83% | CSAT 2025
+How many security incidents occurred in 2025?,"3 reportable incidents, none resulting in data loss.",Report_Security_Review_2025.pdf,TRUE,3 incidents | no data loss | 2025
+What was full-year 2025 revenue?,"IDR 158 billion, with a 14% net profit margin.",Report_Financial_FY2025.pdf,TRUE,IDR 158 billion | 14% | net profit margin
+What database does the platform use?,"PostgreSQL 15, with Redis for caching.",TECH_System_Architecture.txt,TRUE,PostgreSQL 15 | Redis | caching
+How long are internal API tokens valid?,60 minutes.,TECH_Internal_API_Guide.txt,TRUE,60 minutes | API token
+What are the RTO and RPO?,RTO is 4 hours and RPO is 1 hour.,TECH_Disaster_Recovery.txt,TRUE,RTO 4 hours | RPO 1 hour
+What is the API availability SLO?,99.9% per month.,TECH_Monitoring_Guide.txt,TRUE,99.9% | monthly | API availability SLO
+How long are audit logs retained?,7 years.,TECH_Data_Retention.txt,TRUE,7 years | audit logs
+What unit-test coverage is required to merge code?,At least 80%.,TECH_CICD_Pipeline.txt,TRUE,80% | unit-test coverage | merge
+How do I reset my password?,Raise a ticket to the IT Helpdesk via the portal; processed within 1x24 hours.,FAQ_IT_Support.txt,TRUE,IT Helpdesk | portal | 1x24 hours
+When is payday?,The 25th of each month (prior working day if a holiday).,FAQ_Payroll.txt,TRUE,25th | payday | prior working day
+What is the mailbox size limit?,50 GB.,FAQ_Email_Calendar.txt,TRUE,50 GB | mailbox quota
+What should I bring on my first day?,"A valid ID, NPWP (tax ID), and bank account details.",FAQ_Onboarding.txt,TRUE,valid ID | NPWP | bank account details
+Is there a home-office allowance?,"Yes, a one-time allowance of IDR 1,500,000.",FAQ_Remote_Work.txt,TRUE,"IDR 1,500,000 | home-office allowance"
+What is the replacement fee for an access card?,"IDR 50,000.",FAQ_Facilities.txt,TRUE,"IDR 50,000 | replacement access card"
+How many new enterprise customers were added in Q3 2025?,"18, bringing the total to 214.",Report_Q3_2025_Performance.pdf,TRUE,18 new customers | 214 total | Q3 2025
+How many dependents are covered by the company health insurance plan?,The company health insurance plan covers employees and up to three dependents.,FAQ_Benefits.txt,TRUE,up to 3 dependents | health insurance
+What is the standard employee mailbox quota?,The standard mailbox quota is 50 GB.,FAQ_Email_Calendar.txt,TRUE,50 GB | mailbox quota
+How much does a replacement employee access card cost?,"A replacement access card costs IDR 50,000.",FAQ_Facilities.txt,TRUE,"IDR 50,000 | replacement access card"
+Where and when can employees find their payslips?,Payslips are available after the 25th in the HR portal under My Documents.,FAQ_HR.txt,TRUE,HR portal | My Documents | after the 25th
+What documents or details should a new employee bring on the first day?,"A new employee should bring a valid ID, a tax ID or NPWP, and bank account details.",FAQ_Onboarding.txt,TRUE,valid ID | NPWP | bank account details
+When is salary paid if the 25th falls on a holiday?,Salary is paid on the prior working day when the 25th is a holiday.,FAQ_Payroll.txt,TRUE,prior working day | 25th | holiday
+What should an employee do after receiving a suspicious email?,The employee should not click any links and should report the email using the Report Phishing button.,FAQ_Security_Awareness.txt,TRUE,do not click links | Report Phishing button
+Who approves an employee request for access to a software tool?,The system owner approves the software access request submitted through the IT Service Desk.,FAQ_Software_Access.txt,TRUE,system owner | IT Service Desk | approves
+Through which channels can an employee confidentially report harassment?,Harassment can be reported confidentially to HR or through the whistleblower channel.,Policy_Anti_Harassment.docx,TRUE,HR | whistleblower channel | confidentially
+What must happen before a personal device is used for work email?,The personal device must be enrolled in the mobile device management or MDM system.,Policy_BYOD.docx,TRUE,enrolled | MDM | mobile device management
+How must a potential conflict of interest be disclosed?,A potential conflict of interest must be disclosed to HR in writing.,Policy_Code_of_Conduct.docx,TRUE,HR | in writing | conflict of interest
+"How quickly must a suspected data breach be reported, and to which address?",A suspected data breach must be reported within one hour to security@nusantaradynamics.co.id.,Policy_Data_Security.docx,TRUE,within 1 hour | security@nusantaradynamics.co.id
+What are the four information-classification levels?,"The four levels are Public, Internal, Confidential, and Restricted.",Policy_Information_Classification.docx,TRUE,Public | Internal | Confidential | Restricted
+"What are the password length, complexity, and rotation requirements?","Passwords must be at least 12 characters, include uppercase and lowercase letters, a number, and a symbol, and be changed every 90 days.",Policy_Password.docx,TRUE,12 characters | upper case | lower case | number | symbol | 90 days
+Who approves a purchase valued between IDR 10 million and IDR 50 million?,A department head approves purchases valued from IDR 10 million to IDR 50 million.,Policy_Procurement_Threshold.docx,TRUE,department head | IDR 10-50 million
+What is the direct password-reset URL?,The indexed documents do not provide a direct password-reset URL; they only instruct employees to raise an IT Helpdesk ticket through the portal.,None,FALSE,None
+What is the full street address of the company headquarters?,The company headquarters address is not available in the indexed documents.,None,FALSE,None
+How often is a full disaster-recovery failover exercise conducted?,The indexed documents do not state a schedule for a full disaster-recovery failover exercise.,None,FALSE,None
+What is the maximum permitted email attachment size?,The maximum email attachment size is not stated in the indexed documents.,None,FALSE,None
+What is the maximum file-upload size in the customer portal?,The indexed documents do not specify a maximum file-upload size for the customer portal.,None,FALSE,None

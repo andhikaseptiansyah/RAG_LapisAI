@@ -1,0 +1,403 @@
+{
+  "summary": {
+    "questions": 30,
+    "correct_answers_supported": 30,
+    "correct_answer_support_rate": 1.0,
+    "corrupted_answers_rejected": 30,
+    "corrupted_answer_rejection_rate": 1.0,
+    "evaluation_mode": "post_generation_grounding_regression"
+  },
+  "details": [
+    {
+      "question": "How long is the probation period for new employees?",
+      "source": "sop_onboarding.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 months"
+      ]
+    },
+    {
+      "question": "How quickly must a P1 IT incident be resolved?",
+      "source": "sop_it_incident_handling.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 hours"
+      ]
+    },
+    {
+      "question": "What approval is needed for a purchase above IDR 50 million?",
+      "source": "sop_procurement.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts",
+        "unsupported_claims"
+      ],
+      "corrupted_unsupported_facts": [
+        "ZXQ9"
+      ]
+    },
+    {
+      "question": "What is the deadline to submit an expense claim?",
+      "source": "sop_expense_reimbursement.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 days"
+      ]
+    },
+    {
+      "question": "How much advance notice is required for annual leave?",
+      "source": "sop_leave_request.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "How often are full database backups taken?",
+      "source": "sop_data_backup.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "When must IT revoke a departing employee's access?",
+      "source": "sop_offboarding.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 hours"
+      ]
+    },
+    {
+      "question": "How many days per week can employees work from home?",
+      "source": "policy_wfh.docx",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 days"
+      ]
+    },
+    {
+      "question": "Who must a suspected data breach be reported to and how fast?",
+      "source": "policy_data_security.docx",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 hours"
+      ]
+    },
+    {
+      "question": "How many annual leave days do employees get?",
+      "source": "policy_leave.docx",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 days"
+      ]
+    },
+    {
+      "question": "What are the password requirements?",
+      "source": "policy_password.docx",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 characters"
+      ]
+    },
+    {
+      "question": "What is the domestic meal per diem?",
+      "source": "policy_travel_expense.docx",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "idr 987654321"
+      ]
+    },
+    {
+      "question": "What was Q3 2025 revenue?",
+      "source": "report_q3_2025_performance.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "idr 987654321 billion"
+      ]
+    },
+    {
+      "question": "What was the root cause of the October 2025 outage?",
+      "source": "report_incident_postmortem.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts",
+        "unsupported_claims"
+      ],
+      "corrupted_unsupported_facts": [
+        "ZXQ9"
+      ]
+    },
+    {
+      "question": "What was the 2025 overall CSAT score?",
+      "source": "report_csat_2025.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "How many security incidents occurred in 2025?",
+      "source": "report_security_review_2025.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "What was full-year 2025 revenue?",
+      "source": "report_financial_fy2025.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "idr 987654321 billion"
+      ]
+    },
+    {
+      "question": "What database does the platform use?",
+      "source": "tech_system_architecture.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "How long are internal API tokens valid?",
+      "source": "tech_internal_api_guide.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 minutes"
+      ]
+    },
+    {
+      "question": "What are the RTO and RPO?",
+      "source": "tech_disaster_recovery.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 hours"
+      ]
+    },
+    {
+      "question": "What is the API availability SLO?",
+      "source": "tech_monitoring_guide.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "How long are audit logs retained?",
+      "source": "tech_data_retention.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 years"
+      ]
+    },
+    {
+      "question": "What unit-test coverage is required to merge code?",
+      "source": "tech_cicd_pipeline.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    },
+    {
+      "question": "How do I reset my password?",
+      "source": "faq_it_support.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321x24 hours"
+      ]
+    },
+    {
+      "question": "When is payday?",
+      "source": "faq_payroll.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "incomplete_answer_type"
+      ],
+      "corrupted_unsupported_facts": []
+    },
+    {
+      "question": "What is the mailbox size limit?",
+      "source": "faq_email_calendar.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321 gb"
+      ]
+    },
+    {
+      "question": "What should I bring on my first day?",
+      "source": "faq_onboarding.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts",
+        "unsupported_claims"
+      ],
+      "corrupted_unsupported_facts": [
+        "ZXQ9"
+      ]
+    },
+    {
+      "question": "Is there a home-office allowance?",
+      "source": "faq_remote_work.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "idr 987654321"
+      ]
+    },
+    {
+      "question": "What is the replacement fee for an access card?",
+      "source": "faq_facilities.txt",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "idr 987654321"
+      ]
+    },
+    {
+      "question": "How many new enterprise customers were added in Q3 2025?",
+      "source": "report_q3_2025_performance.pdf",
+      "correct_answer_supported": true,
+      "correct_answer_reasons": [],
+      "corrupted_answer_rejected": true,
+      "corrupted_answer_reasons": [
+        "unsupported_explicit_facts"
+      ],
+      "corrupted_unsupported_facts": [
+        "987654321"
+      ]
+    }
+  ]
+}

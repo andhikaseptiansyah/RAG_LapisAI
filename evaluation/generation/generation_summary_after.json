@@ -1,0 +1,20 @@
+{
+  "project": "LapisAI Enterprise Knowledge Assistant",
+  "evaluation": "Answerability-aware Generation Quality Evaluation",
+  "total_questions": 45,
+  "question_counts": {
+    "answerable": 34,
+    "unanswerable": 11
+  },
+  "metrics": {
+    "faithfulness": 2.53,
+    "answer_relevance": 1.82,
+    "context_precision_answerable_only": 2.15,
+    "context_recall_answerable_only": 3.53,
+    "citation_accuracy_answerable_only": 2.85,
+    "hallucination_rate": 0.0,
+    "answerability_accuracy": 0.4222,
+    "false_refusal_rate_answerable": 0.7647,
+    "unsafe_answer_rate_unanswerable": 0.0
+  }
+}

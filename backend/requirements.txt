@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pymupdf
+python-docx
+chromadb
+sentence-transformers
+rank-bm25
+numpy
+python-dotenv
+google-genai
+
+requests
+matplotlib

@@ -1,0 +1,1623 @@
+{
+  "dataset_name": "LapisAI Enterprise Knowledge Assistant Ground Truth - Advanced Split",
+  "version": "2.1.0",
+  "created_at": "2026-07-11",
+  "description": "Balanced bilingual advanced Q&A dataset (30 EN, 30 ID) designed to stress-test semantic retrieval, multi-hop reasoning, and strict false-positive rejection. Features diverse query variants for hybrid search evaluation.",
+  "corpus": {
+    "document_directory": "backend/uploads/files",
+    "document_count": 50,
+    "included_prefixes": [
+      "FAQ_",
+      "Policy_",
+      "Report_",
+      "SOP_",
+      "TECH_"
+    ],
+    "excluded_content": [
+      "personal CV files",
+      "cover letter files",
+      "web-development progress reports"
+    ]
+  },
+  "evaluation_policy": {
+    "development_split_usage": "Use for debugging, retrieval tuning, threshold selection, and prompt iteration.",
+    "test_split_usage": "Keep fixed and use only for final reported evaluation.",
+    "answerable_rule": "A response is correct only when it is supported by at least one listed reference and includes the essential expected-answer facts.",
+    "unanswerable_rule": "The assistant must state that the information is unavailable and must not invent a value, policy, URL, date, or procedure.",
+    "multilingual_retrieval": {
+      "corpus_language": "English",
+      "query_languages": [
+        "English",
+        "Indonesian"
+      ],
+      "purpose": "Evaluate cross-lingual retrieval from Indonesian user queries to English enterprise documents."
+    }
+  },
+  "statistics": {
+    "total_questions": 60,
+    "answerable_questions": 50,
+    "unanswerable_questions": 10,
+    "development_questions": 40,
+    "test_questions": 20,
+    "english_questions": 30,
+    "indonesian_questions": 30
+  },
+  "items": [
+    {
+      "id": "FAQ-001",
+      "split": "development",
+      "category": "faq",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "factual",
+      "question": "If an employee has a spouse and four children, will the entire family receive full medical coverage under the corporate policy?",
+      "answerable": true,
+      "expected_answer": "No, the company health insurance plan covers the employee and a maximum of three dependents.",
+      "expected_answer_keywords": [
+        "up to 3 dependents",
+        "health insurance"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Benefits.txt",
+          "page": 1,
+          "source_excerpt": "Employees and up to 3 dependents are covered by the company health insurance plan."
+        }
+      ],
+      "query_variants": [
+        "If an employee has a spouse and four children, will the entire family receive full medical coverage under the corporate policy?",
+        "Jika seorang karyawan memiliki pasangan dan empat anak, apakah seluruh keluarga akan mendapatkan pertanggungan medis penuh berdasarkan polis perusahaan?",
+        "health insurance coverage limit for employee dependents family"
+      ]
+    },
+    {
+      "id": "FAQ-002",
+      "split": "development",
+      "category": "faq",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "factual",
+      "question": "What is the maximum storage limit allowed for an employee's corporate electronic mail?",
+      "answerable": true,
+      "expected_answer": "The standard mailbox quota is 50 GB.",
+      "expected_answer_keywords": [
+        "50 GB",
+        "mailbox quota"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": 1,
+          "source_excerpt": "The standard mailbox quota is 50 GB."
+        }
+      ],
+      "query_variants": [
+        "What is the maximum storage limit allowed for an employee's corporate electronic mail?",
+        "Berapa batas penyimpanan maksimum yang diizinkan untuk surat elektronik perusahaan milik karyawan?",
+        "employee corporate email mailbox quota maximum capacity"
+      ]
+    },
+    {
+      "id": "FAQ-003",
+      "split": "development",
+      "category": "faq",
+      "language": "en",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "What is the financial penalty for losing your building entry badge?",
+      "answerable": true,
+      "expected_answer": "A replacement access card costs IDR 50,000.",
+      "expected_answer_keywords": [
+        "IDR 50,000",
+        "replacement access card"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": 1,
+          "source_excerpt": "Request one at the front desk; a replacement fee of IDR 50,000 applies."
+        }
+      ],
+      "query_variants": [
+        "What is the financial penalty for losing your building entry badge?",
+        "Apa denda finansial jika kehilangan kartu akses masuk gedung perusahaan?",
+        "replacement fee lost access card IDR"
+      ]
+    },
+    {
+      "id": "FAQ-004",
+      "split": "development",
+      "category": "faq",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "procedural",
+      "question": "If today is the 26th of the month, which portal should staff access to view their latest compensation details?",
+      "answerable": true,
+      "expected_answer": "Staff should access the HR portal under My Documents to view their payslips.",
+      "expected_answer_keywords": [
+        "HR portal",
+        "My Documents",
+        "after the 25th"
+      ],
+      "references": [
+        {
+          "document": "FAQ_HR.txt",
+          "page": 1,
+          "source_excerpt": "Payslips are available in the HR portal under My Documents after the 25th."
+        }
+      ],
+      "query_variants": [
+        "If today is the 26th of the month, which portal should staff access to view their latest compensation details?",
+        "Jika hari ini tanggal 26, portal mana yang harus diakses staf untuk melihat detail kompensasi terbaru mereka?",
+        "where to find payslips after the 25th HR portal My Documents"
+      ]
+    },
+    {
+      "id": "FAQ-005",
+      "split": "development",
+      "category": "faq",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "procedural",
+      "question": "If I forget the credentials to log into the internal system, what is the procedure and the maximum time limit for recovery?",
+      "answerable": true,
+      "expected_answer": "Raise a ticket to the IT Helpdesk via the portal. Resets are processed within 1x24 hours.",
+      "expected_answer_keywords": [
+        "IT Helpdesk",
+        "portal",
+        "1x24 hours"
+      ],
+      "references": [
+        {
+          "document": "FAQ_IT_Support.txt",
+          "page": 1,
+          "source_excerpt": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours."
+        }
+      ],
+      "query_variants": [
+        "If I forget the credentials to log into the internal system, what is the procedure and the maximum time limit for recovery?",
+        "Jika saya lupa kredensial untuk masuk ke sistem internal, prosedur apa yang harus dilakukan dan berapa batas waktu maksimum untuk pemulihannya?",
+        "password reset procedure IT helpdesk SLA 1x24 hours"
+      ]
+    },
+    {
+      "id": "FAQ-006",
+      "split": "development",
+      "category": "faq",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "Dokumen fisik atau identifikasi spesifik apa yang wajib dibawa oleh karyawan baru pada hari orientasi pertama?",
+      "answerable": true,
+      "expected_answer": "Karyawan baru harus membawa ID yang valid (KTP), NPWP (Tax ID), dan detail rekening bank.",
+      "expected_answer_keywords": [
+        "valid ID",
+        "NPWP",
+        "bank account details"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": 1,
+          "source_excerpt": "A valid ID, your tax ID (NPWP), and bank account details."
+        }
+      ],
+      "query_variants": [
+        "Dokumen fisik atau identifikasi spesifik apa yang wajib dibawa oleh karyawan baru pada hari orientasi pertama?",
+        "What specific physical paperwork or identification is required from a fresh hire during orientation day?",
+        "syarat dokumen onboarding karyawan baru hari pertama NPWP rekening"
+      ]
+    },
+    {
+      "id": "FAQ-007",
+      "split": "development",
+      "category": "faq",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "conditional",
+      "question": "Jika tanggal 25 Desember adalah Hari Raya Natal, pada hari apa karyawan akan menerima upah bulanan mereka?",
+      "answerable": true,
+      "expected_answer": "Gaji akan dibayarkan pada hari kerja sebelumnya jika tanggal 25 jatuh pada hari libur.",
+      "expected_answer_keywords": [
+        "prior working day",
+        "25th",
+        "holiday"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": 1,
+          "source_excerpt": "If the 25th is a holiday, payment is the prior working day."
+        }
+      ],
+      "query_variants": [
+        "Jika tanggal 25 Desember adalah Hari Raya Natal, pada hari apa karyawan akan menerima upah bulanan mereka?",
+        "If the 25th of December is Christmas Day, on what day will employees receive their monthly wages?",
+        "jadwal pembayaran gaji payroll jika tanggal 25 jatuh pada hari libur"
+      ]
+    },
+    {
+      "id": "FAQ-008",
+      "split": "test",
+      "category": "faq",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_hop",
+      "question": "Jika saya membeli meja ergonomis senilai Rp 2.000.000 untuk keperluan WFH, berapa nominal maksimal yang akan diganti perusahaan, dan apakah saya wajib melampirkan nota asli?",
+      "answerable": true,
+      "expected_answer": "Perusahaan mengganti maksimal IDR 1.500.000 (tunjangan home-office). Karena nilainya di atas IDR 150.000, Anda wajib melampirkan nota fisik asli.",
+      "expected_answer_keywords": [
+        "IDR 1,500,000",
+        "original receipts"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Remote_Work.txt",
+          "page": 1,
+          "source_excerpt": "A one-time home-office allowance of IDR 1,500,000 is available."
+        },
+        {
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "source_excerpt": "Original receipts are required for any single expense above IDR 150,000."
+        }
+      ],
+      "query_variants": [
+        "Jika saya membeli meja ergonomis senilai Rp 2.000.000 untuk keperluan WFH, berapa nominal maksimal yang akan diganti perusahaan, dan apakah saya wajib melampirkan nota asli?",
+        "If I buy an ergonomic desk for IDR 2,000,000 for WFH purposes, what is the maximum reimbursement amount, and must I attach the original receipt?",
+        "reimbursement home office allowance WFH nota asli di atas 150 ribu"
+      ]
+    },
+    {
+      "id": "FAQ-009",
+      "split": "test",
+      "category": "faq",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "procedural",
+      "question": "Jika ada email masuk yang mendesak dari CEO meminta detail transfer kawat, tetapi alamat pengirimnya terlihat sedikit salah eja, apa yang harus saya lakukan?",
+      "answerable": true,
+      "expected_answer": "Jangan mengklik tautan atau membalas; segera laporkan email tersebut menggunakan tombol Report Phishing.",
+      "expected_answer_keywords": [
+        "do not click links",
+        "Report Phishing button"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Security_Awareness.txt",
+          "page": 1,
+          "source_excerpt": "Do not click links; report it using the Report Phishing button."
+        }
+      ],
+      "query_variants": [
+        "Jika ada email masuk yang mendesak dari CEO meminta detail transfer kawat, tetapi alamat pengirimnya terlihat sedikit salah eja, apa yang harus saya lakukan?",
+        "If an urgent request from the CEO arrives in my inbox asking for wire transfer details, but the sender address looks slightly misspelled, what is the protocol?",
+        "prosedur pelaporan email mencurigakan phishing tombol report"
+      ]
+    },
+    {
+      "id": "FAQ-010",
+      "split": "test",
+      "category": "faq",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "procedural",
+      "question": "Siapa yang memegang otoritas persetujuan akhir ketika seorang developer membutuhkan lisensi untuk IDE perangkat lunak baru?",
+      "answerable": true,
+      "expected_answer": "System owner (pemilik sistem) memegang otoritas persetujuan akhir setelah permintaan diajukan melalui IT Service Desk.",
+      "expected_answer_keywords": [
+        "system owner",
+        "IT Service Desk",
+        "approves"
+      ],
+      "references": [
+        {
+          "document": "FAQ_Software_Access.txt",
+          "page": 1,
+          "source_excerpt": "Request it via the IT Service Desk; the system owner approves."
+        }
+      ],
+      "query_variants": [
+        "Siapa yang memegang otoritas persetujuan akhir ketika seorang developer membutuhkan lisensi untuk IDE perangkat lunak baru?",
+        "Who holds the final sign-off authority when a developer needs a license for a new integrated development environment (IDE)?",
+        "persetujuan system owner untuk request akses lisensi software IT service desk"
+      ]
+    },
+    {
+      "id": "POL-001",
+      "split": "development",
+      "category": "policy",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "procedural",
+      "question": "If an employee experiences inappropriate workplace behavior but fears retaliation from their direct manager, what are the approved secure avenues to escalate the issue?",
+      "answerable": true,
+      "expected_answer": "The complaint can be raised confidentially directly to HR or via the whistleblower channel.",
+      "expected_answer_keywords": [
+        "HR",
+        "whistleblower channel",
+        "confidentially"
+      ],
+      "references": [
+        {
+          "document": "Policy_Anti_Harassment.docx",
+          "page": 1,
+          "source_excerpt": "Complaints can be raised confidentially to HR or via the whistleblower channel."
+        }
+      ],
+      "query_variants": [
+        "If an employee experiences inappropriate workplace behavior but fears retaliation from their direct manager, what are the approved secure avenues to escalate the issue?",
+        "Jika seorang karyawan mengalami perilaku yang tidak pantas di tempat kerja tetapi takut akan pembalasan dari manajernya, apa jalur aman yang disetujui untuk melaporkan masalah ini?",
+        "report harassment confidentially HR whistleblower channel"
+      ]
+    },
+    {
+      "id": "POL-002",
+      "split": "development",
+      "category": "policy",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "requirement",
+      "question": "Can I check my corporate inbox on my own private iPad without any prior IT setup?",
+      "answerable": true,
+      "expected_answer": "No, personal devices used for work email must first be enrolled in the mobile device management (MDM) system.",
+      "expected_answer_keywords": [
+        "enrolled",
+        "MDM",
+        "mobile device management"
+      ],
+      "references": [
+        {
+          "document": "Policy_BYOD.docx",
+          "page": 1,
+          "source_excerpt": "Personal devices used for work email must be enrolled in the mobile device management (MDM) system."
+        }
+      ],
+      "query_variants": [
+        "Can I check my corporate inbox on my own private iPad without any prior IT setup?",
+        "Bolehkah saya memeriksa kotak masuk email perusahaan di iPad pribadi saya tanpa pengaturan TI sebelumnya?",
+        "BYOD policy personal device work email MDM enrollment"
+      ]
+    },
+    {
+      "id": "POL-003",
+      "split": "development",
+      "category": "policy",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "procedural",
+      "question": "If my spouse's consulting firm is bidding on a contract with our company, how and to whom should I report this situation?",
+      "answerable": true,
+      "expected_answer": "This is a potential conflict of interest and must be disclosed to HR in writing.",
+      "expected_answer_keywords": [
+        "HR",
+        "in writing",
+        "conflict of interest"
+      ],
+      "references": [
+        {
+          "document": "Policy_Code_of_Conduct.docx",
+          "page": 1,
+          "source_excerpt": "Any potential conflict of interest must be disclosed to HR in writing."
+        }
+      ],
+      "query_variants": [
+        "If my spouse's consulting firm is bidding on a contract with our company, how and to whom should I report this situation?",
+        "Jika firma konsultan milik pasangan saya mengikuti tender di perusahaan kita, bagaimana dan kepada siapa saya harus melaporkan situasi ini?",
+        "conflict of interest disclosure procedure HR in writing"
+      ]
+    },
+    {
+      "id": "POL-004",
+      "split": "development",
+      "category": "policy",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "requirement",
+      "question": "If an engineer accidentally leaves a laptop containing unencrypted client records at a coffee shop at 2:00 PM, what is the absolute latest time they can notify the company, and how?",
+      "answerable": true,
+      "expected_answer": "The breach must be reported by 3:00 PM (within 1 hour) to security@nusantaradynamics.co.id.",
+      "expected_answer_keywords": [
+        "within 1 hour",
+        "security@nusantaradynamics.co.id"
+      ],
+      "references": [
+        {
+          "document": "Policy_Data_Security.docx",
+          "page": 1,
+          "source_excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour."
+        }
+      ],
+      "query_variants": [
+        "If an engineer accidentally leaves a laptop containing unencrypted client records at a coffee shop at 2:00 PM, what is the absolute latest time they can notify the company, and how?",
+        "Jika insinyur tidak sengaja meninggalkan laptop berisi data klien di kafe jam 14:00, kapan waktu maksimal laporan pelanggaran data dikirimkan dan ke mana?",
+        "report suspected data breach SLA email address within 1 hour"
+      ]
+    },
+    {
+      "id": "POL-005",
+      "split": "development",
+      "category": "policy",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "list",
+      "question": "What are the four tiers of data sensitivity recognized by the organization?",
+      "answerable": true,
+      "expected_answer": "The four tiers are Public, Internal, Confidential, and Restricted.",
+      "expected_answer_keywords": [
+        "Public",
+        "Internal",
+        "Confidential",
+        "Restricted"
+      ],
+      "references": [
+        {
+          "document": "Policy_Information_Classification.docx",
+          "page": 1,
+          "source_excerpt": "Information is classified as Public, Internal, Confidential, or Restricted."
+        }
+      ],
+      "query_variants": [
+        "What are the four tiers of data sensitivity recognized by the organization?",
+        "Apa empat tingkat sensitivitas data yang diakui oleh organisasi perusahaan?",
+        "information classification levels public internal confidential restricted"
+      ]
+    },
+    {
+      "id": "POL-006",
+      "split": "development",
+      "category": "policy",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "factual",
+      "question": "Jika menjelang akhir tahun saya masih memiliki jatah cuti 10 hari yang belum terpakai, berapa hari yang akan hangus?",
+      "answerable": true,
+      "expected_answer": "Hanya maksimal 6 hari yang bisa dibawa ke tahun depan, sehingga 4 hari cuti Anda akan hangus.",
+      "expected_answer_keywords": [
+        "6 days",
+        "carried over"
+      ],
+      "references": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": 1,
+          "source_excerpt": "A maximum of 6 unused leave days may be carried over to the next year."
+        }
+      ],
+      "query_variants": [
+        "Jika menjelang akhir tahun saya masih memiliki jatah cuti 10 hari yang belum terpakai, berapa hari yang akan hangus?",
+        "If I still have 10 unused leave days at the end of the year, how many days will be forfeited?",
+        "maximum unused annual leave carry over policy 6 days"
+      ]
+    },
+    {
+      "id": "POL-007",
+      "split": "development",
+      "category": "policy",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+      "answerable": true,
+      "expected_answer": "Tidak. Kata sandi harus minimal 12 karakter, menyertakan huruf besar, huruf kecil, angka, dan simbol, serta diganti setiap 90 hari.",
+      "expected_answer_keywords": [
+        "12 characters",
+        "upper case",
+        "lower case",
+        "number",
+        "symbol"
+      ],
+      "references": [
+        {
+          "document": "Policy_Password.docx",
+          "page": 1,
+          "source_excerpt": "Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days."
+        }
+      ],
+      "query_variants": [
+        "Jika saya membuat kredensial akun sepanjang 10 karakter, mengandung angka, huruf besar, dan simbol, apakah itu sudah mematuhi standar keamanan perusahaan?",
+        "If I create a credential that is 10 characters long, has a number, an uppercase letter, and a symbol, does it comply with our security standards?",
+        "password policy requirements complexity 12 characters rotation 90 days"
+      ]
+    },
+    {
+      "id": "POL-008",
+      "split": "test",
+      "category": "policy",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "factual",
+      "question": "Tingkat manajerial mana yang harus memberikan otorisasi untuk pembelian peralatan server dengan harga IDR 25 juta?",
+      "answerable": true,
+      "expected_answer": "Kepala departemen (department head) menyetujui pembelian bernilai dari IDR 10 juta hingga IDR 50 juta.",
+      "expected_answer_keywords": [
+        "department head",
+        "IDR 10-50 million"
+      ],
+      "references": [
+        {
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": 1,
+          "source_excerpt": "IDR 10-50 million: department head."
+        }
+      ],
+      "query_variants": [
+        "Tingkat manajerial mana yang harus memberikan otorisasi untuk pembelian peralatan server dengan harga IDR 25 juta?",
+        "Which managerial level must provide authorization for acquiring server equipment quoted at IDR 25 million?",
+        "procurement approval threshold IDR 10-50 million department head"
+      ]
+    },
+    {
+      "id": "POL-009",
+      "split": "test",
+      "category": "policy",
+      "language": "id",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "Berapa batas uang saku makan harian ketika melakukan perjalanan dinas di dalam negeri?",
+      "answerable": true,
+      "expected_answer": "Uang saku makan harian domestik (meal per diem) adalah IDR 250.000 per hari.",
+      "expected_answer_keywords": [
+        "IDR 250,000",
+        "per day",
+        "meal per diem"
+      ],
+      "references": [
+        {
+          "document": "Policy_Travel_Expense.docx",
+          "page": 1,
+          "source_excerpt": "The domestic meal per diem is IDR 250,000 per day."
+        }
+      ],
+      "query_variants": [
+        "Berapa batas uang saku makan harian ketika melakukan perjalanan dinas di dalam negeri?",
+        "What is the daily food allowance limit when taking a business trip within the country?",
+        "domestic travel meal per diem allowance per day IDR"
+      ]
+    },
+    {
+      "id": "POL-010",
+      "split": "test",
+      "category": "policy",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_hop",
+      "question": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+      "answerable": true,
+      "expected_answer": "Hari libur tidak mewajibkan jam kerja reguler. Sistem libur nasional (FAQ_Payroll) menggantikan jam inti wajib (core hours WFH).",
+      "expected_answer_keywords": [
+        "core hours",
+        "holiday"
+      ],
+      "references": [
+        {
+          "document": "Policy_WFH.docx",
+          "page": 1,
+          "source_excerpt": "Remote workers must be available during core hours of 10:00-16:00 WIB."
+        },
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": 1,
+          "source_excerpt": "If the 25th is a holiday, payment is the prior working day."
+        }
+      ],
+      "query_variants": [
+        "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+        "If a designer works remotely and their schedule falls on a national holiday, are they still required to be online in the team app at 14:00 WIB?",
+        "remote work core hours 10:00-16:00 WIB availability during holiday"
+      ]
+    },
+    {
+      "id": "REP-001",
+      "split": "development",
+      "category": "report",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "Did client satisfaction and brand loyalty metrics improve in 2025 compared to the previous year, and what were the exact final figures?",
+      "answerable": true,
+      "expected_answer": "Yes, the CSAT score improved to 87% (up from 83% in 2024), and the Net Promoter Score (loyalty metric) reached 46.",
+      "expected_answer_keywords": [
+        "87%",
+        "46",
+        "CSAT",
+        "Net Promoter Score"
+      ],
+      "references": [
+        {
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "source_excerpt": "The overall CSAT score for 2025 was 87%, up from 83% in 2024. NPS Net Promoter Score reached 46 in 2025."
+        }
+      ],
+      "query_variants": [
+        "Did client satisfaction and brand loyalty metrics improve in 2025 compared to the previous year, and what were the exact final figures?",
+        "Apakah metrik kepuasan klien dan loyalitas merek meningkat pada 2025 dibandingkan tahun sebelumnya, dan berapa angka akhir pastinya?",
+        "CSAT 2025 score increase Net Promoter Score NPS metrics"
+      ]
+    },
+    {
+      "id": "REP-002",
+      "split": "development",
+      "category": "report",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "Of the total turnover generated by the company throughout 2025, what percentage was successfully converted into net profit?",
+      "answerable": true,
+      "expected_answer": "From the full-year revenue of IDR 158 billion, the net profit margin was 14%.",
+      "expected_answer_keywords": [
+        "IDR 158 billion",
+        "14%",
+        "net profit margin"
+      ],
+      "references": [
+        {
+          "document": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "source_excerpt": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%."
+        }
+      ],
+      "query_variants": [
+        "Of the total turnover generated by the company throughout 2025, what percentage was successfully converted into net profit?",
+        "Dari total omzet yang dibukukan perusahaan sepanjang 2025, berapa persentase yang berhasil menjadi keuntungan bersih?",
+        "FY2025 total revenue net profit margin percentage"
+      ]
+    },
+    {
+      "id": "REP-003",
+      "split": "development",
+      "category": "report",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "How many new talents joined the workforce between January and June of 2025, and what is the current total staff count?",
+      "answerable": true,
+      "expected_answer": "37 employees were hired in H1 2025, bringing total headcount to 312.",
+      "expected_answer_keywords": [
+        "37 employees",
+        "312",
+        "H1 2025"
+      ],
+      "references": [
+        {
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "source_excerpt": "The company hired 37 employees in H1 2025; total headcount reached 312."
+        }
+      ],
+      "query_variants": [
+        "How many new talents joined the workforce between January and June of 2025, and what is the current total staff count?",
+        "Berapa banyak bakat baru yang bergabung dengan tenaga kerja antara Januari dan Juni 2025, dan berapa total staf saat ini?",
+        "H1 2025 total hiring headcount employees"
+      ]
+    },
+    {
+      "id": "REP-004",
+      "split": "development",
+      "category": "report",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "Of the total technology compliance issues discovered during the 2025 assessment, how many were deemed critical risks versus acceptable risks?",
+      "answerable": true,
+      "expected_answer": "Out of 14 total findings, 2 were high (critical) risk, 5 medium, and 7 low (acceptable) risk.",
+      "expected_answer_keywords": [
+        "14 findings",
+        "2 high",
+        "7 low"
+      ],
+      "references": [
+        {
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "source_excerpt": "The 2025 audit raised 14 findings: 2 high, 5 medium, 7 low."
+        }
+      ],
+      "query_variants": [
+        "Of the total technology compliance issues discovered during the 2025 assessment, how many were deemed critical risks versus acceptable risks?",
+        "Dari total masalah kepatuhan teknologi yang ditemukan selama audit 2025, berapa banyak yang dianggap risiko kritis dibandingkan risiko dapat diterima?",
+        "IT audit 2025 findings severity high medium low"
+      ]
+    },
+    {
+      "id": "REP-005",
+      "split": "development",
+      "category": "report",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "causal",
+      "question": "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?",
+      "answerable": true,
+      "expected_answer": "The main cause of the customer portal disruption was an expired TLS certificate on the API gateway.",
+      "expected_answer_keywords": [
+        "expired TLS certificate",
+        "API gateway"
+      ],
+      "references": [
+        {
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "source_excerpt": "The root cause was an expired TLS certificate on the API gateway."
+        }
+      ],
+      "query_variants": [
+        "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?",
+        "Insiden teknis apa yang menyebabkan klien kehilangan akses platform pada pertengahan Oktober 2025, dan apa akar penyebabnya?",
+        "incident postmortem root cause expired TLS certificate API gateway"
+      ]
+    },
+    {
+      "id": "REP-006",
+      "split": "development",
+      "category": "report",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "factual",
+      "question": "Pada bulan apa infrastruktur perusahaan berada di bawah beban bandwidth terberat selama 2025, dan berapa persentasenya?",
+      "answerable": true,
+      "expected_answer": "Pemanfaatan jaringan puncak mencapai 72% dari kapasitas pada bulan November 2025.",
+      "expected_answer_keywords": [
+        "72%",
+        "November 2025"
+      ],
+      "references": [
+        {
+          "document": "Report_Network_Capacity.pdf",
+          "page": 1,
+          "source_excerpt": "Peak network utilization reached 72% of capacity in November 2025."
+        }
+      ],
+      "query_variants": [
+        "Pada bulan apa infrastruktur perusahaan berada di bawah beban bandwidth terberat selama 2025, dan berapa persentasenya?",
+        "During which month of 2025 was the corporate infrastructure under the heaviest bandwidth load, and what was the percentage?",
+        "peak network utilization 2025 percentage month"
+      ]
+    },
+    {
+      "id": "REP-007",
+      "split": "development",
+      "category": "report",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "comparison",
+      "question": "Dengan selisih margin yang tepat, seberapa besar tingkat pengunduran diri klien kita membaik menjelang kuartal ketiga 2025?",
+      "answerable": true,
+      "expected_answer": "Customer churn menurun dari 2,8% di Q2 2025 menjadi 2,1% di Q3 2025, terjadi perbaikan sebesar 0,7 poin persentase.",
+      "expected_answer_keywords": [
+        "2.8%",
+        "2.1%",
+        "0.7 percentage points"
+      ],
+      "references": [
+        {
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "source_excerpt": "Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2."
+        }
+      ],
+      "query_variants": [
+        "Dengan selisih margin yang tepat, seberapa besar tingkat pengunduran diri klien kita membaik menjelang kuartal ketiga 2025?",
+        "By what exact margin did our client attrition rate improve heading into the third quarter of 2025?",
+        "customer churn comparison Q2 vs Q3 2025 percentage decrease"
+      ]
+    },
+    {
+      "id": "REP-008",
+      "split": "test",
+      "category": "report",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "Apakah ada catatan pelanggan yang berhasil dicuri selama peristiwa siber yang tercatat sepanjang tahun fiskal lalu?",
+      "answerable": true,
+      "expected_answer": "Tidak. Ada 3 insiden keamanan yang dilaporkan pada tahun 2025, tetapi tidak ada yang mengakibatkan hilangnya data pelanggan.",
+      "expected_answer_keywords": [
+        "3",
+        "none",
+        "data loss"
+      ],
+      "references": [
+        {
+          "document": "Report_Security_Review_2025.pdf",
+          "page": 1,
+          "source_excerpt": "There were 3 reportable security incidents in 2025, none resulting in data loss."
+        }
+      ],
+      "query_variants": [
+        "Apakah ada catatan pelanggan yang berhasil dicuri selama peristiwa siber yang tercatat sepanjang tahun fiskal lalu?",
+        "Were any customer records compromised during the cyber events logged throughout the previous fiscal year?",
+        "reportable security incidents 2025 data loss compromised"
+      ]
+    },
+    {
+      "id": "REP-009",
+      "split": "test",
+      "category": "report",
+      "language": "id",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "Seberapa sukses upaya penghematan daya di fasilitas operasi Jawa Barat tahun lalu?",
+      "answerable": true,
+      "expected_answer": "Kantor Cikarang (Jawa Barat) mengurangi konsumsi listrik sebesar 9% pada tahun 2025.",
+      "expected_answer_keywords": [
+        "9%",
+        "Cikarang"
+      ],
+      "references": [
+        {
+          "document": "Report_Sustainability_2025.pdf",
+          "page": 1,
+          "source_excerpt": "The Cikarang office reduced electricity consumption by 9% in 2025."
+        }
+      ],
+      "query_variants": [
+        "Seberapa sukses upaya penghematan daya di fasilitas operasi Jawa Barat tahun lalu?",
+        "How successful were the power conservation efforts at the West Java facility last year?",
+        "Cikarang office electricity consumption reduction sustainability"
+      ]
+    },
+    {
+      "id": "REP-010",
+      "split": "test",
+      "category": "report",
+      "language": "id",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "Siapa pemasok pihak ketiga dengan performa terbaik dalam tinjauan tahunan kita, dan berapa nilai yang mereka capai?",
+      "answerable": true,
+      "expected_answer": "PT Sumber Makmur menerima peringkat tertinggi, dengan skor 4,6 dari 5.",
+      "expected_answer_keywords": [
+        "PT Sumber Makmur",
+        "4.6 out of 5"
+      ],
+      "references": [
+        {
+          "document": "Report_Vendor_Evaluation.pdf",
+          "page": 1,
+          "source_excerpt": "PT Sumber Makmur scored highest with an overall rating of 4.6 out of 5."
+        }
+      ],
+      "query_variants": [
+        "Siapa pemasok pihak ketiga dengan performa terbaik dalam tinjauan tahunan kita, dan berapa nilai yang mereka capai?",
+        "Who was the top-performing third-party supplier in our annual review, and what grade did they achieve?",
+        "highest rating vendor evaluation PT Sumber Makmur score"
+      ]
+    },
+    {
+      "id": "SOP-001",
+      "split": "development",
+      "category": "sop",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "If a user has not logged into the CMS since January 1st, will their profile still be active on May 1st, and how often is their entitlement audited?",
+      "answerable": true,
+      "expected_answer": "Their profile will be disabled (dormant after 90 days). Access rights are audited every 6 months.",
+      "expected_answer_keywords": [
+        "every 6 months",
+        "90 days inactive",
+        "disabled"
+      ],
+      "references": [
+        {
+          "document": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "source_excerpt": "Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled."
+        }
+      ],
+      "query_variants": [
+        "If a user has not logged into the CMS since January 1st, will their profile still be active on May 1st, and how often is their entitlement audited?",
+        "Jika pengguna belum masuk ke sistem sejak 1 Januari, apakah profilnya masih aktif pada 1 Mei, dan seberapa sering akses mereka diaudit?",
+        "dormant accounts disable 90 days access rights review 6 months"
+      ]
+    },
+    {
+      "id": "SOP-002",
+      "split": "development",
+      "category": "sop",
+      "language": "en",
+      "difficulty": "easy",
+      "question_type": "service_level",
+      "question": "If a client submits a grievance on Friday afternoon, by when are we contractually obligated to provide an initial reply?",
+      "answerable": true,
+      "expected_answer": "A customer complaint must receive a first response within one business day (Monday).",
+      "expected_answer_keywords": [
+        "within 1 business day",
+        "first response"
+      ],
+      "references": [
+        {
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "source_excerpt": "All customer complaints must receive a first response within 1 business day."
+        }
+      ],
+      "query_variants": [
+        "If a client submits a grievance on Friday afternoon, by when are we contractually obligated to provide an initial reply?",
+        "Jika klien menyampaikan keluhan pada Jumat sore, kapan batas waktu maksimal kita wajib memberikan tanggapan awal?",
+        "customer complaint SLA first response 1 business day"
+      ]
+    },
+    {
+      "id": "SOP-003",
+      "split": "development",
+      "category": "sop",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "At what exact hour does the primary storage array run its heavy comprehensive snapshot, and what is the interval for incremental saves?",
+      "answerable": true,
+      "expected_answer": "Full backups run nightly at 01:00 WIB, and production databases are backed up every 6 hours.",
+      "expected_answer_keywords": [
+        "every 6 hours",
+        "01:00 WIB",
+        "full backups"
+      ],
+      "references": [
+        {
+          "document": "SOP_Data_Backup.pdf",
+          "page": 1,
+          "source_excerpt": "Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB."
+        }
+      ],
+      "query_variants": [
+        "At what exact hour does the primary storage array run its heavy comprehensive snapshot, and what is the interval for incremental saves?",
+        "Pada jam berapa persisnya penyimpanan utama menjalankan snapshot pencadangan penuh, dan berapa interval untuk pencadangan sementara?",
+        "production databases full backup nightly 01:00 WIB every 6 hours"
+      ]
+    },
+    {
+      "id": "SOP-004",
+      "split": "development",
+      "category": "sop",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "requirement",
+      "question": "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?",
+      "answerable": true,
+      "expected_answer": "Yes, because expenses below IDR 150,000 do not legally mandate the submission of physical original receipts.",
+      "expected_answer_keywords": [
+        "above IDR 150,000",
+        "original receipts"
+      ],
+      "references": [
+        {
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "source_excerpt": "Original receipts are required for any single expense above IDR 150,000."
+        }
+      ],
+      "query_variants": [
+        "Am I permitted to claim a team lunch expense of IDR 120,000 using only a digital photo of the receipt sent via WhatsApp?",
+        "Apakah saya bisa mengklaim makan siang tim sebesar Rp 120.000 hanya menggunakan foto struk di WhatsApp?",
+        "expense reimbursement original receipts above IDR 150,000 threshold"
+      ]
+    },
+    {
+      "id": "SOP-005",
+      "split": "development",
+      "category": "sop",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "service_level",
+      "question": "If the main payment gateway goes offline completely (critical severity), what is the maximum permissible delay before the engineering team starts working on it, and when must operations be restored?",
+      "answerable": true,
+      "expected_answer": "A P1 (critical) incident must be acknowledged within 15 minutes and resolved within 4 hours.",
+      "expected_answer_keywords": [
+        "15 minutes",
+        "4 hours",
+        "P1"
+      ],
+      "references": [
+        {
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "source_excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours."
+        }
+      ],
+      "query_variants": [
+        "If the main payment gateway goes offline completely (critical severity), what is the maximum permissible delay before the engineering team starts working on it, and when must operations be restored?",
+        "Jika gateway pembayaran utama *offline* sepenuhnya (keparahan kritis), berapa keterlambatan maksimal sebelum tim *engineering* mengerjakannya, dan kapan operasional harus pulih?",
+        "P1 incident SLA acknowledgment 15 minutes resolution 4 hours"
+      ]
+    },
+    {
+      "id": "SOP-006",
+      "split": "development",
+      "category": "sop",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "approval",
+      "question": "Apakah mengambil liburan berturut-turut selama dua minggu memerlukan tanda tangan di luar atasan langsung saya?",
+      "answerable": true,
+      "expected_answer": "Ya, cuti lebih dari 5 hari berturut-turut juga memerlukan persetujuan kepala departemen (department head).",
+      "expected_answer_keywords": [
+        "department head approval",
+        "longer than 5 consecutive days"
+      ],
+      "references": [
+        {
+          "document": "SOP_Leave_Request.pdf",
+          "page": 1,
+          "source_excerpt": "Leave longer than 5 consecutive days also needs department head approval."
+        }
+      ],
+      "query_variants": [
+        "Apakah mengambil liburan berturut-turut selama dua minggu memerlukan tanda tangan di luar atasan langsung saya?",
+        "Does taking a two-week vacation require any signatures beyond my direct supervisor?",
+        "leave request approval longer than 5 days department head"
+      ]
+    },
+    {
+      "id": "SOP-007",
+      "split": "development",
+      "category": "sop",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "service_level",
+      "question": "Jika seorang karyawan menyerahkan laptopnya dan resmi resign pada pukul 15.00, paling lambat jam berapa akun email dan GitHub-nya harus dimatikan?",
+      "answerable": true,
+      "expected_answer": "IT harus mencabut seluruh akses sistem paling lambat pukul 17.00 (dalam waktu 2 jam sejak waktu keluar).",
+      "expected_answer_keywords": [
+        "within 2 hours",
+        "exit time"
+      ],
+      "references": [
+        {
+          "document": "SOP_Offboarding.pdf",
+          "page": 1,
+          "source_excerpt": "IT revokes all system access within 2 hours of the employee's exit time."
+        }
+      ],
+      "query_variants": [
+        "Jika seorang karyawan menyerahkan laptopnya dan resmi resign pada pukul 15.00, paling lambat jam berapa akun email dan GitHub-nya harus dimatikan?",
+        "If an employee returns their laptop and officially resigns at 15:00, what is the latest time their email and GitHub accounts must be deactivated?",
+        "offboarding system access revoke within 2 hours exit time"
+      ]
+    },
+    {
+      "id": "SOP-008",
+      "split": "test",
+      "category": "sop",
+      "language": "id",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "Pada titik mana dalam siklus karyawan baru masa bimbingan mentor yang ditugaskan resmi berakhir?",
+      "answerable": true,
+      "expected_answer": "Onboarding buddy (mentor) ditugaskan hanya untuk 30 hari pertama.",
+      "expected_answer_keywords": [
+        "first 30 days",
+        "onboarding buddy"
+      ],
+      "references": [
+        {
+          "document": "SOP_Onboarding.pdf",
+          "page": 1,
+          "source_excerpt": "Each new hire is assigned an onboarding buddy for the first 30 days."
+        }
+      ],
+      "query_variants": [
+        "Pada titik mana dalam siklus karyawan baru masa bimbingan mentor yang ditugaskan resmi berakhir?",
+        "At what point in the lifecycle of a new employee does the mentorship assigned to them officially conclude?",
+        "new hire onboarding buddy mentorship duration first 30 days"
+      ]
+    },
+    {
+      "id": "SOP-009",
+      "split": "test",
+      "category": "sop",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "requirement",
+      "question": "Sebelum kita dapat secara legal mencairkan dana ke agensi eksternal baru, dokumen apa yang wajib mereka berikan kepada tim keuangan kita?",
+      "answerable": true,
+      "expected_answer": "Vendor baru harus menyerahkan NPWP dan detail bank sebelum pesanan pembelian pertama (purchase order) diterbitkan.",
+      "expected_answer_keywords": [
+        "NPWP",
+        "bank details",
+        "first purchase order"
+      ],
+      "references": [
+        {
+          "document": "SOP_Procurement.pdf",
+          "page": 1,
+          "source_excerpt": "New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued."
+        }
+      ],
+      "query_variants": [
+        "Sebelum kita dapat secara legal mencairkan dana ke agensi eksternal baru, dokumen apa yang wajib mereka berikan kepada tim keuangan kita?",
+        "Before we can legally commit funds to a new external agency, what documentation must they furnish to our finance team?",
+        "new vendor procurement requirements tax ID NPWP bank details purchase order"
+      ]
+    },
+    {
+      "id": "SOP-010",
+      "split": "test",
+      "category": "sop",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "procedural",
+      "question": "Jika saya harus terbang dari Jakarta ke Bali untuk konferensi pada tanggal 20 bulan ini, paling lambat tanggal berapa saya harus menyelesaikan reservasi?",
+      "answerable": true,
+      "expected_answer": "Penerbangan domestik harus dipesan minimal 7 hari sebelumnya (tanggal 13) melalui agen perjalanan yang ditunjuk.",
+      "expected_answer_keywords": [
+        "at least 7 days",
+        "appointed travel agent"
+      ],
+      "references": [
+        {
+          "document": "SOP_Travel_Booking.pdf",
+          "page": 1,
+          "source_excerpt": "Domestic flights must be booked at least 7 days in advance through the appointed travel agent."
+        }
+      ],
+      "query_variants": [
+        "Jika saya harus terbang dari Jakarta ke Bali untuk konferensi pada tanggal 20 bulan ini, paling lambat tanggal berapa saya harus menyelesaikan reservasi?",
+        "If I need to fly from Jakarta to Bali for a conference on the 20th of the month, by what date must I finalize the reservation?",
+        "domestic flight travel booking advance notice at least 7 days"
+      ]
+    },
+    {
+      "id": "TECH-001",
+      "split": "development",
+      "category": "technical",
+      "language": "en",
+      "difficulty": "easy",
+      "question_type": "requirement",
+      "question": "If an automated testing suite reports 75% execution against the codebase, will the CI/CD pipeline allow the branch integration?",
+      "answerable": true,
+      "expected_answer": "No. A minimum of 80% unit-test coverage is required to merge.",
+      "expected_answer_keywords": [
+        "80%",
+        "unit-test coverage",
+        "merge"
+      ],
+      "references": [
+        {
+          "document": "TECH_CICD_Pipeline.txt",
+          "page": 1,
+          "source_excerpt": "A minimum of 80% unit-test coverage is required to merge."
+        }
+      ],
+      "query_variants": [
+        "If an automated testing suite reports 75% execution against the codebase, will the CI/CD pipeline allow the branch integration?",
+        "Jika suite pengujian otomatis melaporkan 75% eksekusi pada basis kode, apakah *pipeline* CI/CD mengizinkan integrasi cabang?",
+        "CI/CD pipeline merge requirements unit test coverage 80%"
+      ]
+    },
+    {
+      "id": "TECH-002",
+      "split": "development",
+      "category": "technical",
+      "language": "en",
+      "difficulty": "easy",
+      "question_type": "requirement",
+      "question": "Is it permissible to self-approve a PR and merge to master without peer validation?",
+      "answerable": true,
+      "expected_answer": "No, every pull request requires at least one approving review from a peer.",
+      "expected_answer_keywords": [
+        "at least one",
+        "approving review",
+        "pull request"
+      ],
+      "references": [
+        {
+          "document": "TECH_Coding_Standards.txt",
+          "page": 1,
+          "source_excerpt": "Every pull request requires at least one approving review."
+        }
+      ],
+      "query_variants": [
+        "Is it permissible to self-approve a PR and merge to master without peer validation?",
+        "Apakah diperbolehkan untuk menyetujui *Pull Request* sendiri dan melakukan *merge* ke *master* tanpa validasi rekan kerja?",
+        "pull request approving review peer validation coding standards"
+      ]
+    },
+    {
+      "id": "TECH-003",
+      "split": "development",
+      "category": "technical",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "factual",
+      "question": "To comply with legal hold requests, what is the mandatory preservation period for system action histories?",
+      "answerable": true,
+      "expected_answer": "Audit logs (system action histories) are retained for 7 years.",
+      "expected_answer_keywords": [
+        "7 years",
+        "audit logs"
+      ],
+      "references": [
+        {
+          "document": "TECH_Data_Retention.txt",
+          "page": 1,
+          "source_excerpt": "Audit logs are retained for 7 years."
+        }
+      ],
+      "query_variants": [
+        "To comply with legal hold requests, what is the mandatory preservation period for system action histories?",
+        "Untuk mematuhi permintaan penyimpanan hukum, berapa masa retensi wajib untuk log tindakan sistem?",
+        "audit logs data retention legal hold 7 years"
+      ]
+    },
+    {
+      "id": "TECH-004",
+      "split": "development",
+      "category": "technical",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "schema",
+      "question": "In our relational architecture, which foreign key establishes the relationship between a buyer's profile and their transaction history?",
+      "answerable": true,
+      "expected_answer": "The orders table links to the customers table through the customer_id field.",
+      "expected_answer_keywords": [
+        "customer_id",
+        "orders",
+        "customers"
+      ],
+      "references": [
+        {
+          "document": "TECH_Database_Schema.txt",
+          "page": 1,
+          "source_excerpt": "The orders table links to customers via customer_id and stores order_date and status."
+        }
+      ],
+      "query_variants": [
+        "In our relational architecture, which foreign key establishes the relationship between a buyer's profile and their transaction history?",
+        "Dalam arsitektur relasional kita, kunci asing (*foreign key*) mana yang membangun hubungan antara profil pembeli dan riwayat transaksi mereka?",
+        "database schema foreign key orders table customers table customer_id"
+      ]
+    },
+    {
+      "id": "TECH-005",
+      "split": "development",
+      "category": "technical",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "If an engineering lead wants to push a hotfix live on a Wednesday afternoon, does this align with the standard release windows?",
+      "answerable": true,
+      "expected_answer": "No. Production deployments are strictly scheduled on Tuesdays and Thursdays from 20:00 to 22:00 WIB.",
+      "expected_answer_keywords": [
+        "Tuesdays",
+        "Thursdays",
+        "20:00-22:00 WIB"
+      ],
+      "references": [
+        {
+          "document": "TECH_Deployment_Runbook.txt",
+          "page": 1,
+          "source_excerpt": "Production deployments are scheduled on Tuesdays and Thursdays, 20:00-22:00 WIB."
+        }
+      ],
+      "query_variants": [
+        "If an engineering lead wants to push a hotfix live on a Wednesday afternoon, does this align with the standard release windows?",
+        "Jika pemimpin teknik ingin merilis pembaruan panas (*hotfix*) ke produksi pada Rabu sore, apakah ini sesuai dengan jendela rilis standar?",
+        "production deployments scheduled release window Tuesdays Thursdays 20:00-22:00 WIB"
+      ]
+    },
+    {
+      "id": "TECH-006",
+      "split": "development",
+      "category": "technical",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_hop",
+      "question": "Berapa lama maksimal layanan backend boleh lumpuh total sebelum melanggar target RTO, dan berapa SLA bulanan untuk ketersediaan API kita?",
+      "answerable": true,
+      "expected_answer": "Target waktu pemulihan (RTO) adalah 4 jam. Sedangkan target Service Level Objective (SLO/SLA) bulanan untuk ketersediaan API adalah 99,9%.",
+      "expected_answer_keywords": [
+        "RTO",
+        "4 hours",
+        "99.9%"
+      ],
+      "references": [
+        {
+          "document": "TECH_Disaster_Recovery.txt",
+          "page": 1,
+          "source_excerpt": "The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour."
+        },
+        {
+          "document": "TECH_Monitoring_Guide.txt",
+          "page": 1,
+          "source_excerpt": "The API availability SLO is 99.9% per month."
+        }
+      ],
+      "query_variants": [
+        "Berapa lama maksimal layanan backend boleh lumpuh total sebelum melanggar target RTO, dan berapa SLA bulanan untuk ketersediaan API kita?",
+        "How long can the backend service be completely down before violating the RTO target, and what is the monthly SLA for our API availability?",
+        "disaster recovery RTO 4 hours API availability SLO 99.9%"
+      ]
+    },
+    {
+      "id": "TECH-007",
+      "split": "development",
+      "category": "technical",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?",
+      "answerable": true,
+      "expected_answer": "Panggilan gagal karena dua hal: token sudah kedaluwarsa (berlaku hanya 60 menit) dan melanggar batas nilai (*rate limit*) yaitu maksimal 100 permintaan per menit.",
+      "expected_answer_keywords": [
+        "expire after 60 minutes",
+        "100 requests per minute"
+      ],
+      "references": [
+        {
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": 1,
+          "source_excerpt": "Tokens expire after 60 minutes. Rate Limit The default rate limit is 100 requests per minute per client."
+        }
+      ],
+      "query_variants": [
+        "Jika sebuah layanan mikro melakukan 120 panggilan dalam 60 detik menggunakan token otentikasi yang dibuat dua jam lalu, dua kesalahan keamanan spesifik apa yang akan ditimbulkan?",
+        "If a microservice makes 120 calls within 60 seconds using a token generated two hours ago, what two security errors will it trigger?",
+        "internal API rate limit 100 requests token expiration 60 minutes"
+      ]
+    },
+    {
+      "id": "TECH-008",
+      "split": "test",
+      "category": "technical",
+      "language": "id",
+      "difficulty": "easy",
+      "question_type": "factual",
+      "question": "Berapa ambang batas keandalan (target operasional) untuk antarmuka programatik kita secara bulanan?",
+      "answerable": true,
+      "expected_answer": "Target ketersediaan SLO untuk API adalah 99,9% per bulan.",
+      "expected_answer_keywords": [
+        "99.9%",
+        "per month"
+      ],
+      "references": [
+        {
+          "document": "TECH_Monitoring_Guide.txt",
+          "page": 1,
+          "source_excerpt": "The API availability SLO is 99.9% per month."
+        }
+      ],
+      "query_variants": [
+        "Berapa ambang batas keandalan (target operasional) untuk antarmuka programatik kita secara bulanan?",
+        "What is the targeted reliability threshold for our programmatic interfaces on a monthly basis?",
+        "API availability SLO monthly target 99.9%"
+      ]
+    },
+    {
+      "id": "TECH-009",
+      "split": "test",
+      "category": "technical",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "multi_fact",
+      "question": "Sistem orkestrasi kontainer apa yang mengelola beban kerja kita, dan *engine* teknologi apa yang digunakan untuk penyimpanan persisten (database) vs tembolok memori sementara?",
+      "answerable": true,
+      "expected_answer": "Beban kerja dikelola oleh Kubernetes. Penyimpanan persisten menggunakan PostgreSQL 15, sementara tembolok (*caching*) menggunakan Redis.",
+      "expected_answer_keywords": [
+        "Kubernetes",
+        "PostgreSQL 15",
+        "Redis"
+      ],
+      "references": [
+        {
+          "document": "TECH_System_Architecture.txt",
+          "page": 1,
+          "source_excerpt": "The platform runs on a microservices architecture deployed on Kubernetes. Services communicate over REST and gRPC. Database The primary datastore is PostgreSQL 15. Redis is used for caching."
+        }
+      ],
+      "query_variants": [
+        "Sistem orkestrasi kontainer apa yang mengelola beban kerja kita, dan engine teknologi apa yang digunakan untuk penyimpanan persisten vs tembolok memori sementara?",
+        "Which container orchestration system manages our workloads, and what engines are utilized for persistent storage versus temporary memory caching?",
+        "microservices architecture Kubernetes primary datastore PostgreSQL Redis caching"
+      ]
+    },
+    {
+      "id": "TECH-010",
+      "split": "test",
+      "category": "technical",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "multi_fact",
+      "question": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+      "answerable": true,
+      "expected_answer": "Karyawan wajib menggunakan klien WireGuard untuk koneksi VPN, dan aksesnya diamankan lebih lanjut dengan otentikasi multi-faktor (MFA).",
+      "expected_answer_keywords": [
+        "WireGuard",
+        "multi-factor authentication"
+      ],
+      "references": [
+        {
+          "document": "TECH_VPN_Setup.txt",
+          "page": 1,
+          "source_excerpt": "Employees connect using the WireGuard client. Configuration files are issued by IT. MFA VPN access requires multi-factor authentication."
+        }
+      ],
+      "query_variants": [
+        "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+        "To securely tunnel into the server network, what specific software client must be configured, and what extra layer of security feature is enforced during login?",
+        "VPN connection client WireGuard multi-factor authentication MFA"
+      ]
+    },
+    {
+      "id": "NEG-001",
+      "split": "development",
+      "category": "negative",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "unanswerable",
+      "question": "How many extra days of paid paternity leave are explicitly granted to male employees when their spouse gives birth?",
+      "answerable": false,
+      "expected_answer": "Information regarding the duration of paid paternity leave is not available in the indexed documents.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "How many extra days of paid paternity leave are explicitly granted to male employees when their spouse gives birth?",
+        "Berapa hari tambahan cuti berbayar (paternity leave) yang secara eksplisit diberikan kepada karyawan pria saat pasangannya melahirkan?",
+        "paternity leave duration male employee spouse birth paid days"
+      ]
+    },
+    {
+      "id": "NEG-002",
+      "split": "development",
+      "category": "negative",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "unanswerable",
+      "question": "Does the corporate cafeteria provide a monthly lunch allowance or subsidy for full-time internal staff?",
+      "answerable": false,
+      "expected_answer": "The indexed documents do not contain information regarding a cafeteria lunch allowance or subsidy.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Does the corporate cafeteria provide a monthly lunch allowance or subsidy for full-time internal staff?",
+        "Apakah kantin perusahaan memberikan tunjangan atau subsidi makan siang bulanan untuk staf internal purna waktu?",
+        "cafeteria lunch allowance subsidy full-time staff"
+      ]
+    },
+    {
+      "id": "NEG-003",
+      "split": "development",
+      "category": "negative",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "unanswerable",
+      "question": "Based on current market conditions, what is the projected gross revenue of the enterprise for the full fiscal year 2026?",
+      "answerable": false,
+      "expected_answer": "The projected revenue for 2026 is not available. The corpus only contains the FY2025 financial report.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Based on current market conditions, what is the projected gross revenue of the enterprise for the full fiscal year 2026?",
+        "Berdasarkan kondisi pasar saat ini, berapa proyeksi pendapatan kotor perusahaan untuk tahun fiskal penuh 2026?",
+        "projected gross revenue full fiscal year 2026 financial report"
+      ]
+    },
+    {
+      "id": "NEG-004",
+      "split": "development",
+      "category": "negative",
+      "language": "en",
+      "difficulty": "hard",
+      "question_type": "unanswerable",
+      "question": "Does the company provide a dedicated relocation allowance program for engineers transferred to the Tokyo branch office?",
+      "answerable": false,
+      "expected_answer": "There is no information in the documents regarding a Tokyo branch office or a relocation allowance program.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Does the company provide a dedicated relocation allowance program for engineers transferred to the Tokyo branch office?",
+        "Apakah perusahaan menyediakan program tunjangan relokasi khusus untuk *engineer* yang dipindahkan ke kantor cabang Tokyo?",
+        "relocation allowance program Tokyo branch office transferred employees"
+      ]
+    },
+    {
+      "id": "NEG-005",
+      "split": "development",
+      "category": "negative",
+      "language": "en",
+      "difficulty": "medium",
+      "question_type": "unanswerable",
+      "question": "What is the absolute minimum supported version of the macOS operating system permitted to connect a personal MacBook to the corporate VPN?",
+      "answerable": false,
+      "expected_answer": "The indexed IT documents do not specify a minimum required macOS version for VPN connectivity.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "What is the absolute minimum supported version of the macOS operating system permitted to connect a personal MacBook to the corporate VPN?",
+        "Apa versi sistem operasi macOS minimum yang didukung dan diizinkan untuk menghubungkan MacBook pribadi ke VPN perusahaan?",
+        "minimum macOS version supported corporate VPN personal MacBook"
+      ]
+    },
+    {
+      "id": "NEG-006",
+      "split": "test",
+      "category": "negative",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "unanswerable",
+      "question": "Apa URL *endpoint* persis yang digunakan karyawan untuk memicu fitur setel ulang kata sandi Active Directory mandiri di portal IT?",
+      "answerable": false,
+      "expected_answer": "Dokumen tidak memberikan URL langsung; prosedur hanya menginstruksikan untuk mengajukan tiket IT Helpdesk melalui portal.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Apa URL endpoint persis yang digunakan karyawan untuk memicu fitur setel ulang kata sandi Active Directory mandiri di portal IT?",
+        "What is the exact URL endpoint used by employees to trigger the self-service Active Directory password reset feature on the IT portal?",
+        "direct URL endpoint self-service password reset active directory portal"
+      ]
+    },
+    {
+      "id": "NEG-007",
+      "split": "test",
+      "category": "negative",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "unanswerable",
+      "question": "Menurut panduan kode etik korporat, berapa nilai nominal maksimum yang diizinkan (dalam mata uang Rupiah) untuk menerima bingkisan atau hadiah dari vendor potensial?",
+      "answerable": false,
+      "expected_answer": "Dokumen Code of Conduct dan Pengadaan tidak menyatakan batasan nilai numerik spesifik untuk hadiah vendor.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Menurut panduan kode etik korporat, berapa nilai nominal maksimum yang diizinkan (dalam mata uang Rupiah) untuk menerima bingkisan atau hadiah dari vendor potensial?",
+        "According to the corporate code of conduct, what is the maximum permissible nominal value (in IDR) for accepting gifts from prospective vendors?",
+        "maximum permissible gift value IDR vendor code of conduct"
+      ]
+    },
+    {
+      "id": "NEG-008",
+      "split": "test",
+      "category": "negative",
+      "language": "id",
+      "difficulty": "hard",
+      "question_type": "unanswerable",
+      "question": "Seberapa sering 'Full Datacenter Failover Exercise' dieksekusi secara aktif untuk memvalidasi tercapainya metrik RTO pada rencana pemulihan bencana?",
+      "answerable": false,
+      "expected_answer": "Dokumentasi *disaster recovery* hanya merinci metrik RTO/RPO tanpa menyebutkan jadwal latihan atau pengujian *failover*.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Seberapa sering 'Full Datacenter Failover Exercise' dieksekusi secara aktif untuk memvalidasi tercapainya metrik RTO pada rencana pemulihan bencana?",
+        "How frequently is a 'Full Datacenter Failover Exercise' actively executed to validate the RTO metrics of the disaster recovery plan?",
+        "disaster recovery full datacenter failover exercise testing schedule RTO validation"
+      ]
+    },
+    {
+      "id": "NEG-009",
+      "split": "test",
+      "category": "negative",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "unanswerable",
+      "question": "Jika peringatan kotak masuk email saya sudah mendekati batas 50 GB, bagaimana langkah sistematis untuk mengarsipkan email yang lebih tua dari 3 tahun secara permanen?",
+      "answerable": false,
+      "expected_answer": "Dokumen FAQ Email menyebutkan batas kuota 50 GB, namun tidak menyediakan instruksi langkah-langkah sistematis untuk mengarsipkan email lama.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Jika peringatan kotak masuk email saya sudah mendekati batas 50 GB, bagaimana langkah sistematis untuk mengarsipkan email yang lebih tua dari 3 tahun secara permanen?",
+        "If my email inbox warning is approaching the 50 GB limit, what is the systematic procedure to permanently archive emails older than 3 years?",
+        "email mailbox quota 50GB procedure archive old emails permanently"
+      ]
+    },
+    {
+      "id": "NEG-010",
+      "split": "test",
+      "category": "negative",
+      "language": "id",
+      "difficulty": "medium",
+      "question_type": "unanswerable",
+      "question": "Apa nama perangkat lunak dan nomor versi spesifik dari aplikasi CRM internal yang dimanfaatkan divisi *sales* untuk memantau data *churn* klien?",
+      "answerable": false,
+      "expected_answer": "Dokumen menyebutkan metrik *customer churn* pada laporan kinerja, tetapi tidak memberikan nama perangkat lunak CRM atau versi spesifik yang digunakan oleh divisi *sales*.",
+      "expected_answer_keywords": [],
+      "references": [],
+      "query_variants": [
+        "Apa nama perangkat lunak dan nomor versi spesifik dari aplikasi CRM internal yang dimanfaatkan divisi sales untuk memantau data churn klien?",
+        "What is the software name and specific version number of the internal CRM application utilized by the sales division to track client churn data?",
+        "CRM software version name sales department tracking client churn"
+      ]
+    }
+  ]
+}

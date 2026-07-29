@@ -1,0 +1,3390 @@
+{
+  "dataset": {
+    "total": 89,
+    "answerable": 79,
+    "unanswerable": 10,
+    "by_language": {
+      "EN": {
+        "total": 74,
+        "answerable": 69,
+        "unanswerable": 5
+      },
+      "ID": {
+        "total": 15,
+        "answerable": 10,
+        "unanswerable": 5
+      }
+    }
+  },
+  "top_k": 5,
+  "items": [
+    {
+      "id": "EN-001",
+      "question": "How long is the probation period for new employees?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Onboarding.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+          "document": "SOP_Onboarding.pdf",
+          "page": 1,
+          "score": 0.857163,
+          "base_score": 0.78,
+          "semantic_score": 0.491017,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "FAQ_Onboarding.txt_para1_c0",
+          "document": "FAQ_Onboarding.txt",
+          "page": "-",
+          "score": 0.573847,
+          "base_score": 0.543698,
+          "semantic_score": 0.427728,
+          "keyword_score": 0.790136,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "score": 0.531648,
+          "base_score": 0.584239,
+          "semantic_score": 0.388587,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "score": 0.514204,
+          "base_score": 0.579154,
+          "semantic_score": 0.381109,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "score": 0.492625,
+          "base_score": 0.579908,
+          "semantic_score": 0.479933,
+          "keyword_score": 0.792355,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How long is the probation period for new employees?",
+        "resolution time resolved within must be resolved probation period",
+        "How long is the probation period for new employees? processing time resolution time resolved within masa percobaan"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.899119,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.815913,
+        "top_base_score": 0.78,
+        "top_evidence_score": 0.923653,
+        "top_exact_coverage": 0.8,
+        "score_margin": 0.1996,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Onboarding.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Onboarding.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6299.11,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-002",
+      "question": "How quickly must a P1 IT incident be resolved?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "score": 0.88677,
+          "base_score": 0.828818,
+          "semantic_score": 0.748262,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+          "document": "TECH_Data_Retention.txt",
+          "page": "-",
+          "score": 0.389446,
+          "base_score": 0.477422,
+          "semantic_score": 0.477422,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "score": 0.380614,
+          "base_score": 0.445342,
+          "semantic_score": 0.52121,
+          "keyword_score": 0.284124,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "score": 0.365261,
+          "base_score": 0.428754,
+          "semantic_score": 0.513558,
+          "keyword_score": 0.248545,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Data_Security.docx_para7_c4",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.34378,
+          "base_score": 0.375126,
+          "semantic_score": 0.495338,
+          "keyword_score": 0.119677,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How quickly must a P1 IT incident be resolved?",
+        "resolution time resolved within must be resolved P1 IT incident P1 incidents P1",
+        "How quickly must a P1 IT incident be resolved? processing time resolution time resolved within p1 incident p1 it incidents"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.884951,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "concept:incident_p1",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.854673,
+        "top_base_score": 0.828818,
+        "top_evidence_score": 0.932239,
+        "top_exact_coverage": 0.833333,
+        "score_margin": 0.377251,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_IT_Incident_Handling.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_IT_Incident_Handling.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4416.72,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-003",
+      "question": "What approval is needed for a purchase above IDR 50 million?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Procurement.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Procurement.pdf_p1_c0",
+          "document": "SOP_Procurement.pdf",
+          "page": 1,
+          "score": 0.829203,
+          "base_score": 0.736616,
+          "semantic_score": 0.662852,
+          "keyword_score": 0.893364,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para3_c2",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.697106,
+          "base_score": 0.680997,
+          "semantic_score": 0.530878,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para2_c1",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.601719,
+          "base_score": 0.7223,
+          "semantic_score": 0.661294,
+          "keyword_score": 0.851936,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para1_c0",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.56657,
+          "base_score": 0.697292,
+          "semantic_score": 0.0,
+          "keyword_score": 0.697292,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "score": 0.553784,
+          "base_score": 0.466417,
+          "semantic_score": 0.473446,
+          "keyword_score": 0.45148,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What approval is needed for a purchase above IDR 50 million?",
+        "amount threshold IDR 50",
+        "What approval is needed for a purchase above IDR 50 million? amount threshold"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.87938,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_approval",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.779819,
+        "top_base_score": 0.736616,
+        "top_evidence_score": 0.909428,
+        "top_exact_coverage": 0.666667,
+        "score_margin": 0.051663,
+        "supporting_candidate_count": 3,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Procurement.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Procurement.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4432.21,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-004",
+      "question": "What is the deadline to submit an expense claim?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "score": 0.842475,
+          "base_score": 0.753818,
+          "semantic_score": 0.692055,
+          "keyword_score": 0.885065,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Travel_Expense.docx_para1_c0",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.641202,
+          "base_score": 0.803869,
+          "semantic_score": 0.0,
+          "keyword_score": 0.803869,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Travel_Expense.docx_para2_c1",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.625078,
+          "base_score": 0.664244,
+          "semantic_score": 0.506242,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Travel_Expense.docx_para3_c2",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.536944,
+          "base_score": 0.636487,
+          "semantic_score": 0.0,
+          "keyword_score": 0.636487,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Travel_Expense.docx_para5_c3",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.486626,
+          "base_score": 0.622095,
+          "semantic_score": 0.0,
+          "keyword_score": 0.622095,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What is the deadline to submit an expense claim?",
+        "expense",
+        "What is the deadline to submit an expense claim? expenses pengeluaran"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.898654,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.803869,
+        "top_base_score": 0.803869,
+        "top_evidence_score": 0.15,
+        "top_exact_coverage": 0.0,
+        "score_margin": 0.007554,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Expense_Reimbursement.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Expense_Reimbursement.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4832.29,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-005",
+      "question": "How much advance notice is required for annual leave?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Leave_Request.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+          "document": "SOP_Leave_Request.pdf",
+          "page": 1,
+          "score": 0.852599,
+          "base_score": 0.771066,
+          "semantic_score": 0.663332,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Leave.docx_para3_c2",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.772648,
+          "base_score": 0.746382,
+          "semantic_score": 0.627033,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.536853,
+          "base_score": 0.508536,
+          "semantic_score": 0.548602,
+          "keyword_score": 0.423394,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Leave.docx_para2_c1",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.497884,
+          "base_score": 0.574718,
+          "semantic_score": 0.615867,
+          "keyword_score": 0.487276,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Leave.docx_para7_c4",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.496299,
+          "base_score": 0.517275,
+          "semantic_score": 0.535046,
+          "keyword_score": 0.479512,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How much advance notice is required for annual leave?",
+        "annual leave",
+        "How much advance notice is required for annual leave? cuti tahunan"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.895943,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "concept:annual_leave",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.809674,
+        "top_base_score": 0.771066,
+        "top_evidence_score": 0.9255,
+        "top_exact_coverage": 0.666667,
+        "score_margin": 0.031874,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Leave_Request.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Leave_Request.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 5923.71,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-006",
+      "question": "How often are full database backups taken?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Data_Backup.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+          "document": "SOP_Data_Backup.pdf",
+          "page": 1,
+          "score": 0.844131,
+          "base_score": 0.792174,
+          "semantic_score": 0.694374,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+          "document": "TECH_Data_Retention.txt",
+          "page": "-",
+          "score": 0.392789,
+          "base_score": 0.47439,
+          "semantic_score": 0.47439,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.345633,
+          "base_score": 0.349815,
+          "semantic_score": 0.349815,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_IT_Audit_2025.pdf_p1_c0",
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "score": 0.278372,
+          "base_score": 0.362605,
+          "semantic_score": 0.362605,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Data_Security.docx_para2_c1",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.276521,
+          "base_score": 0.316338,
+          "semantic_score": 0.316338,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How often are full database backups taken?"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.837525,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_frequency",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.792174,
+        "top_base_score": 0.792174,
+        "top_evidence_score": 0.727949,
+        "top_exact_coverage": 0.4,
+        "score_margin": 0.317784,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Data_Backup.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Data_Backup.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4764.81,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-007",
+      "question": "When must IT revoke a departing employee's access?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "SOP_Offboarding.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+          "document": "SOP_Offboarding.pdf",
+          "page": 1,
+          "score": 0.866944,
+          "base_score": 0.794289,
+          "semantic_score": 0.697484,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_IT_Audit_2025.pdf_p1_c0",
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "score": 0.511382,
+          "base_score": 0.390941,
+          "semantic_score": 0.0,
+          "keyword_score": 0.390941,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+          "document": "TECH_Data_Retention.txt",
+          "page": "-",
+          "score": 0.495764,
+          "base_score": 0.462051,
+          "semantic_score": 0.462051,
+          "keyword_score": 0.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+          "document": "SOP_Leave_Request.pdf",
+          "page": 1,
+          "score": 0.474074,
+          "base_score": 0.56416,
+          "semantic_score": 0.56416,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_WFH.docx_para5_c3",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.444464,
+          "base_score": 0.463822,
+          "semantic_score": 0.463822,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "When must IT revoke a departing employee's access?",
+        "employee offboarding",
+        "When must IT revoke a departing employee's access? offboarding employee exit"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.906046,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "explicit_date_or_time",
+          "concept:offboarding",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.828372,
+        "top_base_score": 0.794289,
+        "top_evidence_score": 0.930623,
+        "top_exact_coverage": 0.833333,
+        "score_margin": 0.264212,
+        "supporting_candidate_count": 3,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "SOP_Offboarding.pdf_p1_c0",
+          "TECH_Data_Retention.txt_para1_c0",
+          "Report_IT_Audit_2025.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "SOP_Offboarding.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 5572.32,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-008",
+      "question": "How many days per week can employees work from home?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Policy_WFH.docx",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Policy_WFH.docx_para5_c3",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.877418,
+          "base_score": 0.804978,
+          "semantic_score": 0.770781,
+          "keyword_score": 0.877645,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "FAQ_Remote_Work.txt_para1_c0",
+          "document": "FAQ_Remote_Work.txt",
+          "page": "-",
+          "score": 0.826817,
+          "base_score": 0.826437,
+          "semantic_score": 0.744761,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_WFH.docx_para2_c1",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.666958,
+          "base_score": 0.775127,
+          "semantic_score": 0.779845,
+          "keyword_score": 0.765101,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_WFH.docx_para7_c4",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.508095,
+          "base_score": 0.584064,
+          "semantic_score": 0.584064,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Leave.docx_para3_c2",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.491329,
+          "base_score": 0.507602,
+          "semantic_score": 0.594416,
+          "keyword_score": 0.323124,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How many days per week can employees work from home?",
+        "How many days per week can employees work from home? remote work work remotely working remotely"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.924495,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_count",
+          "concept:remote_work",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.860256,
+        "top_base_score": 0.826437,
+        "top_evidence_score": 0.961714,
+        "top_exact_coverage": 0.888889,
+        "score_margin": 0.019404,
+        "supporting_candidate_count": 4,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Remote_Work.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "FAQ_Remote_Work.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4982.82,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-009",
+      "question": "Who must a suspected data breach be reported to and how fast?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Policy_Data_Security.docx",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Policy_Data_Security.docx_para7_c4",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.90487,
+          "base_score": 0.864194,
+          "semantic_score": 0.800285,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Data_Security.docx_para1_c0",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.627374,
+          "base_score": 0.803869,
+          "semantic_score": 0.0,
+          "keyword_score": 0.803869,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Data_Security.docx_para2_c1",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.54479,
+          "base_score": 0.667694,
+          "semantic_score": 0.511315,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Data_Security.docx_para5_c3",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.515403,
+          "base_score": 0.667367,
+          "semantic_score": 0.0,
+          "keyword_score": 0.667367,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Information_Classification.docx_para5_c3",
+          "document": "Policy_Information_Classification.docx",
+          "page": "-",
+          "score": 0.50806,
+          "base_score": 0.595178,
+          "semantic_score": 0.0,
+          "keyword_score": 0.595178,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "Who must a suspected data breach be reported to and how fast?",
+        "data breach",
+        "Who must a suspected data breach be reported to and how fast? data breaches security breach"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.89755,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "explicit_reporting_contact",
+          "concept:data_breach",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.879406,
+        "top_base_score": 0.864194,
+        "top_evidence_score": 0.925043,
+        "top_exact_coverage": 0.571429,
+        "score_margin": 0.075537,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Policy_Data_Security.docx_para7_c4"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Policy_Data_Security.docx_para7_c4"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 5508.55,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-010",
+      "question": "How many annual leave days do employees get?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Policy_Leave.docx",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Policy_Leave.docx_para3_c2",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.890739,
+          "base_score": 0.835244,
+          "semantic_score": 0.757712,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+          "document": "SOP_Leave_Request.pdf",
+          "page": 1,
+          "score": 0.675917,
+          "base_score": 0.638937,
+          "semantic_score": 0.608074,
+          "keyword_score": 0.704522,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.55554,
+          "base_score": 0.557303,
+          "semantic_score": 0.619357,
+          "keyword_score": 0.425439,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_WFH.docx_para5_c3",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.493273,
+          "base_score": 0.510765,
+          "semantic_score": 0.61409,
+          "keyword_score": 0.291198,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Leave.docx_para2_c1",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.479703,
+          "base_score": 0.574718,
+          "semantic_score": 0.615867,
+          "keyword_score": 0.487276,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How many annual leave days do employees get?",
+        "annual leave",
+        "How many annual leave days do employees get? cuti tahunan"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.922746,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_count",
+          "concept:annual_leave",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.859847,
+        "top_base_score": 0.835244,
+        "top_evidence_score": 0.933657,
+        "top_exact_coverage": 0.666667,
+        "score_margin": 0.152842,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Policy_Leave.docx_para3_c2"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Policy_Leave.docx_para3_c2"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 5286.78,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-011",
+      "question": "What are the password requirements?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Policy_Password.docx",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Policy_Password.docx_para2_c1",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.874969,
+          "base_score": 0.906055,
+          "semantic_score": 0.861845,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Password.docx_para1_c0",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.684118,
+          "base_score": 0.797966,
+          "semantic_score": 0.0,
+          "keyword_score": 0.797966,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Password.docx_para3_c2",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.678024,
+          "base_score": 0.570698,
+          "semantic_score": 0.56339,
+          "keyword_score": 0.586227,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Password.docx_para5_c3",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.592788,
+          "base_score": 0.579706,
+          "semantic_score": 0.54987,
+          "keyword_score": 0.643109,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Password.docx_para7_c4",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.535001,
+          "base_score": 0.502396,
+          "semantic_score": 0.436178,
+          "keyword_score": 0.643109,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What are the password requirements?",
+        "password",
+        "What are the password requirements? kata sandi sandi"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.947971,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.909361,
+        "top_base_score": 0.906055,
+        "top_evidence_score": 0.919277,
+        "top_exact_coverage": 0.5,
+        "score_margin": 0.111395,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 0,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Policy_Password.docx_para2_c1",
+          "FAQ_IT_Support.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Policy_Password.docx_para2_c1"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4666.54,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-012",
+      "question": "What is the domestic meal per diem?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Policy_Travel_Expense.docx",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Policy_Travel_Expense.docx_para3_c2",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.916389,
+          "base_score": 0.864629,
+          "semantic_score": 0.800925,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.251728,
+          "base_score": 0.207426,
+          "semantic_score": 0.207426,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What is the domestic meal per diem?",
+        "lunch",
+        "What is the domestic meal per diem? lunch makan siang"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.90611,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_monetary_value",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.891007,
+        "top_base_score": 0.864629,
+        "top_evidence_score": 0.970139,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.606678,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Policy_Travel_Expense.docx_para3_c2"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Policy_Travel_Expense.docx_para3_c2"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4998.04,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-013",
+      "question": "What was Q3 2025 revenue?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "score": 0.910435,
+          "base_score": 0.86,
+          "semantic_score": 0.711611,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+          "document": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "score": 0.785371,
+          "base_score": 0.78,
+          "semantic_score": 0.6483,
+          "keyword_score": 0.961958,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.422945,
+          "base_score": 0.457751,
+          "semantic_score": 0.461586,
+          "keyword_score": 0.449601,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.405919,
+          "base_score": 0.490098,
+          "semantic_score": 0.506166,
+          "keyword_score": 0.455952,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+          "document": "Report_Network_Capacity.pdf",
+          "page": 1,
+          "score": 0.360203,
+          "base_score": 0.383992,
+          "semantic_score": 0.378755,
+          "keyword_score": 0.395123,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What was Q3 2025 revenue?",
+        "revenue 2025",
+        "What was Q3 2025 revenue? pendapatan omzet"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.936794,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_monetary_value",
+          "year:2025",
+          "concept:revenue",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.884186,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.956742,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.062375,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_Q3_2025_Performance.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_Q3_2025_Performance.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4533.83,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-014",
+      "question": "What was the root cause of the October 2025 outage?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "score": 0.895,
+          "base_score": 0.86,
+          "semantic_score": 0.585706,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.45719,
+          "base_score": 0.609586,
+          "semantic_score": 0.436828,
+          "keyword_score": 0.976696,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_Vendor_Evaluation.pdf_p1_c0",
+          "document": "Report_Vendor_Evaluation.pdf",
+          "page": 1,
+          "score": 0.438966,
+          "base_score": 0.579395,
+          "semantic_score": 0.0,
+          "keyword_score": 0.579395,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.438694,
+          "base_score": 0.566315,
+          "semantic_score": 0.379596,
+          "keyword_score": 0.963091,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "score": 0.413146,
+          "base_score": 0.550463,
+          "semantic_score": 0.346036,
+          "keyword_score": 0.98487,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What was the root cause of the October 2025 outage?",
+        "2025"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.866704,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "year:2025",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.86,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.701708,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.250414,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_Incident_Postmortem.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_Incident_Postmortem.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6546.83,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-015",
+      "question": "What was the 2025 overall CSAT score?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_CSAT_2025.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.895,
+          "base_score": 0.86,
+          "semantic_score": 0.700156,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.605773,
+          "base_score": 0.646942,
+          "semantic_score": 0.498166,
+          "keyword_score": 0.963091,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+          "document": "Report_Network_Capacity.pdf",
+          "page": 1,
+          "score": 0.47052,
+          "base_score": 0.518843,
+          "semantic_score": 0.364702,
+          "keyword_score": 0.846393,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_IT_Audit_2025.pdf_p1_c0",
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "score": 0.468083,
+          "base_score": 0.551649,
+          "semantic_score": 0.403845,
+          "keyword_score": 0.865732,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_Vendor_Evaluation.pdf_p1_c0",
+          "document": "Report_Vendor_Evaluation.pdf",
+          "page": 1,
+          "score": 0.459592,
+          "base_score": 0.485897,
+          "semantic_score": 0.441898,
+          "keyword_score": 0.579395,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What was the 2025 overall CSAT score?",
+        "2025"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.875604,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_percentage",
+          "year:2025",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.86,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.784112,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.213058,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_CSAT_2025.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_CSAT_2025.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6830.58,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-016",
+      "question": "How many security incidents occurred in 2025?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_Security_Review_2025.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_Security_Review_2025.pdf_p1_c0",
+          "document": "Report_Security_Review_2025.pdf",
+          "page": 1,
+          "score": 0.831696,
+          "base_score": 0.775594,
+          "semantic_score": 0.66999,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "score": 0.667182,
+          "base_score": 0.874767,
+          "semantic_score": 0.0,
+          "keyword_score": 0.874767,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_IT_Audit_2025.pdf_p1_c0",
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "score": 0.528062,
+          "base_score": 0.617941,
+          "semantic_score": 0.501333,
+          "keyword_score": 0.865732,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.517023,
+          "base_score": 0.566315,
+          "semantic_score": 0.379596,
+          "keyword_score": 0.963091,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.468338,
+          "base_score": 0.609586,
+          "semantic_score": 0.436828,
+          "keyword_score": 0.976696,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How many security incidents occurred in 2025?",
+        "2025"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.869578,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_count",
+          "year:2025",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.874767,
+        "top_base_score": 0.874767,
+        "top_evidence_score": 0.55,
+        "top_exact_coverage": 0.2,
+        "score_margin": 0.099173,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_Security_Review_2025.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_Security_Review_2025.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 4590.68,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-017",
+      "question": "What was full-year 2025 revenue?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_Financial_FY2025.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+          "document": "Report_Financial_FY2025.pdf",
+          "page": 1,
+          "score": 0.909847,
+          "base_score": 0.86,
+          "semantic_score": 0.695922,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "score": 0.532359,
+          "base_score": 0.542833,
+          "semantic_score": 0.521353,
+          "keyword_score": 0.588478,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.391047,
+          "base_score": 0.397757,
+          "semantic_score": 0.470162,
+          "keyword_score": 0.243896,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.360948,
+          "base_score": 0.439149,
+          "semantic_score": 0.480723,
+          "keyword_score": 0.350805,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para3_c2",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.331037,
+          "base_score": 0.349484,
+          "semantic_score": 0.349484,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What was full-year 2025 revenue?",
+        "revenue full year 2025",
+        "What was full-year 2025 revenue? pendapatan omzet full year tahun penuh"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.901356,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_monetary_value",
+          "year:2025",
+          "concept:revenue",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.883597,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.954388,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.340764,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_Financial_FY2025.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_Financial_FY2025.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6602.97,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-018",
+      "question": "What database does the platform use?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_System_Architecture.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_System_Architecture.txt_para1_c0",
+          "document": "TECH_System_Architecture.txt",
+          "page": "-",
+          "score": 0.786021,
+          "base_score": 0.714694,
+          "semantic_score": 0.580432,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "TECH_Database_Schema.txt_para1_c0",
+          "document": "TECH_Database_Schema.txt",
+          "page": "-",
+          "score": 0.502197,
+          "base_score": 0.50792,
+          "semantic_score": 0.433837,
+          "keyword_score": 0.665345,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Data_Security.docx_para5_c3",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.483165,
+          "base_score": 0.532686,
+          "semantic_score": 0.0,
+          "keyword_score": 0.532686,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Data_Security.docx_para2_c1",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.409812,
+          "base_score": 0.419796,
+          "semantic_score": 0.419796,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Data_Security.docx_para3_c2",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.3759,
+          "base_score": 0.356193,
+          "semantic_score": 0.215447,
+          "keyword_score": 0.655279,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What database does the platform use?"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.79069,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.714694,
+        "top_base_score": 0.714694,
+        "top_evidence_score": 0.632911,
+        "top_exact_coverage": 0.5,
+        "score_margin": 0.182008,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 0,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_System_Architecture.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_System_Architecture.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7032.85,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-019",
+      "question": "How long are internal API tokens valid?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_Internal_API_Guide.txt_para1_c0",
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": "-",
+          "score": 0.837001,
+          "base_score": 0.74824,
+          "semantic_score": 0.629764,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "score": 0.577045,
+          "base_score": 0.584653,
+          "semantic_score": 0.41525,
+          "keyword_score": 0.944634,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+          "document": "TECH_Data_Retention.txt",
+          "page": "-",
+          "score": 0.559485,
+          "base_score": 0.513216,
+          "semantic_score": 0.513216,
+          "keyword_score": 0.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "score": 0.555572,
+          "base_score": 0.528979,
+          "semantic_score": 0.307322,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+          "document": "SOP_Offboarding.pdf",
+          "page": 1,
+          "score": 0.537512,
+          "base_score": 0.506707,
+          "semantic_score": 0.0,
+          "keyword_score": 0.506707,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How long are internal API tokens valid?",
+        "resolution time resolved within must be resolved API",
+        "How long are internal API tokens valid? processing time resolution time resolved within"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.884897,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.789796,
+        "top_base_score": 0.74824,
+        "top_evidence_score": 0.914465,
+        "top_exact_coverage": 0.6,
+        "score_margin": 0.153234,
+        "supporting_candidate_count": 5,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_Internal_API_Guide.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_Internal_API_Guide.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7906.26,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-020",
+      "question": "What are the RTO and RPO?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_Disaster_Recovery.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0",
+          "document": "TECH_Disaster_Recovery.txt",
+          "page": "-",
+          "score": 0.926483,
+          "base_score": 0.880972,
+          "semantic_score": 0.824958,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+          "document": "SOP_Data_Backup.pdf",
+          "page": 1,
+          "score": 0.503344,
+          "base_score": 0.506414,
+          "semantic_score": 0.506414,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+          "document": "SOP_Onboarding.pdf",
+          "page": 1,
+          "score": 0.45505,
+          "base_score": 0.448819,
+          "semantic_score": 0.448819,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+          "document": "Report_Incident_Postmortem.pdf",
+          "page": 1,
+          "score": 0.411433,
+          "base_score": 0.461867,
+          "semantic_score": 0.461867,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+          "document": "SOP_Offboarding.pdf",
+          "page": 1,
+          "score": 0.409821,
+          "base_score": 0.382936,
+          "semantic_score": 0.51529,
+          "keyword_score": 0.101685,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What are the RTO and RPO?",
+        "What is the recovery time objective (RTO)?",
+        "recovery time objective RTO recovery point objective RPO",
+        "What are the RTO and RPO? recovery time objective recovery point objective"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.913219,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "concept:rpo",
+          "concept:rto",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.904165,
+        "top_base_score": 0.880972,
+        "top_evidence_score": 0.973744,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.397751,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_Disaster_Recovery.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_Disaster_Recovery.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 8208.17,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-021",
+      "question": "What is the API availability SLO?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_Monitoring_Guide.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_Monitoring_Guide.txt_para1_c0",
+          "document": "TECH_Monitoring_Guide.txt",
+          "page": "-",
+          "score": 0.895,
+          "base_score": 0.86,
+          "semantic_score": 0.637403,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "TECH_Internal_API_Guide.txt_para1_c0",
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": "-",
+          "score": 0.47594,
+          "base_score": 0.528259,
+          "semantic_score": 0.306263,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "TECH_System_Architecture.txt_para1_c0",
+          "document": "TECH_System_Architecture.txt",
+          "page": "-",
+          "score": 0.366626,
+          "base_score": 0.408311,
+          "semantic_score": 0.408311,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+          "document": "Report_Network_Capacity.pdf",
+          "page": 1,
+          "score": 0.341336,
+          "base_score": 0.339417,
+          "semantic_score": 0.339417,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "SOP_Access_Provisioning.pdf_p1_c0",
+          "document": "SOP_Access_Provisioning.pdf",
+          "page": 1,
+          "score": 0.341165,
+          "base_score": 0.333107,
+          "semantic_score": 0.333107,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What is the API availability SLO?",
+        "API"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.870724,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_percentage",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.86,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.73893,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.331741,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_Monitoring_Guide.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_Monitoring_Guide.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6983.89,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-022",
+      "question": "How long are audit logs retained?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_Data_Retention.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+          "document": "TECH_Data_Retention.txt",
+          "page": "-",
+          "score": 0.890596,
+          "base_score": 0.82287,
+          "semantic_score": 0.739515,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+          "document": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "score": 0.515517,
+          "base_score": 0.579687,
+          "semantic_score": 0.381892,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "score": 0.513344,
+          "base_score": 0.591369,
+          "semantic_score": 0.486547,
+          "keyword_score": 0.814115,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "TECH_Internal_API_Guide.txt_para1_c0",
+          "document": "TECH_Internal_API_Guide.txt",
+          "page": "-",
+          "score": 0.402066,
+          "base_score": 0.454983,
+          "semantic_score": 0.454983,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_IT_Audit_2025.pdf_p1_c0",
+          "document": "Report_IT_Audit_2025.pdf",
+          "page": 1,
+          "score": 0.395916,
+          "base_score": 0.468784,
+          "semantic_score": 0.379076,
+          "keyword_score": 0.659413,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How long are audit logs retained?",
+        "resolution time resolved within must be resolved audit log",
+        "How long are audit logs retained? processing time resolution time resolved within log audit"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.887943,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_duration",
+          "concept:audit_log",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.857384,
+        "top_base_score": 0.82287,
+        "top_evidence_score": 0.960927,
+        "top_exact_coverage": 0.75,
+        "score_margin": 0.266015,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_Data_Retention.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_Data_Retention.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 6515.19,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-023",
+      "question": "What unit-test coverage is required to merge code?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "TECH_CICD_Pipeline.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "TECH_CICD_Pipeline.txt_para1_c0",
+          "document": "TECH_CICD_Pipeline.txt",
+          "page": "-",
+          "score": 0.895,
+          "base_score": 0.86,
+          "semantic_score": 0.550966,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Information_Classification.docx_para2_c1",
+          "document": "Policy_Information_Classification.docx",
+          "page": "-",
+          "score": 0.294956,
+          "base_score": 0.332447,
+          "semantic_score": 0.332447,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Data_Security.docx_para2_c1",
+          "document": "Policy_Data_Security.docx",
+          "page": "-",
+          "score": 0.279198,
+          "base_score": 0.299701,
+          "semantic_score": 0.299701,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para2_c1",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.265778,
+          "base_score": 0.289787,
+          "semantic_score": 0.289787,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "TECH_System_Architecture.txt_para1_c0",
+          "document": "TECH_System_Architecture.txt",
+          "page": "-",
+          "score": 0.258314,
+          "base_score": 0.30649,
+          "semantic_score": 0.30649,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What unit-test coverage is required to merge code?"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.864003,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_percentage",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.86,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.676696,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.527553,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "TECH_CICD_Pipeline.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "TECH_CICD_Pipeline.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7184.38,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-024",
+      "question": "How do I reset my password?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_IT_Support.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_IT_Support.txt_para1_c0",
+          "document": "FAQ_IT_Support.txt",
+          "page": "-",
+          "score": 0.904107,
+          "base_score": 0.86,
+          "semantic_score": 0.542845,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Password.docx_para2_c1",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.813193,
+          "base_score": 0.906055,
+          "semantic_score": 0.861845,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Password.docx_para1_c0",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.625757,
+          "base_score": 0.797966,
+          "semantic_score": 0.0,
+          "keyword_score": 0.797966,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Password.docx_para5_c3",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.603085,
+          "base_score": 0.580014,
+          "semantic_score": 0.550322,
+          "keyword_score": 0.643109,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Password.docx_para3_c2",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.598085,
+          "base_score": 0.570698,
+          "semantic_score": 0.56339,
+          "keyword_score": 0.586227,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How do I reset my password?",
+        "password",
+        "How do I reset my password? kata sandi sandi"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.947971,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.909361,
+        "top_base_score": 0.906055,
+        "top_evidence_score": 0.919277,
+        "top_exact_coverage": 0.5,
+        "score_margin": 0.031504,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 0,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Policy_Password.docx_para2_c1",
+          "FAQ_IT_Support.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Policy_Password.docx_para2_c1"
+        ],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7458.19,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-025",
+      "question": "When is payday?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_Payroll.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_Payroll.txt_para1_c0",
+          "document": "FAQ_Payroll.txt",
+          "page": "-",
+          "score": 0.907289,
+          "base_score": 0.86,
+          "semantic_score": 0.627712,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Leave.docx_para3_c2",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.468398,
+          "base_score": 0.43261,
+          "semantic_score": 0.43261,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_WFH.docx_para5_c3",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.440706,
+          "base_score": 0.414767,
+          "semantic_score": 0.414767,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "score": 0.3932,
+          "base_score": 0.435144,
+          "semantic_score": 0.435144,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.390777,
+          "base_score": 0.347731,
+          "semantic_score": 0.347731,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "When is payday?",
+        "salary payment",
+        "When is payday? salary paid salaries are paid"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.899453,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_date_or_time",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.881039,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.944157,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.445895,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Payroll.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "FAQ_Payroll.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7652.04,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-026",
+      "question": "What is the mailbox size limit?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_Email_Calendar.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+          "document": "FAQ_Email_Calendar.txt",
+          "page": "-",
+          "score": 0.90709,
+          "base_score": 0.86,
+          "semantic_score": 0.622397,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Password.docx_para3_c2",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.378937,
+          "base_score": 0.324941,
+          "semantic_score": 0.324941,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_BYOD.docx_para3_c2",
+          "document": "Policy_BYOD.docx",
+          "page": "-",
+          "score": 0.352863,
+          "base_score": 0.351922,
+          "semantic_score": 0.351922,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Information_Classification.docx_para3_c2",
+          "document": "Policy_Information_Classification.docx",
+          "page": "-",
+          "score": 0.329374,
+          "base_score": 0.323383,
+          "semantic_score": 0.323383,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Procurement_Threshold.docx_para2_c1",
+          "document": "Policy_Procurement_Threshold.docx",
+          "page": "-",
+          "score": 0.317356,
+          "base_score": 0.332505,
+          "semantic_score": 0.332505,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What is the mailbox size limit?",
+        "mailbox quota",
+        "What is the mailbox size limit? mailbox quota"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.899305,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_storage_quantity",
+          "concept:mailbox_quota",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.88084,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.94336,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.528918,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Email_Calendar.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "FAQ_Email_Calendar.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7116.81,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-027",
+      "question": "What should I bring on my first day?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_Onboarding.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_Onboarding.txt_para1_c0",
+          "document": "FAQ_Onboarding.txt",
+          "page": "-",
+          "score": 0.895,
+          "base_score": 0.86,
+          "semantic_score": 0.357433,
+          "keyword_score": 1.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_Leave.docx_para5_c3",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.355301,
+          "base_score": 0.316942,
+          "semantic_score": 0.316942,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+          "document": "SOP_Customer_Complaint.pdf",
+          "page": 1,
+          "score": 0.279678,
+          "base_score": 0.288538,
+          "semantic_score": 0.226811,
+          "keyword_score": 0.419706,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What should I bring on my first day?"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.766914,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "strong_retrieval_fallback",
+          "bundle_coherence_allowed",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.86,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.537352,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.543058,
+        "supporting_candidate_count": 0,
+        "precision_requirement_count": 0,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Onboarding.txt_para1_c0",
+          "Policy_Leave.docx_para5_c3",
+          "SOP_Customer_Complaint.pdf_p1_c0",
+          "Policy_BYOD.docx_para2_c1"
+        ],
+        "coherent_candidate_count": 0,
+        "coherent_chunk_ids": [],
+        "requires_coherent_evidence": false,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7537.95,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-028",
+      "question": "Is there a home-office allowance?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_Remote_Work.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_Remote_Work.txt_para1_c0",
+          "document": "FAQ_Remote_Work.txt",
+          "page": "-",
+          "score": 0.845417,
+          "base_score": 0.78,
+          "semantic_score": 0.377788,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Policy_WFH.docx_para5_c3",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.606609,
+          "base_score": 0.478833,
+          "semantic_score": 0.541026,
+          "keyword_score": 0.346672,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_Sustainability_2025.pdf_p1_c0",
+          "document": "Report_Sustainability_2025.pdf",
+          "page": 1,
+          "score": 0.574466,
+          "base_score": 0.686128,
+          "semantic_score": 0.0,
+          "keyword_score": 0.686128,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_WFH.docx_para2_c1",
+          "document": "Policy_WFH.docx",
+          "page": "-",
+          "score": 0.553298,
+          "base_score": 0.493594,
+          "semantic_score": 0.532055,
+          "keyword_score": 0.411865,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Policy_Leave.docx_para3_c2",
+          "document": "Policy_Leave.docx",
+          "page": "-",
+          "score": 0.524213,
+          "base_score": 0.384066,
+          "semantic_score": 0.384066,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "Is there a home-office allowance?",
+        "subsidy allowance office",
+        "Is there a home-office allowance? subsidy benefit kantor"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.85538,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_monetary_value",
+          "concept:subsidy",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.804167,
+        "top_base_score": 0.78,
+        "top_evidence_score": 0.876668,
+        "top_exact_coverage": 0.75,
+        "score_margin": 0.118039,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Remote_Work.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "FAQ_Remote_Work.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7229.49,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-029",
+      "question": "What is the replacement fee for an access card?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "FAQ_Facilities.txt",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "FAQ_Facilities.txt_para1_c0",
+          "document": "FAQ_Facilities.txt",
+          "page": "-",
+          "score": 0.904556,
+          "base_score": 0.86,
+          "semantic_score": 0.554833,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+          "document": "SOP_Offboarding.pdf",
+          "page": 1,
+          "score": 0.54676,
+          "base_score": 0.497316,
+          "semantic_score": 0.359086,
+          "keyword_score": 0.791054,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Policy_Password.docx_para2_c1",
+          "document": "Policy_Password.docx",
+          "page": "-",
+          "score": 0.454355,
+          "base_score": 0.511925,
+          "semantic_score": 0.511925,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Policy_Travel_Expense.docx_para2_c1",
+          "document": "Policy_Travel_Expense.docx",
+          "page": "-",
+          "score": 0.406062,
+          "base_score": 0.446857,
+          "semantic_score": 0.446857,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+          "document": "SOP_Expense_Reimbursement.pdf",
+          "page": 1,
+          "score": 0.373078,
+          "base_score": 0.418221,
+          "semantic_score": 0.418221,
+          "keyword_score": 0.0,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "What is the replacement fee for an access card?",
+        "access card",
+        "What is the replacement fee for an access card? employee access card kartu akses"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.93242,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_monetary_value",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.878306,
+        "top_base_score": 0.86,
+        "top_evidence_score": 0.933225,
+        "top_exact_coverage": 1.0,
+        "score_margin": 0.294353,
+        "supporting_candidate_count": 2,
+        "precision_requirement_count": 1,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "FAQ_Facilities.txt_para1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "FAQ_Facilities.txt_para1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 8113.7,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    },
+    {
+      "id": "EN-030",
+      "question": "How many new enterprise customers were added in Q3 2025?",
+      "language": "EN",
+      "answerable": true,
+      "expected_sources": [
+        {
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": ""
+        }
+      ],
+      "top_k": 5,
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+          "document": "Report_Q3_2025_Performance.pdf",
+          "page": 1,
+          "score": 0.835,
+          "base_score": 0.78,
+          "semantic_score": 0.666975,
+          "keyword_score": 1.0,
+          "evidence_supported": true,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 2,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c1",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.497458,
+          "base_score": 0.566315,
+          "semantic_score": 0.379596,
+          "keyword_score": 0.963091,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 3,
+          "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+          "document": "Report_CSAT_2025.pdf",
+          "page": 1,
+          "score": 0.487734,
+          "base_score": 0.621958,
+          "semantic_score": 0.455023,
+          "keyword_score": 0.976696,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 4,
+          "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+          "document": "Report_Hiring_H1_2025.pdf",
+          "page": 1,
+          "score": 0.47042,
+          "base_score": 0.576233,
+          "semantic_score": 0.435747,
+          "keyword_score": 0.874767,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        },
+        {
+          "rank": 5,
+          "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+          "document": "Report_Network_Capacity.pdf",
+          "page": 1,
+          "score": 0.412233,
+          "base_score": 0.537095,
+          "semantic_score": 0.391543,
+          "keyword_score": 0.846393,
+          "evidence_supported": false,
+          "answerability_accepted": true
+        }
+      ],
+      "query_variants": [
+        "How many new enterprise customers were added in Q3 2025?",
+        "2025"
+      ],
+      "baseline_decision": {
+        "answerable": true,
+        "score": 0.835264,
+        "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+        "failed_checks": [],
+        "passed_checks": [
+          "explicit_count",
+          "year:2025",
+          "minimum_top_score",
+          "minimum_base_hybrid_score",
+          "supported_evidence",
+          "coherent_single_chunk_evidence",
+          "top_margin_or_bundle_support"
+        ],
+        "top_score": 0.78,
+        "top_base_score": 0.78,
+        "top_evidence_score": 0.760222,
+        "top_exact_coverage": 0.75,
+        "score_margin": 0.158042,
+        "supporting_candidate_count": 1,
+        "precision_requirement_count": 2,
+        "requirement_coverage": 1.0,
+        "concept_coverage": 1.0,
+        "evidence_chunk_ids": [
+          "Report_Q3_2025_Performance.pdf_p1_c0"
+        ],
+        "coherent_candidate_count": 1,
+        "coherent_chunk_ids": [
+          "Report_Q3_2025_Performance.pdf_p1_c0"
+        ],
+        "requires_coherent_evidence": true,
+        "strictly_supported": true
+      },
+      "retrieval_time_ms": 7103.82,
+      "build_version": "rag-bilingual-grounding-v10-20260724"
+    }
+  ]
+}

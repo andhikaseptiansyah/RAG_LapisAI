@@ -1,0 +1,14 @@
+chroma_db/
+uploads/*
+!uploads/__init__.py
+!uploads/config.py
+!uploads/ingest.py
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+env/
+query_logs.json
+users_store.json
+.auth_secret

@@ -1,0 +1,28 @@
+{
+  "project": "LapisAI Enterprise Knowledge Assistant",
+  "dataset": "Nusantara Dynamics Official Ground Truth Q&A",
+  "ground_truth": "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\evaluation\\ground_truth_qa.csv",
+  "evaluation": "Official 30-question Generation Quality Evaluation",
+  "total_questions": 30,
+  "question_counts": {
+    "answerable": 30,
+    "unanswerable": 0
+  },
+  "metrics": {
+    "normalized_exact_match": 0.0333,
+    "token_f1": 0.5375,
+    "faithfulness_1_to_5": 4.8667,
+    "answer_relevance_1_to_5": 4.8,
+    "context_precision_1_to_5": 5.0,
+    "context_recall_1_to_5": 5.0,
+    "citation_accuracy_1_to_5": 5.0,
+    "hallucination_rate": 0.0,
+    "false_refusal_rate": 0.0,
+    "unanswerable_safety_rate": null
+  },
+  "notes": [
+    "The official CSV contains only answerable questions.",
+    "Source accuracy is evaluated at document level because the CSV has no page labels.",
+    "Faithfulness and answer relevance use the configured deterministic LLM judge."
+  ]
+}

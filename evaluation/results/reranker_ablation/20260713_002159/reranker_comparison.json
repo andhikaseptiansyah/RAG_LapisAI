@@ -1,0 +1,26 @@
+{
+  "split": "development",
+  "candidate_k_per_retriever": 20,
+  "minimum_score": 0.3,
+  "without_reranker": {
+    "page_mrr": 0.985714,
+    "page_hit_at_1": 0.971429,
+    "page_recall_at_5": 0.985714,
+    "false_positive_rate": 0.2,
+    "mean_latency_ms": 136.015
+  },
+  "with_reranker": {
+    "page_mrr": 0.971429,
+    "page_hit_at_1": 0.971429,
+    "page_recall_at_5": 0.957143,
+    "false_positive_rate": 0.0,
+    "mean_latency_ms": 1224.536
+  },
+  "delta": {
+    "page_mrr": -0.014285,
+    "page_hit_at_1": 0.0,
+    "page_recall_at_5": -0.028571,
+    "false_positive_rate": -0.2,
+    "mean_latency_ms": 1088.521
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "questions": 30,
+  "records": 84,
+  "documents": 50,
+  "hit_at_1": 27,
+  "hit_at_3": 30,
+  "hit_at_5": 30,
+  "answerability_pass": 30,
+  "selected_expected_source": 29,
+  "average_generation_contexts": 1.0,
+  "generation_context_distribution": {
+    "1": 30
+  },
+  "failures": []
+}

@@ -1,0 +1,1 @@
+import{d as s,a as r}from"./index-D0knymfK.js";const o=async(e={},t)=>{const a=s({range:e.range??"daily",page:e.page??1,limit:e.limit??25,status:e.status,search:e.search});return r(`/api/admin/query-logs/dashboard${a}`,{method:"GET",signal:t})};export{o as g};

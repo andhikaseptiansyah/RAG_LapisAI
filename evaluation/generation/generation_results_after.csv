@@ -1,0 +1,46 @@
+ID,Answerable,Abstained,Answerability Correct,Faithfulness,Answer Relevance,Context Precision,Context Recall,Citation Accuracy,Hallucination,Judge Reason
+FAQ-008,True,True,False,2.0,2.0,5.0,3.0,3.0,0,system answer tidak menyebutkan nominal maksimal IDR 1.500.000 yang tercantum dalam expected answer
+FAQ-009,True,True,False,1.0,1.0,2.0,5.0,1.0,0,sistem abstain meski konteks 2 jelas menyebutkan tindakan yang diharapkan
+FAQ-010,True,True,False,1.0,1.0,2.0,5.0,4.0,0,System answer abstains despite relevant context containing exact answer
+FAQ-013,True,False,True,5.0,1.0,1.0,1.0,1.0,0,konteks tidak mencakup aturan pajak atau keterlambatan
+FAQ-017,True,True,False,5.0,1.0,1.0,1.0,1.0,0,Tidak ada konteks relevan untuk menjawab pertanyaan.
+FAQ-018,True,True,False,5.0,1.0,1.0,1.0,1.0,0,Jawaban benar-benar tidak relevan dengan expected answer
+POL-008,True,True,False,1.0,1.0,2.0,5.0,4.0,0,tidak ada konteks relevan yang digunakan
+POL-009,True,False,True,5.0,5.0,3.0,5.0,4.0,0,Answer matches retrieved context and expected answer exactly.
+POL-010,True,False,True,5.0,1.0,2.0,3.0,3.0,0,jawaban tidak menyebutkan pengecualian libur nasional yang tidak terdapat dalam context
+POL-013,True,True,False,5.0,1.0,2.0,5.0,1.0,0,Tidak ada informasi tentang durasi penerbangan internasional dalam konteks
+POL-014,True,True,False,1.0,1.0,2.0,5.0,4.0,0,tidak ada konteks relevan untuk pertanyaan
+POL-017,True,True,False,1.0,1.0,3.0,5.0,3.0,0,sistem tidak menggunakan konteks yang relevan untuk menjawab
+POL-018,True,True,False,1.0,1.0,2.0,5.0,5.0,0,konteks tidak menyebutkan klasifikasi PII
+REP-008,True,True,False,1.0,1.0,5.0,5.0,5.0,0,sistem abstain meski konteks sudah menyatakan 'none data loss'
+REP-009,True,True,False,1.0,1.0,1.0,1.0,1.0,0,tidak ada klaim faktual karena konteks kosong
+REP-010,True,True,False,1.0,1.0,2.0,5.0,4.0,0,sistem tidak menggunakan konteks yang relevan untuk menjawab
+REP-013,True,True,False,1.0,1.0,1.0,1.0,1.0,0,"retrieved context empty, no specific claims made"
+REP-014,True,False,True,1.0,1.0,2.0,5.0,4.0,0,konteks tidak menyebutkan vendor dengan skor terendah
+REP-017,True,False,True,1.0,1.0,2.0,5.0,4.0,0,Jawaban tidak relevan dengan pertanyaan dan tidak didukung konteks
+REP-018,True,True,False,5.0,1.0,1.0,1.0,1.0,0,konteks tidak menyebutkan survei atau penilaian pelanggan
+SOP-008,True,True,False,1.0,1.0,2.0,5.0,4.0,0,"konteks tidak mendukung jawaban, sistem memilih abstain"
+SOP-009,True,True,False,1.0,1.0,1.0,1.0,1.0,0,Sistem tidak memberikan jawaban karena konteks tidak relevan dengan pertanyaan
+SOP-010,True,True,False,1.0,1.0,5.0,5.0,5.0,0,sistem gagal menggunakan konteks yang relevan untuk menjawab
+SOP-013,True,True,False,1.0,1.0,2.0,5.0,4.0,0,tidak ada konteks tentang NDA untuk vendor
+SOP-014,True,True,False,1.0,1.0,2.0,3.0,3.0,0,sistem tidak menggunakan konteks relevan yang tersedia
+SOP-017,True,True,False,1.0,1.0,1.0,1.0,1.0,0,konteks tidak menyebutkan hari onboarding atau orientasi teknis
+SOP-018,True,False,True,5.0,5.0,2.0,5.0,4.0,0,Jawaban sesuai konteks dan kata kunci utama.
+TECH-008,True,True,False,1.0,1.0,1.0,1.0,1.0,0,tidak ada konteks yang mendukung klaim tentang SLO 99.9% per bulan
+TECH-009,True,True,False,1.0,1.0,1.0,1.0,1.0,0,"konteks kosong, jawaban abstain tanpa klaim baru"
+TECH-010,True,True,False,1.0,1.0,3.0,5.0,4.0,0,sistem abstain meski konteks 2 sudah menyediakan jawaban
+TECH-013,True,True,False,1.0,1.0,1.0,1.0,1.0,0,Jawaban tidak menyediakan informasi yang relevan dengan expected answer.
+TECH-014,True,False,True,5.0,5.0,5.0,5.0,5.0,0,Jawaban sesuai konteks dan expected answer tanpa klaim tambahan
+TECH-017,True,False,True,5.0,1.0,2.0,5.0,4.0,0,Jawaban sesuai konteks tetapi tidak sesuai dengan expected answer
+TECH-018,True,True,False,5.0,1.0,3.0,5.0,4.0,0,tidak ada konteks relevan
+NEG-006,False,True,True,5.0,5.0,,,,0,tidak ada URL dalam konteks
+NEG-007,False,True,True,5.0,5.0,,,,0,jawaban sesuai dengan konteks yang diberikan dan tidak mengarang
+NEG-008,False,True,True,5.0,5.0,,,,0,jawaban sesuai dengan konteks yang tidak menyebutkan jadwal latihan failover
+NEG-009,False,True,True,1.0,1.0,,,,0,tidak ada konteks yang memberikan langkah-langkah sistematis
+NEG-010,False,True,True,1.0,1.0,,,,0,tidak ada informasi CRM dalam konteks
+NEG-013,False,True,True,1.0,1.0,,,,0,"retrieved context kosong, jawaban abstain tanpa klaim"
+NEG-014,False,True,True,5.0,5.0,,,,0,Jawaban sesuai dengan konteks yang diberikan dan tidak mengarang
+NEG-015,False,True,True,5.0,5.0,,,,0,"Jawaban sesuai konteks dan tidak mengarang, menolak pertanyaan dengan jelas."
+NEG-018,False,True,True,1.0,1.0,,,,0,"konteks yang diperoleh kosong, tidak ada informasi untuk menjawab"
+NEG-019,False,True,True,1.0,1.0,,,,0,"konteks kosong, jawaban abstain"
+NEG-020,False,True,True,5.0,5.0,,,,0,System correctly abstains due to lack of relevant context.

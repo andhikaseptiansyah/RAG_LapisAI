@@ -1,0 +1,13 @@
+{
+  "project": "LapisAI Enterprise Knowledge Assistant",
+  "evaluation": "Answer Generation Quality Evaluation",
+  "total_questions": 45,
+  "metrics": {
+    "faithfulness": 4.2,
+    "answer_relevance": 2.38,
+    "context_precision": 1.0,
+    "context_recall": 1.98,
+    "citation_accuracy": 1.98,
+    "hallucination_rate": 0.07
+  }
+}

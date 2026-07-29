@@ -1,0 +1,26 @@
+{
+  "split": "test",
+  "candidate_k_per_retriever": 20,
+  "minimum_score": 0.3,
+  "without_reranker": {
+    "page_mrr": 1.0,
+    "page_hit_at_1": 1.0,
+    "page_recall_at_5": 0.966667,
+    "false_positive_rate": 1.0,
+    "mean_latency_ms": 273.287
+  },
+  "with_reranker": {
+    "page_mrr": 0.855556,
+    "page_hit_at_1": 0.8,
+    "page_recall_at_5": 0.866667,
+    "false_positive_rate": 0.4,
+    "mean_latency_ms": 1317.494
+  },
+  "delta": {
+    "page_mrr": -0.144444,
+    "page_hit_at_1": -0.2,
+    "page_recall_at_5": -0.1,
+    "false_positive_rate": -0.6,
+    "mean_latency_ms": 1044.207
+  }
+}

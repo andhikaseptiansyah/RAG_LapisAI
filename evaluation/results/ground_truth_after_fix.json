@@ -1,0 +1,464 @@
+{
+  "summary": {
+    "questions": 30,
+    "answerability_pass": 30,
+    "answerability_rate": 1.0,
+    "source_hit_at_1": 27,
+    "source_hit_at_3": 30,
+    "source_hit_at_5": 30,
+    "collection_records": 84,
+    "evaluation_mode": "sqlite_bm25_answerability_regression"
+  },
+  "details": [
+    {
+      "question": "How long is the probation period for new employees?",
+      "expected_source": "sop_onboarding.pdf",
+      "answerable": true,
+      "answerability_score": 0.94288,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "sop_onboarding.pdf",
+        "report_hiring_h1_2025.pdf",
+        "faq_onboarding.txt",
+        "faq_it_support.txt",
+        "sop_offboarding.pdf"
+      ]
+    },
+    {
+      "question": "How quickly must a P1 IT incident be resolved?",
+      "expected_source": "sop_it_incident_handling.pdf",
+      "answerable": true,
+      "answerability_score": 0.9298,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "sop_it_incident_handling.pdf",
+        "report_incident_postmortem.pdf",
+        "policy_data_security.docx",
+        "policy_code_of_conduct.docx",
+        "policy_code_of_conduct.docx"
+      ]
+    },
+    {
+      "question": "What approval is needed for a purchase above IDR 50 million?",
+      "expected_source": "sop_procurement.pdf",
+      "answerable": true,
+      "answerability_score": 0.93166,
+      "failed_checks": [],
+      "source_rank": 2,
+      "top_sources": [
+        "policy_procurement_threshold.docx",
+        "sop_procurement.pdf",
+        "policy_procurement_threshold.docx",
+        "policy_procurement_threshold.docx",
+        "sop_expense_reimbursement.pdf"
+      ]
+    },
+    {
+      "question": "What is the deadline to submit an expense claim?",
+      "expected_source": "sop_expense_reimbursement.pdf",
+      "answerable": true,
+      "answerability_score": 0.90208,
+      "failed_checks": [],
+      "source_rank": 2,
+      "top_sources": [
+        "policy_travel_expense.docx",
+        "sop_expense_reimbursement.pdf",
+        "policy_travel_expense.docx",
+        "policy_travel_expense.docx",
+        "policy_travel_expense.docx"
+      ]
+    },
+    {
+      "question": "How much advance notice is required for annual leave?",
+      "expected_source": "sop_leave_request.pdf",
+      "answerable": true,
+      "answerability_score": 0.9028,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "sop_leave_request.pdf",
+        "policy_leave.docx",
+        "policy_leave.docx",
+        "policy_leave.docx",
+        "policy_leave.docx"
+      ]
+    },
+    {
+      "question": "How often are full database backups taken?",
+      "expected_source": "sop_data_backup.pdf",
+      "answerable": true,
+      "answerability_score": 0.92224,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "sop_data_backup.pdf",
+        "tech_database_schema.txt",
+        "policy_data_security.docx",
+        "report_financial_fy2025.pdf",
+        "tech_system_architecture.txt"
+      ]
+    },
+    {
+      "question": "When must IT revoke a departing employee's access?",
+      "expected_source": "sop_offboarding.pdf",
+      "answerable": true,
+      "answerability_score": 0.906976,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "sop_offboarding.pdf",
+        "faq_facilities.txt",
+        "sop_onboarding.pdf",
+        "report_it_audit_2025.pdf",
+        "sop_access_provisioning.pdf"
+      ]
+    },
+    {
+      "question": "How many days per week can employees work from home?",
+      "expected_source": "policy_wfh.docx",
+      "answerable": true,
+      "answerability_score": 0.939829,
+      "failed_checks": [],
+      "source_rank": 2,
+      "top_sources": [
+        "faq_remote_work.txt",
+        "policy_wfh.docx",
+        "policy_wfh.docx",
+        "policy_leave.docx",
+        "policy_wfh.docx"
+      ]
+    },
+    {
+      "question": "Who must a suspected data breach be reported to and how fast?",
+      "expected_source": "policy_data_security.docx",
+      "answerable": true,
+      "answerability_score": 0.8376,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "policy_data_security.docx",
+        "policy_data_security.docx",
+        "policy_data_security.docx",
+        "policy_data_security.docx",
+        "policy_data_security.docx"
+      ]
+    },
+    {
+      "question": "How many annual leave days do employees get?",
+      "expected_source": "policy_leave.docx",
+      "answerable": true,
+      "answerability_score": 0.91279,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "policy_leave.docx",
+        "sop_leave_request.pdf",
+        "policy_leave.docx",
+        "policy_leave.docx",
+        "faq_remote_work.txt"
+      ]
+    },
+    {
+      "question": "What are the password requirements?",
+      "expected_source": "policy_password.docx",
+      "answerable": true,
+      "answerability_score": 0.90514,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "policy_password.docx",
+        "policy_password.docx",
+        "policy_password.docx",
+        "policy_password.docx",
+        "faq_it_support.txt"
+      ]
+    },
+    {
+      "question": "What is the domestic meal per diem?",
+      "expected_source": "policy_travel_expense.docx",
+      "answerable": true,
+      "answerability_score": 0.84525,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "policy_travel_expense.docx",
+        "policy_travel_expense.docx",
+        "sop_travel_booking.pdf",
+        "tech_internal_api_guide.txt",
+        "policy_leave.docx"
+      ]
+    },
+    {
+      "question": "What was Q3 2025 revenue?",
+      "expected_source": "report_q3_2025_performance.pdf",
+      "answerable": true,
+      "answerability_score": 0.91738,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_q3_2025_performance.pdf",
+        "report_financial_fy2025.pdf",
+        "report_csat_2025.pdf",
+        "report_hiring_h1_2025.pdf",
+        "report_it_audit_2025.pdf"
+      ]
+    },
+    {
+      "question": "What was the root cause of the October 2025 outage?",
+      "expected_source": "report_incident_postmortem.pdf",
+      "answerable": true,
+      "answerability_score": 0.93088,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_incident_postmortem.pdf",
+        "report_q3_2025_performance.pdf",
+        "report_csat_2025.pdf",
+        "report_hiring_h1_2025.pdf",
+        "report_financial_fy2025.pdf"
+      ]
+    },
+    {
+      "question": "What was the 2025 overall CSAT score?",
+      "expected_source": "report_csat_2025.pdf",
+      "answerable": true,
+      "answerability_score": 0.9514,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_csat_2025.pdf",
+        "report_csat_2025.pdf",
+        "report_q3_2025_performance.pdf",
+        "report_vendor_evaluation.pdf",
+        "report_hiring_h1_2025.pdf"
+      ]
+    },
+    {
+      "question": "How many security incidents occurred in 2025?",
+      "expected_source": "report_security_review_2025.pdf",
+      "answerable": true,
+      "answerability_score": 0.9136,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_security_review_2025.pdf",
+        "policy_data_security.docx",
+        "sop_it_incident_handling.pdf",
+        "policy_data_security.docx",
+        "policy_data_security.docx"
+      ]
+    },
+    {
+      "question": "What was full-year 2025 revenue?",
+      "expected_source": "report_financial_fy2025.pdf",
+      "answerable": true,
+      "answerability_score": 0.89749,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_financial_fy2025.pdf",
+        "report_q3_2025_performance.pdf",
+        "policy_leave.docx",
+        "policy_leave.docx",
+        "policy_data_security.docx"
+      ]
+    },
+    {
+      "question": "What database does the platform use?",
+      "expected_source": "tech_system_architecture.txt",
+      "answerable": true,
+      "answerability_score": 0.9244,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_system_architecture.txt",
+        "tech_database_schema.txt",
+        "policy_data_security.docx",
+        "policy_data_security.docx",
+        "tech_deployment_runbook.txt"
+      ]
+    },
+    {
+      "question": "How long are internal API tokens valid?",
+      "expected_source": "tech_internal_api_guide.txt",
+      "answerable": true,
+      "answerability_score": 0.97552,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_internal_api_guide.txt",
+        "report_hiring_h1_2025.pdf",
+        "faq_onboarding.txt",
+        "sop_customer_complaint.pdf",
+        "sop_offboarding.pdf"
+      ]
+    },
+    {
+      "question": "What are the RTO and RPO?",
+      "expected_source": "tech_disaster_recovery.txt",
+      "answerable": true,
+      "answerability_score": 0.8376,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_disaster_recovery.txt",
+        "report_hiring_h1_2025.pdf",
+        "sop_customer_complaint.pdf",
+        "faq_remote_work.txt",
+        "sop_offboarding.pdf"
+      ]
+    },
+    {
+      "question": "What is the API availability SLO?",
+      "expected_source": "tech_monitoring_guide.txt",
+      "answerable": true,
+      "answerability_score": 0.9352,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_monitoring_guide.txt",
+        "tech_internal_api_guide.txt",
+        "tech_disaster_recovery.txt",
+        "report_incident_postmortem.pdf",
+        "faq_benefits.txt"
+      ]
+    },
+    {
+      "question": "How long are audit logs retained?",
+      "expected_source": "tech_data_retention.txt",
+      "answerable": true,
+      "answerability_score": 0.87636,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_data_retention.txt",
+        "report_it_audit_2025.pdf",
+        "report_hiring_h1_2025.pdf",
+        "sop_customer_complaint.pdf",
+        "sop_offboarding.pdf"
+      ]
+    },
+    {
+      "question": "What unit-test coverage is required to merge code?",
+      "expected_source": "tech_cicd_pipeline.txt",
+      "answerable": true,
+      "answerability_score": 0.9244,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "tech_cicd_pipeline.txt",
+        "policy_code_of_conduct.docx",
+        "sop_data_backup.pdf",
+        "policy_code_of_conduct.docx",
+        "faq_benefits.txt"
+      ]
+    },
+    {
+      "question": "How do I reset my password?",
+      "expected_source": "faq_it_support.txt",
+      "answerable": true,
+      "answerability_score": 0.9082,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_it_support.txt",
+        "policy_password.docx",
+        "policy_password.docx",
+        "policy_password.docx",
+        "policy_password.docx"
+      ]
+    },
+    {
+      "question": "When is payday?",
+      "expected_source": "faq_payroll.txt",
+      "answerable": true,
+      "answerability_score": 0.8322,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_payroll.txt",
+        "sop_expense_reimbursement.pdf",
+        "faq_benefits.txt",
+        "faq_email_calendar.txt",
+        "faq_facilities.txt"
+      ]
+    },
+    {
+      "question": "What is the mailbox size limit?",
+      "expected_source": "faq_email_calendar.txt",
+      "answerable": true,
+      "answerability_score": 0.928,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_email_calendar.txt",
+        "tech_internal_api_guide.txt",
+        "policy_wfh.docx",
+        "faq_benefits.txt",
+        "faq_facilities.txt"
+      ]
+    },
+    {
+      "question": "What should I bring on my first day?",
+      "expected_source": "faq_onboarding.txt",
+      "answerable": true,
+      "answerability_score": 0.946,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_onboarding.txt",
+        "sop_customer_complaint.pdf",
+        "policy_byod.docx",
+        "policy_travel_expense.docx",
+        "sop_onboarding.pdf"
+      ]
+    },
+    {
+      "question": "Is there a home-office allowance?",
+      "expected_source": "faq_remote_work.txt",
+      "answerable": true,
+      "answerability_score": 0.90667,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_remote_work.txt",
+        "faq_benefits.txt",
+        "policy_wfh.docx",
+        "report_sustainability_2025.pdf",
+        "policy_wfh.docx"
+      ]
+    },
+    {
+      "question": "What is the replacement fee for an access card?",
+      "expected_source": "faq_facilities.txt",
+      "answerable": true,
+      "answerability_score": 0.90973,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "faq_facilities.txt",
+        "sop_offboarding.pdf",
+        "sop_access_provisioning.pdf",
+        "faq_software_access.txt",
+        "policy_password.docx"
+      ]
+    },
+    {
+      "question": "How many new enterprise customers were added in Q3 2025?",
+      "expected_source": "report_q3_2025_performance.pdf",
+      "answerable": true,
+      "answerability_score": 0.92548,
+      "failed_checks": [],
+      "source_rank": 1,
+      "top_sources": [
+        "report_q3_2025_performance.pdf",
+        "report_security_review_2025.pdf",
+        "tech_database_schema.txt",
+        "faq_it_support.txt",
+        "report_sustainability_2025.pdf"
+      ]
+    }
+  ]
+}

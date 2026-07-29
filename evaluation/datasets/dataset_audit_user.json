@@ -1,0 +1,30 @@
+{
+  "files": {
+    "EN": {
+      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_english.csv",
+      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_english_user.csv",
+      "original_rows": 50,
+      "cleaned": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    },
+    "ID": {
+      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_indonesia.csv",
+      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_indonesia_user.csv",
+      "original_rows": 50,
+      "cleaned": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    }
+  },
+  "duplicates_removed": [],
+  "combined": {
+    "total": 100,
+    "answerable": 90,
+    "unanswerable": 10
+  }
+}

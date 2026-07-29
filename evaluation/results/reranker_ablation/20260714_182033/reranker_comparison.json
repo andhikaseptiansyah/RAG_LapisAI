@@ -1,0 +1,35 @@
+{
+  "dataset": "Nusantara Dynamics Official Ground Truth Q&A",
+  "ground_truth": "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI\\evaluation\\ground_truth_qa.csv",
+  "split": "all",
+  "primary_level": "document",
+  "candidate_k_per_retriever": 20,
+  "minimum_score": 0.3,
+  "reranker_model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+  "reranker_weight": 0.25,
+  "ranking_strategy": "blended_hybrid_plus_cross_encoder",
+  "answerability_min_base_score": 0.22,
+  "answerability_pre_rerank_veto": false,
+  "unanswerable_evaluated": false,
+  "without_reranker": {
+    "mrr": 0.983333,
+    "hit_at_1": 0.966667,
+    "hit_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "mean_latency_ms": 1126.265
+  },
+  "with_reranker": {
+    "mrr": 1.0,
+    "hit_at_1": 1.0,
+    "hit_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "mean_latency_ms": 2326.592
+  },
+  "delta": {
+    "mrr": 0.016667,
+    "hit_at_1": 0.033333,
+    "hit_at_3": 0.0,
+    "recall_at_5": 0.0,
+    "mean_latency_ms": 1200.327
+  }
+}

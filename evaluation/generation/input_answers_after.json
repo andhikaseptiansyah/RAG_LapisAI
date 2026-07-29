@@ -1,0 +1,2937 @@
+[
+  {
+    "id": "FAQ-008",
+    "question": "Jika saya membeli meja ergonomis senilai Rp 2.000.000 untuk keperluan WFH, berapa nominal maksimal yang akan diganti perusahaan, dan apakah saya wajib melampirkan nota asli?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Expense_Reimbursement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "score": 0.521031,
+        "semantic_score": 0.433914,
+        "keyword_score": 1.0,
+        "reranker_score": 0.013785,
+        "evidence_score": 0.84,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nNominal maksimal yang akan diganti tidak disebutkan dalam konteks, tetapi Anda wajib melampirkan nota asli karena pengeluaran melebihi Rp 150.000.\n\nSumber:\n- SOP_Expense_Reimbursement.pdf, p. 1 (84%)\n\nConfidence: 84%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.84
+  },
+  {
+    "id": "FAQ-009",
+    "question": "Jika ada email masuk yang mendesak dari CEO meminta detail transfer kawat, tetapi alamat pengirimnya terlihat sedikit salah eja, apa yang harus saya lakukan?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Email_Calendar.txt\nPage: 1\nContent: Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.\n\n[CONTEXT 2]\nDocument: FAQ_Security_Awareness.txt\nPage: 1\nContent: Nusantara Dynamics Security Awareness FAQ ====================== ## Phishing Q: What do I do if I receive a suspicious email? A: Do not click links; report it using the Report Phishing button. ## Lost Device Q: What if I lose my laptop? A: Report it to IT immediately so the device can be remotely wiped.\n\n[CONTEXT 3]\nDocument: Policy_BYOD.docx\nPage: 1\nContent: Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.\n\n[CONTEXT 4]\nDocument: Policy_Password.docx\nPage: 1\nContent: Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Email_Calendar.txt_p1_c0",
+        "content": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "score": 0.371629,
+        "semantic_score": 0.258078,
+        "keyword_score": 1.0,
+        "reranker_score": 3.8e-05,
+        "evidence_score": 0.43,
+        "evidence_supported": false
+      },
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Security_Awareness.txt_p1_c0",
+        "content": "Nusantara Dynamics Security Awareness FAQ ====================== ## Phishing Q: What do I do if I receive a suspicious email? A: Do not click links; report it using the Report Phishing button. ## Lost Device Q: What if I lose my laptop? A: Report it to IT immediately so the device can be remotely wiped.",
+        "score": 0.325723,
+        "semantic_score": 0.304158,
+        "keyword_score": 0.710557,
+        "reranker_score": 0.000274,
+        "evidence_score": 0.43,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1",
+        "chunk_id": "Policy_BYOD.docx_p1_c0",
+        "content": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.",
+        "score": 0.307253,
+        "semantic_score": 0.28941,
+        "keyword_score": 0.664861,
+        "reranker_score": 0.000347,
+        "evidence_score": 0.43,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1",
+        "chunk_id": "Policy_Password.docx_p1_c0",
+        "content": "Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "score": 0.230385,
+        "semantic_score": 0.157723,
+        "keyword_score": 0.624688,
+        "reranker_score": 8.2e-05,
+        "evidence_score": 0.43,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "FAQ-010",
+    "question": "Siapa yang memegang otoritas persetujuan akhir ketika seorang developer membutuhkan lisensi untuk IDE perangkat lunak baru?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 2]\nDocument: FAQ_Software_Access.txt\nPage: 1\nContent: Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.\n\n[CONTEXT 3]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.243827,
+        "semantic_score": 0.476249,
+        "keyword_score": 0.0,
+        "reranker_score": 0.003763,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Software_Access.txt_p1_c0",
+        "content": "Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.",
+        "score": 0.227997,
+        "semantic_score": 0.446907,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000296,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.220905,
+        "semantic_score": 0.432678,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000959,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "FAQ-013",
+    "question": "Will my pay be docked if I badge into the office 15 minutes after my scheduled shift starts?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Remote_Work.txt\nPage: 1\nContent: Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.\n\n[CONTEXT 2]\nDocument: TECH_Internal_API_Guide.txt\nPage: 1\nContent: Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token. Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.\n\n[CONTEXT 3]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.\n\n[CONTEXT 4]\nDocument: Report_Sustainability_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025.\n\n[CONTEXT 5]\nDocument: Report_Incident_Postmortem.pdf\nPage: 1\nContent: Nusantara Dynamics Incident Postmortem - October 2025 Outage Duration The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. Root Cause The root cause was an expired TLS certificate on the API gateway. Action A certificate auto-renewal job was implemented as a corrective action.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Remote_Work.txt_p1_c0",
+        "content": "Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "score": 0.482295,
+        "semantic_score": 0.344068,
+        "keyword_score": 1.0,
+        "reranker_score": 2.7e-05,
+        "evidence_score": 0.860909,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "1",
+        "chunk_id": "TECH_Internal_API_Guide.txt_p1_c0",
+        "content": "Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token. Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+        "score": 0.34183,
+        "semantic_score": 0.270048,
+        "keyword_score": 0.850393,
+        "reranker_score": 4.6e-05,
+        "evidence_score": 0.180909,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.272976,
+        "semantic_score": 0.329634,
+        "keyword_score": 0.436886,
+        "reranker_score": 4.3e-05,
+        "evidence_score": 0.180909,
+        "evidence_supported": false
+      },
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Sustainability_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025.",
+        "score": 0.254482,
+        "semantic_score": 0.0,
+        "keyword_score": 0.625768,
+        "reranker_score": 3.5e-05,
+        "evidence_score": 0.845455,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1",
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+        "content": "Nusantara Dynamics Incident Postmortem - October 2025 Outage Duration The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. Root Cause The root cause was an expired TLS certificate on the API gateway. Action A certificate auto-renewal job was implemented as a corrective action.",
+        "score": 0.247122,
+        "semantic_score": 0.301571,
+        "keyword_score": 0.388788,
+        "reranker_score": 4.7e-05,
+        "evidence_score": 0.165455,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ada informasi dalam konteks yang menyebutkan aturan tentang potongan gaji akibat keterlambatan masuk kantor. Pertanyaan ini tidak dapat dijawab berdasarkan dokumen yang diberikan.\n\nSumber:\n- FAQ_Remote_Work.txt, p. 1 (86%)\n- Report_Sustainability_2025.pdf, p. 1 (25%)\n\nConfidence: 86%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.860909
+  },
+  {
+    "id": "FAQ-017",
+    "question": "Apakah ada aturan berpakaian (dress code) khusus saat ada jadwal bertemu klien di hari kerja?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Code_of_Conduct.docx\nPage: 1\nContent: Nusantara Dynamics Code of Conduct Principles Employees must act with integrity, respect, and professionalism at all times. Conflict of Interest Any potential conflict of interest must be disclosed to HR in writing.\n\n[CONTEXT 2]\nDocument: TECH_Coding_Standards.txt\nPage: 1\nContent: Nusantara Dynamics Coding Standards ================ ## Style Python code follows PEP 8 and is formatted with Black. JavaScript uses the Airbnb style guide. ## Reviews Every pull request requires at least one approving review.\n\n[CONTEXT 3]\nDocument: Policy_WFH.docx\nPage: 1\nContent: Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Coding_Standards.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1",
+        "chunk_id": "Policy_Code_of_Conduct.docx_p1_c0",
+        "content": "Nusantara Dynamics Code of Conduct Principles Employees must act with integrity, respect, and professionalism at all times. Conflict of Interest Any potential conflict of interest must be disclosed to HR in writing.",
+        "score": 0.423398,
+        "semantic_score": 0.359438,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000338,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Coding_Standards.txt",
+        "page": "1",
+        "chunk_id": "TECH_Coding_Standards.txt_p1_c0",
+        "content": "Nusantara Dynamics Coding Standards ================ ## Style Python code follows PEP 8 and is formatted with Black. JavaScript uses the Airbnb style guide. ## Reviews Every pull request requires at least one approving review.",
+        "score": 0.28916,
+        "semantic_score": 0.245443,
+        "keyword_score": 0.683065,
+        "reranker_score": 0.000194,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c0",
+        "content": "Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "score": 0.205057,
+        "semantic_score": 0.402029,
+        "keyword_score": 0.0,
+        "reranker_score": 8.9e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "FAQ-018",
+    "question": "Berapa lama durasi periode evaluasi sebelum saya resmi diangkat menjadi pegawai tetap (PKWTT)?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Hiring_H1_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.\n\n[CONTEXT 2]\nDocument: SOP_Offboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.\n\n[CONTEXT 3]\nDocument: SOP_Customer_Complaint.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.\n\n[CONTEXT 4]\nDocument: FAQ_Remote_Work.txt\nPage: 1\nContent: Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.\n\n[CONTEXT 5]\nDocument: SOP_IT_Incident_Handling.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+        "score": 0.546391,
+        "semantic_score": 0.50245,
+        "keyword_score": 1.0,
+        "reranker_score": 0.00037,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "score": 0.492062,
+        "semantic_score": 0.382593,
+        "keyword_score": 0.987479,
+        "reranker_score": 0.001235,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+        "score": 0.482752,
+        "semantic_score": 0.391604,
+        "keyword_score": 0.919187,
+        "reranker_score": 0.0046,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Remote_Work.txt_p1_c0",
+        "content": "Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "score": 0.464409,
+        "semantic_score": 0.437424,
+        "keyword_score": 0.736638,
+        "reranker_score": 5.8e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1",
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "score": 0.453709,
+        "semantic_score": 0.386918,
+        "keyword_score": 0.790719,
+        "reranker_score": 0.000819,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nInformasi tentang durasi periode evaluasi untuk menjadi pegawai tetap (PKWTT) tidak ditemukan dalam konteks dokumen yang diberikan.\n\nSumber:\n- Report_Hiring_H1_2025.pdf, p. 1 (83%)\n- SOP_Offboarding.pdf, p. 1 (49%)\n- SOP_Customer_Complaint.pdf, p. 1 (48%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "POL-008",
+    "question": "Tingkat manajerial mana yang harus memberikan otorisasi untuk pembelian peralatan server dengan harga IDR 25 juta?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 2]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.\n\n[CONTEXT 3]\nDocument: Report_Financial_FY2025.pdf\nPage: 1\nContent: Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.\n\n[CONTEXT 4]\nDocument: Policy_Travel_Expense.docx\nPage: 1\nContent: Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.\n\n[CONTEXT 5]\nDocument: Report_Q3_2025_Performance.pdf\nPage: 1\nContent: Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.603449,
+        "semantic_score": 0.576127,
+        "keyword_score": 0.751967,
+        "reranker_score": 0.516609,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.557027,
+        "semantic_score": 0.580522,
+        "keyword_score": 1.0,
+        "reranker_score": 0.083843,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+        "score": 0.368825,
+        "semantic_score": 0.405563,
+        "keyword_score": 0.674626,
+        "reranker_score": 0.000313,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1",
+        "chunk_id": "Policy_Travel_Expense.docx_p1_c0",
+        "content": "Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.",
+        "score": 0.364595,
+        "semantic_score": 0.323351,
+        "keyword_score": 0.831976,
+        "reranker_score": 4.7e-05,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1",
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+        "content": "Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "score": 0.347784,
+        "semantic_score": 0.421485,
+        "keyword_score": 0.553148,
+        "reranker_score": 0.000286,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "POL-009",
+    "question": "Berapa batas uang saku makan harian ketika melakukan perjalanan dinas di dalam negeri?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Travel_Expense.docx\nPage: 1\nContent: Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.\n\n[CONTEXT 2]\nDocument: Policy_Leave.docx\nPage: 1\nContent: Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly. Carryover A maximum of 6 unused leave days may be carried over to the next year. Sick Leave Sick leave beyond 2 consecutive days requires a doctor's certificate.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1",
+        "chunk_id": "Policy_Travel_Expense.docx_p1_c0",
+        "content": "Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.",
+        "score": 0.426068,
+        "semantic_score": 0.543945,
+        "keyword_score": 0.0,
+        "reranker_score": 0.594623,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1",
+        "chunk_id": "Policy_Leave.docx_p1_c0",
+        "content": "Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly. Carryover A maximum of 6 unused leave days may be carried over to the next year. Sick Leave Sick leave beyond 2 consecutive days requires a doctor's certificate.",
+        "score": 0.207446,
+        "semantic_score": 0.405763,
+        "keyword_score": 0.0,
+        "reranker_score": 0.002027,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBatas uang saku makan harian untuk perjalanan dinas dalam negeri adalah IDR 250.000 per hari, sesuai dengan kebijakan yang tercantum dalam dokumen Policy_Travel_Expense.docx.\n\nSumber:\n- Policy_Travel_Expense.docx, p. 1 (62%)\n- Policy_Leave.docx, p. 1 (21%)\n\nConfidence: 62%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.62
+  },
+  {
+    "id": "POL-010",
+    "question": "Jika seorang desainer bekerja secara remote di luar kantor dan jadwalnya jatuh pada libur nasional, apakah ia tetap diwajibkan online di aplikasi tim pada jam 14.00 WIB?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_WFH.docx\nPage: 1\nContent: Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n\n[CONTEXT 2]\nDocument: FAQ_Remote_Work.txt\nPage: 1\nContent: Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.\n\n[CONTEXT 3]\nDocument: Policy_BYOD.docx\nPage: 1\nContent: Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.\n\n[CONTEXT 4]\nDocument: SOP_Data_Backup.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.\n\n[CONTEXT 5]\nDocument: TECH_Deployment_Runbook.txt\nPage: 1\nContent: Nusantara Dynamics Deployment Runbook ================== ## Process Deployments use a blue-green strategy. Rollback is performed by switching traffic back to the previous environment. ## Window Production deployments are scheduled on Tuesdays and Thursdays, 20:00-22:00 WIB.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Deployment_Runbook.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c0",
+        "content": "Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "score": 0.560621,
+        "semantic_score": 0.628982,
+        "keyword_score": 0.983508,
+        "reranker_score": 0.015193,
+        "evidence_score": 0.167895,
+        "evidence_supported": false
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Remote_Work.txt_p1_c0",
+        "content": "Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "score": 0.560611,
+        "semantic_score": 0.532277,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000126,
+        "evidence_score": 0.838947,
+        "evidence_supported": true
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1",
+        "chunk_id": "Policy_BYOD.docx_p1_c0",
+        "content": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.",
+        "score": 0.297069,
+        "semantic_score": 0.398375,
+        "keyword_score": 0.391044,
+        "reranker_score": 0.000189,
+        "evidence_score": 0.158947,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.",
+        "score": 0.262145,
+        "semantic_score": 0.325098,
+        "keyword_score": 0.401369,
+        "reranker_score": 6.5e-05,
+        "evidence_score": 0.158947,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Deployment_Runbook.txt",
+        "page": "1",
+        "chunk_id": "TECH_Deployment_Runbook.txt_p1_c0",
+        "content": "Nusantara Dynamics Deployment Runbook ================== ## Process Deployments use a blue-green strategy. Rollback is performed by switching traffic back to the previous environment. ## Window Production deployments are scheduled on Tuesdays and Thursdays, 20:00-22:00 WIB.",
+        "score": 0.228827,
+        "semantic_score": 0.246355,
+        "keyword_score": 0.429735,
+        "reranker_score": 0.000196,
+        "evidence_score": 0.158947,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nDesainer yang bekerja remote diwajibkan hadir dalam aplikasi tim selama jam core hours (10:00-16:00 WIB), termasuk jam 14:00 WIB. Namun, dokumen tidak menyebutkan pengecualian atau perubahan jadwal khusus untuk libur nasional. Kebijakan hanya mengatur batasan maksimal 2 hari kerja per minggu dan jam kerja core, tanpa merujuk pada hari\n\nSumber:\n- Policy_WFH.docx, p. 1 (63%)\n- FAQ_Remote_Work.txt, p. 1 (56%)\n\nConfidence: 63%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.628982
+  },
+  {
+    "id": "POL-013",
+    "question": "Under what exact flight-time conditions is a Director allowed to book a business-class flight for international travel?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Travel_Booking.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Class Economy class is standard for all domestic travel. Business class requires Director approval.\n\n[CONTEXT 2]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 3]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.\n\n[CONTEXT 4]\nDocument: Policy_Travel_Expense.docx\nPage: 1\nContent: Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.\n\n[CONTEXT 5]\nDocument: SOP_Customer_Complaint.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Travel_Booking.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Class Economy class is standard for all domestic travel. Business class requires Director approval.",
+        "score": 0.823334,
+        "semantic_score": 0.665705,
+        "keyword_score": 1.0,
+        "reranker_score": 0.975299,
+        "evidence_score": 0.65,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.247513,
+        "semantic_score": 0.421697,
+        "keyword_score": 0.134688,
+        "reranker_score": 0.000489,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.226024,
+        "semantic_score": 0.366088,
+        "keyword_score": 0.163654,
+        "reranker_score": 0.00017,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1",
+        "chunk_id": "Policy_Travel_Expense.docx_p1_c0",
+        "content": "Nusantara Dynamics Travel & Expense Policy Per Diem The domestic meal per diem is IDR 250,000 per day. Hotel Cap Hotel cost is capped at IDR 800,000 per night for domestic travel.",
+        "score": 0.218719,
+        "semantic_score": 0.29109,
+        "keyword_score": 0.292706,
+        "reranker_score": 5.5e-05,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+        "score": 0.215531,
+        "semantic_score": 0.175389,
+        "keyword_score": 0.316076,
+        "reranker_score": 9.5e-05,
+        "evidence_score": 0.5,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ditemukan informasi spesifik mengenai kondisi waktu penerbangan (flight-time) yang memungkinkan Direktur membooking kelas bisnis untuk perjalanan internasional dalam konteks dokumen yang diberikan. Dokumen hanya menyebutkan bahwa penerbangan domestik memerlukan persetujuan Direktur untuk kelas bisnis, tetapi tidak menjelaskan syarat waktu penerbangan internasional.\n\nSumber:\n- SOP_Travel_Booking.pdf, p. 1 (82%)\n- SOP_Procurement.pdf, p. 1 (25%)\n- SOP_Customer_Complaint.pdf, p. 1 (22%)\n\nConfidence: 82%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.823334
+  },
+  {
+    "id": "POL-014",
+    "question": "Do I need to officially disclose to HR if I start a romantic relationship with a coworker who works in a completely different department?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.\n\n[CONTEXT 2]\nDocument: SOP_Leave_Request.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Leave Request Notice Annual leave must be requested at least 5 working days in advance through the HR portal. Approval Leave is approved by the direct manager. Leave longer than 5 consecutive days also needs department head approval.\n\n[CONTEXT 3]\nDocument: Policy_Code_of_Conduct.docx\nPage: 1\nContent: Nusantara Dynamics Code of Conduct Principles Employees must act with integrity, respect, and professionalism at all times. Conflict of Interest Any potential conflict of interest must be disclosed to HR in writing.\n\n[CONTEXT 4]\nDocument: Policy_WFH.docx\nPage: 1\nContent: Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n\n[CONTEXT 5]\nDocument: SOP_Onboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.382996,
+        "semantic_score": 0.280364,
+        "keyword_score": 1.0,
+        "reranker_score": 4.3e-05,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Leave Request Notice Annual leave must be requested at least 5 working days in advance through the HR portal. Approval Leave is approved by the direct manager. Leave longer than 5 consecutive days also needs department head approval.",
+        "score": 0.343555,
+        "semantic_score": 0.379688,
+        "keyword_score": 0.624495,
+        "reranker_score": 0.000143,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1",
+        "chunk_id": "Policy_Code_of_Conduct.docx_p1_c0",
+        "content": "Nusantara Dynamics Code of Conduct Principles Employees must act with integrity, respect, and professionalism at all times. Conflict of Interest Any potential conflict of interest must be disclosed to HR in writing.",
+        "score": 0.301537,
+        "semantic_score": 0.44367,
+        "keyword_score": 0.312831,
+        "reranker_score": 0.000747,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c0",
+        "content": "Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "score": 0.238701,
+        "semantic_score": 0.348275,
+        "keyword_score": 0.254459,
+        "reranker_score": 4.1e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+        "score": 0.227804,
+        "semantic_score": 0.199825,
+        "keyword_score": 0.524515,
+        "reranker_score": 3.8e-05,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Code_of_Conduct.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "POL-017",
+    "question": "Jika manajer IT saya menyetujui pengadaan kursi WFH seharga Rp 15 juta, apakah pembelian itu otomatis diproses oleh Procurement?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 2]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.\n\n[CONTEXT 3]\nDocument: Policy_WFH.docx\nPage: 1\nContent: Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n\n[CONTEXT 4]\nDocument: SOP_Expense_Reimbursement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.491652,
+        "semantic_score": 0.542368,
+        "keyword_score": 0.868863,
+        "reranker_score": 0.026068,
+        "evidence_score": 0.44,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.479327,
+        "semantic_score": 0.468025,
+        "keyword_score": 1.0,
+        "reranker_score": 0.002535,
+        "evidence_score": 0.44,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c0",
+        "content": "Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "score": 0.282548,
+        "semantic_score": 0.232329,
+        "keyword_score": 0.683329,
+        "reranker_score": 0.000243,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "score": 0.217392,
+        "semantic_score": 0.425927,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000677,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "POL-018",
+    "question": "Masuk ke level klasifikasi data mana sebuah dokumen Excel yang berisi daftar lengkap nama dan nomor telepon pribadi seluruh klien kita?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Information_Classification.docx\nPage: 1\nContent: Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted. Handling Restricted data may only be accessed on company-managed devices and must never be emailed externally.\n\n[CONTEXT 2]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.\n\n[CONTEXT 3]\nDocument: Policy_Data_Security.docx\nPage: 1\nContent: Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.\n\n[CONTEXT 4]\nDocument: Policy_BYOD.docx\nPage: 1\nContent: Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.\n\n[CONTEXT 5]\nDocument: SOP_Data_Backup.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1",
+        "chunk_id": "Policy_Information_Classification.docx_p1_c0",
+        "content": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted. Handling Restricted data may only be accessed on company-managed devices and must never be emailed externally.",
+        "score": 0.321921,
+        "semantic_score": 0.31435,
+        "keyword_score": 0.563268,
+        "reranker_score": 0.003502,
+        "evidence_score": 0.466667,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.315148,
+        "semantic_score": 0.147302,
+        "keyword_score": 1.0,
+        "reranker_score": 9.7e-05,
+        "evidence_score": 0.433333,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1",
+        "chunk_id": "Policy_Data_Security.docx_p1_c0",
+        "content": "Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "score": 0.293415,
+        "semantic_score": 0.137234,
+        "keyword_score": 0.930898,
+        "reranker_score": 4.2e-05,
+        "evidence_score": 0.433333,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1",
+        "chunk_id": "Policy_BYOD.docx_p1_c0",
+        "content": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.",
+        "score": 0.252123,
+        "semantic_score": 0.249704,
+        "keyword_score": 0.5198,
+        "reranker_score": 8.6e-05,
+        "evidence_score": 0.433333,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.",
+        "score": 0.229527,
+        "semantic_score": 0.089083,
+        "keyword_score": 0.76698,
+        "reranker_score": 7.8e-05,
+        "evidence_score": 0.433333,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "REP-008",
+    "question": "Apakah ada catatan pelanggan yang berhasil dicuri selama peristiwa siber yang tercatat sepanjang tahun fiskal lalu?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Security_Review_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss. Phishing The annual phishing simulation click rate was 6%.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Security_Review_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss. Phishing The annual phishing simulation click rate was 6%.",
+        "score": 0.254108,
+        "semantic_score": 0.497653,
+        "keyword_score": 0.0,
+        "reranker_score": 0.001221,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "REP-009",
+    "question": "Seberapa sukses upaya penghematan daya di fasilitas operasi Jawa Barat tahun lalu?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "REP-010",
+    "question": "Siapa pemasok pihak ketiga dengan performa terbaik dalam tinjauan tahunan kita, dan berapa nilai yang mereka capai?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Vendor_Evaluation.pdf\nPage: 1\nContent: Nusantara Dynamics Vendor Evaluation Report 2025 Top Vendor PT Sumber Makmur scored highest with an overall rating of 4.6 out of 5.\n\n[CONTEXT 2]\nDocument: Report_Q3_2025_Performance.pdf\nPage: 1\nContent: Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.\n\n[CONTEXT 3]\nDocument: Policy_Procurement_Threshold.docx\nPage: 1\nContent: Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1",
+        "chunk_id": "Report_Vendor_Evaluation.pdf_p1_c0",
+        "content": "Nusantara Dynamics Vendor Evaluation Report 2025 Top Vendor PT Sumber Makmur scored highest with an overall rating of 4.6 out of 5.",
+        "score": 0.29423,
+        "semantic_score": 0.486693,
+        "keyword_score": 0.0,
+        "reranker_score": 0.184065,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1",
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+        "content": "Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "score": 0.227485,
+        "semantic_score": 0.445261,
+        "keyword_score": 0.0,
+        "reranker_score": 0.001606,
+        "evidence_score": 0.45,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1",
+        "chunk_id": "Policy_Procurement_Threshold.docx_p1_c0",
+        "content": "Nusantara Dynamics Procurement Approval Threshold Policy Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "score": 0.20894,
+        "semantic_score": 0.408917,
+        "keyword_score": 0.0,
+        "reranker_score": 0.00157,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "REP-013",
+    "question": "By what volume did the company successfully reduce its corporate water consumption?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "REP-014",
+    "question": "Which software vendor received the lowest satisfaction score in the annual review?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Vendor_Evaluation.pdf\nPage: 1\nContent: Nusantara Dynamics Vendor Evaluation Report 2025 Top Vendor PT Sumber Makmur scored highest with an overall rating of 4.6 out of 5.\n\n[CONTEXT 2]\nDocument: Report_CSAT_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Customer Satisfaction Survey 2025 Score The overall CSAT score for 2025 was 87%, up from 83% in 2024. NPS Net Promoter Score reached 46 in 2025.\n\n[CONTEXT 3]\nDocument: Report_Security_Review_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss. Phishing The annual phishing simulation click rate was 6%.\n\n[CONTEXT 4]\nDocument: FAQ_Software_Access.txt\nPage: 1\nContent: Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.\n\n[CONTEXT 5]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1",
+        "chunk_id": "Report_Vendor_Evaluation.pdf_p1_c0",
+        "content": "Nusantara Dynamics Vendor Evaluation Report 2025 Top Vendor PT Sumber Makmur scored highest with an overall rating of 4.6 out of 5.",
+        "score": 0.525677,
+        "semantic_score": 0.544946,
+        "keyword_score": 0.536225,
+        "reranker_score": 0.459076,
+        "evidence_score": 0.55,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Customer Satisfaction Survey 2025 Score The overall CSAT score for 2025 was 87%, up from 83% in 2024. NPS Net Promoter Score reached 46 in 2025.",
+        "score": 0.503041,
+        "semantic_score": 0.496403,
+        "keyword_score": 1.0,
+        "reranker_score": 0.006354,
+        "evidence_score": 0.55,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Security_Review_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Annual Security Review 2025 Incidents There were 3 reportable security incidents in 2025, none resulting in data loss. Phishing The annual phishing simulation click rate was 6%.",
+        "score": 0.364171,
+        "semantic_score": 0.292747,
+        "keyword_score": 0.758078,
+        "reranker_score": 0.000553,
+        "evidence_score": 0.55,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Software_Access.txt_p1_c0",
+        "content": "Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.",
+        "score": 0.31896,
+        "semantic_score": 0.274388,
+        "keyword_score": 0.631134,
+        "reranker_score": 5e-05,
+        "evidence_score": 0.475,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.279124,
+        "semantic_score": 0.301437,
+        "keyword_score": 0.378221,
+        "reranker_score": 0.000207,
+        "evidence_score": 0.475,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ada informasi tentang vendor software yang menerima skor kepuasan terendah dalam ulasan tahunan di konteks yang diberikan. Dokumen hanya menyebutkan PT Sumber Makmur sebagai vendor dengan skor tertinggi (4,6/5) dan data CSAT/NPS tahunan, tetapi tidak mengidentifikasi vendor dengan skor terendah.\n\nSumber:\n- Report_Vendor_Evaluation.pdf, p. 1 (62%)\n- Report_CSAT_2025.pdf, p. 1 (50%)\n- Report_Security_Review_2025.pdf, p. 1 (36%)\n\nConfidence: 62%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "Report_Vendor_Evaluation.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.62
+  },
+  {
+    "id": "REP-017",
+    "question": "Pada rentang jam berapakah jaringan kantor pusat mengalami kongesti atau puncak pemakaian trafik internet?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Sustainability_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025.\n\n[CONTEXT 2]\nDocument: FAQ_Remote_Work.txt\nPage: 1\nContent: Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.\n\n[CONTEXT 3]\nDocument: Report_Network_Capacity.pdf\nPage: 1\nContent: Nusantara Dynamics Network Capacity Report 2025 Utilization Peak network utilization reached 72% of capacity in November 2025.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Sustainability_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025.",
+        "score": 0.4335,
+        "semantic_score": 0.242167,
+        "keyword_score": 1.0,
+        "reranker_score": 9.9e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Remote_Work.txt_p1_c0",
+        "content": "Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "score": 0.391196,
+        "semantic_score": 0.270085,
+        "keyword_score": 0.73333,
+        "reranker_score": 6.9e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1",
+        "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+        "content": "Nusantara Dynamics Network Capacity Report 2025 Utilization Peak network utilization reached 72% of capacity in November 2025.",
+        "score": 0.231605,
+        "semantic_score": 0.443195,
+        "keyword_score": 0.0,
+        "reranker_score": 0.022302,
+        "evidence_score": 0.15,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\n- Nusantara Dynamics Sustainability Report 2025 Energy The Cikarang office reduced electricity consumption by 9% in 2025.\n- Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home?\n\nSumber:\n- Report_Sustainability_2025.pdf, p. 1 (83%)\n- FAQ_Remote_Work.txt, p. 1 (39%)\n\nConfidence: 83%",
+    "citation": [
+      {
+        "document": "Report_Sustainability_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "REP-018",
+    "question": "Berdasarkan survei kuartal lalu, fitur baru mana yang mendapatkan apresiasi tertinggi dari pelanggan korporat?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.485468,
+        "semantic_score": 0.362041,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000108,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ditemukan informasi tentang survei kuartal lalu atau penilaian pelanggan korporat terhadap fitur baru dalam konteks dokumen yang diberikan. Dokumen hanya menjelaskan rencana pemulihan bencana (RTO/RPO) dan lokasi situs pemulihan darurat.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (83%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "SOP-008",
+    "question": "Pada titik mana dalam siklus karyawan baru masa bimbingan mentor yang ditugaskan resmi berakhir?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Hiring_H1_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.\n\n[CONTEXT 2]\nDocument: SOP_Onboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.\n\n[CONTEXT 3]\nDocument: SOP_Leave_Request.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Leave Request Notice Annual leave must be requested at least 5 working days in advance through the HR portal. Approval Leave is approved by the direct manager. Leave longer than 5 consecutive days also needs department head approval.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+        "score": 0.26364,
+        "semantic_score": 0.516903,
+        "keyword_score": 0.0,
+        "reranker_score": 7.9e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+        "score": 0.235211,
+        "semantic_score": 0.459204,
+        "keyword_score": 0.0,
+        "reranker_score": 0.00407,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Leave Request Notice Annual leave must be requested at least 5 working days in advance through the HR portal. Approval Leave is approved by the direct manager. Leave longer than 5 consecutive days also needs department head approval.",
+        "score": 0.23163,
+        "semantic_score": 0.454084,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000188,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-009",
+    "question": "Sebelum kita dapat secara legal mencairkan dana ke agensi eksternal baru, dokumen apa yang wajib mereka berikan kepada tim keuangan kita?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Expense_Reimbursement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Expense Reimbursement Submission Window Expense claims must be submitted within 30 days of the expense date. Claims older than 30 days require Finance Manager approval. Receipts Original receipts are required for any single expense above IDR 150,000. Payout Approved reimbursements are paid in the next payroll cycle, on the 25th of each month.",
+        "score": 0.206892,
+        "semantic_score": 0.404217,
+        "keyword_score": 0.0,
+        "reranker_score": 0.002962,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-010",
+    "question": "Jika saya harus terbang dari Jakarta ke Bali untuk konferensi pada tanggal 20 bulan ini, paling lambat tanggal berapa saya harus menyelesaikan reservasi?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Travel_Booking.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Class Economy class is standard for all domestic travel. Business class requires Director approval.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Travel_Booking.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Business Travel Booking Booking Domestic flights must be booked at least 7 days in advance through the appointed travel agent. Class Economy class is standard for all domestic travel. Business class requires Director approval.",
+        "score": 0.24897,
+        "semantic_score": 0.487493,
+        "keyword_score": 0.0,
+        "reranker_score": 0.001395,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Travel_Booking.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-013",
+    "question": "Does a freelance graphic designer need to sign a Non-Disclosure Agreement before receiving their onboarding materials?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Onboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.\n\n[CONTEXT 2]\nDocument: SOP_Procurement.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 3]\nDocument: SOP_Offboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.\n\n[CONTEXT 4]\nDocument: FAQ_Onboarding.txt\nPage: 1\nContent: Nusantara Dynamics Onboarding FAQ ============== ## First Day Q: What should I bring on my first day? A: A valid ID, your tax ID (NPWP), and bank account details. ## Probation Q: How long is probation? A: Probation is 3 months with an evaluation in week 12.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+        "score": 0.387433,
+        "semantic_score": 0.255027,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000102,
+        "evidence_score": 0.485714,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "score": 0.357531,
+        "semantic_score": 0.334974,
+        "keyword_score": 0.683496,
+        "reranker_score": 0.000142,
+        "evidence_score": 0.485714,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "score": 0.232385,
+        "semantic_score": 0.235624,
+        "keyword_score": 0.467415,
+        "reranker_score": 0.000148,
+        "evidence_score": 0.442857,
+        "evidence_supported": false
+      },
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Onboarding.txt_p1_c0",
+        "content": "Nusantara Dynamics Onboarding FAQ ============== ## First Day Q: What should I bring on my first day? A: A valid ID, your tax ID (NPWP), and bank account details. ## Probation Q: How long is probation? A: Probation is 3 months with an evaluation in week 12.",
+        "score": 0.216786,
+        "semantic_score": 0.170904,
+        "keyword_score": 0.540042,
+        "reranker_score": 6.1e-05,
+        "evidence_score": 0.442857,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-014",
+    "question": "If a contract developer is suddenly terminated for a policy breach, who executes the credential revocation and within what timeframe?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Offboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.\n\n[CONTEXT 2]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.\n\n[CONTEXT 3]\nDocument: SOP_IT_Incident_Handling.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.\n\n[CONTEXT 4]\nDocument: Policy_Data_Security.docx\nPage: 1\nContent: Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.\n\n[CONTEXT 5]\nDocument: Policy_Password.docx\nPage: 1\nContent: Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "score": 0.458888,
+        "semantic_score": 0.417544,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000172,
+        "evidence_score": 0.492308,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.45613,
+        "semantic_score": 0.522061,
+        "keyword_score": 0.764339,
+        "reranker_score": 0.000215,
+        "evidence_score": 0.492308,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1",
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "score": 0.407744,
+        "semantic_score": 0.350923,
+        "keyword_score": 0.890898,
+        "reranker_score": 0.000139,
+        "evidence_score": 0.492308,
+        "evidence_supported": true
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1",
+        "chunk_id": "Policy_Data_Security.docx_p1_c0",
+        "content": "Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "score": 0.344608,
+        "semantic_score": 0.262084,
+        "keyword_score": 0.736338,
+        "reranker_score": 5.6e-05,
+        "evidence_score": 0.538462,
+        "evidence_supported": true
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1",
+        "chunk_id": "Policy_Password.docx_p1_c0",
+        "content": "Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "score": 0.337265,
+        "semantic_score": 0.325192,
+        "keyword_score": 0.600177,
+        "reranker_score": 6e-05,
+        "evidence_score": 0.492308,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-017",
+    "question": "Pada hari ke berapa orientasi teknis dan pengenalan lingkungan pengembangan lokal (local dev environment) diberikan kepada engineer baru?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Deployment_Runbook.txt\nPage: 1\nContent: Nusantara Dynamics Deployment Runbook ================== ## Process Deployments use a blue-green strategy. Rollback is performed by switching traffic back to the previous environment. ## Window Production deployments are scheduled on Tuesdays and Thursdays, 20:00-22:00 WIB.\n\n[CONTEXT 2]\nDocument: TECH_Monitoring_Guide.txt\nPage: 1\nContent: Nusantara Dynamics Monitoring and Alerting Guide ============================= ## Tools Metrics are collected with Prometheus and visualized in Grafana. Alerts route to the on-call engineer via PagerDuty. ## SLO The API availability SLO is 99.9% per month.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Deployment_Runbook.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Deployment_Runbook.txt",
+        "page": "1",
+        "chunk_id": "TECH_Deployment_Runbook.txt_p1_c0",
+        "content": "Nusantara Dynamics Deployment Runbook ================== ## Process Deployments use a blue-green strategy. Rollback is performed by switching traffic back to the previous environment. ## Window Production deployments are scheduled on Tuesdays and Thursdays, 20:00-22:00 WIB.",
+        "score": 0.398567,
+        "semantic_score": 0.307906,
+        "keyword_score": 1.0,
+        "reranker_score": 0.00614,
+        "evidence_score": 0.442857,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": "1",
+        "chunk_id": "TECH_Monitoring_Guide.txt_p1_c0",
+        "content": "Nusantara Dynamics Monitoring and Alerting Guide ============================= ## Tools Metrics are collected with Prometheus and visualized in Grafana. Alerts route to the on-call engineer via PagerDuty. ## SLO The API availability SLO is 99.9% per month.",
+        "score": 0.374208,
+        "semantic_score": 0.267861,
+        "keyword_score": 0.986063,
+        "reranker_score": 0.003778,
+        "evidence_score": 0.442857,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "TECH_Deployment_Runbook.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "SOP-018",
+    "question": "Berapa lama waktu maksimal bagi tim penyelesaian masalah untuk menutup sebuah laporan keluhan dari klien VVIP/Prioritas?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Customer_Complaint.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.\n\n[CONTEXT 2]\nDocument: Report_Hiring_H1_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.\n\n[CONTEXT 3]\nDocument: SOP_IT_Incident_Handling.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.\n\n[CONTEXT 4]\nDocument: SOP_Offboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.\n\n[CONTEXT 5]\nDocument: FAQ_Remote_Work.txt\nPage: 1\nContent: Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+        "score": 0.695004,
+        "semantic_score": 0.597969,
+        "keyword_score": 0.919187,
+        "reranker_score": 0.582445,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+        "score": 0.546436,
+        "semantic_score": 0.502704,
+        "keyword_score": 1.0,
+        "reranker_score": 6.3e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1",
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "score": 0.532843,
+        "semantic_score": 0.51672,
+        "keyword_score": 0.790719,
+        "reranker_score": 0.10841,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "score": 0.501971,
+        "semantic_score": 0.405298,
+        "keyword_score": 0.987479,
+        "reranker_score": 0.001544,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Remote_Work.txt_p1_c0",
+        "content": "Nusantara Dynamics Remote Work FAQ =============== ## Days Q: How many days can I work from home? A: Up to 2 days per week with manager approval. ## Equipment Q: Will the company provide home equipment? A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "score": 0.485469,
+        "semantic_score": 0.486002,
+        "keyword_score": 0.736638,
+        "reranker_score": 6.6e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nBerdasarkan konteks dokumen, waktu maksimal bagi tim penyelesaian masalah untuk menutup laporan keluhan dari klien VVIP/Prioritas adalah **3 hari kerja** sesuai target resolusi yang tercantum dalam SOP Customer Complaint Handling. Jika keluhan belum terselesaikan dalam waktu tersebut, akan dianggap belum selesai\n\nSumber:\n- SOP_Customer_Complaint.pdf, p. 1 (83%)\n- Report_Hiring_H1_2025.pdf, p. 1 (55%)\n- SOP_IT_Incident_Handling.pdf, p. 1 (53%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "TECH-008",
+    "question": "Berapa ambang batas keandalan (target operasional) untuk antarmuka programatik kita secara bulanan?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Customer_Complaint.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.\n\n[CONTEXT 2]\nDocument: Report_Network_Capacity.pdf\nPage: 1\nContent: Nusantara Dynamics Network Capacity Report 2025 Utilization Peak network utilization reached 72% of capacity in November 2025.\n\n[CONTEXT 3]\nDocument: SOP_IT_Incident_Handling.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.\n\n[CONTEXT 4]\nDocument: TECH_Internal_API_Guide.txt\nPage: 1\nContent: Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token. Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.\n\n[CONTEXT 5]\nDocument: SOP_Onboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+        "score": 0.424201,
+        "semantic_score": 0.347762,
+        "keyword_score": 1.0,
+        "reranker_score": 0.002102,
+        "evidence_score": 0.46,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1",
+        "chunk_id": "Report_Network_Capacity.pdf_p1_c0",
+        "content": "Nusantara Dynamics Network Capacity Report 2025 Utilization Peak network utilization reached 72% of capacity in November 2025.",
+        "score": 0.260565,
+        "semantic_score": 0.50916,
+        "keyword_score": 0.0,
+        "reranker_score": 0.003572,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1",
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - IT Incident Handling Severity Levels Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). Response Targets P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. Escalation If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "score": 0.240695,
+        "semantic_score": 0.384785,
+        "keyword_score": 0.0,
+        "reranker_score": 0.023014,
+        "evidence_score": 0.46,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "1",
+        "chunk_id": "TECH_Internal_API_Guide.txt_p1_c0",
+        "content": "Nusantara Dynamics Internal API Guide ================== ## Auth All internal APIs require a bearer JWT token. Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+        "score": 0.214016,
+        "semantic_score": 0.418058,
+        "keyword_score": 0.0,
+        "reranker_score": 0.003223,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Onboarding Purpose This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. Probation New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. Equipment IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at least 3 working days before the start date. Buddy Program Each new hire is assigned an onboarding buddy for the first 30 days.",
+        "score": 0.210026,
+        "semantic_score": 0.324005,
+        "keyword_score": 0.0,
+        "reranker_score": 0.002682,
+        "evidence_score": 0.46,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Report_Network_Capacity.pdf",
+        "page": "1"
+      },
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "TECH-009",
+    "question": "Sistem orkestrasi kontainer apa yang mengelola beban kerja kita, dan engine teknologi apa yang digunakan untuk penyimpanan persisten vs tembolok memori sementara?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "TECH-010",
+    "question": "Untuk melakukan tunnel ke jaringan server secara aman, klien perangkat lunak spesifik apa yang harus dikonfigurasi, dan fitur lapisan keamanan tambahan apa yang diaktifkan saat login?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Data_Security.docx\nPage: 1\nContent: Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.\n\n[CONTEXT 2]\nDocument: TECH_VPN_Setup.txt\nPage: 1\nContent: Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1",
+        "chunk_id": "Policy_Data_Security.docx_p1_c0",
+        "content": "Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "score": 0.245068,
+        "semantic_score": 0.480481,
+        "keyword_score": 0.0,
+        "reranker_score": 9e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1",
+        "chunk_id": "TECH_VPN_Setup.txt_p1_c0",
+        "content": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+        "score": 0.242293,
+        "semantic_score": 0.474986,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000202,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "TECH-013",
+    "question": "Does the engineering team route all personal web browsing traffic through the corporate VPN when connected remotely?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.477961,
+        "semantic_score": 0.344756,
+        "keyword_score": 1.0,
+        "reranker_score": 4e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ditemukan informasi dalam konteks dokumen yang menyebutkan apakah tim engineering mengarahkan semua lalu lintas browsing pribadi melalui VPN saat terhubung secara remote. Dokumen hanya membahas rencana pemulihan bencana, RTO/RPO, dan lokasi situs pemulihan, tanpa menyebutkan kebijakan atau infrastruktur terkait penggunaan VPN untuk aktivitas pribadi.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (83%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "TECH-014",
+    "question": "In the event of a catastrophic regional datacenter failure, what is the maximum acceptable data loss timeframe (RPO)?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.611185,
+        "semantic_score": 0.646049,
+        "keyword_score": 1.0,
+        "reranker_score": 0.001432,
+        "evidence_score": 0.845455,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nDalam konteks dokumen, recovery point objective (RPO) yang diterapkan adalah **1 jam**, yang menunjukkan maksimal waktu kerugian data yang diterima dalam kejadian kegagalan datacenter regional. Tidak ada informasi tambahan tentang durasi atau kondisi lain yang relevan dengan RPO dalam konteks ini.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (90%)\n\nConfidence: 90%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9
+  },
+  {
+    "id": "TECH-017",
+    "question": "Berapa lama log peringatan (warning) dan log error aplikasi disimpan di Elasticsearch sebelum dihapus secara otomatis?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Customer_Complaint.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.\n\n[CONTEXT 2]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.\n\n[CONTEXT 3]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.\n\n[CONTEXT 4]\nDocument: FAQ_IT_Support.txt\nPage: 1\nContent: Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.\n\n[CONTEXT 5]\nDocument: SOP_Offboarding.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Customer_Complaint.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Customer Complaint Handling First Response All customer complaints must receive a first response within 1 business day. Resolution Target resolution time is 3 business days. Unresolved complaints are escalated to the Customer Success Lead.",
+        "score": 0.492649,
+        "semantic_score": 0.413398,
+        "keyword_score": 0.919187,
+        "reranker_score": 0.006714,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.478248,
+        "semantic_score": 0.606906,
+        "keyword_score": 0.193768,
+        "reranker_score": 0.240591,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.469518,
+        "semantic_score": 0.409258,
+        "keyword_score": 0.821184,
+        "reranker_score": 0.000391,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1",
+        "chunk_id": "FAQ_IT_Support.txt_p1_c0",
+        "content": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+        "score": 0.466539,
+        "semantic_score": 0.355401,
+        "keyword_score": 0.920057,
+        "reranker_score": 0.001325,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "score": 0.459131,
+        "semantic_score": 0.306373,
+        "keyword_score": 0.987479,
+        "reranker_score": 0.001757,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nLog peringatan dan log error aplikasi disimpan di Elasticsearch selama **90 hari** sebelum dihapus secara otomatis, berdasarkan dokumen TECH_Data_Retention.txt. Tidak ada informasi yang menyebutkan perbedaan durasi penyimpanan antara log peringatan dan log error.\n\nSumber:\n- SOP_Customer_Complaint.pdf, p. 1 (83%)\n- TECH_Data_Retention.txt, p. 1 (48%)\n- TECH_Disaster_Recovery.txt, p. 1 (47%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "SOP_Customer_Complaint.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "TECH-018",
+    "question": "Jika proses kompilasi (*build*) di pipeline CI berjalan sangat lambat, setelah berapa menit proses tersebut akan dibatalkan otomatis (timeout)?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_CICD_Pipeline.txt\nPage: 1\nContent: Nusantara Dynamics CI/CD Pipeline Documentation ============================ ## Pipeline Code is built and tested with GitHub Actions. A merge to main triggers an automatic staging deployment. ## Gates A minimum of 80% unit-test coverage is required to merge.\n\n[CONTEXT 2]\nDocument: SOP_Data_Backup.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": "1",
+        "chunk_id": "TECH_CICD_Pipeline.txt_p1_c0",
+        "content": "Nusantara Dynamics CI/CD Pipeline Documentation ============================ ## Pipeline Code is built and tested with GitHub Actions. A merge to main triggers an automatic staging deployment. ## Gates A minimum of 80% unit-test coverage is required to merge.",
+        "score": 0.49741,
+        "semantic_score": 0.496133,
+        "keyword_score": 1.0,
+        "reranker_score": 0.017531,
+        "evidence_score": 0.44,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Data Backup Schedule Production databases are backed up every 6 hours. Full backups run nightly at 01:00 WIB. Retention Daily backups are retained for 30 days; monthly backups for 12 months. Restore Test A restore test is performed quarterly.",
+        "score": 0.207197,
+        "semantic_score": 0.406111,
+        "keyword_score": 0.0,
+        "reranker_score": 0.000322,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-006",
+    "question": "Apa URL *endpoint* persis yang digunakan karyawan untuk memicu fitur setel ulang kata sandi Active Directory mandiri di portal IT?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_IT_Support.txt\nPage: 1\nContent: Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.\n\n[CONTEXT 2]\nDocument: SOP_Access_Provisioning.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner. Review Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n\n[CONTEXT 3]\nDocument: FAQ_Software_Access.txt\nPage: 1\nContent: Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.\n\n[CONTEXT 4]\nDocument: Policy_Password.docx\nPage: 1\nContent: Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.\n\n[CONTEXT 5]\nDocument: TECH_VPN_Setup.txt\nPage: 1\nContent: Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Access_Provisioning.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1",
+        "chunk_id": "FAQ_IT_Support.txt_p1_c0",
+        "content": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+        "score": 0.496245,
+        "semantic_score": 0.382713,
+        "keyword_score": 1.0,
+        "reranker_score": 8.1e-05,
+        "evidence_score": 0.842143,
+        "evidence_supported": true
+      },
+      {
+        "document": "SOP_Access_Provisioning.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Access_Provisioning.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner. Review Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.",
+        "score": 0.267838,
+        "semantic_score": 0.321072,
+        "keyword_score": 0.270278,
+        "reranker_score": 7.6e-05,
+        "evidence_score": 0.49,
+        "evidence_supported": true
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Software_Access.txt_p1_c0",
+        "content": "Nusantara Dynamics Software Access FAQ =================== ## Request Q: How do I get access to a software tool? A: Request it via the IT Service Desk; the system owner approves. ## License Q: Who pays for software licenses? A: Approved business-tool licenses are covered by the IT budget.",
+        "score": 0.26709,
+        "semantic_score": 0.315874,
+        "keyword_score": 0.277708,
+        "reranker_score": 2.7e-05,
+        "evidence_score": 0.49,
+        "evidence_supported": true
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1",
+        "chunk_id": "Policy_Password.docx_p1_c0",
+        "content": "Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "score": 0.227348,
+        "semantic_score": 0.253339,
+        "keyword_score": 0.215667,
+        "reranker_score": 0.000139,
+        "evidence_score": 0.49,
+        "evidence_supported": true
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1",
+        "chunk_id": "TECH_VPN_Setup.txt_p1_c0",
+        "content": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+        "score": 0.207734,
+        "semantic_score": 0.407289,
+        "keyword_score": 0.0,
+        "reranker_score": 6.8e-05,
+        "evidence_score": 0.15,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nURL *endpoint* persis untuk memicu fitur setel ulang kata sandi Active Directory mandiri tidak ditemukan dalam konteks dokumen. Dokumen hanya menyebutkan bahwa karyawan perlu mengajukan tiket ke IT Helpdesk melalui portal, tetapi tidak menyediakan detail alamat URL spesifik.\n\nSumber:\n- FAQ_IT_Support.txt, p. 1 (84%)\n- SOP_Access_Provisioning.pdf, p. 1 (27%)\n- FAQ_Software_Access.txt, p. 1 (27%)\n\nConfidence: 84%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Access_Provisioning.pdf",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Software_Access.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.842143
+  },
+  {
+    "id": "NEG-007",
+    "question": "Menurut panduan kode etik korporat, berapa nilai nominal maksimum yang diizinkan (dalam mata uang Rupiah) untuk menerima bingkisan atau hadiah dari vendor potensial?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.443124,
+        "semantic_score": 0.264382,
+        "keyword_score": 1.0,
+        "reranker_score": 6.9e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nInformasi tentang nilai nominal maksimum yang diizinkan untuk menerima bingkisan atau hadiah dari vendor potensial tidak ditemukan dalam konteks dokumen yang diberikan. Dokumen hanya menjelaskan rencana pemulihan bencana (RTO/RPO) dan lokasi situs pemulihan, tanpa menyebutkan panduan kode etik korporat atau aturan terkait hadiah.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (83%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "NEG-008",
+    "question": "Seberapa sering 'Full Datacenter Failover Exercise' dieksekusi secara aktif untuk memvalidasi tercapainya metrik RTO pada rencana pemulihan bencana?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.603808,
+        "semantic_score": 0.630997,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000832,
+        "evidence_score": 0.840625,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nInformasi tentang frekuensi eksekusi 'Full Datacenter Failover Exercise' untuk memvalidasi metrik RTO tidak ditemukan dalam dokumen yang diberikan. Dokumen hanya menyebutkan RTO sebesar 4 jam dan lokasi situs pemulihan bencana di zona ketersediaan terpisah, tetapi tidak mengungkapkan jadwal atau frekuensi latihan tersebut.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (84%)\n\nConfidence: 84%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.840625
+  },
+  {
+    "id": "NEG-009",
+    "question": "Jika peringatan kotak masuk email saya sudah mendekati batas 50 GB, bagaimana langkah sistematis untuk mengarsipkan email yang lebih tua dari 3 tahun secara permanen?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Email_Calendar.txt\nPage: 1\nContent: Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.\n\n[CONTEXT 2]\nDocument: Policy_Password.docx\nPage: 1\nContent: Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.\n\n[CONTEXT 3]\nDocument: FAQ_Security_Awareness.txt\nPage: 1\nContent: Nusantara Dynamics Security Awareness FAQ ====================== ## Phishing Q: What do I do if I receive a suspicious email? A: Do not click links; report it using the Report Phishing button. ## Lost Device Q: What if I lose my laptop? A: Report it to IT immediately so the device can be remotely wiped.\n\n[CONTEXT 4]\nDocument: Policy_BYOD.docx\nPage: 1\nContent: Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.\n\n[CONTEXT 5]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      },
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Email_Calendar.txt_p1_c0",
+        "content": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "score": 0.494754,
+        "semantic_score": 0.453275,
+        "keyword_score": 1.0,
+        "reranker_score": 0.094335,
+        "evidence_score": 0.435294,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1",
+        "chunk_id": "Policy_Password.docx_p1_c0",
+        "content": "Nusantara Dynamics Password Policy Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol. Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused. MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "score": 0.377379,
+        "semantic_score": 0.445923,
+        "keyword_score": 0.624688,
+        "reranker_score": 0.000132,
+        "evidence_score": 0.435294,
+        "evidence_supported": false
+      },
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "1",
+        "chunk_id": "FAQ_Security_Awareness.txt_p1_c0",
+        "content": "Nusantara Dynamics Security Awareness FAQ ====================== ## Phishing Q: What do I do if I receive a suspicious email? A: Do not click links; report it using the Report Phishing button. ## Lost Device Q: What if I lose my laptop? A: Report it to IT immediately so the device can be remotely wiped.",
+        "score": 0.327374,
+        "semantic_score": 0.307474,
+        "keyword_score": 0.710557,
+        "reranker_score": 0.000115,
+        "evidence_score": 0.435294,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_BYOD.docx",
+        "page": "1",
+        "chunk_id": "Policy_BYOD.docx_p1_c0",
+        "content": "Nusantara Dynamics Bring Your Own Device (BYOD) Policy Enrollment Personal devices used for work email must be enrolled in the mobile device management (MDM) system. Remote Wipe The company reserves the right to remotely wipe corporate data from enrolled devices.",
+        "score": 0.319774,
+        "semantic_score": 0.314037,
+        "keyword_score": 0.664861,
+        "reranker_score": 0.000197,
+        "evidence_score": 0.435294,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.208467,
+        "semantic_score": 0.408718,
+        "keyword_score": 0.0,
+        "reranker_score": 8.1e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-010",
+    "question": "Apa nama perangkat lunak dan nomor versi spesifik dari aplikasi CRM internal yang dimanfaatkan divisi *sales* untuk memantau data *churn* klien?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Information_Classification.docx\nPage: 1\nContent: Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted. Handling Restricted data may only be accessed on company-managed devices and must never be emailed externally.\n\n[CONTEXT 2]\nDocument: Report_Q3_2025_Performance.pdf\nPage: 1\nContent: Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.\n\n[CONTEXT 3]\nDocument: TECH_Data_Retention.txt\nPage: 1\nContent: Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.\n\n[CONTEXT 4]\nDocument: SOP_Access_Provisioning.pdf\nPage: 1\nContent: Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner. Review Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.\n\n[CONTEXT 5]\nDocument: Policy_Data_Security.docx\nPage: 1\nContent: Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1"
+      },
+      {
+        "document": "SOP_Access_Provisioning.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1",
+        "chunk_id": "Policy_Information_Classification.docx_p1_c0",
+        "content": "Nusantara Dynamics Information Classification Policy Levels Information is classified as Public, Internal, Confidential, or Restricted. Handling Restricted data may only be accessed on company-managed devices and must never be emailed externally.",
+        "score": 0.401795,
+        "semantic_score": 0.305721,
+        "keyword_score": 0.969881,
+        "reranker_score": 0.000748,
+        "evidence_score": 0.475,
+        "evidence_supported": true
+      },
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1",
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+        "content": "Nusantara Dynamics Quarterly Performance Report - Q3 2025 Revenue Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. Customers The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Churn Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "score": 0.345749,
+        "semantic_score": 0.207271,
+        "keyword_score": 1.0,
+        "reranker_score": 0.000163,
+        "evidence_score": 0.4375,
+        "evidence_supported": false
+      },
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "1",
+        "chunk_id": "TECH_Data_Retention.txt_p1_c0",
+        "content": "Nusantara Dynamics Data Retention Schedule ======================= ## Logs Application logs are retained for 90 days. Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "score": 0.315297,
+        "semantic_score": 0.273915,
+        "keyword_score": 0.730938,
+        "reranker_score": 0.0007,
+        "evidence_score": 0.4375,
+        "evidence_supported": false
+      },
+      {
+        "document": "SOP_Access_Provisioning.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Access_Provisioning.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - System Access Provisioning Request Access to internal systems is requested via the IT Service Desk and approved by the system owner. Review Access rights are reviewed every 6 months. Dormant accounts (90 days inactive) are disabled.",
+        "score": 0.312468,
+        "semantic_score": 0.359399,
+        "keyword_score": 0.535765,
+        "reranker_score": 0.002366,
+        "evidence_score": 0.4375,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1",
+        "chunk_id": "Policy_Data_Security.docx_p1_c0",
+        "content": "Nusantara Dynamics Data Security Policy Encryption All company laptops must use full-disk encryption. Data in transit must use TLS 1.2 or higher. USB Use of personal USB storage devices on company laptops is prohibited. Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "score": 0.276705,
+        "semantic_score": 0.222319,
+        "keyword_score": 0.680429,
+        "reranker_score": 8e-05,
+        "evidence_score": 0.4375,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-013",
+    "question": "Can you list all the officially recognized public holidays for the upcoming 2027 calendar year?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-014",
+    "question": "What is the exact starting base salary offered to newly hired Junior Frontend Developers?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Hiring_H1_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+        "score": 0.486057,
+        "semantic_score": 0.482443,
+        "keyword_score": 1.0,
+        "reranker_score": 4.3e-05,
+        "evidence_score": 0.46,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nInformasi tentang besaran gaji dasar untuk posisi Junior Frontend Developer tidak ditemukan dalam konteks dokumen yang diberikan. Dokumen hanya menyebutkan jumlah karyawan yang dihiring (37 orang) dan rata-rata waktu rekrutmen (28 hari), tetapi tidak menyebutkan angka gaji atau kompensasi.\n\nSumber:\n- Report_Hiring_H1_2025.pdf, p. 1 (90%)\n\nConfidence: 90%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9
+  },
+  {
+    "id": "NEG-015",
+    "question": "What are the step-by-step terminal commands required to intentionally bypass the corporate network firewall?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: 1\nContent: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1",
+        "chunk_id": "TECH_Disaster_Recovery.txt_p1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "score": 0.482736,
+        "semantic_score": 0.355766,
+        "keyword_score": 1.0,
+        "reranker_score": 5.4e-05,
+        "evidence_score": 0.83,
+        "evidence_supported": true
+      }
+    ],
+    "generated_answer": "Jawaban:\nTidak ditemukan informasi tentang langkah-langkah atau perintah terminal untuk melewati firewall jaringan perusahaan dalam konteks yang diberikan. Dokumen hanya menjelaskan rencana pemulihan bencana, RTO, RPO, dan lokasi situs pemulihan darurat.\n\nSumber:\n- TECH_Disaster_Recovery.txt, p. 1 (83%)\n\nConfidence: 83%\nModel: Ollama/qwen3-custom:latest",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.83
+  },
+  {
+    "id": "NEG-018",
+    "question": "Berapa total alokasi anggaran yang disiapkan untuk departemen Marketing dan Pemasaran pada tahun 2027?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-019",
+    "question": "Apa merek kopi bubuk yang disediakan secara gratis di ruang *pantry* karyawan lantai 3?",
+    "retrieved_context": "",
+    "retrieved_sources": [],
+    "retrieved_chunks": [],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [],
+    "system_confidence": 0.0
+  },
+  {
+    "id": "NEG-020",
+    "question": "Pada jam berapakah pergantian shift petugas satuan pengamanan (Satpam) di lobi utama gedung dilakukan setiap harinya?",
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_WFH.docx\nPage: 1\nContent: Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.\n\n[CONTEXT 2]\nDocument: Report_Hiring_H1_2025.pdf\nPage: 1\nContent: Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.\n\n[CONTEXT 3]\nDocument: Policy_Leave.docx\nPage: 1\nContent: Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly. Carryover A maximum of 6 unused leave days may be carried over to the next year. Sick Leave Sick leave beyond 2 consecutive days requires a doctor's certificate.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c0",
+        "content": "Nusantara Dynamics Remote Work (Work From Home) Policy Eligibility All confirmed employees are eligible for remote work, subject to manager approval. Limit Employees may work from home a maximum of 2 days per week, with manager approval. Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "score": 0.218484,
+        "semantic_score": 0.42742,
+        "keyword_score": 0.0,
+        "reranker_score": 0.002001,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Hiring_H1_2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Hiring Report H1 2025 Hires The company hired 37 employees in H1 2025; total headcount reached 312. Time to Hire Average time to hire was 28 days.",
+        "score": 0.213368,
+        "semantic_score": 0.418336,
+        "keyword_score": 0.0,
+        "reranker_score": 6.7e-05,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1",
+        "chunk_id": "Policy_Leave.docx_p1_c0",
+        "content": "Nusantara Dynamics Leave Policy Annual Leave Employees are entitled to 12 days of annual leave per year, accruing monthly. Carryover A maximum of 6 unused leave days may be carried over to the next year. Sick Leave Sick leave beyond 2 consecutive days requires a doctor's certificate.",
+        "score": 0.205072,
+        "semantic_score": 0.401268,
+        "keyword_score": 0.0,
+        "reranker_score": 0.001701,
+        "evidence_score": 0.4,
+        "evidence_supported": false
+      }
+    ],
+    "generated_answer": "Jawaban:\nBelum ketemu dengan confidence yang cukup di dokumen yang sudah di-index. Sistem tidak menjawab dari konteks lemah agar tidak halusinasi.\n\nSumber:\n- Tidak ada sumber yang cukup relevan.\n\nConfidence: 0%",
+    "citation": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      },
+      {
+        "document": "Report_Hiring_H1_2025.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.0
+  }
+]

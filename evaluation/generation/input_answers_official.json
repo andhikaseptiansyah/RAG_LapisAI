@@ -1,0 +1,1382 @@
+[
+  {
+    "id": "QA-001",
+    "question": "How long is the probation period for new employees?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "3 months, with a performance evaluation in week 12.",
+    "expected_sources": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Onboarding.pdf\nPage: 1\nEvidence: New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0",
+        "content": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "document_name": "SOP_Onboarding.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Onboarding.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "The probation period for new employees is 3 months.",
+    "citation": [
+      {
+        "document": "SOP_Onboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9687,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-002",
+    "question": "How quickly must a P1 IT incident be resolved?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Within 4 hours, acknowledged within 15 minutes.",
+    "expected_sources": [
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_IT_Incident_Handling.pdf\nPage: 1\nEvidence: P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1",
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0",
+        "content": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+        "document_name": "SOP_IT_Incident_Handling.pdf",
+        "page": 1,
+        "chunk_id": "SOP_IT_Incident_Handling.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "P1 IT incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+    "citation": [
+      {
+        "document": "SOP_IT_Incident_Handling.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9332,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-003",
+    "question": "What approval is needed for a purchase above IDR 50 million?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Director approval plus three vendor quotations.",
+    "expected_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Procurement.pdf\nPage: 1\nEvidence: Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "document_name": "SOP_Procurement.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Procurement.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+    "citation": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8752,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-004",
+    "question": "What is the deadline to submit an expense claim?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Within 30 days of the expense date.",
+    "expected_sources": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Expense_Reimbursement.pdf\nPage: 1\nEvidence: Expense claims must be submitted within 30 days of the expense date.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0",
+        "content": "Expense claims must be submitted within 30 days of the expense date.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Expense claims must be submitted within 30 days of the expense date.",
+        "document_name": "SOP_Expense_Reimbursement.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Expense_Reimbursement.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "The deadline to submit an expense claim is within 30 days of the expense date.",
+    "citation": [
+      {
+        "document": "SOP_Expense_Reimbursement.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-005",
+    "question": "How much advance notice is required for annual leave?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "At least 5 working days via the HR portal.",
+    "expected_sources": [
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Leave_Request.pdf\nPage: 1\nEvidence: Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Leave_Request.pdf_p1_c0",
+        "content": "Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Annual leave must be requested at least 5 working days in advance through the HR portal. Leave is approved by the direct manager.",
+        "document_name": "SOP_Leave_Request.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Leave_Request.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "Annual leave must be requested at least 5 working days in advance.",
+    "citation": [
+      {
+        "document": "SOP_Leave_Request.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9217,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-006",
+    "question": "How often are full database backups taken?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Nightly at 01:00 WIB, with incremental backups every 6 hours.",
+    "expected_sources": [
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Data_Backup.pdf\nPage: 1\nEvidence: Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Data_Backup.pdf_p1_c0",
+        "content": "Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months.",
+        "document_name": "SOP_Data_Backup.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Data_Backup.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "Full database backups are taken nightly at 01:00 WIB.",
+    "citation": [
+      {
+        "document": "SOP_Data_Backup.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8541,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-007",
+    "question": "When must IT revoke a departing employee's access?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Within 2 hours of the employee's exit time.",
+    "expected_sources": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Offboarding.pdf\nPage: 1\nEvidence: Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+        "document_name": "SOP_Offboarding.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "IT must revoke a departing employee's access within 2 hours of the employee's exit time.",
+    "citation": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9685,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-008",
+    "question": "How many days per week can employees work from home?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Up to 2 days per week with manager approval.",
+    "expected_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_WFH.docx\nPage: 1\nEvidence: Employees may work from home a maximum of 2 days per week, with manager approval.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1",
+        "chunk_id": "Policy_WFH.docx_p1_c3",
+        "content": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+        "document_name": "Policy_WFH.docx",
+        "page": 1,
+        "chunk_id": "Policy_WFH.docx_p1_c3"
+      }
+    ],
+    "generated_answer": "2 days per week.",
+    "citation": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9387,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-009",
+    "question": "Who must a suspected data breach be reported to and how fast?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "security@nusantaradynamics.co.id within 1 hour.",
+    "expected_sources": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Data_Security.docx\nPage: 1\nEvidence: Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1",
+        "chunk_id": "Policy_Data_Security.docx_p1_c4",
+        "content": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "document_name": "Policy_Data_Security.docx",
+        "page": 1,
+        "chunk_id": "Policy_Data_Security.docx_p1_c4"
+      }
+    ],
+    "generated_answer": "A suspected data breach must be reported to security@nusantaradynamics.co.id within 1 hour.",
+    "citation": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9296,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-010",
+    "question": "How many annual leave days do employees get?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "12 days per year, accruing monthly.",
+    "expected_sources": [
+      {
+        "document": "Policy_Leave.docx",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Leave.docx\nPage: 1\nEvidence: Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1",
+        "chunk_id": "Policy_Leave.docx_p1_c2",
+        "content": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Employees are entitled to 12 days of annual leave per year, accruing monthly.",
+        "document_name": "Policy_Leave.docx",
+        "page": 1,
+        "chunk_id": "Policy_Leave.docx_p1_c2"
+      }
+    ],
+    "generated_answer": "12 days",
+    "citation": [
+      {
+        "document": "Policy_Leave.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9299,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-011",
+    "question": "What are the password requirements?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "At least 12 characters with upper, lower, number, and symbol; changed every 90 days.",
+    "expected_sources": [
+      {
+        "document": "Policy_Password.docx",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Password.docx\nPage: 1\nEvidence: Password Policy",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "1",
+        "chunk_id": "Policy_Password.docx_p1_c1",
+        "content": "Password Policy",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Password Policy",
+        "document_name": "Policy_Password.docx",
+        "page": 1,
+        "chunk_id": "Policy_Password.docx_p1_c1"
+      }
+    ],
+    "generated_answer": "The password requirements are defined in the Password Policy document.",
+    "citation": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8567,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-012",
+    "question": "What is the domestic meal per diem?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "IDR 250,000 per day.",
+    "expected_sources": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Travel_Expense.docx\nPage: 1\nEvidence: The domestic meal per diem is IDR 250,000 per day.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1",
+        "chunk_id": "Policy_Travel_Expense.docx_p1_c2",
+        "content": "The domestic meal per diem is IDR 250,000 per day.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "The domestic meal per diem is IDR 250,000 per day.",
+        "document_name": "Policy_Travel_Expense.docx",
+        "page": 1,
+        "chunk_id": "Policy_Travel_Expense.docx_p1_c2"
+      }
+    ],
+    "generated_answer": "The domestic meal per diem is IDR 250,000 per day.",
+    "citation": [
+      {
+        "document": "Policy_Travel_Expense.docx",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-013",
+    "question": "What was Q3 2025 revenue?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "IDR 42.5 billion, up 12% over Q2 2025.",
+    "expected_sources": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Q3_2025_Performance.pdf\nPage: 1\nEvidence: Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1",
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+        "content": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Q3 2025 revenue was IDR 42.5 billion, a 12% increase over Q2 2025. The company added 18 new enterprise customers in Q3 2025, bringing the total to 214.",
+        "document_name": "Report_Q3_2025_Performance.pdf",
+        "page": 1,
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "Q3 2025 revenue was IDR 42.5 billion.",
+    "citation": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8715,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-014",
+    "question": "What was the root cause of the October 2025 outage?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "An expired TLS certificate on the API gateway.",
+    "expected_sources": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Incident_Postmortem.pdf\nPage: 1\nEvidence: The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1",
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+        "content": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. The root cause was an expired TLS certificate on the API gateway.",
+        "document_name": "Report_Incident_Postmortem.pdf",
+        "page": 1,
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "The root cause of the October 2025 outage was an expired TLS certificate on the API gateway.",
+    "citation": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.885,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-015",
+    "question": "What was the 2025 overall CSAT score?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "87%, up from 83% in 2024.",
+    "expected_sources": [
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_CSAT_2025.pdf\nPage: 1\nEvidence: The overall CSAT score for 2025 was 87%, up from 83% in 2024.",
+    "retrieved_sources": [
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_CSAT_2025.pdf_p1_c0",
+        "content": "The overall CSAT score for 2025 was 87%, up from 83% in 2024.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "The overall CSAT score for 2025 was 87%, up from 83% in 2024.",
+        "document_name": "Report_CSAT_2025.pdf",
+        "page": 1,
+        "chunk_id": "Report_CSAT_2025.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "87%",
+    "citation": [
+      {
+        "document": "Report_CSAT_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9055,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-016",
+    "question": "How many security incidents occurred in 2025?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "3 reportable incidents, none resulting in data loss.",
+    "expected_sources": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Security_Review_2025.pdf\nPage: 1\nEvidence: There were 3 reportable security incidents in 2025, none resulting in data loss.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Security_Review_2025.pdf_p1_c0",
+        "content": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "There were 3 reportable security incidents in 2025, none resulting in data loss.",
+        "document_name": "Report_Security_Review_2025.pdf",
+        "page": 1,
+        "chunk_id": "Report_Security_Review_2025.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "3 security incidents occurred in 2025.",
+    "citation": [
+      {
+        "document": "Report_Security_Review_2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8675,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-017",
+    "question": "What was full-year 2025 revenue?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "IDR 158 billion, with a 14% net profit margin.",
+    "expected_sources": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Financial_FY2025.pdf\nPage: 1\nEvidence: Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+        "content": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+        "document_name": "Report_Financial_FY2025.pdf",
+        "page": 1,
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "Full-year 2025 revenue was IDR 158 billion.",
+    "citation": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8516,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-018",
+    "question": "What database does the platform use?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "PostgreSQL 15, with Redis for caching.",
+    "expected_sources": [
+      {
+        "document": "TECH_System_Architecture.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_System_Architecture.txt\nPage: -\nEvidence: Services communicate over REST and gRPC. ## Database The primary datastore is PostgreSQL 15.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_System_Architecture.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_System_Architecture.txt",
+        "page": "-",
+        "chunk_id": "TECH_System_Architecture.txt_para1_c0",
+        "content": "Services communicate over REST and gRPC. ## Database The primary datastore is PostgreSQL 15.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Services communicate over REST and gRPC. ## Database The primary datastore is PostgreSQL 15.",
+        "document_name": "TECH_System_Architecture.txt",
+        "page": "-",
+        "chunk_id": "TECH_System_Architecture.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "PostgreSQL 15.",
+    "citation": [
+      {
+        "document": "TECH_System_Architecture.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8016,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-019",
+    "question": "How long are internal API tokens valid?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "60 minutes.",
+    "expected_sources": [
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Internal_API_Guide.txt\nPage: -\nEvidence: Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": "-",
+        "chunk_id": "TECH_Internal_API_Guide.txt_para1_c0",
+        "content": "Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Tokens expire after 60 minutes. ## Rate Limit The default rate limit is 100 requests per minute per client.",
+        "document_name": "TECH_Internal_API_Guide.txt",
+        "page": "-",
+        "chunk_id": "TECH_Internal_API_Guide.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "60 minutes.",
+    "citation": [
+      {
+        "document": "TECH_Internal_API_Guide.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8967,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-020",
+    "question": "What are the RTO and RPO?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "RTO is 4 hours and RPO is 1 hour.",
+    "expected_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: -\nEvidence: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "-",
+        "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "document_name": "TECH_Disaster_Recovery.txt",
+        "page": "-",
+        "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour.",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8027,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-021",
+    "question": "What is the API availability SLO?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "99.9% per month.",
+    "expected_sources": [
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Monitoring_Guide.txt\nPage: -\nEvidence: Alerts route to the on-call engineer via PagerDuty. ## SLO The API availability SLO is 99.9% per month.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": "-",
+        "chunk_id": "TECH_Monitoring_Guide.txt_para1_c0",
+        "content": "Alerts route to the on-call engineer via PagerDuty. ## SLO The API availability SLO is 99.9% per month.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Alerts route to the on-call engineer via PagerDuty. ## SLO The API availability SLO is 99.9% per month.",
+        "document_name": "TECH_Monitoring_Guide.txt",
+        "page": "-",
+        "chunk_id": "TECH_Monitoring_Guide.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "The API availability SLO is 99.9% per month.",
+    "citation": [
+      {
+        "document": "TECH_Monitoring_Guide.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-022",
+    "question": "How long are audit logs retained?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "7 years.",
+    "expected_sources": [
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Data_Retention.txt\nPage: -\nEvidence: Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": "-",
+        "chunk_id": "TECH_Data_Retention.txt_para1_c0",
+        "content": "Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Audit logs are retained for 7 years. ## Customer Data Customer data is deleted 90 days after contract termination unless legally required otherwise.",
+        "document_name": "TECH_Data_Retention.txt",
+        "page": "-",
+        "chunk_id": "TECH_Data_Retention.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "Audit logs are retained for 7 years.",
+    "citation": [
+      {
+        "document": "TECH_Data_Retention.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9876,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-023",
+    "question": "What unit-test coverage is required to merge code?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "At least 80%.",
+    "expected_sources": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_CICD_Pipeline.txt\nPage: -\nEvidence: A merge to main triggers an automatic staging deployment. ## Gates A minimum of 80% unit-test coverage is required to merge.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": "-",
+        "chunk_id": "TECH_CICD_Pipeline.txt_para1_c0",
+        "content": "A merge to main triggers an automatic staging deployment. ## Gates A minimum of 80% unit-test coverage is required to merge.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "A merge to main triggers an automatic staging deployment. ## Gates A minimum of 80% unit-test coverage is required to merge.",
+        "document_name": "TECH_CICD_Pipeline.txt",
+        "page": "-",
+        "chunk_id": "TECH_CICD_Pipeline.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "A minimum of 80% unit-test coverage is required to merge.",
+    "citation": [
+      {
+        "document": "TECH_CICD_Pipeline.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8858,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-024",
+    "question": "How do I reset my password?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Raise a ticket to the IT Helpdesk via the portal; processed within 1x24 hours.",
+    "expected_sources": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_IT_Support.txt\nPage: -\nEvidence: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "-",
+        "chunk_id": "FAQ_IT_Support.txt_para1_c0",
+        "content": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+        "document_name": "FAQ_IT_Support.txt",
+        "page": "-",
+        "chunk_id": "FAQ_IT_Support.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours.",
+    "citation": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9949,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-025",
+    "question": "When is payday?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "The 25th of each month (prior working day if a holiday).",
+    "expected_sources": [
+      {
+        "document": "FAQ_Payroll.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Payroll.txt\nPage: -\nEvidence: Salaries are paid on the 25th of each month. If the 25th is a holiday, payment is the prior working day.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Payroll.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Payroll.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Payroll.txt_para1_c0",
+        "content": "Salaries are paid on the 25th of each month. If the 25th is a holiday, payment is the prior working day.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Salaries are paid on the 25th of each month. If the 25th is a holiday, payment is the prior working day.",
+        "document_name": "FAQ_Payroll.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Payroll.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "Payday is on the 25th of each month. If the 25th is a holiday, payment is the prior working day.",
+    "citation": [
+      {
+        "document": "FAQ_Payroll.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.96,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-026",
+    "question": "What is the mailbox size limit?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "50 GB.",
+    "expected_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Email_Calendar.txt\nPage: -\nEvidence: The standard mailbox quota is 50 GB.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+        "content": "The standard mailbox quota is 50 GB.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "The standard mailbox quota is 50 GB.",
+        "document_name": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "The standard mailbox quota is 50 GB.",
+    "citation": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-027",
+    "question": "What should I bring on my first day?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "A valid ID, NPWP (tax ID), and bank account details.",
+    "expected_sources": [
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Onboarding.txt\nPage: -\nEvidence: A valid ID, your tax ID (NPWP), and bank account details.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Onboarding.txt_para1_c0",
+        "content": "A valid ID, your tax ID (NPWP), and bank account details.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "A valid ID, your tax ID (NPWP), and bank account details.",
+        "document_name": "FAQ_Onboarding.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Onboarding.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "A valid ID, your tax ID (NPWP), and bank account details.",
+    "citation": [
+      {
+        "document": "FAQ_Onboarding.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9863,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-028",
+    "question": "Is there a home-office allowance?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Yes, a one-time allowance of IDR 1,500,000.",
+    "expected_sources": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Remote_Work.txt\nPage: -\nEvidence: A: A one-time home-office allowance of IDR 1,500,000 is available.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Remote_Work.txt_para1_c0",
+        "content": "A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "A: A one-time home-office allowance of IDR 1,500,000 is available.",
+        "document_name": "FAQ_Remote_Work.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Remote_Work.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "A one-time home-office allowance of IDR 1,500,000 is available.",
+    "citation": [
+      {
+        "document": "FAQ_Remote_Work.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9268,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-029",
+    "question": "What is the replacement fee for an access card?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "IDR 50,000.",
+    "expected_sources": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Facilities.txt\nPage: -\nEvidence: Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Facilities.txt_para1_c0",
+        "content": "Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Request one at the front desk; a replacement fee of IDR 50,000 applies.",
+        "document_name": "FAQ_Facilities.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Facilities.txt_para1_c0"
+      }
+    ],
+    "generated_answer": "The replacement fee for an access card is IDR 50,000.",
+    "citation": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9,
+    "evaluation_context_mode": "source_locked_single_pass"
+  },
+  {
+    "id": "QA-030",
+    "question": "How many new enterprise customers were added in Q3 2025?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "18, bringing the total to 214.",
+    "expected_sources": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": ""
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Q3_2025_Performance.pdf\nPage: 1\nEvidence: The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1",
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0",
+        "content": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "The company added 18 new enterprise customers in Q3 2025, bringing the total to 214. Customer churn in Q3 2025 was 2.1%, down from 2.8% in Q2.",
+        "document_name": "Report_Q3_2025_Performance.pdf",
+        "page": 1,
+        "chunk_id": "Report_Q3_2025_Performance.pdf_p1_c0"
+      }
+    ],
+    "generated_answer": "18",
+    "citation": [
+      {
+        "document": "Report_Q3_2025_Performance.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.9812,
+    "evaluation_context_mode": "source_locked_single_pass"
+  }
+]
