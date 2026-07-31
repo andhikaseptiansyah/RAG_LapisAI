@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import hashlib
 import json
 import os
 import time
@@ -625,14 +626,22 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
     )
 
     def compact(candidate: dict[str, Any]) -> dict[str, Any]:
+        content = str(candidate.get("content") or "")
         return {
             "chunkId": candidate.get("chunkId"),
             "documentName": candidate.get("documentName"),
             "page": candidate.get("page"),
+            "contentSha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
             "score": candidate.get("score"),
             "baseScore": candidate.get("baseScore"),
             "semanticScore": candidate.get("semanticScore"),
             "keywordScore": candidate.get("keywordScore"),
+            "exactTokenCoverage": candidate.get("exactTokenCoverage"),
+            "inventoryFieldScore": candidate.get("inventoryFieldScore"),
+            "rerankerApplied": candidate.get("rerankerApplied"),
+            "rerankerScore": candidate.get("rerankerScore"),
+            "rerankerRawScore": candidate.get("rerankerRawScore"),
+            "rerankerRank": candidate.get("rerankerRank"),
             "semanticQueryVariant": candidate.get("semanticQueryVariant"),
             "keywordQueryVariant": candidate.get("keywordQueryVariant"),
             "rerankerQueryVariant": candidate.get("rerankerQueryVariant"),
@@ -642,7 +651,7 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
             "answerabilityAccepted": candidate.get("answerabilityAccepted"),
             "answerabilityStrictlySupported": candidate.get("answerabilityStrictlySupported"),
             "answerabilityEvidenceSelected": candidate.get("answerabilityEvidenceSelected"),
-            "preview": str(candidate.get("content") or "")[:300],
+            "preview": content[:300],
         }
 
     return {

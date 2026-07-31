@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 import time
 from typing import Any
@@ -30,6 +31,9 @@ from retrieval.context_selector import select_context_bundle
 from retrieval.hybrid_search import (
     _apply_evidence_verification,
     _base_hybrid_candidates,
+    _exact_token_coverage,
+    _inventory_field_score,
+    _is_inventory_query,
     hybrid_search,
 )
 from retrieval.query_expansion import (
@@ -399,6 +403,18 @@ def _materialize_locked_candidates(
         content, metadata = record
         if not content.strip():
             continue
+        expected_hash = str(
+            compact.get("contentSha256")
+            or compact.get("content_sha256")
+            or ""
+        ).strip().lower()
+        actual_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        if expected_hash and expected_hash != actual_hash:
+            print(
+                "[EVALUATION] Snapshot chunk content changed after capture: "
+                f"{chunk_id}"
+            )
+            continue
 
         def number(*keys: str, default: float = 0.0) -> float:
             for key in keys:
@@ -411,18 +427,44 @@ def _materialize_locked_candidates(
                     continue
             return default
 
+        def flag(*keys: str, default: bool = False) -> bool:
+            for key in keys:
+                if key not in compact or compact.get(key) is None:
+                    continue
+                value = compact.get(key)
+                if isinstance(value, str):
+                    return value.strip().casefold() in {"1", "true", "yes", "on"}
+                return bool(value)
+            return default
+
         score = number("score", default=0.0)
         base_score = number("baseScore", "base_score", default=score)
         semantic_score = number("semanticScore", "semantic_score", default=0.0)
         keyword_score = number("keywordScore", "keyword_score", default=0.0)
+        document_name = str(
+            metadata.get("filename")
+            or compact.get("documentName")
+            or compact.get("document")
+            or "-"
+        )
+        coverage_query = str(
+            compact.get("snapshotRetrievalQuery")
+            or compact.get("snapshot_retrieval_query")
+            or question
+        ).strip()
+        searchable_text = f"{document_name} {content}"
+        exact_token_coverage = _exact_token_coverage(
+            coverage_query,
+            searchable_text,
+        )
+        inventory_field_score = (
+            _inventory_field_score(searchable_text)
+            if _is_inventory_query(coverage_query)
+            else 0.0
+        )
         hydrated.append({
             "chunkId": chunk_id,
-            "documentName": str(
-                metadata.get("filename")
-                or compact.get("documentName")
-                or compact.get("document")
-                or "-"
-            ),
+            "documentName": document_name,
             "page": metadata.get("page", compact.get("page", "-")),
             "chunkIndex": metadata.get("chunk_index"),
             "content": content,
@@ -432,7 +474,31 @@ def _materialize_locked_candidates(
             "keywordScore": keyword_score,
             "semanticRank": rank - 1,
             "keywordRank": rank - 1,
-            "rerankerApplied": bool(compact.get("rerankerApplied", True)),
+            "exactTokenCoverage": round(exact_token_coverage, 6),
+            "inventoryFieldScore": round(inventory_field_score, 6),
+            "rerankerApplied": flag(
+                "rerankerApplied",
+                "reranker_applied",
+                default=False,
+            ),
+            "rerankerScore": number(
+                "rerankerScore",
+                "reranker_score",
+                default=0.0,
+            ),
+            "rerankerRawScore": number(
+                "rerankerRawScore",
+                "reranker_raw_score",
+                default=0.0,
+            ),
+            "rerankerRank": number(
+                "rerankerRank",
+                "reranker_rank",
+                default=float(rank),
+            ),
+            "snapshotRetrievalMode": compact.get("snapshotRetrievalMode")
+            or compact.get("snapshot_retrieval_mode"),
+            "snapshotRetrievalQuery": coverage_query,
             "metadata": metadata,
             "evaluationSnapshotRank": rank,
         })
@@ -440,11 +506,15 @@ def _materialize_locked_candidates(
     if not hydrated:
         return []
 
+    snapshot_query = str(
+        hydrated[0].get("snapshotRetrievalQuery")
+        or question
+    )
     return _validate_for_original_question(
         question,
         hydrated,
         requested_k=requested_k,
-        bridge_query=question,
+        bridge_query=snapshot_query,
         stage="evaluation_snapshot",
     )
 
@@ -686,7 +756,21 @@ def _run_chat_impl(
             requested_k=requested_k,
         )
         retrieval_mode = "evaluation_snapshot"
-        retrieval_query = question
+        retrieval_query = str(
+            next(
+                (
+                    candidate.get("snapshotRetrievalQuery")
+                    or candidate.get("snapshot_retrieval_query")
+                    for candidate in locked_candidates
+                    if isinstance(candidate, dict)
+                    and (
+                        candidate.get("snapshotRetrievalQuery")
+                        or candidate.get("snapshot_retrieval_query")
+                    )
+                ),
+                question,
+            )
+        )
     else:
         retrieved_chunks, retrieval_mode, retrieval_query = _retrieve_with_language_fallback(
             question,

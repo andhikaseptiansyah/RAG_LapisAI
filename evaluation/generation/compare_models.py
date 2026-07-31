@@ -17,11 +17,16 @@ METRICS = (
     "answer_relevance_1_to_5",
     "context_precision",
     "context_recall",
+    "citation_precision",
+    "citation_recall",
+    "citation_f1",
     "citation_accuracy",
     "precision_at_k",
     "recall_at_k",
     "hit_at_k",
     "mrr",
+    "top1_accuracy",
+    "ndcg_at_k",
     "retrieval_debug_coverage",
     "average_retrieval_time_ms",
     "false_refusal_rate",
@@ -29,6 +34,8 @@ METRICS = (
     "unanswerable_no_citation_rate",
     "unanswerable_no_result_rate",
     "hallucination_rate",
+    "pipeline_failure_rate",
+    "retrieval_or_context_failure_rate",
     "generation_failure_rate",
     "average_response_time_ms",
     "p95_response_time_ms",
@@ -68,7 +75,12 @@ def _scale_five(value: Any) -> float | None:
         return None
 
 
-def derived_scores(metrics: dict[str, Any]) -> dict[str, float | None]:
+def derived_scores(metrics: dict[str, Any]) -> dict[str, Any]:
+    citation_f1 = (
+        metrics.get("citation_f1")
+        if metrics.get("citation_f1") is not None
+        else metrics.get("citation_accuracy")
+    )
     answer = _mean_available(
         metrics.get("token_f1"),
         metrics.get("keyword_coverage"),
@@ -76,13 +88,17 @@ def derived_scores(metrics: dict[str, Any]) -> dict[str, float | None]:
     )
     grounding = _mean_available(
         _scale_five(metrics.get("faithfulness_1_to_5")),
-        metrics.get("citation_accuracy"),
+        citation_f1,
         _inverse_rate(metrics.get("hallucination_rate")),
     )
     retrieval = _mean_available(
         metrics.get("recall_at_k"),
-        metrics.get("hit_at_k"),
         metrics.get("mrr"),
+        (
+            metrics.get("ndcg_at_k")
+            if metrics.get("ndcg_at_k") is not None
+            else metrics.get("hit_at_k")
+        ),
     )
     safety = _mean_available(
         _inverse_rate(metrics.get("false_refusal_rate")),
@@ -102,10 +118,59 @@ def derived_scores(metrics: dict[str, Any]) -> dict[str, float | None]:
         (safety, 0.15),
     ]
     valid = [(value, weight) for value, weight in weighted if value is not None]
-    overall = (sum(value * weight for value, weight in valid) / sum(weight for _, weight in valid)) if valid else None
+    deterministic_answer = _mean_available(
+        metrics.get("token_f1"),
+        metrics.get("keyword_coverage"),
+    )
+    deterministic_grounding = _mean_available(citation_f1)
+    deterministic_weighted = [
+        (deterministic_answer, 0.35),
+        (deterministic_grounding, 0.30),
+        (retrieval, 0.20),
+        (safety, 0.15),
+    ]
+    deterministic_valid = [
+        (value, weight)
+        for value, weight in deterministic_weighted
+        if value is not None
+    ]
+    deterministic_score = (
+        sum(value * weight for value, weight in deterministic_valid)
+        / sum(weight for _, weight in deterministic_valid)
+        if deterministic_valid
+        else None
+    )
+
+    required_metrics = {
+        "answer_relevance_1_to_5": metrics.get("answer_relevance_1_to_5"),
+        "faithfulness_1_to_5": metrics.get("faithfulness_1_to_5"),
+        "hallucination_rate": metrics.get("hallucination_rate"),
+    }
+    missing_metrics = [
+        name
+        for name, value in required_metrics.items()
+        if value is None
+    ]
+    overall = (
+        sum(value * weight for value, weight in valid)
+        / sum(weight for _, weight in valid)
+        if valid and not missing_metrics
+        else None
+    )
     return {
         **{key: round(value * 100, 2) if value is not None else None for key, value in components.items()},
         "overall_score": round(overall * 100, 2) if overall is not None else None,
+        "deterministic_score": (
+            round(deterministic_score * 100, 2)
+            if deterministic_score is not None
+            else None
+        ),
+        "score_status": (
+            "COMPLETE"
+            if not missing_metrics
+            else "INCOMPLETE_MISSING_JUDGE"
+        ),
+        "missing_score_metrics": ", ".join(missing_metrics),
     }
 
 
@@ -124,6 +189,7 @@ def bilingual_macro_metrics(summary: dict[str, Any]) -> dict[str, Any]:
 
 
 def flatten_summary(summary: dict[str, Any], scope: str, metrics: dict[str, Any]) -> dict[str, Any]:
+    language_pairing = summary.get("language_pairing", {}) or {}
     row = {
         "Model": summary.get("model"),
         "Model Name": summary.get("model_name"),
@@ -131,6 +197,11 @@ def flatten_summary(summary: dict[str, Any], scope: str, metrics: dict[str, Any]
         "Total Questions": metrics.get("total_questions"),
         "Answerable": metrics.get("answerable_questions"),
         "Unanswerable": metrics.get("unanswerable_questions"),
+        "Language Comparison Status": language_pairing.get("status"),
+        "Paired Language IDs": language_pairing.get("paired_id_count"),
+        "Equivalent Source Pairs": language_pairing.get(
+            "same_expected_source_pair_count"
+        ),
     }
     for metric in METRICS:
         row[metric] = metrics.get(metric)
@@ -172,11 +243,26 @@ def main() -> None:
                 for row in csv.DictReader(file):
                     fingerprints[row["ID"]][model] = row.get("Context Fingerprint", "")
 
-    mismatches = {
+    consistency_applicable = len(summaries) > 1
+    comparable_fingerprints = {
         qid: values
         for qid, values in fingerprints.items()
-        if len(values) == len(summaries) and len(set(values.values())) > 1
+        if len(values) == len(summaries)
     }
+    mismatches = (
+        {
+            qid: values
+            for qid, values in comparable_fingerprints.items()
+            if len(set(values.values())) > 1
+        }
+        if consistency_applicable
+        else {}
+    )
+    questions_checked = (
+        len(comparable_fingerprints)
+        if consistency_applicable
+        else 0
+    )
 
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -193,7 +279,8 @@ def main() -> None:
         "models": [summary.get("model") for summary in summaries],
         "rows": rows,
         "retrieval_context_consistency": {
-            "questions_checked": len(fingerprints),
+            "status": "checked" if consistency_applicable else "not_applicable",
+            "questions_checked": questions_checked,
             "mismatch_count": len(mismatches),
             "mismatches": mismatches,
         },
@@ -201,24 +288,29 @@ def main() -> None:
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
     overall = [row for row in rows if row["Scope"] == "MACRO"] or [row for row in rows if row["Scope"] == "ALL"]
+    model_count = len(summaries)
     headers = [
-        "Model", "Model Name", "Overall", "Answer", "Grounding", "Retrieval", "Safety",
-        "P@K", "R@K", "Hit@K", "MRR", "Token F1", "Faithfulness", "Citation",
+        "Model", "Model Name", "Overall", "Deterministic", "Answer", "Grounding", "Retrieval", "Safety",
+        "Status", "P@K", "R@K", "Hit@K", "MRR", "NDCG@K", "Token F1", "Faithfulness", "Citation F1",
         "Hallucination", "Avg ms",
     ]
     table_rows = []
     for row in overall:
         table_rows.append([
             row["Model"], row.get("Model Name"), row.get("overall_score"),
+            row.get("deterministic_score"),
             row.get("answer_quality_score"), row.get("grounding_score"),
             row.get("retrieval_score"), row.get("safety_score"),
+            row.get("score_status"),
             row.get("precision_at_k"), row.get("recall_at_k"), row.get("hit_at_k"),
-            row.get("mrr"), row.get("token_f1"), row.get("faithfulness_1_to_5"),
-            row.get("citation_accuracy"), row.get("hallucination_rate"),
+            row.get("mrr"), row.get("ndcg_at_k"), row.get("token_f1"),
+            row.get("faithfulness_1_to_5"),
+            row.get("citation_f1") if row.get("citation_f1") is not None else row.get("citation_accuracy"),
+            row.get("hallucination_rate"),
             row.get("average_response_time_ms"),
         ])
     lines = [
-        "# Comparison of 3 LLM Models (Bilingual Macro)",
+        f"# Comparison of {model_count} LLM Model{'s' if model_count != 1 else ''} (Bilingual Macro)",
         "",
         "| " + " | ".join(headers) + " |",
         "|" + "|".join(["---"] * len(headers)) + "|",
@@ -229,17 +321,38 @@ def main() -> None:
         "",
         "## Retrieval-context consistency",
         "",
-        f"- Questions checked: {len(fingerprints)}",
+        f"- Status: {'checked' if consistency_applicable else 'not applicable (only one model)'}",
+        f"- Questions checked: {questions_checked}",
         f"- Context mismatches across models: {len(mismatches)}",
-        "",
-        "A zero mismatch count confirms that the three models were compared using identical retrieved evidence.",
         "",
         "## Composite score",
         "",
         "The primary comparison uses a bilingual macro average, so English and Indonesian receive equal weight despite different question counts.",
         "",
         "Overall score = 35% answer quality + 30% grounding + 20% retrieval + 15% safety. Latency is reported separately and does not increase the quality score.",
+        "",
+        "If the LLM judge is skipped or fails, Overall is intentionally left empty and score_status is INCOMPLETE_MISSING_JUDGE; deterministic_score remains available for diagnostics.",
     ])
+    pairing_statuses = {
+        str(row.get("Language Comparison Status") or "")
+        for row in overall
+    }
+    if "descriptive_only_unpaired_targets" in pairing_statuses:
+        lines.extend([
+            "",
+            "## Language comparison",
+            "",
+            "English and Indonesian scores are descriptive by-language slices, not a controlled language-gap test, because the question sets do not use equivalent source targets.",
+        ])
+    if consistency_applicable:
+        lines[lines.index("## Composite score"):lines.index("## Composite score")] = [
+            (
+                "A zero mismatch count confirms that the compared models used identical retrieved evidence."
+                if not mismatches
+                else "Context mismatches were found; model-level comparisons are not evidence-locked for every question."
+            ),
+            "",
+        ]
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(f"Comparison CSV : {csv_path}")

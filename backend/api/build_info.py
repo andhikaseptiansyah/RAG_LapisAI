@@ -5,8 +5,13 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-BUILD_VERSION = "rag-bilingual-eval-v11-20260729"
+BUILD_VERSION = "rag-bilingual-eval-v12-20260730"
 BUILD_FEATURES = (
+    "content-hash-verified-snapshot-replay",
+    "snapshot-reranker-and-lexical-signal-preservation",
+    "evaluation-pipeline-failure-taxonomy",
+    "citation-precision-recall-f1-and-ndcg-reporting",
+    "structured-refusal-aware-abstention-detection",
     "english-corpus-first-retrieval-for-indonesian-queries",
     "direct-english-production-path-reused-for-language-bridge",
     "stale-evidence-and-answerability-annotations-cleared-before-revalidation",

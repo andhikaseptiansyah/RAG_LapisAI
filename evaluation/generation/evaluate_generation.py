@@ -36,37 +36,51 @@ LLM_BASE_URL = os.getenv("EVAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_API_KEY = os.getenv("EVAL_LLM_API_KEY", "ollama")
 LLM_MODEL = os.getenv("EVAL_LLM_MODEL", "qwen3-custom:latest")
 
-ABSTENTION_PATTERNS = (
-    # Indonesian
-    "belum ketemu",
-    "belum ditemukan",
-    "tidak ditemukan",
-    "tidak disebutkan",
-    "tidak dicantumkan",
-    "tidak tersedia",
-    "tidak ada informasi",
-    "tidak memiliki informasi",
-    "tidak dapat ditemukan",
+REFUSAL_PREFIXES = (
+    # Canonical backend refusals and direct first-person refusals.
+    "informasi tersebut tidak ditemukan",
+    "informasi tidak ditemukan",
+    "tidak ditemukan dengan bukti",
+    "belum ditemukan di dokumen",
+    "belum ketemu di dokumen",
+    "tidak ada informasi yang cukup",
+    "konteks tidak cukup",
+    "saya tidak menemukan",
+    "saya belum menemukan",
+    "saya tidak dapat menemukan",
+    "the requested information was not found",
+    "the information was not found",
+    "i cannot answer",
+    "i can't answer",
+    "i could not find",
+    "i couldn't find",
+    "i cannot find",
+    "could not find the requested information",
+    "no sufficient information was found",
+    "no reliable source",
+    "insufficient context",
+    "insufficient evidence",
+)
+
+DOCUMENT_REFUSAL_PREFIXES = (
     "dokumen yang diindeks tidak",
+    "dokumen yang telah diindeks tidak",
     "dokumen tidak menyebutkan",
     "dokumen tidak menentukan",
-    "informasi tersebut tidak tersedia",
-    "saya tidak menemukan",
-    # English
-    "no reliable source",
-    "not found",
-    "not provided",
-    "not specified",
-    "not mentioned",
-    "no information",
-    "cannot find",
-    "could not find",
-    "indexed documents do not",
-    "documents do not specify",
-    "documents do not mention",
-    "not available in the documents",
-    "not available in the indexed documents",
-    "not stated in the indexed documents",
+    "the indexed documents do not",
+    "the documents do not specify",
+    "the documents do not mention",
+)
+
+CONTRAST_MARKERS = (
+    " but ",
+    " however ",
+    " although ",
+    " yet ",
+    " namun ",
+    " tetapi ",
+    " meskipun ",
+    " akan tetapi ",
 )
 
 
@@ -133,10 +147,14 @@ def source_metrics(
     cited = source_set(citations)
 
     if not answerable:
+        citation_precision = 1.0 if not cited else 0.0
         return {
             "context_precision": 1.0 if not retrieved else 0.0,
             "context_recall": None,
-            "citation_accuracy": 1.0 if not cited else 0.0,
+            "citation_precision": citation_precision,
+            "citation_recall": None,
+            "citation_f1": citation_precision,
+            "citation_accuracy": citation_precision,
             "retrieval_no_result": 1.0 if not retrieved else 0.0,
         }
 
@@ -148,15 +166,31 @@ def source_metrics(
         return {
             "context_precision": None,
             "context_recall": None,
+            "citation_precision": None,
+            "citation_recall": None,
+            "citation_f1": None,
             "citation_accuracy": None,
             "retrieval_no_result": 1.0 if not retrieved_units else 0.0,
         }
 
     intersection = expected_units & retrieved_units
+    cited_intersection = expected_units & cited_units
+    citation_precision = len(cited_intersection) / max(len(cited_units), 1)
+    citation_recall = len(cited_intersection) / len(expected_units)
+    citation_f1 = (
+        2 * citation_precision * citation_recall
+        / (citation_precision + citation_recall)
+        if citation_precision + citation_recall > 0
+        else 0.0
+    )
     return {
         "context_precision": len(intersection) / max(len(retrieved_units), 1),
         "context_recall": len(intersection) / len(expected_units),
-        "citation_accuracy": len(expected_units & cited_units) / len(expected_units),
+        "citation_precision": citation_precision,
+        "citation_recall": citation_recall,
+        "citation_f1": citation_f1,
+        # Compatibility alias. New reports label this as F1, not "accuracy".
+        "citation_accuracy": citation_f1,
         "retrieval_no_result": 1.0 if not retrieved_units else 0.0,
     }
 
@@ -175,6 +209,8 @@ def ranked_retrieval_metrics(
             "recall_at_k": None,
             "hit_at_k": None,
             "mrr": None,
+            "top1_accuracy": None,
+            "ndcg_at_k": None,
             "first_relevant_rank": None,
         }
 
@@ -185,6 +221,8 @@ def ranked_retrieval_metrics(
             "recall_at_k": None,
             "hit_at_k": None,
             "mrr": None,
+            "top1_accuracy": None,
+            "ndcg_at_k": None,
             "first_relevant_rank": None,
         }
 
@@ -209,11 +247,27 @@ def ranked_retrieval_metrics(
         (index for index, document in enumerate(ranked_documents, start=1) if document in expected_documents),
         None,
     )
+    dcg = sum(
+        1.0 / math.log2(rank + 1)
+        for rank, document in enumerate(top_documents, start=1)
+        if document in expected_documents
+    )
+    ideal_relevant = min(len(expected_documents), k)
+    ideal_dcg = sum(
+        1.0 / math.log2(rank + 1)
+        for rank in range(1, ideal_relevant + 1)
+    )
     return {
         "precision_at_k": len(relevant_in_top_k) / k,
         "recall_at_k": len(relevant_in_top_k) / len(expected_documents),
         "hit_at_k": 1.0 if relevant_in_top_k else 0.0,
         "mrr": (1.0 / first_rank) if first_rank else 0.0,
+        "top1_accuracy": (
+            1.0
+            if top_documents and top_documents[0] in expected_documents
+            else 0.0
+        ),
+        "ndcg_at_k": dcg / ideal_dcg if ideal_dcg else None,
         "first_relevant_rank": float(first_rank) if first_rank else None,
     }
 
@@ -309,8 +363,22 @@ def keyword_coverage(keywords: list[str], question: str, generated: str) -> floa
 
 
 def detect_abstention(answer: str) -> bool:
-    text = str(answer or "").casefold()
-    return "confidence: 0%" in text or any(pattern in text for pattern in ABSTENTION_PATTERNS)
+    """Detect a direct refusal without treating a factual caveat as abstention."""
+    text = re.sub(r"\s+", " ", str(answer or "")).strip().casefold()
+    if not text:
+        return False
+    if re.search(r"(?:^|\s)confidence\s*:\s*0\s*%(?:\s|$)", text):
+        return True
+    if text.startswith(REFUSAL_PREFIXES):
+        return True
+
+    # Legacy answers sometimes use a document-scoped refusal. Restrict this to
+    # the opening statement and ignore "not specified, but ..." caveats that
+    # continue with a supported answer.
+    first_statement = re.split(r"(?<=[.!?])\s+|\n+", text, maxsplit=1)[0]
+    if first_statement.startswith(DOCUMENT_REFUSAL_PREFIXES):
+        return not any(marker in f" {text[:320]} " for marker in CONTRAST_MARKERS)
+    return False
 
 
 def clamp_score(value: Any) -> float | None:
@@ -446,12 +514,66 @@ def percentile(values: Iterable[float | None], percentile_value: float) -> float
     return round(result, 2)
 
 
+def bilingual_pairing_diagnostics(
+    items: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Report whether EN-vs-ID scores measure the same underlying questions."""
+    by_language: dict[str, dict[str, dict[str, Any]]] = {
+        "EN": {},
+        "ID": {},
+    }
+    for item in items:
+        language = str(item.get("language") or "").upper()
+        if language not in by_language:
+            continue
+        qid = str(item.get("id") or "")
+        pair_key = qid.split("-", 1)[-1]
+        by_language[language][pair_key] = item
+
+    paired_keys = sorted(
+        set(by_language["EN"]).intersection(by_language["ID"])
+    )
+    same_source_pairs = 0
+    for key in paired_keys:
+        english_sources = {
+            document
+            for document, _ in source_set(
+                by_language["EN"][key].get("references") or []
+            )
+        }
+        indonesian_sources = {
+            document
+            for document, _ in source_set(
+                by_language["ID"][key].get("references") or []
+            )
+        }
+        if english_sources and english_sources == indonesian_sources:
+            same_source_pairs += 1
+
+    paired_count = len(paired_keys)
+    comparable = bool(paired_count and same_source_pairs == paired_count)
+    return {
+        "status": (
+            "paired_equivalent_source_targets"
+            if comparable
+            else "descriptive_only_unpaired_targets"
+        ),
+        "paired_id_count": paired_count,
+        "same_expected_source_pair_count": same_source_pairs,
+        "direct_language_gap_interpretation_supported": comparable,
+    }
+
+
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     answerable_rows = [row for row in rows if row["Answerable"]]
     unanswerable_rows = [row for row in rows if not row["Answerable"]]
     judge_attempted = [
         row for row in rows
-        if row["Judge Error"] not in {"SKIPPED", "GENERATION_FAILED"}
+        if row["Judge Error"] not in {
+            "SKIPPED",
+            "GENERATION_FAILED",
+            "PIPELINE_FAILED",
+        }
     ]
     judge_rows = [row for row in judge_attempted if not row["Judge Error"]]
     latencies = [row["Client Response Time (ms)"] for row in rows]
@@ -467,11 +589,16 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "answer_relevance_1_to_5": mean(row["Answer Relevance"] for row in judge_rows),
         "context_precision": mean(row["Context Precision"] for row in answerable_rows),
         "context_recall": mean(row["Context Recall"] for row in answerable_rows),
+        "citation_precision": mean(row["Citation Precision"] for row in answerable_rows),
+        "citation_recall": mean(row["Citation Recall"] for row in answerable_rows),
+        "citation_f1": mean(row["Citation F1"] for row in answerable_rows),
         "citation_accuracy": mean(row["Citation Accuracy"] for row in answerable_rows),
         "precision_at_k": mean(row["Precision@K"] for row in answerable_rows),
         "recall_at_k": mean(row["Recall@K"] for row in answerable_rows),
         "hit_at_k": mean(row["Hit@K"] for row in answerable_rows),
         "mrr": mean(row["MRR"] for row in answerable_rows),
+        "top1_accuracy": mean(row["Top-1 Accuracy"] for row in answerable_rows),
+        "ndcg_at_k": mean(row["NDCG@K"] for row in answerable_rows),
         "retrieval_debug_coverage": mean(row["Retrieval Debug Available"] for row in rows),
         "average_retrieval_time_ms": mean(row["Retrieval Time (ms)"] for row in rows),
         "false_refusal_rate": mean(row["False Refusal"] for row in answerable_rows),
@@ -479,6 +606,11 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "unanswerable_no_citation_rate": mean(row["No Citation On Unanswerable"] for row in unanswerable_rows),
         "unanswerable_no_result_rate": mean(row["Retrieval No Result"] for row in unanswerable_rows),
         "hallucination_rate": mean(row["Hallucination"] for row in judge_rows),
+        "pipeline_failure_rate": mean(row["Pipeline Failed"] for row in rows),
+        "retrieval_or_context_failure_rate": mean(
+            int(row["Failure Category"] == "retrieval_or_context")
+            for row in rows
+        ),
         "generation_failure_rate": mean(row["Generation Failed"] for row in rows),
         "judge_error_rate": (
             round(1 - (len(judge_rows) / len(judge_attempted)), 4)
@@ -549,9 +681,27 @@ def main() -> None:
 
         generated_answer = str(item.get("generated_answer") or "")
         generation_failed = bool(item.get("generation_failed"))
+        pipeline_failed = bool(item.get("pipeline_failed")) or generation_failed
+        structured_refusal = (
+            str(item.get("generation_mode") or "").strip().casefold()
+            == "retrieval_refusal"
+        )
+        failure_category = str(item.get("failure_category") or "").strip()
+        if pipeline_failed and not failure_category:
+            if structured_refusal:
+                # Backward-compatible correction for v4 rows, which marked a
+                # deterministic retrieval refusal as generation_failed.
+                failure_category = "retrieval_or_context"
+                generation_failed = False
+            else:
+                failure_category = (
+                    "generation_or_provider"
+                    if generation_failed
+                    else "pipeline_unknown"
+                )
         expected_answer = str(gt.get("expected_answer") or "")
         answerable = bool(gt.get("answerable"))
-        abstained = detect_abstention(generated_answer)
+        abstained = structured_refusal or detect_abstention(generated_answer)
         metadata = source_metrics(
             item.get("retrieved_sources") or [],
             gt.get("references") or [],
@@ -574,13 +724,21 @@ def main() -> None:
             else None
         )
 
-        if generation_failed:
+        if pipeline_failed:
             semantic = {
                 "faithfulness": None,
                 "answer_relevance": None,
                 "is_hallucination": None,
-                "reason": str(item.get("generation_error") or "Generation failed"),
-                "judge_error": "GENERATION_FAILED",
+                "reason": str(
+                    item.get("pipeline_error")
+                    or item.get("generation_error")
+                    or "Pipeline failed"
+                ),
+                "judge_error": (
+                    "GENERATION_FAILED"
+                    if generation_failed
+                    else "PIPELINE_FAILED"
+                ),
             }
         elif args.skip_llm_judge:
             semantic = {
@@ -600,7 +758,12 @@ def main() -> None:
             )
 
         citations = item.get("citation") or []
-        correct_unanswerable = int((not answerable) and abstained and not citations)
+        correct_unanswerable = int(
+            (not answerable)
+            and abstained
+            and not citations
+            and not pipeline_failed
+        )
         row = {
             "ID": qid,
             "Model": model,
@@ -625,10 +788,16 @@ def main() -> None:
                 for source in citations
                 if isinstance(source, dict)
             ),
+            "Pipeline Failed": int(pipeline_failed),
+            "Failure Category": failure_category,
+            "Failure Stage": str(item.get("failure_stage") or ""),
+            "Retrieval Mode": str(item.get("retrieval_mode") or ""),
+            "Retrieval Query": str(item.get("retrieval_query") or ""),
+            "Backend Build Version": str(item.get("backend_build_version") or ""),
             "Generation Failed": int(generation_failed),
             "Generation Error": str(item.get("generation_error") or ""),
             "Abstained": int(abstained),
-            "False Refusal": int(answerable and (abstained or generation_failed)),
+            "False Refusal": int(answerable and (abstained or pipeline_failed)),
             "Correct Unanswerable Refusal": correct_unanswerable,
             "No Citation On Unanswerable": int((not answerable) and not citations),
             "Normalized Exact Match": round(em, 4) if em is not None else None,
@@ -649,6 +818,21 @@ def main() -> None:
             "Citation Accuracy": (
                 round(metadata["citation_accuracy"], 4)
                 if metadata["citation_accuracy"] is not None
+                else None
+            ),
+            "Citation Precision": (
+                round(metadata["citation_precision"], 4)
+                if metadata["citation_precision"] is not None
+                else None
+            ),
+            "Citation Recall": (
+                round(metadata["citation_recall"], 4)
+                if metadata["citation_recall"] is not None
+                else None
+            ),
+            "Citation F1": (
+                round(metadata["citation_f1"], 4)
+                if metadata["citation_f1"] is not None
                 else None
             ),
             "Retrieval Top K": retrieval_top_k,
@@ -672,6 +856,16 @@ def main() -> None:
                 if ranked_metrics["mrr"] is not None
                 else None
             ),
+            "Top-1 Accuracy": (
+                round(ranked_metrics["top1_accuracy"], 4)
+                if ranked_metrics["top1_accuracy"] is not None
+                else None
+            ),
+            "NDCG@K": (
+                round(ranked_metrics["ndcg_at_k"], 4)
+                if ranked_metrics["ndcg_at_k"] is not None
+                else None
+            ),
             "First Relevant Rank": ranked_metrics["first_relevant_rank"],
             "Retrieval Debug Available": int(bool(item.get("ranked_candidates"))),
             "Retrieval Time (ms)": item.get("retrieval_time_ms"),
@@ -693,24 +887,34 @@ def main() -> None:
     if not rows:
         raise RuntimeError("No matching evaluation rows were found")
 
+    pairing = bilingual_pairing_diagnostics(gt_items)
     summary = {
         "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
-        "evaluation": "Bilingual 3-model generation evaluation",
+        "evaluation": "Bilingual RAG generation evaluation",
         "model": model,
         "model_name": model_name,
         "judge_model": None if args.skip_llm_judge else LLM_MODEL,
         "ground_truth_files": [str(path.resolve()) for path in datasets],
         "dataset": dataset_summary(gt_items),
+        "language_pairing": pairing,
         "overall": summarize_rows(rows),
         "by_language": {
             language: summarize_rows([row for row in rows if row["Language"] == language])
             for language in ("EN", "ID")
         },
         "notes": [
-            "Precision@K, Recall@K, Hit@K, and MRR are evaluated at document level because the CSV has no page labels.",
+            "Precision@K, Recall@K, Hit@K, MRR, Top-1 Accuracy, and NDCG@K are evaluated at document level because the CSV has no page labels.",
+            "Precision@K remains a standard ranking metric; with one relevant document its maximum at K=5 is 0.2. Use Hit@K, MRR, Top-1 Accuracy, or NDCG@K for easier interpretation.",
             "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
+            "Citation F1 combines citation precision and recall. Citation Accuracy is retained as a compatibility alias for Citation F1.",
+            "Pipeline failures are classified separately; generation_failure_rate now counts only model/provider failures, not retrieval refusals.",
             "Unanswerable safety requires a refusal and no citation.",
-            "The same configured judge model must be used for all three evaluated models.",
+            "The same configured judge model must be used for every compared model.",
+            (
+                "English-vs-Indonesian scores are descriptive only because the two language sets do not use equivalent source targets."
+                if not pairing["direct_language_gap_interpretation_supported"]
+                else "English-vs-Indonesian scores use paired IDs with equivalent expected source targets."
+            ),
         ],
     }
 

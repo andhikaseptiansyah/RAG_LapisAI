@@ -29,6 +29,7 @@ RETRIEVAL_DEBUG_URL = os.getenv(
     "LAPISAI_RETRIEVAL_DEBUG_URL",
     "http://localhost:8000/api/admin/retrieval-debug",
 )
+SNAPSHOT_SCHEMA_VERSION = 2
 
 
 def load_existing(path: Path) -> dict[str, dict[str, Any]]:
@@ -37,6 +38,15 @@ def load_existing(path: Path) -> dict[str, dict[str, Any]]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
+        return {}
+    if (
+        not isinstance(payload, dict)
+        or payload.get("snapshot_schema_version") != SNAPSHOT_SCHEMA_VERSION
+    ):
+        print(
+            "[SNAPSHOT] Existing snapshot uses an older contract; "
+            "all retrieval rows will be recaptured."
+        )
         return {}
     items = payload.get("items") if isinstance(payload, dict) else None
     if not isinstance(items, list):
@@ -55,12 +65,20 @@ def compact_candidate(candidate: Any, rank: int) -> dict[str, Any]:
         "chunk_id": item.get("chunkId"),
         "document": item.get("documentName"),
         "page": item.get("page"),
+        "content_sha256": item.get("contentSha256"),
         "score": item.get("score"),
         "base_score": item.get("baseScore"),
         "semantic_score": item.get("semanticScore"),
         "keyword_score": item.get("keywordScore"),
+        "exact_token_coverage": item.get("exactTokenCoverage"),
+        "inventory_field_score": item.get("inventoryFieldScore"),
+        "reranker_applied": item.get("rerankerApplied"),
+        "reranker_score": item.get("rerankerScore"),
+        "reranker_raw_score": item.get("rerankerRawScore"),
+        "reranker_rank": item.get("rerankerRank"),
         "evidence_supported": item.get("evidenceSupported"),
         "evidence_score": item.get("evidenceScore"),
+        "evidence_hard_failures": item.get("evidenceHardFailures") or [],
         "answerability_accepted": item.get("answerabilityAccepted"),
         "answerability_strictly_supported": item.get("answerabilityStrictlySupported"),
         "answerability_evidence_selected": item.get("answerabilityEvidenceSelected"),
@@ -118,13 +136,31 @@ def main() -> None:
         })
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(
-            json.dumps({"dataset": dataset_summary(questions), "top_k": top_k, "items": items}, indent=2, ensure_ascii=False),
+            json.dumps(
+                {
+                    "snapshot_schema_version": SNAPSHOT_SCHEMA_VERSION,
+                    "dataset": dataset_summary(questions),
+                    "top_k": top_k,
+                    "items": items,
+                },
+                indent=2,
+                ensure_ascii=False,
+            ),
             encoding="utf-8",
         )
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
-        json.dumps({"dataset": dataset_summary(questions), "top_k": top_k, "items": items}, indent=2, ensure_ascii=False),
+        json.dumps(
+            {
+                "snapshot_schema_version": SNAPSHOT_SCHEMA_VERSION,
+                "dataset": dataset_summary(questions),
+                "top_k": top_k,
+                "items": items,
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
         encoding="utf-8",
     )
     print(f"Retrieval snapshot: {output}")

@@ -81,13 +81,50 @@ CHAT_URL = os.getenv(
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
-CONTEXT_MODE = "source_locked_snapshot_native_model_v4"
+CONTEXT_MODE = "source_locked_snapshot_native_model_v5"
+SNAPSHOT_SCHEMA_VERSION = 2
 VALID_MODELS = ("ollama", "gemini", "groq")
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
     "gemini": ("GEMINI_MODEL", "gemini-3.5-flash"),
     "groq": ("GROQ_MODEL", "llama-3.3-70b-versatile"),
 }
+
+
+class NonRetryableEvaluationError(RuntimeError):
+    """A deterministic backend outcome that another identical retry cannot fix."""
+
+    def __init__(self, message: str, *, category: str):
+        super().__init__(message)
+        self.category = category
+
+
+def classify_chat_failure(response: dict[str, Any]) -> str:
+    """Map structured backend diagnostics to one stable benchmark category."""
+    stage = str(response.get("failure_stage") or "").strip().casefold()
+    generation_mode = str(response.get("generation_mode") or "").strip().casefold()
+    retrieval_mode = str(response.get("retrieval_mode") or "").strip().casefold()
+
+    if (
+        generation_mode == "retrieval_refusal"
+        or retrieval_mode == "refused"
+        or any(
+            marker in stage
+            for marker in ("retrieval", "context", "answerability", "confidence")
+        )
+    ):
+        return "retrieval_or_context"
+    if "answer_or_source" in stage:
+        return "answer_postprocessing"
+    if generation_mode and generation_mode != "native_model":
+        return "pipeline_contract"
+    return "generation_or_provider"
+
+
+def candidate_value(candidate: dict[str, Any], snake: str, camel: str) -> Any:
+    """Read snapshot v5 snake_case fields with compatibility for older snapshots."""
+    value = candidate.get(snake)
+    return candidate.get(camel) if value is None else value
 
 
 def resolved_model_name(provider: str) -> str:
@@ -302,10 +339,20 @@ def retrieved_sources_from_contexts(contexts: list[dict[str, Any]]) -> list[dict
     return output
 
 
-def load_retrieval_snapshot(path: Path | None) -> dict[str, dict[str, Any]]:
+def load_retrieval_snapshot(
+    path: Path | None,
+) -> dict[str, dict[str, Any]] | None:
     if path is None:
-        return {}
+        return None
     payload = json.loads(path.resolve().read_text(encoding="utf-8"))
+    if (
+        not isinstance(payload, dict)
+        or payload.get("snapshot_schema_version") != SNAPSHOT_SCHEMA_VERSION
+    ):
+        raise ValueError(
+            "Retrieval snapshot uses an obsolete contract. Rebuild it with "
+            "build_retrieval_snapshot.py before generating answers."
+        )
     items = payload.get("items") if isinstance(payload, dict) else None
     if not isinstance(items, list):
         raise ValueError("Retrieval snapshot must contain an items array")
@@ -333,6 +380,8 @@ def _existing_results(output: Path, model: str) -> dict[str, dict[str, Any]]:
             and item.get("model") == model
             and item.get("id")
             and item.get("evaluation_context_mode") == CONTEXT_MODE
+            and not item.get("pipeline_failed")
+            and not item.get("generation_failed")
         )
     }
 
@@ -378,6 +427,7 @@ def build_dataset(
         last_answer = ""
         last_chat_response: dict[str, Any] = {}
         last_client_elapsed_ms = 0.0
+        last_failure_category = "generation_or_provider"
         for attempt in range(1, retries + 2):
             try:
                 request_started = time.perf_counter()
@@ -395,12 +445,47 @@ def build_dataset(
                             "documentName": candidate.get("document") or candidate.get("documentName"),
                             "page": candidate.get("page"),
                             "score": candidate.get("score"),
-                            "baseScore": candidate.get("base_score") or candidate.get("baseScore"),
-                            "semanticScore": candidate.get("semantic_score") or candidate.get("semanticScore"),
-                            "keywordScore": candidate.get("keyword_score") or candidate.get("keywordScore"),
+                            "contentSha256": candidate_value(
+                                candidate, "content_sha256", "contentSha256"
+                            ),
+                            "baseScore": candidate_value(
+                                candidate, "base_score", "baseScore"
+                            ),
+                            "semanticScore": candidate_value(
+                                candidate, "semantic_score", "semanticScore"
+                            ),
+                            "keywordScore": candidate_value(
+                                candidate, "keyword_score", "keywordScore"
+                            ),
+                            "exactTokenCoverage": candidate_value(
+                                candidate, "exact_token_coverage", "exactTokenCoverage"
+                            ),
+                            "inventoryFieldScore": candidate_value(
+                                candidate, "inventory_field_score", "inventoryFieldScore"
+                            ),
+                            "rerankerApplied": candidate_value(
+                                candidate, "reranker_applied", "rerankerApplied"
+                            ),
+                            "rerankerScore": candidate_value(
+                                candidate, "reranker_score", "rerankerScore"
+                            ),
+                            "rerankerRawScore": candidate_value(
+                                candidate, "reranker_raw_score", "rerankerRawScore"
+                            ),
+                            "rerankerRank": candidate_value(
+                                candidate, "reranker_rank", "rerankerRank"
+                            ),
+                            "snapshotRetrievalMode": retrieval_item.get(
+                                "retrieval_mode"
+                            ),
+                            "snapshotRetrievalQuery": (
+                                retrieval_item.get("retrieval_query")
+                                or question
+                            ),
                         }
                         for candidate in ranked_candidates
-                        if candidate.get("chunk_id") or candidate.get("chunkId")
+                        if isinstance(candidate, dict)
+                        and (candidate.get("chunk_id") or candidate.get("chunkId"))
                     ]
                 chat_response = post_json(
                     CHAT_URL,
@@ -409,6 +494,23 @@ def build_dataset(
                 client_elapsed_ms = round((time.perf_counter() - request_started) * 1000, 2)
                 last_client_elapsed_ms = client_elapsed_ms
                 last_chat_response = chat_response
+                snapshot_build = str(
+                    retrieval_item.get("build_version") or ""
+                ).strip()
+                active_build = str(
+                    chat_response.get("buildVersion") or ""
+                ).strip()
+                if (
+                    snapshot_locked
+                    and snapshot_build
+                    and active_build
+                    and snapshot_build != active_build
+                ):
+                    raise NonRetryableEvaluationError(
+                        "Backend build changed after retrieval snapshot capture "
+                        f"({snapshot_build} != {active_build}). Rebuild the snapshot.",
+                        category="pipeline_contract",
+                    )
                 answer = str(
                     chat_response.get("answer")
                     or chat_response.get("result")
@@ -422,14 +524,16 @@ def build_dataset(
                 contexts = contexts_from_chat(chat_response)
                 answerable = bool(item.get("answerable"))
                 if answerable and not contexts:
-                    raise RuntimeError(
+                    raise NonRetryableEvaluationError(
                         "Answerable question returned no generation contexts. "
-                        "Verify that the source document is indexed."
+                        "Inspect failure_stage and retrieval diagnostics.",
+                        category=classify_chat_failure(chat_response),
                     )
                 if answerable and chat_response.get("generation_mode") != "native_model":
-                    raise RuntimeError(
-                        "Backend did not return native model output. Restart the backend "
-                        "after installing the native-evaluation patch."
+                    raise NonRetryableEvaluationError(
+                        "Backend did not return native model output. "
+                        "Inspect generation_mode and failure_stage.",
+                        category=classify_chat_failure(chat_response),
                     )
                 # Empty context is correct for a properly refused unanswerable question.
                 retrieved_context = build_context(contexts)
@@ -476,12 +580,27 @@ def build_dataset(
                         "ranked_candidates": ranked_candidates,
                         "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
                         "retrieval_snapshot_build": retrieval_item.get("build_version"),
+                        "snapshot_retrieval_mode": retrieval_item.get("retrieval_mode"),
+                        "snapshot_retrieval_query": retrieval_item.get("retrieval_query"),
+                        "backend_build_version": chat_response.get("buildVersion"),
+                        "retrieval_mode": chat_response.get("retrieval_mode"),
+                        "retrieval_query": chat_response.get("retrieval_query"),
+                        "failure_stage": chat_response.get("failure_stage"),
+                        "pipeline_failed": False,
+                        "failure_category": None,
+                        "generation_failed": False,
+                        "generation_error": "",
                     }
                 )
                 last_error = None
                 break
+            except NonRetryableEvaluationError as error:
+                last_error = error
+                last_failure_category = error.category
+                break
             except Exception as error:
                 last_error = error
+                last_failure_category = "generation_or_provider"
                 if attempt <= retries:
                     delay = min(2 ** (attempt - 1), 8)
                     print(f"  retry {attempt}/{retries} after error: {error}")
@@ -498,6 +617,7 @@ def build_dataset(
             failure_contexts = contexts_from_chat(last_chat_response) if last_chat_response else []
             failure_citations = normalize_chat_citations(last_chat_response) if last_chat_response else []
             failure_sources = retrieved_sources_from_contexts(failure_contexts)
+            generation_failed = last_failure_category == "generation_or_provider"
             results.append(
                 {
                     "id": qid,
@@ -527,8 +647,33 @@ def build_dataset(
                     "ranked_candidates": ranked_candidates,
                     "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
                     "retrieval_snapshot_build": retrieval_item.get("build_version"),
-                    "generation_failed": True,
-                    "generation_error": str(last_error),
+                    "snapshot_retrieval_mode": retrieval_item.get("retrieval_mode"),
+                    "snapshot_retrieval_query": retrieval_item.get("retrieval_query"),
+                    "backend_build_version": (
+                        last_chat_response.get("buildVersion")
+                        if last_chat_response
+                        else None
+                    ),
+                    "retrieval_mode": (
+                        last_chat_response.get("retrieval_mode")
+                        if last_chat_response
+                        else retrieval_item.get("retrieval_mode")
+                    ),
+                    "retrieval_query": (
+                        last_chat_response.get("retrieval_query")
+                        if last_chat_response
+                        else retrieval_item.get("retrieval_query")
+                    ),
+                    "failure_stage": (
+                        last_chat_response.get("failure_stage")
+                        if last_chat_response
+                        else None
+                    ),
+                    "pipeline_failed": True,
+                    "failure_category": last_failure_category,
+                    "pipeline_error": str(last_error),
+                    "generation_failed": generation_failed,
+                    "generation_error": str(last_error) if generation_failed else "",
                 }
             )
 

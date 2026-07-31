@@ -1,0 +1,123 @@
+{
+  "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
+  "evaluation": "Bilingual 3-model generation evaluation",
+  "model": "ollama",
+  "model_name": "qwen3-custom:latest",
+  "judge_model": null,
+  "ground_truth_files": [
+    "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI-main\\evaluation\\datasets\\qna_english_user.csv",
+    "C:\\Users\\ANDIKA\\Downloads\\RAG_LapisAI-main\\evaluation\\datasets\\qna_indonesia_user.csv"
+  ],
+  "dataset": {
+    "total": 100,
+    "answerable": 90,
+    "unanswerable": 10,
+    "by_language": {
+      "EN": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      },
+      "ID": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    }
+  },
+  "overall": {
+    "total_questions": 100,
+    "answerable_questions": 90,
+    "unanswerable_questions": 10,
+    "normalized_exact_match": 0.0444,
+    "token_f1": 0.4516,
+    "keyword_coverage": 0.7037,
+    "faithfulness_1_to_5": null,
+    "answer_relevance_1_to_5": null,
+    "context_precision": 0.7056,
+    "context_recall": 0.7222,
+    "citation_accuracy": 0.7,
+    "precision_at_k": 0.1756,
+    "recall_at_k": 0.8778,
+    "hit_at_k": 0.8778,
+    "mrr": 0.8611,
+    "retrieval_debug_coverage": 0.81,
+    "average_retrieval_time_ms": 13600.7274,
+    "false_refusal_rate": 0.2778,
+    "unanswerable_safety_rate": 1.0,
+    "unanswerable_no_citation_rate": 1.0,
+    "unanswerable_no_result_rate": 1.0,
+    "hallucination_rate": null,
+    "generation_failure_rate": 0.24,
+    "judge_error_rate": null,
+    "average_response_time_ms": 9085.9321,
+    "median_response_time_ms": 7135.5,
+    "p95_response_time_ms": 21460.39
+  },
+  "by_language": {
+    "EN": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0444,
+      "token_f1": 0.5302,
+      "keyword_coverage": 0.8667,
+      "faithfulness_1_to_5": null,
+      "answer_relevance_1_to_5": null,
+      "context_precision": 0.9,
+      "context_recall": 0.9111,
+      "citation_accuracy": 0.8889,
+      "precision_at_k": 0.1867,
+      "recall_at_k": 0.9333,
+      "hit_at_k": 0.9333,
+      "mrr": 0.9222,
+      "retrieval_debug_coverage": 0.86,
+      "average_retrieval_time_ms": 9750.0912,
+      "false_refusal_rate": 0.0889,
+      "unanswerable_safety_rate": 1.0,
+      "unanswerable_no_citation_rate": 1.0,
+      "unanswerable_no_result_rate": 1.0,
+      "hallucination_rate": null,
+      "generation_failure_rate": 0.06,
+      "judge_error_rate": null,
+      "average_response_time_ms": 9118.542,
+      "median_response_time_ms": 6482.69,
+      "p95_response_time_ms": 20437.26
+    },
+    "ID": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0444,
+      "token_f1": 0.373,
+      "keyword_coverage": 0.5407,
+      "faithfulness_1_to_5": null,
+      "answer_relevance_1_to_5": null,
+      "context_precision": 0.5111,
+      "context_recall": 0.5333,
+      "citation_accuracy": 0.5111,
+      "precision_at_k": 0.1644,
+      "recall_at_k": 0.8222,
+      "hit_at_k": 0.8222,
+      "mrr": 0.8,
+      "retrieval_debug_coverage": 0.76,
+      "average_retrieval_time_ms": 17451.3636,
+      "false_refusal_rate": 0.4667,
+      "unanswerable_safety_rate": 1.0,
+      "unanswerable_no_citation_rate": 1.0,
+      "unanswerable_no_result_rate": 1.0,
+      "hallucination_rate": null,
+      "generation_failure_rate": 0.42,
+      "judge_error_rate": null,
+      "average_response_time_ms": 9053.3222,
+      "median_response_time_ms": 7515.45,
+      "p95_response_time_ms": 22733.04
+    }
+  },
+  "notes": [
+    "Precision@K, Recall@K, Hit@K, and MRR are evaluated at document level because the CSV has no page labels.",
+    "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
+    "Unanswerable safety requires a refusal and no citation.",
+    "The same configured judge model must be used for all three evaluated models."
+  ]
+}
