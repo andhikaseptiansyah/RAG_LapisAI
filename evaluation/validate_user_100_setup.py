@@ -85,9 +85,15 @@ def normalize_metric_text(text: str) -> str:
 
 
 def keyword_self_coverage(question: str, expected_answer: str, keywords: list[str]) -> float:
+    """Require score annotations to be observable in the reference answer.
+
+    ``question`` is retained for call-site compatibility but deliberately does
+    not contribute to the score.
+    """
+    del question
     if not keywords:
         return 1.0
-    combined = normalize_metric_text(f"{question} {expected_answer}")
+    combined = normalize_metric_text(expected_answer)
     combined_tokens = set(combined.split())
     hits = 0
     for keyword in keywords:

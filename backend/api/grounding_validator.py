@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from api.progress import emit_progress
@@ -84,6 +85,12 @@ MONEY_PATTERN = re.compile(
     r"(?:\s*(?:ribu|thousand|juta|million|miliar|billion|triliun|trillion))?\b",
     flags=re.I,
 )
+MONEY_RANGE_PATTERN = re.compile(
+    rf"\b(IDR|Rp\.?|USD|EUR)\s*({NUMBER_CORE})\s*"
+    rf"(?:-|–|—|to|hingga|sampai(?:\s+dengan)?)\s*({NUMBER_CORE})\s*"
+    r"(ribu|thousand|juta|million|miliar|billion|triliun|trillion)\b",
+    flags=re.I,
+)
 PERCENT_PATTERN = re.compile(
     rf"\b{NUMBER_CORE}\s*(?:%(?=$|[\s.,;:!?\)\]}}])|(?:persen|percent|percentage)\b)",
     flags=re.I,
@@ -103,7 +110,15 @@ LEAVE_DAY_QUANTITY_PATTERN = re.compile(
 PLAIN_NUMBER_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?(?:st|nd|rd|th)?\b", flags=re.I)
 YEAR_PATTERN = re.compile(r"\b(?:19|20)\d{2}\b")
 ACRONYM_PATTERN = re.compile(r"\b[A-Z][A-Z0-9/_-]{1,11}\b")
+CAMEL_IDENTIFIER_PATTERN = re.compile(
+    r"\b[A-Z][a-z0-9]+(?:[A-Z][A-Za-z0-9]*)+\b"
+)
 SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+|\n+|\s+[•-]\s+")
+QA_PAIR_PATTERN = re.compile(
+    r"\bQ:\s*(?P<question>.*?)\s+\bA:\s*(?P<answer>.*?)"
+    r"(?=\s+#{1,6}\s+|\s+\bQ:\s*|$)",
+    flags=re.I,
+)
 CLAUSE_SPLIT = re.compile(
     r"\s*(?:;|\b(?:and|but|because|due\s+to|therefore|thus|while|whereas|"
     r"dan|tetapi|namun|karena|sehingga|sedangkan)\b)\s*",
@@ -187,6 +202,32 @@ GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "masa percobaan selama",
         "menjalani masa percobaan",
         "berlangsung selama masa percobaan",
+    ))),
+    "mailbox_quota": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("mailbox_quota", ()),
+        "standard mailbox quota",
+        "standard employee mailbox quota",
+        "kuota mailbox standar",
+        "kuota standar mailbox",
+        "kuota email standar",
+    ))),
+    "mdm": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("mdm", ()),
+        "mobile device management system",
+        "sistem mobile device management",
+        "sistem manajemen perangkat mobile",
+        "sistem manajemen perangkat seluler",
+        "manajemen perangkat mobile",
+        "manajemen perangkat seluler",
+    ))),
+    "software_access": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("software_access", ()),
+        "access to a software tool",
+        "request for access",
+        "request access to software",
+        "permintaan akses",
+        "pengajuan akses",
+        "sistem pemilik",
     ))),
     "new_employee": (
         "new employee",
@@ -310,6 +351,8 @@ GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "jatah cuti tahunan",
         "jumlah cuti tahunan",
         "cuti per tahun",
+        "libur tahunan",
+        "hak libur tahunan",
     ))),
     "hotel_limit": tuple(dict.fromkeys((
         *CONCEPT_ALIASES.get("hotel_limit", ()),
@@ -327,6 +370,19 @@ GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "boleh mengajukan kerja jarak jauh",
         "dapat mengajukan remote work",
         "hak untuk bekerja jarak jauh",
+        "karyawan yang telah dikonfirmasi",
+        "pegawai yang telah dikonfirmasi",
+    ))),
+    "offboarding": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("offboarding", ()),
+        "departing employee",
+        "departing employees",
+        "employee exit",
+        "employee's exit",
+        "exit time",
+        "karyawan yang keluar",
+        "pegawai yang keluar",
+        "waktu keluar karyawan",
     ))),
 }
 
@@ -348,6 +404,8 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
     "confirmed_employee": (
         "confirmed employee", "confirmed employees", "permanent employee",
         "permanent employees", "karyawan tetap", "pegawai tetap",
+        "karyawan yang telah dikonfirmasi", "pegawai yang telah dikonfirmasi",
+        "karyawan terkonfirmasi", "pegawai terkonfirmasi",
     ),
     "all": ("all", "every", "seluruh", "semua"),
     "person": (
@@ -417,8 +475,12 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "kebijakan", "ketentuan",
     ),
     "apply_policy": (
-        "apply", "applies", "implement", "implements", "has",
-        "menerapkan", "memberlakukan", "memiliki",
+        "apply", "applies", "implement", "implements", "has", "maintain",
+        "maintains", "adopt", "adopts", "menerapkan", "memberlakukan",
+        "memiliki", "mempertahankan",
+    ),
+    "policy_stance": (
+        "stance", "position", "policy stance", "sikap", "posisi kebijakan",
     ),
     "zero_tolerance": (
         "zero tolerance", "no tolerance", "without tolerance",
@@ -433,7 +495,7 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
     "report": (
         "report", "reports", "reported", "raise", "raised", "submit",
         "notify", "inform", "contact",
-        "lapor", "laporkan", "melaporkan", "dilaporkan", "diajukan",
+        "lapor", "laporan", "laporkan", "melaporkan", "dilaporkan", "diajukan",
         "mengajukan", "beri tahu", "memberi tahu", "hubungi", "menghubungi",
     ),
     "immediately": (
@@ -495,7 +557,10 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "disclose", "disclosed", "declare", "declared",
         "ungkapkan", "mengungkapkan", "diungkapkan", "dideklarasikan",
     ),
-    "in_writing": ("in writing", "written", "written disclosure", "secara tertulis", "tertulis"),
+    "in_writing": (
+        "in writing", "written", "written disclosure", "write", "writes",
+        "secara tertulis", "tertulis", "menulis", "ditulis", "melalui tulisan",
+    ),
     "entitled": (
         "entitled", "eligible", "entitlement", "has the right",
         "berhak", "memiliki hak", "hak",
@@ -506,6 +571,8 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "terakumulasi setiap bulan", "terakumulasi tiap bulan",
         "diakumulasi setiap bulan", "diakumulasi tiap bulan",
         "bertambah setiap bulan", "bertambah tiap bulan",
+        "diperhitungkan secara bulanan", "dihitung secara bulanan",
+        "diperhitungkan setiap bulan", "dihitung setiap bulan",
     ),
     "required": (
         "require", "requires", "required", "must", "mandatory", "needed",
@@ -513,8 +580,8 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
     ),
     "condition": ("if", "when", "for", "beyond", "apabila", "jika", "ketika"),
     "longer_than": (
-        "beyond", "longer than", "more than", "exceed", "exceeds",
-        "lebih dari", "melebihi",
+        "above", "over", "beyond", "longer than", "more than", "exceed",
+        "exceeds", "di atas", "lebih dari", "melebihi",
     ),
     "duration_relation": (
         "last", "lasts", "lasting", "longer than",
@@ -546,7 +613,12 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "approval", "approve", "approves", "approved by", "requires approval from",
         "menyetujui", "disetujui oleh", "persetujuan dari",
     ),
-    "manager": ("manager", "managers", "manajer"),
+    "manager": ("manager", "managers", "manajer", "atasan", "atasan langsung"),
+    "department_head": (
+        "department head", "head of department", "kepala departemen",
+        "kepala bagian",
+    ),
+    "director": ("director", "directors", "direktur"),
     "eligible": ("eligible", "may request", "can request", "berhak", "dapat mengajukan"),
     "manager_approval": (
         "manager approval", "approval from the manager", "with manager approval",
@@ -555,6 +627,21 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "atas persetujuan manajer", "setelah disetujui manajer",
         "memerlukan persetujuan manajer", "harus mendapat persetujuan manajer",
         "setelah mendapat persetujuan manajer", "dengan izin manajer",
+        "persetujuan atasan", "dengan persetujuan atasan",
+        "setelah mendapat persetujuan atasan", "izin atasan",
+    ),
+    "holiday": ("holiday", "public holiday", "hari libur", "libur"),
+    "prior_working_day": (
+        "prior working day", "previous working day", "preceding working day",
+        "hari kerja sebelumnya", "hari kerja terdahulu",
+    ),
+    "revoke": (
+        "revoke", "revokes", "revoked", "revocation", "mencabut",
+        "dicabut", "pencabutan",
+    ),
+    "system_access": (
+        "system access", "all system access", "akses sistem",
+        "seluruh akses sistem",
     ),
     "weekly": (
         "per week", "each week", "weekly", "in a week",
@@ -571,10 +658,99 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
     "per_night": (
         "per night", "each night", "nightly", "per malam", "setiap malam",
     ),
+    "replacement_fee": (
+        "replacement fee", "fee for replacement", "replacement charge",
+        "biaya penggantian", "tarif penggantian",
+    ),
+    "front_desk": (
+        "front desk", "reception desk", "reception", "receptionist",
+        "meja depan", "meja resepsionis", "bagian resepsionis", "resepsionis",
+    ),
+    "request_item": (
+        "request one", "request it", "submit a request", "request a replacement",
+        "mengajukan permohonan", "ajukan permohonan", "meminta penggantian",
+        "mengajukan penggantian",
+    ),
+    "access_request": (
+        "request it", "request access", "request for access", "submit the request",
+        "submit an access request", "permintaan akses", "pengajuan akses",
+        "mengajukan akses", "diajukan",
+    ),
+    "system_owner": (
+        "system owner", "owner of the system", "pemilik sistem", "sistem pemilik",
+    ),
+    "change_record": (
+        "change", "changes", "update", "updates", "updated", "modification",
+        "perubahan", "memperbarui", "mengubah", "ubah",
+    ),
+    "take_effect": (
+        "apply", "applies", "take effect", "takes effect", "effective from",
+        "berlaku", "mulai berlaku", "diberlakukan",
+    ),
+    "payroll_cycle": (
+        "payroll cycle", "pay cycle", "salary cycle",
+        "siklus payroll", "siklus penggajian", "siklus pembayaran gaji",
+        "siklus pembayaran",
+    ),
     "domestic_travel": (
         "domestic travel", "domestic business travel", "domestic trip",
         "perjalanan domestik", "perjalanan dinas domestik", "dinas dalam negeri",
     ),
+}
+
+
+# Some terms are not merely paraphrases. They are mutually exclusive values in
+# the same semantic field. A topical overlap must never make "director" support
+# "department head", or "verbal" support "in writing". This small deterministic
+# ontology protects high-risk roles and modalities before fuzzy bilingual
+# matching is considered.
+GROUNDING_EXCLUSIVE_TERMS: dict[str, dict[str, tuple[str, ...]]] = {
+    "approval_role": {
+        "manager": ("manager", "manajer", "atasan", "atasan langsung"),
+        "department_head": (
+            "department head", "head of department", "kepala departemen",
+            "kepala bagian",
+        ),
+        "director": ("director", "direktur"),
+        "human_resources": ("human resources", "hr team", "tim hr", "bagian hr"),
+        "information_technology": ("it team", "tim it", "bagian it"),
+    },
+    "disclosure_form": {
+        "written": ("in writing", "written", "secara tertulis", "tertulis", "menulis"),
+        "verbal": ("verbally", "verbal", "orally", "secara lisan", "lisan"),
+    },
+    "payroll_timing": {
+        "next": (
+            "next payroll cycle", "following payroll cycle",
+            "next pay cycle", "following pay cycle",
+            "siklus payroll berikutnya", "siklus penggajian berikutnya",
+            "siklus pembayaran berikutnya", "siklus pembayaran gaji berikutnya",
+        ),
+        "current": (
+            "current payroll cycle", "this payroll cycle", "current pay cycle",
+            "siklus payroll saat ini", "siklus payroll berjalan",
+            "siklus penggajian saat ini", "siklus penggajian berjalan",
+            "siklus pembayaran saat ini", "siklus pembayaran berjalan",
+        ),
+        "previous": (
+            "previous payroll cycle", "prior payroll cycle",
+            "siklus payroll sebelumnya", "siklus penggajian sebelumnya",
+            "siklus pembayaran sebelumnya",
+        ),
+    },
+    "service_location": {
+        "front_desk": (
+            "front desk", "reception desk", "reception", "receptionist",
+            "meja depan", "meja resepsionis", "bagian resepsionis", "resepsionis",
+        ),
+        "it_helpdesk": (
+            "it helpdesk", "it service desk", "service desk", "helpdesk",
+            "meja layanan it", "dukungan it",
+        ),
+        "security_desk": (
+            "security desk", "security office", "pos keamanan", "meja keamanan",
+        ),
+    },
 }
 
 # These qualifiers materially change the meaning of a claim. A generated claim
@@ -588,9 +764,9 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "exclusive": re.compile(r"\b(?:only|solely|exclusively|hanya)\b", flags=re.I),
     "minimum": re.compile(
-        r"\b(?:at\s+least|minimum|minimal|no\s+less\s+than|more\s+than|"
+        r"\b(?:at\s+least|minimum|minimal|no\s+less\s+than|above|over|more\s+than|"
         r"longer\s+than|beyond|exceed(?:s|ed)?|sekurang-kurangnya|lebih\s+dari|"
-        r"melebihi)\b",
+        r"di\s+atas|melebihi)\b",
         flags=re.I,
     ),
     "maximum": re.compile(
@@ -602,6 +778,13 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
     "exception": re.compile(r"\b(?:except|unless|excluding|kecuali)\b", flags=re.I),
     "prohibition": re.compile(
         r"\b(?:must\s+not|cannot|may\s+not|not\s+allowed|prohibited|dilarang|tidak\s+boleh)\b",
+        flags=re.I,
+    ),
+    "negated_requirement": re.compile(
+        r"\b(?:not\s+required|is\s+not\s+required|are\s+not\s+required|"
+        r"does\s+not\s+need|do\s+not\s+need|need\s+not|"
+        r"tidak\s+perlu|tidak\s+wajib|tidak\s+harus|tidak\s+diwajibkan|"
+        r"tidak\s+dipersyaratkan)\b",
         flags=re.I,
     ),
     "approximate": re.compile(
@@ -655,6 +838,25 @@ def _normalize_magnitude(value: str) -> str:
         "triliun": "trillion", "trillion": "trillion",
     }
     return mapping.get(normalize_text(value), normalize_text(value))
+
+
+def _canonical_money_amount(number: str, magnitude: str) -> str:
+    """Normalize equivalent forms such as 50 million and 50,000,000."""
+    scales = {
+        "": Decimal(1),
+        "thousand": Decimal(1_000),
+        "million": Decimal(1_000_000),
+        "billion": Decimal(1_000_000_000),
+        "trillion": Decimal(1_000_000_000_000),
+    }
+    try:
+        amount = Decimal(number) * scales.get(magnitude, Decimal(1))
+    except (InvalidOperation, ValueError):
+        return f"{number}:{magnitude}"
+    normalized = format(amount, "f")
+    if "." in normalized:
+        normalized = normalized.rstrip("0").rstrip(".")
+    return normalized or "0"
 
 
 def _tokenize(value: str) -> set[str]:
@@ -727,6 +929,57 @@ def _equivalent_group_occurs(
     )
 
 
+def _matched_equivalent_groups(value: str) -> set[str]:
+    """Return canonical relationship groups explicitly present in ``value``."""
+    return {
+        canonical
+        for canonical, aliases in GROUNDING_EQUIVALENT_TERMS.items()
+        if _equivalent_group_occurs(value, aliases)
+    }
+
+
+def _exclusive_semantic_values(value: str) -> dict[str, set[str]]:
+    """Find mutually exclusive values without confusing English pronouns.
+
+    Short acronyms are matched case-sensitively. This prevents the English
+    pronoun ``it`` from being interpreted as the Information Technology team.
+    """
+    matches: dict[str, set[str]] = {}
+    for family, values in GROUNDING_EXCLUSIVE_TERMS.items():
+        family_matches = {
+            canonical
+            for canonical, aliases in values.items()
+            if _equivalent_group_occurs(value, aliases)
+        }
+        if family == "approval_role":
+            if re.search(r"\bHR\b", value):
+                family_matches.add("human_resources")
+            if re.search(r"\bIT\b", value):
+                family_matches.add("information_technology")
+        if family_matches:
+            matches[family] = family_matches
+    return matches
+
+
+def _exclusive_semantics_conflict(claim: str, unit: str) -> bool:
+    """Reject evidence that states a different role or required modality."""
+    claim_values = _exclusive_semantic_values(claim)
+    unit_values = _exclusive_semantic_values(unit)
+    return any(
+        family in unit_values and values.isdisjoint(unit_values[family])
+        for family, values in claim_values.items()
+    )
+
+
+def _shared_exclusive_semantics(claim: str, unit: str) -> bool:
+    claim_values = _exclusive_semantic_values(claim)
+    unit_values = _exclusive_semantic_values(unit)
+    return any(
+        family in unit_values and bool(values.intersection(unit_values[family]))
+        for family, values in claim_values.items()
+    )
+
+
 def _span_overlaps(span: tuple[int, int], occupied: list[tuple[int, int]]) -> bool:
     start, end = span
     return any(start < other_end and end > other_start for other_start, other_end in occupied)
@@ -751,7 +1004,26 @@ def _fact_entries(value: str) -> list[tuple[str, str, str]]:
         display = match.group(0)
         add(f"email:{display.casefold()}", display, display.casefold(), match.span())
 
+    # A compact range such as ``IDR 10-50 million`` asserts both endpoints.
+    # Record them separately so it can support the equivalent expanded form
+    # ``IDR 10 million to IDR 50 million`` without weakening numeric checks.
+    for match in MONEY_RANGE_PATTERN.finditer(raw):
+        display = match.group(0)
+        currency = match.group(1).casefold().replace("rp.", "idr").replace("rp", "idr")
+        magnitude = _normalize_magnitude(match.group(4))
+        for raw_number in (match.group(2), match.group(3)):
+            number = _normalize_number(raw_number)
+            canonical = " ".join((currency, number, magnitude))
+            add(
+                f"money:{currency}:{_canonical_money_amount(number, magnitude)}",
+                display,
+                canonical,
+                match.span(),
+            )
+
     for match in MONEY_PATTERN.finditer(raw):
+        if _span_overlaps(match.span(), occupied):
+            continue
         display = match.group(0)
         parsed = re.search(
             rf"\b(IDR|Rp\.?|USD|EUR)\s*({NUMBER_CORE})"
@@ -764,7 +1036,12 @@ def _fact_entries(value: str) -> list[tuple[str, str, str]]:
             number = _normalize_number(parsed.group(2))
             magnitude = _normalize_magnitude(parsed.group(3) or "")
             canonical = " ".join(part for part in (currency, number, magnitude) if part)
-            add(f"money:{currency}:{number}:{magnitude}", display, canonical, match.span())
+            add(
+                f"money:{currency}:{_canonical_money_amount(number, magnitude)}",
+                display,
+                canonical,
+                match.span(),
+            )
 
     for match in PERCENT_PATTERN.finditer(raw):
         if _span_overlaps(match.span(), occupied):
@@ -823,6 +1100,13 @@ def _fact_entries(value: str) -> list[tuple[str, str, str]]:
             continue
         add(f"identifier:{display}", display, display)
 
+    # Preserve mixed-case product and protocol names such as WireGuard and
+    # PostgreSQL as strict identifiers. Ordinary sentence-initial words do not
+    # match because an additional internal capital is required.
+    for match in CAMEL_IDENTIFIER_PATTERN.finditer(raw):
+        display = match.group(0)
+        add(f"identifier:{display.upper()}", display, display.casefold())
+
     return entries
 
 
@@ -846,19 +1130,73 @@ def _evidence_units(chunks: list[dict[str, Any]]) -> list[str]:
         content = _clean(chunk.get("content"))
         if not content:
             continue
-        # Keep the whole chunk as a source-bounded unit so a valid answer may
-        # combine adjacent sentences from the same passage. Separate chunks are
-        # never merged, which still blocks cross-document relation swapping.
-        if content not in units:
-            units.append(content)
-        parts = [
-            _clean(part).lstrip("-• ")
-            for part in SENTENCE_SPLIT.split(content)
-            if _clean(part).lstrip("-• ")
-        ]
-        for part in parts:
-            if part not in units:
-                units.append(part)
+        # A compact FAQ often stores several independent Q/A entries in one
+        # chunk. Treat each pair as one evidence unit so the answer keeps the
+        # subject stated in its question (for example, "replacement access
+        # card" followed by "request one"), while facts from a neighboring FAQ
+        # entry cannot be combined into a false relation.
+        qa_matches = list(QA_PAIR_PATTERN.finditer(content))
+        bounded_units: list[str] = []
+        if qa_matches:
+            cursor = 0
+            for match in qa_matches:
+                # Preserve standalone policy prose around Q/A blocks, but split
+                # away headings so it cannot be combined with a neighboring
+                # FAQ answer. Some chunks start with a complete rule before the
+                # first Q/A entry.
+                gap = content[cursor:match.start()]
+                for fragment in re.split(r"\s+#{1,6}\s+", gap):
+                    clean_fragment = _clean(fragment).strip(" =#")
+                    is_substantive = bool(
+                        re.search(r"[.!?;:]$", clean_fragment)
+                        or _fact_entries(clean_fragment)
+                        or len(_tokenize(clean_fragment)) >= 8
+                    )
+                    if (
+                        clean_fragment
+                        and is_substantive
+                        and clean_fragment not in bounded_units
+                    ):
+                        bounded_units.append(clean_fragment)
+
+                question = _clean(match.group("question"))
+                answer = _clean(match.group("answer"))
+                if question and answer:
+                    pair = _clean(f"Q: {question} A: {answer}")
+                    if pair not in bounded_units:
+                        bounded_units.append(pair)
+                cursor = match.end()
+
+            for fragment in re.split(r"\s+#{1,6}\s+", content[cursor:]):
+                clean_fragment = _clean(fragment).strip(" =#")
+                is_substantive = bool(
+                    re.search(r"[.!?;:]$", clean_fragment)
+                    or _fact_entries(clean_fragment)
+                    or len(_tokenize(clean_fragment)) >= 8
+                )
+                if (
+                    clean_fragment
+                    and is_substantive
+                    and clean_fragment not in bounded_units
+                ):
+                    bounded_units.append(clean_fragment)
+        else:
+            bounded_units = [content]
+
+        for bounded_unit in bounded_units:
+            # Non-FAQ prose retains the whole source-bounded chunk so a valid
+            # answer may combine adjacent sentences. FAQ chunks retain only the
+            # current pair, never the full multi-question container.
+            if bounded_unit not in units:
+                units.append(bounded_unit)
+            parts = [
+                _clean(part).lstrip("-• ")
+                for part in SENTENCE_SPLIT.split(bounded_unit)
+                if _clean(part).lstrip("-• ")
+            ]
+            for part in parts:
+                if part not in units:
+                    units.append(part)
     return units
 
 
@@ -928,8 +1266,24 @@ def _atomic_claims(value: Any) -> list[str]:
         # Pisahkan klausa kausal/kontras terlebih dahulu. Ini memungkinkan
         # bagian fakta yang didukung tetap dipertahankan ketika model menambah
         # ekor spekulatif seperti "because it is more scalable".
+        # Preserve conjunctions that are part of a numeric or policy range.
+        # Splitting "between IDR 10 million and IDR 50 million" turns one
+        # coherent approval claim into two misleading fragments.
+        protected_sentence = re.sub(
+            r"\bbetween\b(.{0,100}?)\band\b",
+            lambda match: f"between{match.group(1)} __RANGE_AND__ ",
+            sentence,
+            flags=re.I,
+        )
+        protected_sentence = re.sub(
+            r"\bantara\b(.{0,100}?)\bdan\b",
+            lambda match: f"antara{match.group(1)} __RANGE_DAN__ ",
+            protected_sentence,
+            flags=re.I,
+        )
         clause_parts = [
-            part for part in CLAUSE_SPLIT.split(sentence)
+            part.replace("__RANGE_AND__", "and").replace("__RANGE_DAN__", "dan")
+            for part in CLAUSE_SPLIT.split(protected_sentence)
             if _clean(part)
         ] or [sentence]
 
@@ -1041,9 +1395,59 @@ def _incident_relation_is_coherent(claim: str, unit: str) -> bool:
     return False
 
 
-def _claim_reference_units(claim: str, evidence_units: list[str]) -> list[str]:
+def _approval_relation_is_coherent(
+    claim: str,
+    unit: str,
+    *,
+    question: str = "",
+) -> bool:
+    """Bind an approval role to the monetary tier in the same local clause."""
+    claim_roles = _exclusive_semantic_values(claim).get("approval_role", set())
+    claim_money = {
+        key for key, _, _ in _fact_entries(claim) if key.startswith("money:")
+    }
+    if not claim_money:
+        # Concise answers often omit the amount already stated in the question.
+        # Use it only as a relation constraint: the evidence must bind that
+        # exact tier to the claimed role in one local segment.
+        claim_money = {
+            key for key, _, _ in _fact_entries(question) if key.startswith("money:")
+        }
+    if len(claim_roles) != 1 or not claim_money:
+        return True
+
+    segments = [
+        _clean(part)
+        for part in re.split(r"(?<=[.!?])\s+|\n+|;", unit)
+        if _clean(part)
+    ]
+    for segment in segments:
+        segment_money = {
+            key for key, _, _ in _fact_entries(segment) if key.startswith("money:")
+        }
+        segment_roles = _exclusive_semantic_values(segment).get(
+            "approval_role", set()
+        )
+        if claim_money.issubset(segment_money) and claim_roles.intersection(segment_roles):
+            return True
+    return False
+
+
+def _claim_reference_units(
+    claim: str,
+    evidence_units: list[str],
+    *,
+    question: str = "",
+) -> list[str]:
     claim_fact_keys = {key for key, _, _ in _fact_entries(claim)}
-    if not claim_fact_keys:
+    question_money = {
+        key for key, _, _ in _fact_entries(question) if key.startswith("money:")
+    }
+    needs_approval_binding = bool(
+        _exclusive_semantic_values(claim).get("approval_role")
+        and question_money
+    )
+    if not claim_fact_keys and not needs_approval_binding:
         return list(evidence_units)
 
     matched = [
@@ -1051,6 +1455,7 @@ def _claim_reference_units(claim: str, evidence_units: list[str]) -> list[str]:
         for unit in evidence_units
         if claim_fact_keys.issubset({key for key, _, _ in _fact_entries(unit)})
         and _incident_relation_is_coherent(claim, unit)
+        and _approval_relation_is_coherent(claim, unit, question=question)
     ]
     if not matched:
         return []
@@ -1084,12 +1489,12 @@ def _canonical_claim_token_coverage(
     claim_tokens = _tokenize(claim)
     if not claim_tokens:
         return 1.0
-    if claim_concepts and not claim_concepts.issubset(unit_concepts):
-        return 0.0
-
     covered = set(claim_tokens.intersection(_tokenize(unit)))
 
-    for concept in claim_concepts:
+    # A claim can contain a harmless extra retrieval concept, for example
+    # Indonesian "laptop kantor" also maps to the broad concept ``office``.
+    # Only aliases actually present on both sides may bridge languages.
+    for concept in claim_concepts.intersection(unit_concepts):
         for alias in GROUNDING_CONCEPT_ALIASES.get(concept, ()):
             covered.update(claim_tokens.intersection(_tokenize(alias)))
 
@@ -1119,7 +1524,6 @@ def _claim_support(
     """Return support from one evidence unit, not a token soup across documents."""
     claim_tokens = _tokenize(claim)
     claim_concepts = _grounding_concepts(claim)
-    question_concepts = _grounding_concepts(question)
     claim_qualifiers = _qualifier_families(claim)
     if not claim_tokens and not claim_concepts:
         return 1.0
@@ -1131,6 +1535,8 @@ def _claim_support(
         # the policy or causal meaning of the claim.
         if not claim_qualifiers.issubset(_qualifier_families(unit)):
             continue
+        if _exclusive_semantics_conflict(claim, unit):
+            continue
 
         unit_tokens = _tokenize(unit)
         lexical = (
@@ -1138,7 +1544,10 @@ def _claim_support(
             if claim_tokens
             else 0.0
         )
-        unit_concepts = _grounding_concepts(unit) | question_concepts
+        # The question is routing context, not evidence. Letting its concepts
+        # satisfy a generated claim can turn a retrieved topical mismatch into
+        # false support.
+        unit_concepts = _grounding_concepts(unit)
         concept = (
             len(claim_concepts.intersection(unit_concepts)) / len(claim_concepts)
             if claim_concepts
@@ -1166,9 +1575,33 @@ def _claim_support(
             else 1.0
         )
         has_explicit_facts = bool(_fact_entries(claim))
-        required_coverage = 0.85 if has_explicit_facts else 0.95
-        if canonical_coverage + 1e-9 >= required_coverage:
+        shared_groups = _matched_equivalent_groups(claim).intersection(
+            _matched_equivalent_groups(unit)
+        )
+        shared_concepts = claim_concepts.intersection(unit_concepts)
+        has_semantic_anchor = bool(
+            has_explicit_facts
+            or shared_concepts
+            or len(shared_groups) >= 2
+            or (shared_groups and canonical_coverage >= 0.80)
+        )
+        # Exact facts are already bound to one evidence unit. For natural
+        # bilingual prose, require at least half of all content tokens plus a
+        # concrete concept, fact, or two independent relationship anchors.
+        required_coverage = 0.65 if has_explicit_facts else 0.50
+        if (
+            has_semantic_anchor
+            and canonical_coverage + 1e-9 >= required_coverage
+        ):
             score = max(score, canonical_coverage)
+        if (
+            has_explicit_facts
+            and _shared_exclusive_semantics(claim, unit)
+            and canonical_coverage + 1e-9 >= 0.40
+        ):
+            # A monetary tier plus its locally bound approval role is a strong
+            # structured match even when compact table extraction omits verbs.
+            score = max(score, 0.55)
 
         scores.append(score)
     return max(scores, default=0.0)
@@ -1219,7 +1652,11 @@ def prune_unsupported_claims(
 
     kept: list[str] = []
     for claim in _atomic_claims(answer):
-        reference_units = _claim_reference_units(claim, evidence_units)
+        reference_units = _claim_reference_units(
+            claim,
+            evidence_units,
+            question=question,
+        )
         if not reference_units:
             continue
         required_support = _required_claim_support(claim, minimum_claim_support)
@@ -1310,7 +1747,11 @@ def validate_grounded_answer(
         # than four words allowed unsupported answers such as "MySQL" to pass.
         if not _tokenize(claim) and not _fact_entries(claim):
             continue
-        fact_bound_units = _claim_reference_units(claim, claim_reference_units)
+        fact_bound_units = _claim_reference_units(
+            claim,
+            claim_reference_units,
+            question=question,
+        )
         # A factual claim must be supported by the same evidence unit that
         # contains its explicit values. This prevents relation swapping across
         # chunks, such as attaching a P2 deadline to a P1 incident.

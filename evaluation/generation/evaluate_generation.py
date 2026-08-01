@@ -9,14 +9,19 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
+import platform
 import re
 import statistics
+import subprocess
 import requests
 from dotenv import load_dotenv
 from collections import Counter
+from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -68,8 +73,19 @@ DOCUMENT_REFUSAL_PREFIXES = (
     "dokumen tidak menyebutkan",
     "dokumen tidak menentukan",
     "the indexed documents do not",
+    "the documents do not provide",
     "the documents do not specify",
     "the documents do not mention",
+)
+
+UNAVAILABLE_OPENING_PATTERN = re.compile(
+    r"^(?:"
+    r"(?:the\s+)?[a-z0-9][^.]{0,180}\s+(?:is|are)\s+not\s+"
+    r"(?:available|stated|specified|provided|found)\s+in\s+(?:the\s+)?indexed\s+documents"
+    r"|informasi\s+mengenai\s+[^.]{0,180}\s+tidak\s+tersedia"
+    r"|laporan\s+[^.]{0,180}\s+tidak\s+tersedia"
+    r")",
+    flags=re.I,
 )
 
 CONTRAST_MARKERS = (
@@ -361,28 +377,46 @@ def token_f1(expected: str, generated: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
-def keyword_coverage(keywords: list[str], question: str, generated: str) -> float | None:
-    """Measure whether each annotated concept appears in the question-answer pair.
-
-    Some CSV keywords repeat conditions already stated in the question (for
-    example "probation" or "above IDR 50 million"). Requiring the answer to
-    repeat those conditions would unfairly penalize concise correct answers, so
-    the metric checks the complete question-answer pair.
-    """
+def _keyword_coverage_in_text(keywords: list[str], text: str) -> float | None:
     if not keywords:
         return None
-    combined_normalized = normalize_answer(f"{question} {generated}")
-    combined_tokens = set(combined_normalized.split())
+    normalized_text = normalize_answer(text)
+    text_tokens = set(normalized_text.split())
     hits = 0
     for keyword in keywords:
         normalized = normalize_answer(keyword)
         keyword_tokens = set(normalized.split())
         if normalized and (
-            normalized in combined_normalized
-            or (keyword_tokens and keyword_tokens.issubset(combined_tokens))
+            normalized in normalized_text
+            or (keyword_tokens and keyword_tokens.issubset(text_tokens))
         ):
             hits += 1
     return hits / len(keywords)
+
+
+def keyword_coverage(keywords: list[str], question: str, generated: str) -> float | None:
+    """Measure annotated concepts in the generated answer only.
+
+    ``question`` remains in the public signature for backward compatibility,
+    but it is deliberately excluded. Counting prompt words as answer content
+    inflates correctness and can hide a missing answer fact.
+    """
+    del question
+    return _keyword_coverage_in_text(keywords, generated)
+
+
+def question_keyword_coverage(keywords: list[str], question: str) -> float | None:
+    """Diagnostic only: quantify how much of the annotation leaks from the prompt."""
+    return _keyword_coverage_in_text(keywords, question)
+
+
+def question_answer_keyword_coverage(
+    keywords: list[str],
+    question: str,
+    generated: str,
+) -> float | None:
+    """Compatibility diagnostic for historical question-plus-answer scoring."""
+    return _keyword_coverage_in_text(keywords, f"{question} {generated}")
 
 
 def detect_abstention(answer: str) -> bool:
@@ -393,6 +427,8 @@ def detect_abstention(answer: str) -> bool:
     if re.search(r"(?:^|\s)confidence\s*:\s*0\s*%(?:\s|$)", text):
         return True
     if text.startswith(REFUSAL_PREFIXES):
+        return True
+    if UNAVAILABLE_OPENING_PATTERN.search(text):
         return True
 
     # Legacy answers sometimes use a document-scoped refusal. Restrict this to
@@ -537,6 +573,144 @@ def percentile(values: Iterable[float | None], percentile_value: float) -> float
     return round(result, 2)
 
 
+def wilson_interval_95(values: Iterable[float | int | None]) -> dict[str, Any]:
+    """Return a Wilson 95% interval for a binary rate."""
+    valid = [float(value) for value in values if value is not None]
+    if not valid:
+        return {"estimate": None, "lower": None, "upper": None, "n": 0}
+    if any(value not in {0.0, 1.0} for value in valid):
+        raise ValueError("Wilson interval requires binary 0/1 observations")
+    n = len(valid)
+    estimate = sum(valid) / n
+    z = 1.959963984540054
+    denominator = 1 + (z * z / n)
+    center = (estimate + z * z / (2 * n)) / denominator
+    margin = (
+        z
+        * math.sqrt(
+            estimate * (1 - estimate) / n + z * z / (4 * n * n)
+        )
+        / denominator
+    )
+    return {
+        "estimate": round(estimate, 4),
+        "lower": round(max(0.0, center - margin), 4),
+        "upper": round(min(1.0, center + margin), 4),
+        "n": n,
+    }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for block in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _manifest_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(PROJECT_ROOT))
+    except ValueError:
+        return str(resolved)
+
+
+def _git_commit() -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        ).strip() or None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def _dependency_versions(requirement_files: list[Path]) -> dict[str, str]:
+    names: set[str] = set()
+    for path in requirement_files:
+        if not path.exists():
+            continue
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.split("#", 1)[0].strip()
+            if not line or line.startswith("-"):
+                continue
+            match = re.match(r"([A-Za-z0-9_.-]+)", line)
+            if match:
+                names.add(match.group(1))
+    output: dict[str, str] = {}
+    for name in sorted(names, key=str.casefold):
+        try:
+            output[name] = version(name)
+        except PackageNotFoundError:
+            output[name] = "not-installed"
+    return output
+
+
+def reproducibility_manifest(
+    *,
+    datasets: list[Path],
+    input_path: Path,
+    answers: list[dict[str, Any]],
+    model_name: str,
+    judge_model: str | None,
+) -> dict[str, Any]:
+    """Capture immutable inputs and runtime metadata without recording secrets."""
+    requirement_files = [
+        PROJECT_ROOT / "backend" / "requirements.txt",
+        PROJECT_ROOT / "backend" / "requirements-dev.txt",
+    ]
+    files = [
+        *datasets,
+        input_path,
+        *requirement_files,
+        Path(__file__).resolve(),
+    ]
+    return {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "git_commit": _git_commit(),
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "dependency_versions": _dependency_versions(requirement_files),
+        "files": [
+            {
+                "path": _manifest_path(path),
+                "sha256": _sha256_file(path.resolve()),
+                "bytes": path.resolve().stat().st_size,
+            }
+            for path in files
+        ],
+        "model_name": model_name,
+        "model_reference_mutable": model_name.casefold().endswith(":latest"),
+        "judge_model": judge_model,
+        "judge_independent": bool(
+            judge_model
+            and judge_model.strip().casefold() != model_name.strip().casefold()
+        ),
+        "backend_build_versions": sorted({
+            str(item.get("backend_build_version") or "")
+            for item in answers
+            if item.get("backend_build_version")
+        }),
+        "retrieval_snapshot_builds": sorted({
+            str(item.get("retrieval_snapshot_build") or "")
+            for item in answers
+            if item.get("retrieval_snapshot_build")
+        }),
+        "evaluation_context_modes": sorted({
+            str(item.get("evaluation_context_mode") or "")
+            for item in answers
+            if item.get("evaluation_context_mode")
+        }),
+        "retrieval_top_k": sorted({
+            int(item.get("retrieval_top_k") or 5) for item in answers
+        }),
+    }
+
+
 def bilingual_pairing_diagnostics(
     items: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -599,7 +773,16 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         }
     ]
     judge_rows = [row for row in judge_attempted if not row["Judge Error"]]
-    latencies = [row["Client Response Time (ms)"] for row in rows]
+    latencies = [
+        float(row["Client Response Time (ms)"])
+        for row in rows
+        if row.get("Client Response Time (ms)") is not None
+    ]
+    estimated_e2e_latencies = [
+        float(row["Estimated Sequential E2E (ms)"])
+        for row in rows
+        if row.get("Estimated Sequential E2E (ms)") is not None
+    ]
     failure_categories = Counter(
         str(row.get("Failure Category") or "")
         for row in rows
@@ -618,6 +801,12 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "normalized_exact_match": mean(row["Normalized Exact Match"] for row in answerable_rows),
         "token_f1": mean(row["Token F1"] for row in answerable_rows),
         "keyword_coverage": mean(row["Keyword Coverage"] for row in answerable_rows),
+        "question_keyword_coverage": mean(
+            row["Question Keyword Coverage"] for row in answerable_rows
+        ),
+        "question_answer_keyword_coverage": mean(
+            row["Question+Answer Keyword Coverage"] for row in answerable_rows
+        ),
         "faithfulness_1_to_5": mean(row["Faithfulness"] for row in judge_rows),
         "answer_relevance_1_to_5": mean(row["Answer Relevance"] for row in judge_rows),
         "context_precision": mean(row["Context Precision"] for row in answerable_rows),
@@ -669,6 +858,36 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "average_response_time_ms": mean(latencies),
         "median_response_time_ms": round(statistics.median(latencies), 2) if latencies else None,
         "p95_response_time_ms": percentile(latencies, 0.95),
+        "average_estimated_sequential_e2e_ms": mean(estimated_e2e_latencies),
+        "median_estimated_sequential_e2e_ms": (
+            round(statistics.median(estimated_e2e_latencies), 2)
+            if estimated_e2e_latencies
+            else None
+        ),
+        "p95_estimated_sequential_e2e_ms": percentile(
+            estimated_e2e_latencies,
+            0.95,
+        ),
+        "confidence_intervals_95": {
+            "pipeline_failure_rate": wilson_interval_95(
+                row["Pipeline Failed"] for row in rows
+            ),
+            "false_refusal_rate": wilson_interval_95(
+                row["False Refusal"] for row in answerable_rows
+            ),
+            "unanswerable_safety_rate": wilson_interval_95(
+                row["Correct Unanswerable Refusal"] for row in unanswerable_rows
+            ),
+            "unanswerable_no_result_rate": wilson_interval_95(
+                row["Retrieval No Result"] for row in unanswerable_rows
+            ),
+            "hit_at_k": wilson_interval_95(
+                row["Hit@K"] for row in answerable_rows
+            ),
+            "top1_accuracy": wilson_interval_95(
+                row["Top-1 Accuracy"] for row in answerable_rows
+            ),
+        },
     }
 
 
@@ -689,6 +908,16 @@ def main() -> None:
     )
     parser.add_argument("--output-prefix", default=None)
     parser.add_argument("--skip-llm-judge", action="store_true")
+    parser.add_argument(
+        "--allow-self-judge",
+        action="store_true",
+        help="Explicitly allow the evaluated model to judge its own answers.",
+    )
+    parser.add_argument(
+        "--benchmark-role",
+        choices=("development", "holdout"),
+        default="development",
+    )
     args = parser.parse_args()
 
     datasets = args.ground_truth_files or DEFAULT_DATASETS
@@ -713,6 +942,16 @@ def main() -> None:
     if len(resolved_names) != 1:
         raise ValueError(f"Input contains multiple concrete model names: {sorted(resolved_names)}")
     model_name = next(iter(resolved_names))
+    if (
+        not args.skip_llm_judge
+        and not args.allow_self_judge
+        and model_name.strip().casefold() == LLM_MODEL.strip().casefold()
+    ):
+        raise RuntimeError(
+            "The configured judge is the same as the evaluated model. "
+            "Use an independent judge, --skip-llm-judge, or explicitly "
+            "acknowledge the limitation with --allow-self-judge."
+        )
     prefix = args.output_prefix or model
 
     rows: list[dict[str, Any]] = []
@@ -772,6 +1011,20 @@ def main() -> None:
             if answerable
             else None
         )
+        question_coverage = (
+            question_keyword_coverage(keywords, str(gt.get("question") or ""))
+            if answerable
+            else None
+        )
+        question_answer_coverage = (
+            question_answer_keyword_coverage(
+                keywords,
+                str(gt.get("question") or ""),
+                generated_answer,
+            )
+            if answerable
+            else None
+        )
 
         if pipeline_failed:
             semantic = {
@@ -812,6 +1065,21 @@ def main() -> None:
             and abstained
             and not citations
             and not pipeline_failed
+        )
+        retrieval_time_ms = item.get("retrieval_time_ms")
+        client_response_time_ms = item.get("client_response_time_ms")
+        retrieval_time_value = (
+            float(retrieval_time_ms) if retrieval_time_ms is not None else None
+        )
+        client_time_value = (
+            float(client_response_time_ms)
+            if client_response_time_ms is not None
+            else None
+        )
+        estimated_sequential_e2e = (
+            retrieval_time_value + client_time_value
+            if retrieval_time_value is not None and client_time_value is not None
+            else None
         )
         row = {
             "ID": qid,
@@ -867,6 +1135,16 @@ def main() -> None:
             "Normalized Exact Match": round(em, 4) if em is not None else None,
             "Token F1": round(f1, 4) if f1 is not None else None,
             "Keyword Coverage": round(coverage, 4) if coverage is not None else None,
+            "Question Keyword Coverage": (
+                round(question_coverage, 4)
+                if question_coverage is not None
+                else None
+            ),
+            "Question+Answer Keyword Coverage": (
+                round(question_answer_coverage, 4)
+                if question_answer_coverage is not None
+                else None
+            ),
             "Faithfulness": semantic["faithfulness"],
             "Answer Relevance": semantic["answer_relevance"],
             "Context Precision": (
@@ -932,7 +1210,7 @@ def main() -> None:
             ),
             "First Relevant Rank": ranked_metrics["first_relevant_rank"],
             "Retrieval Debug Available": int(bool(item.get("ranked_candidates"))),
-            "Retrieval Time (ms)": item.get("retrieval_time_ms"),
+            "Retrieval Time (ms)": retrieval_time_value,
             "Retrieval No Result": metadata["retrieval_no_result"],
             "Hallucination": (
                 int(semantic["is_hallucination"])
@@ -943,7 +1221,12 @@ def main() -> None:
             "Judge Error": semantic["judge_error"],
             "System Confidence": item.get("system_confidence"),
             "Backend Response Time (ms)": item.get("backend_response_time_ms"),
-            "Client Response Time (ms)": float(item.get("client_response_time_ms") or 0),
+            "Client Response Time (ms)": client_time_value,
+            "Estimated Sequential E2E (ms)": (
+                round(estimated_sequential_e2e, 2)
+                if estimated_sequential_e2e is not None
+                else None
+            ),
             "Context Fingerprint": item.get("context_fingerprint"),
         }
         rows.append(row)
@@ -955,12 +1238,24 @@ def main() -> None:
     summary = {
         "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
         "evaluation": "Bilingual RAG generation evaluation",
+        "benchmark_role": args.benchmark_role,
         "model": model,
         "model_name": model_name,
         "judge_model": None if args.skip_llm_judge else LLM_MODEL,
+        "judge_independent": bool(
+            not args.skip_llm_judge
+            and model_name.strip().casefold() != LLM_MODEL.strip().casefold()
+        ),
         "ground_truth_files": [str(path.resolve()) for path in datasets],
         "dataset": dataset_summary(gt_items),
         "language_pairing": pairing,
+        "reproducibility": reproducibility_manifest(
+            datasets=[Path(path).resolve() for path in datasets],
+            input_path=args.input.resolve(),
+            answers=answers,
+            model_name=model_name,
+            judge_model=None if args.skip_llm_judge else LLM_MODEL,
+        ),
         "overall": summarize_rows(rows),
         "by_language": {
             language: summarize_rows([row for row in rows if row["Language"] == language])
@@ -974,6 +1269,9 @@ def main() -> None:
             "Pipeline failures are classified by their precise stage; late answer/citation failures preserve evaluation contexts and are not counted as retrieval misses.",
             "Unanswerable safety requires a refusal and no citation.",
             "The same configured judge model must be used for every compared model.",
+            "Keyword Coverage is answer-only. Question Keyword Coverage and Question+Answer Keyword Coverage are diagnostics for annotation leakage and historical comparability.",
+            "Estimated Sequential E2E is retrieval time plus client generation-call time, not a directly instrumented wall-clock request latency.",
+            "Wilson 95% confidence intervals are reported for binary rates; small unanswerable sets can therefore have wide intervals.",
             (
                 "English-vs-Indonesian scores are descriptive only because the two language sets do not use equivalent source targets."
                 if not pairing["direct_language_gap_interpretation_supported"]

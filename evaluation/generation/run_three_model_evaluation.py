@@ -30,6 +30,12 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--retries", type=int, default=2)
     parser.add_argument("--skip-llm-judge", action="store_true")
+    parser.add_argument("--allow-self-judge", action="store_true")
+    parser.add_argument(
+        "--benchmark-role",
+        choices=("development", "holdout"),
+        default="development",
+    )
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
@@ -49,12 +55,25 @@ def main() -> None:
     ]
     run(validate_command)
     if args.validate_only:
+        run([
+            sys.executable,
+            str(EVALUATION_DIR / "audit_benchmark_leakage.py"),
+            *common_dataset_args,
+            "--role", args.benchmark_role,
+        ])
         return
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = (args.output_dir or (SCRIPT_DIR / "results" / f"three_model_{timestamp}")).resolve()
     raw_dir = output_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
+    run([
+        sys.executable,
+        str(EVALUATION_DIR / "audit_benchmark_leakage.py"),
+        *common_dataset_args,
+        "--role", args.benchmark_role,
+        "--output", str(output_dir / "benchmark_leakage_audit.json"),
+    ])
 
     retrieval_snapshot = output_dir / "retrieval_snapshot.json"
     retrieval_command = [
@@ -92,9 +111,12 @@ def main() -> None:
             "--input", str(raw_output),
             "--output-dir", str(output_dir),
             "--output-prefix", model,
+            "--benchmark-role", args.benchmark_role,
         ]
         if args.skip_llm_judge:
             evaluate_command.append("--skip-llm-judge")
+        if args.allow_self_judge:
+            evaluate_command.append("--allow-self-judge")
         run(evaluate_command)
         summary_paths.append(output_dir / f"generation_summary_{model}.json")
 

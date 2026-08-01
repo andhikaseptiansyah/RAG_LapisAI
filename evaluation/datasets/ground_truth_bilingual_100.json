@@ -28,7 +28,7 @@
       "expected_answer": "3 months, with a performance evaluation in week 12.",
       "expected_answer_keywords": [
         "3 months",
-        "probation",
+        "performance evaluation",
         "week 12"
       ],
       "references": [
@@ -47,7 +47,6 @@
       "answerable": true,
       "expected_answer": "Within 4 hours, acknowledged within 15 minutes.",
       "expected_answer_keywords": [
-        "P1",
         "4 hours",
         "15 minutes"
       ],
@@ -68,8 +67,7 @@
       "expected_answer": "Director approval plus three vendor quotations.",
       "expected_answer_keywords": [
         "Director approval",
-        "3 vendor quotations",
-        "above IDR 50 million"
+        "3 vendor quotations"
       ],
       "references": [
         {
@@ -88,7 +86,7 @@
       "expected_answer": "Within 30 days of the expense date.",
       "expected_answer_keywords": [
         "30 days",
-        "expense claim deadline"
+        "expense date"
       ],
       "references": [
         {
@@ -107,7 +105,6 @@
       "expected_answer": "At least 5 working days via the HR portal.",
       "expected_answer_keywords": [
         "5 working days",
-        "annual leave",
         "HR portal"
       ],
       "references": [
@@ -126,9 +123,8 @@
       "answerable": true,
       "expected_answer": "Nightly at 01:00 WIB, with incremental backups every 6 hours.",
       "expected_answer_keywords": [
-        "nightly 01:00 WIB",
-        "full backup",
-        "6 hours incremental"
+        "01:00 WIB",
+        "6 hours"
       ],
       "references": [
         {
@@ -147,8 +143,7 @@
       "expected_answer": "Within 2 hours of the employee's exit time.",
       "expected_answer_keywords": [
         "2 hours",
-        "offboarding",
-        "access revocation"
+        "exit time"
       ],
       "references": [
         {
@@ -167,7 +162,6 @@
       "expected_answer": "Up to 2 days per week with manager approval.",
       "expected_answer_keywords": [
         "2 days per week",
-        "WFH",
         "manager approval"
       ],
       "references": [
@@ -187,8 +181,7 @@
       "expected_answer": "security@nusantaradynamics.co.id within 1 hour.",
       "expected_answer_keywords": [
         "security@nusantaradynamics.co.id",
-        "1 hour",
-        "data breach"
+        "1 hour"
       ],
       "references": [
         {
@@ -207,7 +200,7 @@
       "expected_answer": "12 days per year, accruing monthly.",
       "expected_answer_keywords": [
         "12 days",
-        "annual leave",
+        "per year",
         "accruing monthly"
       ],
       "references": [
@@ -247,8 +240,7 @@
       "expected_answer": "IDR 250,000 per day.",
       "expected_answer_keywords": [
         "IDR 250,000",
-        "per day",
-        "meal per diem"
+        "per day"
       ],
       "references": [
         {
@@ -268,7 +260,7 @@
       "expected_answer_keywords": [
         "IDR 42.5 billion",
         "12%",
-        "Q3 2025"
+        "Q2 2025"
       ],
       "references": [
         {
@@ -307,7 +299,7 @@
       "expected_answer_keywords": [
         "87%",
         "83%",
-        "CSAT 2025"
+        "2024"
       ],
       "references": [
         {
@@ -325,9 +317,8 @@
       "answerable": true,
       "expected_answer": "3 reportable incidents, none resulting in data loss.",
       "expected_answer_keywords": [
-        "3 incidents",
-        "no data loss",
-        "2025"
+        "3 reportable incidents",
+        "no data loss"
       ],
       "references": [
         {
@@ -385,8 +376,7 @@
       "answerable": true,
       "expected_answer": "60 minutes.",
       "expected_answer_keywords": [
-        "60 minutes",
-        "API token"
+        "60 minutes"
       ],
       "references": [
         {
@@ -424,8 +414,7 @@
       "expected_answer": "99.9% per month.",
       "expected_answer_keywords": [
         "99.9%",
-        "monthly",
-        "API availability SLO"
+        "per month"
       ],
       "references": [
         {
@@ -443,8 +432,7 @@
       "answerable": true,
       "expected_answer": "7 years.",
       "expected_answer_keywords": [
-        "7 years",
-        "audit logs"
+        "7 years"
       ],
       "references": [
         {
@@ -462,9 +450,7 @@
       "answerable": true,
       "expected_answer": "At least 80%.",
       "expected_answer_keywords": [
-        "80%",
-        "unit-test coverage",
-        "merge"
+        "at least 80%"
       ],
       "references": [
         {
@@ -503,8 +489,8 @@
       "expected_answer": "The 25th of each month (prior working day if a holiday).",
       "expected_answer_keywords": [
         "25th",
-        "payday",
-        "prior working day"
+        "prior working day",
+        "holiday"
       ],
       "references": [
         {
@@ -522,8 +508,7 @@
       "answerable": true,
       "expected_answer": "50 GB.",
       "expected_answer_keywords": [
-        "50 GB",
-        "mailbox quota"
+        "50 GB"
       ],
       "references": [
         {
@@ -562,7 +547,7 @@
       "expected_answer": "Yes, a one-time allowance of IDR 1,500,000.",
       "expected_answer_keywords": [
         "IDR 1,500,000",
-        "home-office allowance"
+        "one-time allowance"
       ],
       "references": [
         {
@@ -580,8 +565,7 @@
       "answerable": true,
       "expected_answer": "IDR 50,000.",
       "expected_answer_keywords": [
-        "IDR 50,000",
-        "replacement access card"
+        "IDR 50,000"
       ],
       "references": [
         {
@@ -599,9 +583,8 @@
       "answerable": true,
       "expected_answer": "18, bringing the total to 214.",
       "expected_answer_keywords": [
-        "18 new customers",
-        "214 total",
-        "Q3 2025"
+        "18",
+        "214"
       ],
       "references": [
         {
@@ -736,7 +719,7 @@
       "answerable": true,
       "expected_answer": "The employee should not click any links and should report the email using the Report Phishing button.",
       "expected_answer_keywords": [
-        "do not click links",
+        "not click any links",
         "Report Phishing button"
       ],
       "references": [
@@ -993,7 +976,8 @@
       "expected_answer": "Tunjangan satu kali untuk home office adalah IDR 1.500.000.",
       "expected_answer_keywords": [
         "IDR 1.500.000",
-        "tunjangan kerja dari rumah"
+        "tunjangan satu kali",
+        "home office"
       ],
       "references": [
         {
@@ -1012,7 +996,7 @@
       "expected_answer": "Maksimum enam hari cuti yang tidak terpakai dapat dibawa ke tahun berikutnya.",
       "expected_answer_keywords": [
         "6 hari",
-        "cuti terbawa",
+        "tidak terpakai",
         "tahun berikutnya"
       ],
       "references": [
@@ -1031,8 +1015,9 @@
       "answerable": true,
       "expected_answer": "Pekerja remote wajib tersedia pada pukul 10.00 sampai 16.00 WIB.",
       "expected_answer_keywords": [
-        "10:00-16:00 WIB",
-        "jam kerja inti"
+        "10.00",
+        "16.00",
+        "WIB"
       ],
       "references": [
         {
@@ -1108,9 +1093,9 @@
       "answerable": true,
       "expected_answer": "IT harus mencabut seluruh akses sistem dalam waktu dua jam sejak waktu keluar karyawan.",
       "expected_answer_keywords": [
-        "dalam 2 jam",
-        "waktu keluar karyawan",
-        "pencabutan seluruh akses sistem"
+        "2 jam",
+        "seluruh akses sistem",
+        "waktu keluar karyawan"
       ],
       "references": [
         {
@@ -1244,7 +1229,7 @@
       "expected_answer": "Ya, perusahaan memberikan kontribusi ke BPJS Ketenagakerjaan untuk seluruh karyawan.",
       "expected_answer_keywords": [
         "BPJS Ketenagakerjaan",
-        "pensiun"
+        "seluruh karyawan"
       ],
       "references": [
         {
@@ -1281,7 +1266,7 @@
       "answerable": true,
       "expected_answer": "Gunakan opsi calendar sharing dan berikan akses lihat (view access) kepada rekan kerja terkait.",
       "expected_answer_keywords": [
-        "berbagi kalender",
+        "calendar sharing",
         "akses lihat"
       ],
       "references": [
@@ -1423,7 +1408,13 @@
       "references": [
         {
           "document": "FAQ_Onboarding.txt",
-          "page": ""
+          "page": "",
+          "acceptable_alternative": true
+        },
+        {
+          "document": "SOP_Onboarding.pdf",
+          "page": "",
+          "acceptable_alternative": true
         }
       ],
       "source_dataset": "qna_indonesia_50.csv"
@@ -1436,8 +1427,7 @@
       "answerable": true,
       "expected_answer": "Gaji dibayarkan pada tanggal 25 setiap bulan.",
       "expected_answer_keywords": [
-        "tanggal 25",
-        "hari gajian"
+        "tanggal 25"
       ],
       "references": [
         {
@@ -1493,8 +1483,8 @@
       "answerable": true,
       "expected_answer": "Karyawan tidak boleh mengklik tautan apa pun dan harus melaporkannya menggunakan tombol Report Phishing.",
       "expected_answer_keywords": [
-        "jangan klik tautan",
-        "tombol Report Phishing"
+        "tidak boleh mengklik tautan",
+        "Report Phishing"
       ],
       "references": [
         {
@@ -1551,7 +1541,7 @@
       "expected_answer": "Lisensi perangkat lunak bisnis yang telah disetujui ditanggung oleh anggaran IT.",
       "expected_answer_keywords": [
         "anggaran IT",
-        "lisensi software"
+        "lisensi perangkat lunak bisnis"
       ],
       "references": [
         {
@@ -1590,8 +1580,8 @@
       "expected_answer": "Perangkat pribadi harus didaftarkan terlebih dahulu ke sistem mobile device management (MDM).",
       "expected_answer_keywords": [
         "MDM",
-        "manajemen perangkat mobile",
-        "terdaftar"
+        "mobile device management",
+        "didaftarkan"
       ],
       "references": [
         {
@@ -1770,7 +1760,7 @@
       "expected_answer": "Kata sandi harus diganti setiap 90 hari, dan 5 kata sandi terakhir tidak boleh digunakan kembali.",
       "expected_answer_keywords": [
         "90 hari",
-        "5 kata sandi terakhir tidak boleh dipakai ulang"
+        "5 kata sandi terakhir tidak boleh digunakan kembali"
       ],
       "references": [
         {
@@ -1788,8 +1778,8 @@
       "answerable": true,
       "expected_answer": "Pembelian dengan nilai di bawah IDR 10.000.000 disetujui oleh manajer.",
       "expected_answer_keywords": [
-        "di bawah IDR 10.000.000",
-        "persetujuan manajer"
+        "IDR 10.000.000",
+        "manajer"
       ],
       "references": [
         {
@@ -1809,7 +1799,7 @@
       "expected_answer_keywords": [
         "IDR 250.000",
         "per hari",
-        "uang makan (per diem)"
+        "uang makan harian"
       ],
       "references": [
         {
@@ -1829,7 +1819,7 @@
       "expected_answer_keywords": [
         "IDR 800.000",
         "per malam",
-        "batas biaya hotel"
+        "biaya hotel"
       ],
       "references": [
         {
@@ -1848,7 +1838,6 @@
       "expected_answer": "Seluruh karyawan tetap (confirmed employees) berhak bekerja jarak jauh, dengan persetujuan manajer.",
       "expected_answer_keywords": [
         "karyawan tetap",
-        "memenuhi syarat",
         "persetujuan manajer"
       ],
       "references": [
@@ -1869,7 +1858,8 @@
       "expected_answer_keywords": [
         "87%",
         "CSAT",
-        "NPS 46"
+        "Net Promoter Score",
+        "46"
       ],
       "references": [
         {

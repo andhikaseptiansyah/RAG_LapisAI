@@ -13,6 +13,8 @@ METRICS = (
     "normalized_exact_match",
     "token_f1",
     "keyword_coverage",
+    "question_keyword_coverage",
+    "question_answer_keyword_coverage",
     "faithfulness_1_to_5",
     "answer_relevance_1_to_5",
     "context_precision",
@@ -36,9 +38,14 @@ METRICS = (
     "hallucination_rate",
     "pipeline_failure_rate",
     "retrieval_or_context_failure_rate",
+    "answer_postprocessing_failure_rate",
+    "generation_output_failure_rate",
     "generation_failure_rate",
     "average_response_time_ms",
+    "median_response_time_ms",
     "p95_response_time_ms",
+    "average_estimated_sequential_e2e_ms",
+    "p95_estimated_sequential_e2e_ms",
 )
 
 
@@ -47,6 +54,30 @@ def load_summaries(paths: list[Path]) -> list[dict[str, Any]]:
     models = [str(item.get("model") or "") for item in summaries]
     if len(models) != len(set(models)):
         raise ValueError(f"Duplicate model summaries: {models}")
+    roles = {str(item.get("benchmark_role") or "development") for item in summaries}
+    if len(roles) != 1:
+        raise ValueError(f"Benchmark roles differ across summaries: {sorted(roles)}")
+    judges = {str(item.get("judge_model") or "") for item in summaries}
+    if len(judges) != 1:
+        raise ValueError(f"Judge models differ across summaries: {sorted(judges)}")
+    if any(
+        item.get("judge_model") and item.get("judge_independent") is False
+        for item in summaries
+    ):
+        raise ValueError("At least one summary was produced with a non-independent judge")
+
+    dataset_signatures = []
+    for item in summaries:
+        files = (item.get("reproducibility") or {}).get("files") or []
+        signature = tuple(sorted(
+            (str(file.get("path") or ""), str(file.get("sha256") or ""))
+            for file in files
+            if "/datasets/" in f"/{str(file.get('path') or '')}"
+        ))
+        if signature:
+            dataset_signatures.append(signature)
+    if dataset_signatures and len(set(dataset_signatures)) != 1:
+        raise ValueError("Ground-truth dataset hashes differ across summaries")
     return summaries
 
 
@@ -197,6 +228,12 @@ def flatten_summary(summary: dict[str, Any], scope: str, metrics: dict[str, Any]
         "Total Questions": metrics.get("total_questions"),
         "Answerable": metrics.get("answerable_questions"),
         "Unanswerable": metrics.get("unanswerable_questions"),
+        "Benchmark Role": summary.get("benchmark_role"),
+        "Judge Model": summary.get("judge_model"),
+        "Judge Independent": summary.get("judge_independent"),
+        "Model Reference Mutable": (
+            summary.get("reproducibility") or {}
+        ).get("model_reference_mutable"),
         "Language Comparison Status": language_pairing.get("status"),
         "Paired Language IDs": language_pairing.get("paired_id_count"),
         "Equivalent Source Pairs": language_pairing.get(
@@ -292,7 +329,7 @@ def main() -> None:
     headers = [
         "Model", "Model Name", "Overall", "Deterministic", "Answer", "Grounding", "Retrieval", "Safety",
         "Status", "P@K", "R@K", "Hit@K", "MRR", "NDCG@K", "Token F1", "Faithfulness", "Citation F1",
-        "Hallucination", "Avg ms",
+        "Hallucination", "Avg generation ms", "Estimated E2E ms",
     ]
     table_rows = []
     for row in overall:
@@ -308,6 +345,7 @@ def main() -> None:
             row.get("citation_f1") if row.get("citation_f1") is not None else row.get("citation_accuracy"),
             row.get("hallucination_rate"),
             row.get("average_response_time_ms"),
+            row.get("average_estimated_sequential_e2e_ms"),
         ])
     lines = [
         f"# Comparison of {model_count} LLM Model{'s' if model_count != 1 else ''} (Bilingual Macro)",

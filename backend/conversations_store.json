@@ -1,1 +1,138 @@
-[]
+[
+  {
+    "id": "6708adf7-baa2-48d0-adca-60d602ee7f50",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bea97a31-33b1-43a1-898a-43adc9f18e41",
+        "conversation_id": "6708adf7-baa2-48d0-adca-60d602ee7f50",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "03849c87-1fce-4b6b-bdde-9b4a7f1e123c",
+          "queryId": "03849c87-1fce-4b6b-bdde-9b4a7f1e123c"
+        },
+        "created_at": "2026-08-01T20:14:14.972318+00:00"
+      },
+      {
+        "id": "23b9d43b-3329-46f6-8b5c-5ba565a495bd",
+        "conversation_id": "6708adf7-baa2-48d0-adca-60d602ee7f50",
+        "role": "assistant",
+        "content": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "03849c87-1fce-4b6b-bdde-9b4a7f1e123c",
+          "queryId": "03849c87-1fce-4b6b-bdde-9b4a7f1e123c",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-01T20:14:14.972318+00:00"
+      }
+    ],
+    "created_at": "2026-08-01T20:14:14.972318+00:00",
+    "updated_at": "2026-08-01T20:14:14.972318+00:00",
+    "last_message": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-08-01T20:14:14.972318+00:00"
+  },
+  {
+    "id": "f5b39e06-7246-4974-96ed-bccd0d1a1ac8",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How quickly must a P1 IT incident be resolved?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "11296cd6-2d71-49e1-864f-6e3e744a2e19",
+        "conversation_id": "f5b39e06-7246-4974-96ed-bccd0d1a1ac8",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "4ddd117b-d15d-4872-acac-e95419123efd",
+          "queryId": "4ddd117b-d15d-4872-acac-e95419123efd"
+        },
+        "created_at": "2026-08-01T20:13:11.238526+00:00"
+      },
+      {
+        "id": "7585b0aa-b5fa-4809-83b8-101a1fd4a4db",
+        "conversation_id": "f5b39e06-7246-4974-96ed-bccd0d1a1ac8",
+        "role": "assistant",
+        "content": "P1 IT incidents must be acknowledged within 15 minutes and resolved within 4 hours. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+        "attachments": [],
+        "confidence": 0.8868,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "4ddd117b-d15d-4872-acac-e95419123efd",
+          "queryId": "4ddd117b-d15d-4872-acac-e95419123efd",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8868,
+              "relevance_score": 0.8868,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?",
+          "followUpQuestion": "What technical incident caused clients to lose platform access in mid-October 2025, and what was the root cause?"
+        },
+        "created_at": "2026-08-01T20:13:11.238526+00:00"
+      }
+    ],
+    "created_at": "2026-08-01T20:13:11.238526+00:00",
+    "updated_at": "2026-08-01T20:13:11.238526+00:00",
+    "last_message": "P1 IT incidents must be acknowledged within 15 minutes and resolved within 4 hours. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+    "last_user_message": "How quickly must a P1 IT incident be resolved?",
+    "last_message_at": "2026-08-01T20:13:11.238526+00:00"
+  }
+]

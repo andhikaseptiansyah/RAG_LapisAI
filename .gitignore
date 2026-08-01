@@ -5,11 +5,11 @@ uploads/*
 !uploads/ingest.py
 __pycache__/
 *.pyc
-.env
+.env*
+!.env.example
 .venv/
 venv/
 env/
 query_logs.json
 users_store.json
 .auth_secret
-node_modules/

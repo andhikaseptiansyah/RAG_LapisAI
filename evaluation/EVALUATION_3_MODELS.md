@@ -25,12 +25,17 @@ Retrieval:
 
 Jawaban dan grounding:
 
-- Token F1 dan expected-keyword coverage.
+- Token F1 dan expected-keyword coverage dari **jawaban saja**. Coverage pada
+  pertanyaan serta question+answer tetap dicatat sebagai diagnostik kebocoran
+  anotasi, bukan skor kualitas utama.
 - Citation precision, recall, dan F1.
 - Faithfulness serta answer relevance bila LLM judge diaktifkan.
 - False-refusal rate, unanswerable safety rate, hallucination rate, dan
   generation failure rate.
-- Average, median, dan P95 latency.
+- Average, median, dan P95 latency, termasuk estimasi sequential retrieval plus
+  generation. Nilai ini bukan pengukuran wall-clock request tunggal.
+- Interval kepercayaan Wilson 95% untuk metrik biner seperti false refusal,
+  safety, Hit@K, Top-1, dan pipeline failure.
 
 Perbandingan utama memakai macro average per bahasa agar English dan Indonesia
 mendapat bobot seimbang. Latency dilaporkan terpisah dari skor kualitas.
@@ -61,7 +66,9 @@ LAPISAI_EVALUATION_READINESS_URL=http://127.0.0.1:8000/api/admin/evaluation/read
 LAPISAI_EVALUATION_CHAT_URL=http://127.0.0.1:8000/api/admin/evaluation/chat
 LAPISAI_EVAL_TIMEOUT=240
 
-OLLAMA_MODEL=qwen3-custom:latest
+# Pin tag atau digest immutable untuk run produksi yang dapat direproduksi.
+OLLAMA_MODEL=qwen3-custom:2026-08-01
+OLLAMA_SEED=42
 ```
 
 Untuk provider eksternal, tambahkan key dan nama model masing-masing:
@@ -79,9 +86,11 @@ Untuk judge lokal yang kompatibel dengan OpenAI API:
 ```env
 EVAL_LLM_BASE_URL=http://127.0.0.1:11434/v1
 EVAL_LLM_API_KEY=ollama
-EVAL_LLM_MODEL=qwen3-custom:latest
+EVAL_LLM_MODEL=model-judge-independen:versi-terkunci
 ```
 
+Judge harus berbeda dari model yang sedang dievaluasi. Evaluator akan berhenti
+jika keduanya sama, kecuali `--allow-self-judge` diberikan secara eksplisit.
 Jangan commit key, token, atau password asli.
 
 ## Urutan menjalankan
@@ -144,11 +153,16 @@ python .\evaluation\run_user_100_evaluation.py `
 - Context fingerprint dicatat untuk mendeteksi perbedaan bukti antar-model.
 - Provider yang gagal tidak diam-diam diganti provider lain.
 - `--resume` memakai checkpoint yang sama dan tidak mengulang baris selesai.
+- Hash dataset dan raw answer, git commit, versi build, context mode, serta
+  status model tag mutable dicatat pada reproducibility manifest.
+- Dataset 100 pertanyaan saat ini adalah development/regression set. Gunakan
+  dataset terpisah dengan `--benchmark-role holdout` untuk estimasi final.
 
 ## Output
 
 ```text
 evaluation/generation/results/<run>/
+├── benchmark_leakage_audit.json
 ├── retrieval_snapshot.json
 ├── raw/
 │   ├── input_answers_ollama.json

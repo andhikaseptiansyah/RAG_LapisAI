@@ -1,0 +1,30 @@
+LapisAI industry hardening patch
+Only the following 27 new or modified files are included in the ZIP:
+
+.env.example
+.gitignore
+EVALUATION_3_MODELS_USER_DATASET.md
+PATCH_FILE_MANIFEST.txt
+PATCH_INDUSTRY_HARDENING.md
+backend/.gitignore
+backend/api/answer_formatter.py
+backend/api/grounding_validator.py
+backend/api/llm_shared.py
+backend/api/ollama_client.py
+backend/tests/test_industry_hardening_regressions.py
+backend/uploads/config.py
+evaluation/EVALUATION_3_MODELS.md
+evaluation/README.md
+evaluation/audit_benchmark_leakage.py
+evaluation/datasets/dataset_audit_user.json
+evaluation/datasets/ground_truth_bilingual_100.json
+evaluation/datasets/qna_english_50.csv
+evaluation/datasets/qna_english_user.csv
+evaluation/datasets/qna_indonesia_50.csv
+evaluation/datasets/qna_indonesia_user.csv
+evaluation/generation/compare_models.py
+evaluation/generation/evaluate_generation.py
+evaluation/generation/run_three_model_evaluation.py
+evaluation/generation/test_evaluation_helpers.py
+evaluation/run_user_100_evaluation.py
+evaluation/validate_user_100_setup.py

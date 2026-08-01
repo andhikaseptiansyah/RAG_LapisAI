@@ -32,6 +32,7 @@ OLLAMA_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "120"))
 OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "640"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
 OLLAMA_MAX_RETRIES = max(0, int(os.getenv("OLLAMA_MAX_RETRIES", "1")))
+OLLAMA_SEED = int(os.getenv("OLLAMA_SEED", "42"))
 
 MAX_CONTEXT_CHARS_PER_CHUNK = 1400
 MAX_CONTEXT_CHUNKS = MAX_GENERATION_CONTEXTS
@@ -225,6 +226,7 @@ def _ollama_chat(
         "options": {
             "temperature": 0.0,
             "top_p": 0.80,
+            "seed": OLLAMA_SEED,
             "num_ctx": OLLAMA_NUM_CTX,
             "num_predict": int(num_predict or OLLAMA_NUM_PREDICT),
         },
@@ -440,6 +442,7 @@ def build_ollama_grounded_answer(
         "one fact is requested, stop after that fact and one faithful clarification at most. "
         "Do not add an introduction, recommendation, citation, confidence, heading, label, assumption, "
         "example, outside inference, repetition, or a generic closing sentence. "
+        "Never mention document titles or filenames in the answer text; citations are attached separately. "
         "Never replace a supported answer with a refusal. "
         "Do not combine details from different evidence blocks into one claim unless the question explicitly "
         "requires both details."
@@ -462,7 +465,8 @@ def build_ollama_grounded_answer(
             "2 to 4 connected sentences only when the question asks multiple parts or the evidence directly "
             "supports a necessary explanation. Use multiple evidence blocks only when they answer the question. "
             "Do not repeat facts, add filler, or infer "
-            "anything absent from the evidence. Output answer text only. ENGLISH ONLY."
+            "anything absent from the evidence. Do not mention document titles or filenames. "
+            "Output answer text only. ENGLISH ONLY."
         )
     else:
         user_prompt = (
@@ -476,6 +480,7 @@ def build_ollama_grounded_answer(
             "beberapa bagian atau bukti memang mendukung penjelasan yang diperlukan. Gabungkan beberapa blok "
             "bukti hanya jika semuanya menjawab pertanyaan. Jangan "
             "mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
+            "Jangan menyebut judul dokumen atau nama file karena sitasi ditambahkan secara terpisah. "
             "Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
             "nama produk, kode, akronim, label antarmuka, nama portal/menu, nama tombol, nama kanal, "
             "dan nama tim yang harus dipertahankan persis seperti bukti. Keluarkan teks jawaban saja. "

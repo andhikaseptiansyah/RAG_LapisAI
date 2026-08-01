@@ -18,6 +18,12 @@ File yang digunakan:
 - `datasets/qna_indonesia_user.csv`
 - `datasets/dataset_audit_user.json`
 
+Dataset ini diperlakukan sebagai **development/regression set**, bukan blind
+holdout, karena sebagian pertanyaan sudah muncul di test atau kode aktif. Runner
+menjalankan `audit_benchmark_leakage.py` dan menyimpan laporannya. Untuk dataset
+baru yang benar-benar tertutup, gunakan `--benchmark-role holdout`; run akan
+gagal jika ada pertanyaan atau expected answer yang ditemukan di kode.
+
 ## Validasi dataset saja
 
 Perintah ini tidak membutuhkan backend, corpus, Chroma, atau Ollama:
@@ -49,14 +55,18 @@ python .\evaluation\run_user_100_evaluation.py `
 ```
 
 Lanjutkan checkpoint dengan menambahkan `--resume`. Hapus
-`--skip-llm-judge` setelah judge model dikonfigurasi bila faithfulness dan
-answer relevance berbasis judge diperlukan.
+`--skip-llm-judge` setelah judge model independen dikonfigurasi bila
+faithfulness dan answer relevance berbasis judge diperlukan. Evaluator menolak
+self-judge secara default. `--allow-self-judge` hanya untuk eksperimen yang
+secara eksplisit menerima keterbatasan tersebut.
 
 ## Output
 
 Output baru dibuat di directory yang diberikan dan mencakup retrieval snapshot,
-raw model answers, CSV per pertanyaan, JSON summary, model comparison, chart,
-serta dashboard HTML.
+audit kebocoran benchmark, raw model answers, CSV per pertanyaan, JSON summary,
+model comparison, chart, serta dashboard HTML. Summary menyertakan hash input,
+versi build, referensi model, interval kepercayaan Wilson 95%, dan estimasi
+latency sequential retrieval plus generation.
 
 File lama di `evaluation/results` atau `evaluation/generation/results` adalah
 artefak eksperimen/regresi dan bukan hasil final setelah perubahan strict RAG.

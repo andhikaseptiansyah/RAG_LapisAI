@@ -4,7 +4,14 @@ import tempfile
 from pathlib import Path
 
 from dataset_utils import load_ground_truth_files, parse_bool, parse_keywords
-from evaluate_generation import detect_abstention, keyword_coverage, source_metrics, token_f1
+from evaluate_generation import (
+    detect_abstention,
+    keyword_coverage,
+    question_answer_keyword_coverage,
+    source_metrics,
+    token_f1,
+    wilson_interval_95,
+)
 
 
 def main() -> None:
@@ -23,12 +30,31 @@ def main() -> None:
     assert parse_keywords("3 months | week 12") == ["3 months", "week 12"]
     assert detect_abstention("The indexed documents do not specify this value.")
     assert detect_abstention("Dokumen yang diindeks tidak menyebutkan informasi tersebut.")
+    assert detect_abstention(
+        "The company headquarters address is not available in the indexed documents."
+    )
+    assert detect_abstention(
+        "Informasi mengenai durasi cuti melahirkan tidak tersedia dalam dokumen yang diindeks."
+    )
     assert token_f1("3 months", "The probation period is 3 months.") > 0
     assert keyword_coverage(
         ["IDR 1.500.000"],
         "Berapa tunjangannya?",
         "Tunjangannya adalah IDR 1.500.000.",
     ) == 1.0
+    assert keyword_coverage(
+        ["probation"],
+        "How long is probation?",
+        "It lasts three months.",
+    ) == 0.0
+    assert question_answer_keyword_coverage(
+        ["probation"],
+        "How long is probation?",
+        "It lasts three months.",
+    ) == 1.0
+    interval = wilson_interval_95([1, 1, 1, 0])
+    assert interval["estimate"] == 0.75
+    assert interval["lower"] < interval["estimate"] < interval["upper"]
 
     answerable_metrics = source_metrics(
         [{"document": "Policy_WFH.docx"}],

@@ -1,5 +1,8 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
+  "benchmark_role": "development",
+  "keyword_annotation_contract": "answer_only",
+  "holdout_requirement": "Use a separate unseen dataset and run audit_benchmark_leakage.py with --role holdout.",
   "files": {
     "EN": {
       "source": "user-provided English CSV",

@@ -19,6 +19,12 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--skip-llm-judge", action="store_true")
+    parser.add_argument("--allow-self-judge", action="store_true")
+    parser.add_argument(
+        "--benchmark-role",
+        choices=("development", "holdout"),
+        default="development",
+    )
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
@@ -45,6 +51,9 @@ def main() -> None:
         command.append("--resume")
     if args.skip_llm_judge:
         command.append("--skip-llm-judge")
+    if args.allow_self_judge:
+        command.append("--allow-self-judge")
+    command.extend(["--benchmark-role", args.benchmark_role])
     if args.validate_only:
         command.append("--validate-only")
     if args.output_dir:

@@ -3,6 +3,7 @@ from difflib import SequenceMatcher
 from typing import Any
 
 from uploads.config import (
+    CITATION_MIN_CLAIM_SUPPORT,
     MIN_ANSWER_CONFIDENCE,
     MIN_SOURCE_CONFIDENCE,
     SOURCE_EXCERPT_MAX_CHARS,
@@ -2532,6 +2533,7 @@ def build_sources(
                     question,
                     claim,
                     evidence_group,
+                    minimum_claim_support=CITATION_MIN_CLAIM_SUPPORT,
                 )
                 if (
                     not claim_decision.unsupported_facts
@@ -2638,6 +2640,32 @@ def answer_text_only(value: Any) -> str:
         maxsplit=1,
         flags=re.I,
     )[0]
+    # Citations are returned as structured metadata. Remove redundant filename
+    # narration from model prose so users do not see a second, unvalidated
+    # citation channel inside the answer itself.
+    filename = r"[^\s,;]+\.(?:pdf|docx?|txt|xlsx?|csv|pptx?)"
+    text = re.sub(
+        rf"^\s*(?:according\s+to|based\s+on|menurut|berdasarkan)\s+"
+        rf"(?:the\s+)?(?:document|file|source|dokumen|berkas|sumber)?\s*"
+        rf"{filename}\s*,\s*",
+        "",
+        text,
+        flags=re.I,
+    )
+    attribution_sentence = re.compile(
+        rf"^\s*(?:this|that|it|this\s+information|the\s+information|ini|itu|"
+        rf"hal\s+ini|informasi\s+ini)\s+(?:is\s+)?(?:explicitly\s+)?"
+        rf"(?:stated|documented|described|specified|found|dinyatakan|tercantum|"
+        rf"dijelaskan|didokumentasikan|ditemukan)\s+(?:in|within|at|di|dalam|pada)\s+"
+        rf"(?:the\s+)?(?:document|file|source|dokumen|berkas|sumber)?\s*"
+        rf"{filename}\s*[.!?]?\s*$",
+        flags=re.I,
+    )
+    text = " ".join(
+        sentence
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", text)
+        if sentence.strip() and not attribution_sentence.fullmatch(sentence.strip())
+    )
     lines = [re.sub(r"[ \t]+", " ", line).strip() for line in text.splitlines()]
     text = "\n".join(line for line in lines if line)
     return text.strip()

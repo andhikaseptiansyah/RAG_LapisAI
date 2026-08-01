@@ -27,6 +27,7 @@ BASE_SYSTEM_PROMPT = (
     "evidence supports only one fact, stop after that fact instead of padding the answer. "
     "Do not add an introduction, recommendation, citation, confidence, heading, label, assumption, example, "
     "or outside inference. Do not repeat the same fact or add a generic closing sentence. "
+    "Never mention document titles or filenames in the answer text; citations are attached separately. "
     "Never replace a supported answer with a refusal. "
     "Answer in the language explicitly requested in the user prompt. "
     "Do not copy headings, FAQ questions, separators, or unrelated context into the answer."
@@ -186,7 +187,8 @@ def build_user_prompt(question: str, context: str, language: str) -> str:
             "Translate any Indonesian evidence needed for the answer. Start with the direct answer, "
             "then write 2 to 4 connected sentences when the evidence supports relevant explanation. "
             "Use multiple evidence blocks when they add complementary facts. Do not repeat facts, add "
-            "filler, or infer anything absent from the evidence. Output answer text only. ENGLISH ONLY."
+            "filler, infer anything absent from the evidence, or mention document titles or filenames. "
+            "Output answer text only. ENGLISH ONLY."
         )
     return (
         "BAHASA KELUARAN: BAHASA INDONESIA SAJA.\n"
@@ -196,6 +198,7 @@ def build_user_prompt(question: str, context: str, language: str) -> str:
         "tulis 2 sampai 4 kalimat yang saling terhubung jika bukti mendukung penjelasan yang relevan. "
         "Gabungkan beberapa blok bukti bila masing-masing menambahkan fakta yang saling melengkapi. "
         "Jangan mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
+        "Jangan menyebut judul dokumen atau nama file karena sitasi ditambahkan secara terpisah. "
         "Jangan menyalin kalimat bahasa Inggris, "
         "kecuali nama diri, nama produk, kode, akronim, label antarmuka, nama portal/menu, "
         "nama tombol, nama kanal, dan nama tim yang harus dipertahankan persis seperti bukti. "

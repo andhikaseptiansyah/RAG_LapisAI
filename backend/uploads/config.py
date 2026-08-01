@@ -220,6 +220,9 @@ ENABLE_GENERATION_GROUNDING_VALIDATION = _env_bool(
     True,
 )
 GENERATION_MIN_CLAIM_SUPPORT = _env_float("GENERATION_MIN_CLAIM_SUPPORT", 0.32)
+# Citations need stronger source-to-claim evidence than the generation pruning
+# gate. This prevents a merely topical document from being shown as proof.
+CITATION_MIN_CLAIM_SUPPORT = _env_float("CITATION_MIN_CLAIM_SUPPORT", 0.50)
 if MAX_GENERATION_CONTEXTS <= 0:
     raise ValueError("MAX_GENERATION_CONTEXTS must be greater than zero")
 if MAX_SOURCE_CITATIONS <= 0:
@@ -228,6 +231,7 @@ for _name, _value in (
     ("CONTEXT_REDUNDANCY_THRESHOLD", CONTEXT_REDUNDANCY_THRESHOLD),
     ("CONTEXT_SECONDARY_SCORE_RATIO", CONTEXT_SECONDARY_SCORE_RATIO),
     ("GENERATION_MIN_CLAIM_SUPPORT", GENERATION_MIN_CLAIM_SUPPORT),
+    ("CITATION_MIN_CLAIM_SUPPORT", CITATION_MIN_CLAIM_SUPPORT),
 ):
     if not 0.0 <= _value <= 1.0:
         raise ValueError(f"{_name} must be between 0.0 and 1.0")
@@ -287,4 +291,5 @@ def public_rag_config() -> dict[str, str | float | bool | int]:
         "maxSourceCitations": MAX_SOURCE_CITATIONS,
         "generationGroundingValidationEnabled": ENABLE_GENERATION_GROUNDING_VALIDATION,
         "generationMinimumClaimSupport": GENERATION_MIN_CLAIM_SUPPORT,
+        "citationMinimumClaimSupport": CITATION_MIN_CLAIM_SUPPORT,
     }
