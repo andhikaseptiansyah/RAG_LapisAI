@@ -12,6 +12,10 @@ import { Login } from './components/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { StartupScreen } from './components/StartupScreen';
 import { AuthProvider } from './hooks/useAuth';
+import {
+  UiLanguageProvider,
+  useUiLanguage,
+} from './i18n/LanguageContext';
 
 import './globals.css';
 
@@ -47,15 +51,18 @@ const AdminStaffManagement = lazy(() =>
   }))
 );
 
-const AdminPageFallback: React.FC = () => (
-  <div
-    role="status"
-    aria-live="polite"
-    className="grid min-h-screen place-items-center bg-black text-sm text-white/60"
-  >
-    Loading admin page...
-  </div>
-);
+const AdminPageFallback: React.FC = () => {
+  const { t } = useUiLanguage();
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="grid min-h-screen place-items-center bg-black text-sm text-white/60"
+    >
+      {t('loadingAdmin')}
+    </div>
+  );
+};
 
 const renderAdminPage = (page: React.ReactNode): React.ReactNode => (
   <ProtectedRoute requireAdmin>
@@ -71,9 +78,10 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <AppErrorBoundary>
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <UiLanguageProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
           <Route
             path="/intro"
             element={<Navigate to="/login" replace />}
@@ -111,8 +119,9 @@ ReactDOM.createRoot(rootElement).render(
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </UiLanguageProvider>
   </AppErrorBoundary>
 );

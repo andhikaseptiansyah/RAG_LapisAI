@@ -135,6 +135,14 @@ def _source_units(items: Iterable[Any], document_only: bool) -> set[Any]:
     return {document for document, _ in sources} if document_only else sources
 
 
+def _sources_are_interchangeable(items: Iterable[Any]) -> bool:
+    references = [item for item in items or [] if isinstance(item, dict)]
+    return bool(
+        len(references) > 1
+        and all(reference.get("acceptable_alternative") is True for reference in references)
+    )
+
+
 def source_metrics(
     retrieved_sources: list[Any],
     expected_sources: list[Any],
@@ -162,6 +170,7 @@ def source_metrics(
     expected_units = _source_units(expected_sources, document_only)
     retrieved_units = _source_units(retrieved_sources, document_only)
     cited_units = _source_units(citations, document_only)
+    interchangeable = _sources_are_interchangeable(expected_sources)
     if not expected_units:
         return {
             "context_precision": None,
@@ -176,7 +185,9 @@ def source_metrics(
     intersection = expected_units & retrieved_units
     cited_intersection = expected_units & cited_units
     citation_precision = len(cited_intersection) / max(len(cited_units), 1)
-    citation_recall = len(cited_intersection) / len(expected_units)
+    citation_recall = (
+        1.0 if cited_intersection else 0.0
+    ) if interchangeable else len(cited_intersection) / len(expected_units)
     citation_f1 = (
         2 * citation_precision * citation_recall
         / (citation_precision + citation_recall)
@@ -185,7 +196,9 @@ def source_metrics(
     )
     return {
         "context_precision": len(intersection) / max(len(retrieved_units), 1),
-        "context_recall": len(intersection) / len(expected_units),
+        "context_recall": (
+            1.0 if intersection else 0.0
+        ) if interchangeable else len(intersection) / len(expected_units),
         "citation_precision": citation_precision,
         "citation_recall": citation_recall,
         "citation_f1": citation_f1,
@@ -215,6 +228,7 @@ def ranked_retrieval_metrics(
         }
 
     expected_documents = {document for document, _ in source_set(expected_sources)}
+    interchangeable = _sources_are_interchangeable(expected_sources)
     if not expected_documents:
         return {
             "precision_at_k": None,
@@ -247,19 +261,28 @@ def ranked_retrieval_metrics(
         (index for index, document in enumerate(ranked_documents, start=1) if document in expected_documents),
         None,
     )
-    dcg = sum(
-        1.0 / math.log2(rank + 1)
-        for rank, document in enumerate(top_documents, start=1)
-        if document in expected_documents
-    )
-    ideal_relevant = min(len(expected_documents), k)
+    if interchangeable:
+        dcg = (
+            1.0 / math.log2(first_rank + 1)
+            if first_rank is not None and first_rank <= k
+            else 0.0
+        )
+    else:
+        dcg = sum(
+            1.0 / math.log2(rank + 1)
+            for rank, document in enumerate(top_documents, start=1)
+            if document in expected_documents
+        )
+    ideal_relevant = 1 if interchangeable else min(len(expected_documents), k)
     ideal_dcg = sum(
         1.0 / math.log2(rank + 1)
         for rank in range(1, ideal_relevant + 1)
     )
     return {
         "precision_at_k": len(relevant_in_top_k) / k,
-        "recall_at_k": len(relevant_in_top_k) / len(expected_documents),
+        "recall_at_k": (
+            1.0 if relevant_in_top_k else 0.0
+        ) if interchangeable else len(relevant_in_top_k) / len(expected_documents),
         "hit_at_k": 1.0 if relevant_in_top_k else 0.0,
         "mrr": (1.0 / first_rank) if first_rank else 0.0,
         "top1_accuracy": (
@@ -577,6 +600,16 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ]
     judge_rows = [row for row in judge_attempted if not row["Judge Error"]]
     latencies = [row["Client Response Time (ms)"] for row in rows]
+    failure_categories = Counter(
+        str(row.get("Failure Category") or "")
+        for row in rows
+        if row.get("Pipeline Failed")
+    )
+    failure_stages = Counter(
+        str(row.get("Failure Stage") or "")
+        for row in rows
+        if row.get("Pipeline Failed")
+    )
 
     return {
         "total_questions": len(rows),
@@ -611,7 +644,23 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
             int(row["Failure Category"] == "retrieval_or_context")
             for row in rows
         ),
+        "answer_postprocessing_failure_rate": mean(
+            int(row["Failure Category"] == "answer_postprocessing")
+            for row in rows
+        ),
+        "generation_output_failure_rate": mean(
+            int(row["Failure Category"] == "generation_output")
+            for row in rows
+        ),
         "generation_failure_rate": mean(row["Generation Failed"] for row in rows),
+        "failure_category_counts": {
+            key or "unspecified": value
+            for key, value in sorted(failure_categories.items())
+        },
+        "failure_stage_counts": {
+            key or "unspecified": value
+            for key, value in sorted(failure_stages.items())
+        },
         "judge_error_rate": (
             round(1 - (len(judge_rows) / len(judge_attempted)), 4)
             if judge_attempted
@@ -791,6 +840,21 @@ def main() -> None:
             "Pipeline Failed": int(pipeline_failed),
             "Failure Category": failure_category,
             "Failure Stage": str(item.get("failure_stage") or ""),
+            "Failure Reason": str(item.get("failure_reason") or ""),
+            "Rejected Native Answer": str(
+                item.get("rejected_native_answer") or ""
+            ),
+            "Citation Validation": json.dumps(
+                item.get("citation_validation") or {},
+                ensure_ascii=False,
+                sort_keys=True,
+            ),
+            "Generation Mode": str(item.get("generation_mode") or ""),
+            "Pipeline Error": str(item.get("pipeline_error") or ""),
+            "Context Count Before Failure": int(
+                item.get("context_count_before_failure")
+                or len(item.get("generation_contexts") or [])
+            ),
             "Retrieval Mode": str(item.get("retrieval_mode") or ""),
             "Retrieval Query": str(item.get("retrieval_query") or ""),
             "Backend Build Version": str(item.get("backend_build_version") or ""),
@@ -907,7 +971,7 @@ def main() -> None:
             "Precision@K remains a standard ranking metric; with one relevant document its maximum at K=5 is 0.2. Use Hit@K, MRR, Top-1 Accuracy, or NDCG@K for easier interpretation.",
             "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
             "Citation F1 combines citation precision and recall. Citation Accuracy is retained as a compatibility alias for Citation F1.",
-            "Pipeline failures are classified separately; generation_failure_rate now counts only model/provider failures, not retrieval refusals.",
+            "Pipeline failures are classified by their precise stage; late answer/citation failures preserve evaluation contexts and are not counted as retrieval misses.",
             "Unanswerable safety requires a refusal and no citation.",
             "The same configured judge model must be used for every compared model.",
             (

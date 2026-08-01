@@ -3,8 +3,13 @@ from __future__ import annotations
 import pytest
 
 from api import chat_service
-from retrieval.evidence_verifier import verify_evidence
-from retrieval.query_expansion import build_natural_bridge_query
+from retrieval.answerability import apply_answerability_gate
+from retrieval.evidence_verifier import verify_chunks, verify_evidence
+from retrieval.query_expansion import (
+    build_natural_bridge_query,
+    concepts_in_text,
+    expand_query,
+)
 
 
 def _candidate(*, chunk_id: str, score: float, strict: bool) -> dict:
@@ -90,3 +95,137 @@ def test_indonesian_access_revocation_morphology_is_supported() -> None:
     decision = verify_evidence(question, evidence, semantic_score=0.85)
     assert decision.supported is True
     assert "access_revocation" in decision.matched_concepts
+
+
+@pytest.mark.parametrize(
+    ("question", "evidence", "expected_concept"),
+    [
+        (
+            "How long are audit logs retained?",
+            "Audit and compliance logs are retained for seven years.",
+            "audit_retention",
+        ),
+        (
+            "What are the four information-classification levels?",
+            "Information classification levels are Public, Internal, Confidential, and Restricted.",
+            "classification_levels",
+        ),
+        (
+            "Bagaimana cara memperbarui data rekening bank di sistem HR?",
+            "Employees submit updated bank details through the HR portal; the change applies next payroll cycle.",
+            "bank_account_update",
+        ),
+        (
+            "Apa yang harus dilakukan jika laptop kantor hilang?",
+            "If a company laptop is lost or stolen, report it to IT immediately so it can be remotely wiped.",
+            "lost_company_device",
+        ),
+        (
+            "Siapa yang menanggung biaya lisensi software untuk keperluan kerja?",
+            "The cost of approved business software licenses is paid from the IT budget.",
+            "software_license",
+        ),
+        (
+            "Apa syarat sebelum perangkat pribadi digunakan untuk email kantor?",
+            "Personal devices must be registered in mobile device management before accessing corporate email.",
+            "byod",
+        ),
+        (
+            "What documents or details should a new employee bring on the first day?",
+            "A valid ID, a tax ID (NPWP), and bank account details.",
+            "onboarding_documents",
+        ),
+        (
+            "Kapan surat keterangan dokter diperlukan untuk cuti sakit?",
+            "A doctor's certificate is required when sick leave exceeds two consecutive days.",
+            "medical_certificate",
+        ),
+    ],
+)
+def test_known_bilingual_false_refusals_have_explicit_subject_evidence(
+    question: str,
+    evidence: str,
+    expected_concept: str,
+) -> None:
+    decision = verify_evidence(question, evidence, semantic_score=0.90)
+    assert decision.supported is True, decision.reason
+    assert expected_concept in decision.matched_concepts
+
+
+def test_employee_onboarding_rejects_vendor_onboarding_context() -> None:
+    question = "What documents or details should a new employee bring on the first day?"
+    vendor_evidence = (
+        "Vendor onboarding requires a tax ID and bank account details before "
+        "the first purchase order is issued."
+    )
+
+    decision = verify_evidence(question, vendor_evidence, semantic_score=0.95)
+
+    assert decision.supported is False
+    assert "missing_concept:onboarding_documents" in decision.hard_failures
+    assert "conflicting_concept:vendor_onboarding" in decision.hard_failures
+
+
+def test_query_expansion_does_not_append_expected_onboarding_or_classification_answers() -> None:
+    onboarding = expand_query(
+        "What documents should a new employee bring on the first day?"
+    ).casefold()
+    classification = expand_query(
+        "What are the information-classification levels?"
+    ).casefold()
+
+    assert "tax id" not in onboarding
+    assert "npwp" not in onboarding
+    assert "public internal confidential restricted" not in classification
+
+
+def test_business_tool_license_wording_is_supported() -> None:
+    decision = verify_evidence(
+        "Siapa yang menanggung biaya lisensi software untuk keperluan kerja?",
+        "Approved business-tool licenses are covered by the IT budget.",
+        semantic_score=0.90,
+    )
+
+    assert decision.supported is True, decision.reason
+    assert "software_license" in decision.matched_concepts
+
+
+def test_generic_password_question_selects_adjacent_complete_policy_evidence() -> None:
+    question = "What are the password requirements?"
+    expanded = expand_query(question).casefold()
+    assert {"password", "password_complexity", "password_rotation"}.issubset(
+        set(concepts_in_text(question))
+    )
+    assert "12 characters" not in expanded
+    assert "90 days" not in expanded
+
+    candidates = verify_chunks(
+        question,
+        [
+            {
+                "chunkId": "password-0",
+                "chunkIndex": 0,
+                "documentName": "Policy_Password.docx",
+                "content": (
+                    "Passwords must be at least 12 characters and include upper case, "
+                    "lower case, a number, and a symbol."
+                ),
+                "score": 0.88,
+                "baseScore": 0.78,
+                "semanticScore": 0.85,
+            },
+            {
+                "chunkId": "password-1",
+                "chunkIndex": 1,
+                "documentName": "Policy_Password.docx",
+                "content": "Passwords must be changed every 90 days.",
+                "score": 0.83,
+                "baseScore": 0.70,
+                "semanticScore": 0.82,
+            },
+        ],
+    )
+
+    gated = apply_answerability_gate(question, candidates)
+    assert {item["chunkId"] for item in gated} == {"password-0", "password-1"}
+    assert all(item["answerabilityStrictlySupported"] is True for item in gated)

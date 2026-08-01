@@ -23,7 +23,15 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
 
-    subprocess.run([sys.executable, str(EVALUATION_DIR / "validate_user_100_setup.py")], cwd=PROJECT_ROOT, check=True)
+    readiness_command = [
+        sys.executable,
+        str(EVALUATION_DIR / "validate_user_100_setup.py"),
+    ]
+    if args.validate_only:
+        # Dataset validation must remain usable before the local corpus and
+        # Chroma index are prepared.
+        readiness_command.append("--dataset-only")
+    subprocess.run(readiness_command, cwd=PROJECT_ROOT, check=True)
 
     command = [
         sys.executable,

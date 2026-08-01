@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -13,6 +14,11 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   onToggleConversationNavigator,
 }) => {
+  const { t } = useUiLanguage();
+  const mainMenuLabel = isSidebarOpen
+    ? t('closeMainMenu')
+    : t('openMainMenu');
+
   return (
     <header className="pointer-events-none absolute left-0 top-0 z-30 flex h-24 w-full shrink-0 items-center justify-between bg-transparent px-4 md:h-28 md:px-6">
       <button
@@ -23,8 +29,8 @@ export const Header: React.FC<HeaderProps> = ({
             ? 'border-white/15 bg-white/10 text-white'
             : 'border-white/10 bg-black/55 text-white/80 hover:border-white/20 hover:bg-white/[0.08]'
         }`}
-        title={isSidebarOpen ? 'Tutup menu utama' : 'Buka menu utama'}
-        aria-label={isSidebarOpen ? 'Tutup menu utama' : 'Buka menu utama'}
+        title={mainMenuLabel}
+        aria-label={mainMenuLabel}
         aria-expanded={isSidebarOpen}
       >
         <svg
@@ -59,8 +65,8 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={onToggleConversationNavigator}
           className="pointer-events-auto flex h-24 w-24 -translate-y-3 items-center justify-center bg-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none md:h-28 md:w-28 md:-translate-y-4"
-          title="Buka isi percakapan"
-          aria-label="Buka isi percakapan"
+          title={t('openConversationContents')}
+          aria-label={t('openConversationContents')}
           aria-expanded="false"
         >
           <img

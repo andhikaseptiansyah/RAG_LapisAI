@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ export const ProtectedRoute: React.FC<
   requireAdmin = false,
 }) => {
   const location = useLocation();
+  const { language } = useUiLanguage();
 
   const {
     user,
@@ -34,7 +36,7 @@ export const ProtectedRoute: React.FC<
   if (isInitializing) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black text-white">
-        Checking session...
+        {language === 'EN' ? 'Checking session...' : 'Memeriksa sesi...'}
       </div>
     );
   }

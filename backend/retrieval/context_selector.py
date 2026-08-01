@@ -27,6 +27,71 @@ def _score(row: dict[str, Any]) -> float:
         return 0.0
 
 
+def _bounded_number(row: dict[str, Any], *keys: str) -> float:
+    for key in keys:
+        value = row.get(key)
+        if value is None:
+            continue
+        try:
+            return max(0.0, min(float(value), 1.0))
+        except (TypeError, ValueError):
+            continue
+    return 0.0
+
+
+def _flag(row: dict[str, Any], *keys: str) -> bool:
+    for key in keys:
+        if key not in row or row.get(key) is None:
+            continue
+        value = row.get(key)
+        if isinstance(value, str):
+            return value.strip().casefold() in {"1", "true", "yes", "on"}
+        return bool(value)
+    return False
+
+
+def _items(row: dict[str, Any], *keys: str) -> list[Any]:
+    for key in keys:
+        value = row.get(key)
+        if isinstance(value, (list, tuple)):
+            return list(value)
+    return []
+
+
+def _individually_supported(row: dict[str, Any]) -> bool:
+    """Return whether this exact chunk, rather than only its bundle, is evidence."""
+    return bool(
+        _flag(row, "evidenceSupported", "evidence_supported")
+        and not _items(row, "evidenceHardFailures", "evidence_hard_failures")
+        and not _items(
+            row,
+            "evidenceHardContradictions",
+            "evidence_hard_contradictions",
+        )
+    )
+
+
+def _locked_missing_requirements(row: dict[str, Any]) -> set[str]:
+    """Normalize snapshot verifier gaps for complementary-chunk selection.
+
+    Answerability is evaluated over a candidate bundle, so its diagnostics are
+    copied to every accepted row. ``evidenceMissingRequirements`` remains local
+    to each row and lets the selector distinguish a heading-only chunk from the
+    complexity and rotation paragraphs that jointly answer a password question.
+    The ``locked:`` namespace intentionally stays separate from live requirement
+    keys; it is selection metadata only and cannot make evidence answerable.
+    """
+    return {
+        "locked:" + str(item).strip().casefold()
+        for item in _items(
+            row,
+            "evidenceMissingRequirements",
+            "evidence_missing_requirements",
+        )
+        if str(item).strip()
+    }
+
+
 def _tokens(text: str) -> set[str]:
     return {
         token for token in re.findall(r"[a-z0-9à-ÿ]+", normalize_text(text))
@@ -70,9 +135,11 @@ def select_context_bundle(
 ) -> list[dict[str, Any]]:
     """Return a compact evidence set while preserving requirement coverage.
 
-    The first candidate is retained when available. Additional candidates are
-    selected only when they cover a missing requirement, add a different source,
-    or provide meaningfully different text at a sufficiently strong score.
+    The highest-utility evidence candidate is retained first. A heading-only
+    rank-1 hit cannot displace a lower-ranked paragraph that actually satisfies
+    the verifier. Additional candidates are selected when they cover a missing
+    requirement, add a different source, or provide meaningfully different text
+    at a sufficiently strong score.
     """
     if not candidates:
         return []
@@ -82,16 +149,30 @@ def select_context_bundle(
     ranked = sorted(candidates, key=_score, reverse=True)
     requirements = extract_evidence_requirements(question)
     all_requirement_keys = {item.key for item in requirements}
+    locked_requirement_keys = set().union(
+        *(_locked_missing_requirements(row) for row in ranked)
+    )
+    all_requirement_keys.update(locked_requirement_keys)
     question_tokens = _tokens(question)
 
     enriched: list[dict[str, Any]] = []
     for row in ranked:
         content = str(row.get("content") or "")
         coverage = _requirement_keys(question, content)
+        if locked_requirement_keys:
+            coverage.update(
+                locked_requirement_keys - _locked_missing_requirements(row)
+            )
         enriched.append({
             **row,
             "contextRequirementCoverage": sorted(coverage),
             "contextDocument": _document_name(row),
+            "contextIndividuallySupported": _individually_supported(row),
+            "contextEvidenceScore": _bounded_number(
+                row,
+                "evidenceScore",
+                "evidence_score",
+            ),
         })
 
     selected: list[dict[str, Any]] = []
@@ -114,8 +195,8 @@ def select_context_bundle(
                 for chosen in selected
             )
 
-            # Keep the first result. Afterwards, reject near-duplicate passages
-            # unless they satisfy a requirement not covered by the current set.
+            # Afterwards, reject near-duplicate passages unless they satisfy a
+            # requirement not covered by the current set.
             if selected and redundancy >= redundancy_threshold and requirement_gain == 0:
                 continue
 
@@ -128,17 +209,30 @@ def select_context_bundle(
                 )
                 lexical_overlap = len(question_tokens & _tokens(content))
                 required_overlap = min(2, max(1, len(question_tokens)))
-                if not supports_existing_requirement and lexical_overlap < required_overlap:
+                if (
+                    not supports_existing_requirement
+                    and lexical_overlap < required_overlap
+                    and row["contextEvidenceScore"] < 0.55
+                ):
                     continue
 
+            content_token_count = len(_tokens(content))
             utility = (
                 2.4 * requirement_gain
                 + 0.85 * _score(row)
+                + (1.10 if row["contextIndividuallySupported"] else 0.0)
+                + 0.45 * row["contextEvidenceScore"]
+                + min(content_token_count / 40.0, 0.30)
                 + (0.12 if new_document else 0.0)
                 - 0.65 * redundancy
             )
+            if content_token_count <= 3 and not row["contextIndividuallySupported"]:
+                # A document title can rank first lexically, but it must not
+                # displace the substantive paragraph that actually proves the
+                # answer. It remains eligible only when no better row exists.
+                utility -= 0.85
             if not selected and index == 0:
-                utility += 1.0
+                utility += 0.08
 
             if utility > best_utility:
                 best_utility = utility

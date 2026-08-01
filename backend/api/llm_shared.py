@@ -43,7 +43,8 @@ def build_system_prompt(language: str) -> str:
         language_rule = (
             "MANDATORY OUTPUT LANGUAGE: Bahasa Indonesia only. Translate English evidence "
             "into natural Bahasa Indonesia. Do not copy English sentences, except proper "
-            "names, product names, codes, and acronyms. "
+            "names, product names, codes, acronyms, UI labels, portal/menu names, button "
+            "names, channel names, and team names. "
         )
     return language_rule + BASE_SYSTEM_PROMPT
 
@@ -196,7 +197,9 @@ def build_user_prompt(question: str, context: str, language: str) -> str:
         "Gabungkan beberapa blok bukti bila masing-masing menambahkan fakta yang saling melengkapi. "
         "Jangan mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
         "Jangan menyalin kalimat bahasa Inggris, "
-        "kecuali nama diri, nama produk, kode, dan akronim. Keluarkan teks jawaban saja. "
+        "kecuali nama diri, nama produk, kode, akronim, label antarmuka, nama portal/menu, "
+        "nama tombol, nama kanal, dan nama tim yang harus dipertahankan persis seperti bukti. "
+        "Keluarkan teks jawaban saja. "
         "BAHASA INDONESIA SAJA."
     )
 

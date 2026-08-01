@@ -2280,7 +2280,8 @@ def build_sources(
     evidence units are genuinely needed to support different answer claims.
 
     PDF citations keep physical page metadata. DOCX pages are shown only when
-    the parser marked them reliable. TXT uses chapter and paragraph ranges.
+    the parser marked them reliable. TXT uses paragraph ranges only because a
+    plain-text file has no dependable physical page or chapter model.
     """
     confidence = answer_confidence(question, chunks)
     answerability_accepted = has_answerable_evidence(chunks)
@@ -2384,6 +2385,12 @@ def build_sources(
             or chunk.get("section")
             or metadata.get("section")
         ) or None
+        if document_type == "txt":
+            # Headings from TXT are useful internally for retrieval, but they
+            # are not stable physical locations. Exposing them as chapters made
+            # citations depend on parser heuristics and violated the public
+            # citation contract. Paragraph ranges remain deterministic.
+            chapter = None
 
         paragraph_start = chunk.get(
             "paragraphStart", metadata.get("paragraph_start")
@@ -2614,7 +2621,17 @@ def answer_text_only(value: Any) -> str:
     text = str(value or "")
     text = re.sub(r"<think>.*?</think>", " ", text, flags=re.I | re.S)
     text = re.sub(r"</?think>", " ", text, flags=re.I)
-    text = re.sub(r"^\s*(?:Jawaban|Answer)\s*:\s*", "", text, flags=re.I)
+    # Local instruction-tuned models occasionally wrap the forbidden answer
+    # label in Markdown (for example ``**Jawaban:**``). Treat that wrapper as
+    # presentation metadata so it cannot make an otherwise grounded claim fail
+    # citation validation.
+    text = re.sub(
+        r"^\s*(?:#{1,6}\s*)?(?:[*_`]+\s*)?(?:Jawaban|Answer)"
+        r"(?:\s*[*_`]+)?\s*:\s*",
+        "",
+        text,
+        flags=re.I,
+    )
     text = re.split(
         r"(?:\r?\n){1,}\s*(?:Sumber|Source|Confidence|Kepercayaan|Model)\s*:",
         text,

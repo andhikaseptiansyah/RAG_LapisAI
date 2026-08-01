@@ -48,6 +48,22 @@ def parse_keywords(value: Any) -> list[str]:
     return keywords
 
 
+def parse_source_documents(value: Any) -> list[str]:
+    """Return independently acceptable sources separated by ``||``."""
+    text = str(value or "").strip()
+    if text.casefold() in NULL_VALUES:
+        return []
+    documents: list[str] = []
+    seen: set[str] = set()
+    for part in re.split(r"\s*\|\|\s*", text):
+        clean = part.strip()
+        key = clean.casefold()
+        if clean and key not in NULL_VALUES and key not in seen:
+            seen.add(key)
+            documents.append(clean)
+    return documents
+
+
 def normalize_metric_text(text: str) -> str:
     value = str(text or "").casefold()
     number_words = {
@@ -101,15 +117,15 @@ def load(path: Path, language: str) -> list[dict[str, Any]]:
     for number, row in enumerate(rows, start=2):
         question = str(row.get("question") or "").strip()
         expected_answer = str(row.get("expected_answer") or "").strip()
-        source_document = str(row.get("source_document") or "").strip()
+        source_documents = parse_source_documents(row.get("source_document"))
         answerable = parse_bool(row.get("answerable"))
         keywords = parse_keywords(row.get("expected_answer_keywords"))
 
         if not question or not expected_answer:
             raise ValueError(f"Empty question/answer at {path}:{number}")
-        if answerable and not source_document:
+        if answerable and not source_documents:
             raise ValueError(f"Answerable row has no source at {path}:{number}")
-        if not answerable and source_document:
+        if not answerable and source_documents:
             raise ValueError(f"Unanswerable row has a source at {path}:{number}")
         if answerable and not keywords:
             raise ValueError(f"Answerable row has no keywords at {path}:{number}")
@@ -136,7 +152,7 @@ def load(path: Path, language: str) -> list[dict[str, Any]]:
             "language": language,
             "question": question,
             "answerable": answerable,
-            "source_document": source_document,
+            "source_documents": source_documents,
         })
     return output
 
@@ -190,30 +206,45 @@ def main() -> None:
             f"Actual  : {json.dumps(summary, ensure_ascii=False)}"
         )
 
-    expected_docs = {item["source_document"] for item in items if item["source_document"]}
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    print("Dataset validation: PASS (100 questions, language and keyword annotations are consistent).")
+    if args.dataset_only:
+        return
+
+    expected_by_key = {
+        document.casefold(): document
+        for item in items
+        for document in item["source_documents"]
+    }
+    expected_docs = set(expected_by_key)
     store_path = BACKEND_DIR / "documents_store.json"
     store_docs: set[str] = set()
     if store_path.exists():
         payload = json.loads(store_path.read_text(encoding="utf-8"))
         if isinstance(payload, list):
             store_docs = {
-                str(row.get("filename") or "").strip()
+                str(row.get("filename") or "").strip().casefold()
                 for row in payload
                 if isinstance(row, dict) and str(row.get("filename") or "").strip()
             }
 
-    missing_metadata = sorted(expected_docs - store_docs) if store_docs else sorted(expected_docs)
+    missing_metadata = sorted(
+        (expected_by_key[key] for key in expected_docs - store_docs),
+        key=str.casefold,
+    )
     corpus_dir = Path(UPLOAD_DIR)
     actual_files = (
-        {path.name for path in corpus_dir.iterdir() if path.is_file()}
+        {path.name.casefold() for path in corpus_dir.iterdir() if path.is_file()}
         if corpus_dir.is_dir()
         else set()
     )
-    missing_files = sorted(expected_docs - actual_files)
+    missing_files = sorted(
+        (expected_by_key[key] for key in expected_docs - actual_files),
+        key=str.casefold,
+    )
     chroma_dir = Path(CHROMA_PATH)
     chroma_ready = chroma_dir.is_dir() and any(chroma_dir.iterdir())
 
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
     print(f"Unique expected source documents: {len(expected_docs)}")
     print(f"Missing from documents_store.json: {len(missing_metadata)}")
     print(f"Missing physical corpus files: {len(missing_files)}")
@@ -225,9 +256,6 @@ def main() -> None:
         print("WARNING: physical source files are missing: " + ", ".join(missing_files))
         print("The existing Chroma index may still be evaluated, but the corpus cannot be reproduced/re-indexed.")
 
-    print("Dataset validation: PASS (100 questions, language and keyword annotations are consistent).")
-    if args.dataset_only:
-        return
     if not chroma_ready:
         raise SystemExit(
             "Runtime readiness FAILED: Chroma index is missing or empty. "

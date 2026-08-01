@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import type { Message } from '../types';
 import type { ChatLanguage } from '../services/chatService';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 interface ConversationNavigatorPanelProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const ConversationNavigatorPanel: React.FC<
   onLanguageChange,
   onSelectMessage,
 }) => {
+  const { t } = useUiLanguage();
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const questions = useMemo<ConversationQuestion[]>(() => {
@@ -45,14 +47,14 @@ export const ConversationNavigatorPanel: React.FC<
       return [
         {
           id: message.id,
-          content: message.content.trim() || 'Pesan dengan lampiran',
+          content: message.content.trim() || t('attachmentMessage'),
           time: message.time,
           attachmentCount: message.attachments?.length ?? 0,
           position,
         },
       ];
     });
-  }, [messages]);
+  }, [messages, t]);
 
   const filteredQuestions = useMemo(() => {
     const normalizedKeyword = searchKeyword.trim().toLocaleLowerCase();
@@ -91,7 +93,7 @@ export const ConversationNavigatorPanel: React.FC<
             ? 'w-[300px] translate-x-0 border-l border-[#1a1a1a] opacity-100 md:w-[340px]'
             : 'translate-x-full border-transparent opacity-0 md:w-0 md:translate-x-0'
         }`}
-        aria-label="Navigasi percakapan aktif"
+        aria-label={t('openConversationContents')}
       >
         <div className="flex h-full min-h-0 flex-col px-5 pb-5 pt-6">
           
@@ -103,8 +105,8 @@ export const ConversationNavigatorPanel: React.FC<
               type="button"
               onClick={onClose}
               className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111] text-white/50 transition-all hover:bg-[#1a1a1a] hover:text-white"
-              aria-label="Tutup navigasi percakapan aktif"
-              title="Tutup navigasi percakapan aktif"
+              aria-label={t('closeConversationContents')}
+              title={t('closeConversationContents')}
             >
               <span className="material-symbols-outlined text-[20px]">
                 right_panel_close
@@ -132,10 +134,10 @@ export const ConversationNavigatorPanel: React.FC<
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-                  Bahasa jawaban
+                  {t('answerLanguage')}
                 </p>
                 <p className="mt-1 text-[11px] text-white/40">
-                  Pilih bahasa yang digunakan untuk jawaban.
+                  {t('answerLanguageHelp')}
                 </p>
               </div>
 
@@ -163,7 +165,7 @@ export const ConversationNavigatorPanel: React.FC<
                       {language}
                     </span>
                     <span className={`mt-0.5 block truncate text-[10px] ${isSelected ? 'text-white/60' : 'text-white/30'}`}>
-                      {language === 'ID' ? 'Bahasa Indonesia' : 'Bahasa Inggris'}
+                      {language === 'ID' ? t('indonesian') : t('english')}
                     </span>
                   </button>
                 );
@@ -176,10 +178,10 @@ export const ConversationNavigatorPanel: React.FC<
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-                  Pertanyaan dalam percakapan ini
+                  {t('questionsInConversation')}
                 </p>
                 <p className="mt-1 text-[11px] text-white/40">
-                  Pilih pertanyaan untuk membuka posisinya.
+                  {t('questionsHelp')}
                 </p>
               </div>
 
@@ -197,7 +199,7 @@ export const ConversationNavigatorPanel: React.FC<
               <input
                 value={searchKeyword}
                 onChange={(event) => setSearchKeyword(event.target.value)}
-                placeholder="Cari dalam percakapan ini"
+                placeholder={t('searchConversation')}
                 className="h-12 w-full rounded-xl border border-[#1a1a1a] bg-[#0c0c0c] pl-11 pr-10 text-[13px] text-white/90 outline-none transition-all duration-200 placeholder:text-white/30 focus:border-[#333] focus:bg-[#111] focus:ring-2 focus:ring-[#333]/30"
               />
               {searchKeyword && (
@@ -205,7 +207,7 @@ export const ConversationNavigatorPanel: React.FC<
                   type="button"
                   onClick={() => setSearchKeyword('')}
                   className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-[#1a1a1a] text-white/50 transition-colors hover:bg-[#2a2a2a] hover:text-white"
-                  aria-label="Bersihkan pencarian"
+                  aria-label={t('clearSearch')}
                 >
                   <span className="material-symbols-outlined text-[16px]">
                     close
@@ -223,10 +225,10 @@ export const ConversationNavigatorPanel: React.FC<
                     </span>
                   </div>
                   <p className="text-[14px] font-medium text-white/70">
-                    Belum ada pertanyaan
+                    {t('noQuestions')}
                   </p>
                   <p className="mt-1.5 max-w-[220px] text-[11px] leading-relaxed text-white/40">
-                    Pertanyaan dari percakapan ini akan muncul setelah Anda mengirimkannya.
+                    {t('noQuestionsHelp')}
                   </p>
                 </div>
               ) : filteredQuestions.length === 0 ? (
@@ -235,7 +237,7 @@ export const ConversationNavigatorPanel: React.FC<
                     search_off
                   </span>
                   <p className="mt-3 text-[12px] text-white/50">
-                    Pertanyaan yang sesuai tidak ditemukan.
+                    {t('noMatchingQuestions')}
                   </p>
                 </div>
               ) : (

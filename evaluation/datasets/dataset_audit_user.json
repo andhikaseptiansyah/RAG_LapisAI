@@ -1,8 +1,9 @@
 {
+  "schema_version": 2,
   "files": {
     "EN": {
-      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_english.csv",
-      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_english_user.csv",
+      "source": "user-provided English CSV",
+      "dataset": "evaluation/datasets/qna_english_user.csv",
       "original_rows": 50,
       "cleaned": {
         "total": 50,
@@ -11,8 +12,8 @@
       }
     },
     "ID": {
-      "input": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/raw_user/qna_indonesia.csv",
-      "output": "/mnt/data/LapisAI_Evaluation_100_Patch/evaluation/datasets/qna_indonesia_user.csv",
+      "source": "user-provided Indonesian CSV",
+      "dataset": "evaluation/datasets/qna_indonesia_user.csv",
       "original_rows": 50,
       "cleaned": {
         "total": 50,

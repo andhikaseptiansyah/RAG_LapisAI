@@ -76,6 +76,7 @@ RELATIVE_DATE_TIME_PATTERN = re.compile(
     r"(?:the\s+)?(?:next|following|previous|prior)\s+(?:working\s+day|business\s+day|"
     r"day|week|month|year|payroll(?:\s+cycle)?)|"
     r"(?:next|following)\s+month(?:'s)?\s+payroll|"
+    r"(?:next|following)\s+monthly\s+payroll(?:\s+cycle)?|"
     r"payroll\s+(?:cycle\s+)?(?:of\s+)?(?:the\s+)?(?:next|following)\s+month|"
     r"(?:hari\s+kerja|hari|minggu|bulan|tahun|payroll)\s+(?:sebelumnya|berikutnya)|"
     r"siklus\s+payroll\s+(?:bulan\s+)?berikutnya|"
@@ -87,9 +88,9 @@ NUMBER_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?\b")
 YEAR_PATTERN = re.compile(r"\b(?:19|20)\d{2}\b")
 QUOTED_PATTERN = re.compile(r"['\"“”‘’*]([^'\"“”‘’*]{8,160})['\"“”‘’*]")
 NUMBER_WITH_UNIT_PATTERN = re.compile(
-    r"\b(\d+(?:[.,]\d+)?)\s*(GB|MB|TB|KB|days?|years?|months?|weeks?|hours?|"
+    r"\b(\d+(?:[.,]\d+)?)\s*(GB|MB|TB|KB|(?:consecutive\s+)?days?|years?|months?|weeks?|hours?|"
     r"minutes?|seconds?|characters?|chars?|requests?|calls?|hari|tahun|bulan|minggu|jam|"
-    r"menit|detik|karakter|permintaan|panggilan|%|persen|percent)(?=$|[^A-Za-z0-9])",
+    r"hari\s+berturut-turut|menit|detik|karakter|permintaan|panggilan|%|persen|percent)(?=$|[^A-Za-z0-9])",
     flags=re.I,
 )
 
@@ -278,6 +279,8 @@ def canonical_unit(unit: str) -> str:
     value = normalize_text(unit)
     aliases = {
         "day": "days", "hari": "days", "working day": "days", "business day": "days",
+        "consecutive day": "days", "consecutive days": "days",
+        "hari berturut turut": "days", "hari berturut-turut": "days",
         "year": "years", "tahun": "years", "month": "months", "bulan": "months",
         "week": "weeks", "minggu": "weeks", "hour": "hours", "hr": "hours", "jam": "hours",
         "minute": "minutes", "min": "minutes", "menit": "minutes",
@@ -606,11 +609,34 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
     if requirement.kind == "number":
         return bool(NUMBER_PATTERN.search(combined))
     if requirement.kind == "approval":
-        return bool(re.search(
+        if re.search(
             r"\b(?:approval|approved|approve|approver|persetujuan|disetujui|menyetujui)\b",
             combined,
             flags=re.I,
-        ))
+        ):
+            return True
+        # Compact policy tables often encode the approver as
+        # ``Below IDR 10,000,000: manager`` without the word "approval".
+        # Require both a monetary threshold and an explicit organizational
+        # role so an unrelated mention of a manager cannot pass this gate.
+        has_threshold = bool(MONEY_PATTERN.search(combined)) and bool(
+            re.search(
+                r"\b(?:below|under|up\s+to|between|above|over|"
+                r"di\s+bawah|hingga|antara|di\s+atas)\b",
+                combined,
+                flags=re.I,
+            )
+        )
+        has_role = bool(
+            re.search(
+                r"(?:[:;\-–—]|\brequires?\b|\bby\b)\s*"
+                r"(?:the\s+)?(?:manager|department\s+head|director|"
+                r"manajer|kepala\s+departemen|direktur)\b",
+                combined,
+                flags=re.I,
+            )
+        )
+        return has_threshold and has_role
     if requirement.kind == "contact":
         return bool(
             EMAIL_PATTERN.search(combined)
@@ -621,14 +647,27 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
             )
         )
     if requirement.kind == "supporting_document":
-        return bool(re.search(
+        if re.search(
             r"\b(?:receipt|receipts|invoice|invoices|document|documents|attachment|attachments|"
             r"proof|evidence|kuitansi|faktur|dokumen|lampiran|bukti)\b|"
             r"\b(?:must|required|wajib)\s+(?:be\s+)?(?:attach|attached|submit|submitted|provide|provided|"
             r"dilampirkan|disertakan|diajukan)\b",
             combined,
             flags=re.I,
-        ))
+        ):
+            return True
+        # Onboarding and identity checklists frequently list the concrete
+        # items directly (for example a valid ID, tax ID, and bank details)
+        # without repeating the generic word "document". These markers are
+        # explicit document/detail types, not inferred answer values.
+        explicit_items = (
+            r"\b(?:valid\s+(?:photo\s+)?id|identity\s+(?:card|document)|"
+            r"government(?:-issued)?\s+id|tax\s+id|npwp|passport|birth\s+certificate|"
+            r"medical\s+certificate|bank\s+account\s+details?|bank\s+details?|"
+            r"nomor\s+rekening|detail\s+rekening|kartu\s+identitas|identitas\s+resmi|"
+            r"surat\s+keterangan|form(?:ulir)?|certificate|license|licence)\b"
+        )
+        return bool(re.search(explicit_items, combined, flags=re.I))
     if requirement.kind in {"literal", "year"}:
         return requirement.value in normalized_combined
     if requirement.kind == "numeric_constraint":

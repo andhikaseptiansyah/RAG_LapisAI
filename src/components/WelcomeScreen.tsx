@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AttachedFile } from '../types';
 import type { ModelType } from '../types';
 
-type UploadMode = 'photo' | 'file';
 type ChatLanguage = 'ID' | 'EN';
 
 
@@ -18,7 +17,6 @@ const MODEL_OPTIONS: Array<{
 
 interface WelcomeScreenProps {
   onSendMessage: (text: string, files: AttachedFile[]) => void;
-  onAttachFileClick: (mode: UploadMode) => void;
   onMicClick: () => void;
   language?: ChatLanguage;
   model: ModelType;

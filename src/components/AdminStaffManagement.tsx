@@ -3,6 +3,10 @@ import React, { FormEvent, useCallback, useEffect, useMemo, useState } from 'rea
 import { AdminHeader } from './AdminHeader';
 import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '../hooks/useAuth';
+import {
+  useUiLanguage,
+  type UiLanguage,
+} from '../i18n/LanguageContext';
 import { ApiError, getAdminApiErrorMessage } from '../services/api';
 import {
   createManagedUser,
@@ -22,11 +26,11 @@ const getAccountErrorMessage = (error: unknown): string => {
   return getAdminApiErrorMessage(error);
 };
 
-const formatAccountDate = (value: string): string => {
+const formatAccountDate = (value: string, language: UiLanguage): string => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(language === 'EN' ? 'en-US' : 'id-ID', {
     timeZone: 'Asia/Jakarta',
     year: 'numeric',
     month: 'short',
@@ -34,9 +38,9 @@ const formatAccountDate = (value: string): string => {
   });
 };
 
-const roleLabel = (role: string): string => {
+const roleLabel = (role: string, language: UiLanguage): string => {
   if (role === 'admin') return 'Administrator';
-  return 'Staff';
+  return language === 'EN' ? 'Staff' : 'Staf';
 };
 
 const roleClassName = (role: string): string => {
@@ -60,7 +64,9 @@ const ModalShell: React.FC<ModalShellProps> = ({
   icon,
   onClose,
   children,
-}) => (
+}) => {
+  const { language } = useUiLanguage();
+  return (
   <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
     <div
       role="dialog"
@@ -82,7 +88,7 @@ const ModalShell: React.FC<ModalShellProps> = ({
           type="button"
           onClick={onClose}
           className="rounded-xl p-2 text-slate-500 transition hover:bg-white/5 hover:text-white"
-          aria-label="Close dialog"
+          aria-label={language === 'EN' ? 'Close dialog' : 'Tutup dialog'}
         >
           <span className="material-symbols-outlined text-[20px]">close</span>
         </button>
@@ -90,7 +96,8 @@ const ModalShell: React.FC<ModalShellProps> = ({
       {children}
     </div>
   </div>
-);
+  );
+};
 
 const AccountFields: React.FC<{
   name: string;
@@ -106,22 +113,28 @@ const AccountFields: React.FC<{
   onNameChange,
   onUsernameChange,
   onRoleChange,
-}) => (
+}) => {
+  const { language } = useUiLanguage();
+  return (
   <>
     <label className="block">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Full name</span>
+      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        {language === 'EN' ? 'Full name' : 'Nama lengkap'}
+      </span>
       <input
         value={name}
         onChange={(event) => onNameChange(event.target.value)}
         required
         minLength={2}
         maxLength={80}
-        placeholder="Example: Alex Morgan"
+        placeholder={language === 'EN' ? 'Example: Alex Morgan' : 'Contoh: Alex Morgan'}
         className="mt-2 w-full rounded-xl border border-white/10 bg-[#050918] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-700 focus:border-cyan-400/50"
       />
     </label>
     <label className="block">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Username</span>
+      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        {language === 'EN' ? 'Username' : 'Nama pengguna'}
+      </span>
       <input
         value={username}
         onChange={(event) => onUsernameChange(event.target.value.toLowerCase())}
@@ -133,33 +146,41 @@ const AccountFields: React.FC<{
         className="mt-2 w-full rounded-xl border border-white/10 bg-[#050918] px-4 py-3 font-mono text-sm text-white outline-none transition placeholder:text-slate-700 focus:border-cyan-400/50"
       />
       <span className="mt-1 block text-xs text-slate-600">
-        Use lowercase letters, numbers, periods, underscores, or hyphens.
+        {language === 'EN'
+          ? 'Use lowercase letters, numbers, periods, underscores, or hyphens.'
+          : 'Gunakan huruf kecil, angka, titik, garis bawah, atau tanda hubung.'}
       </span>
     </label>
     <label className="block">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Account role</span>
+      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        {language === 'EN' ? 'Account role' : 'Peran akun'}
+      </span>
       <select
         value={role}
         onChange={(event) => onRoleChange(event.target.value as ManagedAccountRole)}
         disabled
-        aria-label="Account role"
+        aria-label={language === 'EN' ? 'Account role' : 'Peran akun'}
         className="mt-2 w-full cursor-not-allowed rounded-xl border border-white/10 bg-[#050918] px-4 py-3 text-sm text-slate-300 outline-none opacity-80"
       >
-        <option value="staff">Staff</option>
+        <option value="staff">{language === 'EN' ? 'Staff' : 'Staf'}</option>
       </select>
       <span className="mt-1 block text-xs text-slate-600">
-        All managed accounts use the Staff role.
+        {language === 'EN'
+          ? 'All managed accounts use the Staff role.'
+          : 'Semua akun yang dikelola menggunakan peran Staf.'}
       </span>
     </label>
   </>
-);
+  );
+};
 
 export const AdminStaffManagement: React.FC = () => {
   const { user: currentUser } = useAuth();
+  const { language } = useUiLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -244,7 +265,11 @@ export const AdminStaffManagement: React.FC = () => {
     );
 
     if (usernameExists) {
-      setErrorMessage('Username is already in use. Choose another username.');
+      setErrorMessage(
+        language === 'EN'
+          ? 'Username is already in use. Choose another username.'
+          : 'Nama pengguna sudah digunakan. Pilih nama pengguna lain.'
+      );
       return;
     }
 
@@ -256,7 +281,11 @@ export const AdminStaffManagement: React.FC = () => {
         password: createPassword,
         role: createRole,
       });
-      setSuccessMessage(`Account "${normalizedUsername}" was created successfully.`);
+      setSuccessMessage(
+        language === 'EN'
+          ? `Account "${normalizedUsername}" was created successfully.`
+          : `Akun "${normalizedUsername}" berhasil dibuat.`
+      );
       setIsCreateOpen(false);
       resetCreateForm();
       await loadUsers(true);
@@ -280,7 +309,11 @@ export const AdminStaffManagement: React.FC = () => {
     );
 
     if (usernameExists) {
-      setErrorMessage('Username is already in use. Choose another username.');
+      setErrorMessage(
+        language === 'EN'
+          ? 'Username is already in use. Choose another username.'
+          : 'Nama pengguna sudah digunakan. Pilih nama pengguna lain.'
+      );
       return;
     }
 
@@ -291,7 +324,11 @@ export const AdminStaffManagement: React.FC = () => {
         username: normalizedUsername,
         role: editRole,
       });
-      setSuccessMessage(`Account "${normalizedUsername}" was updated successfully.`);
+      setSuccessMessage(
+        language === 'EN'
+          ? `Account "${normalizedUsername}" was updated successfully.`
+          : `Akun "${normalizedUsername}" berhasil diperbarui.`
+      );
       setEditTarget(null);
       await loadUsers(true);
     } catch (error) {
@@ -308,7 +345,11 @@ export const AdminStaffManagement: React.FC = () => {
     setIsUpdatingPassword(true);
     try {
       await updateManagedUserPassword(passwordTarget.id, newPassword);
-      setSuccessMessage(`Password for "${passwordTarget.username}" was updated successfully.`);
+      setSuccessMessage(
+        language === 'EN'
+          ? `Password for "${passwordTarget.username}" was updated successfully.`
+          : `Kata sandi "${passwordTarget.username}" berhasil diperbarui.`
+      );
       setPasswordTarget(null);
       setNewPassword('');
       setShowNewPassword(false);
@@ -326,7 +367,11 @@ export const AdminStaffManagement: React.FC = () => {
     setIsDeleting(true);
     try {
       await deleteManagedUser(deleteTarget.id);
-      setSuccessMessage(`Account "${deleteTarget.username}" was deleted successfully.`);
+      setSuccessMessage(
+        language === 'EN'
+          ? `Account "${deleteTarget.username}" was deleted successfully.`
+          : `Akun "${deleteTarget.username}" berhasil dihapus.`
+      );
       setDeleteTarget(null);
       await loadUsers(true);
     } catch (error) {
@@ -347,23 +392,20 @@ export const AdminStaffManagement: React.FC = () => {
           <div className="mx-auto max-w-[1500px]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.24em] text-cyan-400">Alat Admin</p>
-                <h1 className="mt-2 text-2xl font-black tracking-tight text-white md:text-3xl">Account Management</h1>
+                <p className="font-mono text-xs uppercase tracking-[0.24em] text-cyan-400">
+                  {language === 'EN' ? 'Admin Tools' : 'Alat Admin'}
+                </p>
+                <h1 className="mt-2 text-2xl font-black tracking-tight text-white md:text-3xl">
+                  {language === 'EN' ? 'Account Management' : 'Manajemen Akun'}
+                </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                  Create and manage staff accounts, edit identity, reset passwords, and revoke account access.
+                  {language === 'EN'
+                    ? 'Create and manage staff accounts, edit identity, reset passwords, and revoke account access.'
+                    : 'Buat dan kelola akun staf, ubah identitas, atur ulang kata sandi, dan cabut akses akun.'}
                 </p>
               </div>
 
               <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => void loadUsers(true)}
-                  disabled={isRefreshing}
-                  className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/10 bg-[#10182b] px-4 text-sm font-semibold text-slate-300 transition hover:border-cyan-400/30 hover:text-cyan-300 disabled:opacity-60"
-                >
-                  <span className={`material-symbols-outlined text-[20px] ${isRefreshing ? 'animate-spin' : ''}`}>refresh</span>
-                  Segarkan
-                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -373,7 +415,7 @@ export const AdminStaffManagement: React.FC = () => {
                   className="inline-flex h-11 items-center gap-2 rounded-xl bg-cyan-400 px-4 text-sm font-black text-slate-950 transition hover:bg-cyan-300"
                 >
                   <span className="material-symbols-outlined text-[20px]">person_add</span>
-                  Add Account
+                  {language === 'EN' ? 'Add Account' : 'Tambah Akun'}
                 </button>
               </div>
             </div>
@@ -394,17 +436,19 @@ export const AdminStaffManagement: React.FC = () => {
 
             <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                { label: 'Total Accounts', value: summary.total, icon: 'group' },
-                { label: 'Staff', value: summary.staff, icon: 'badge' },
+                { label: language === 'EN' ? 'Total Accounts' : 'Total Akun', value: summary.total, icon: 'group' },
+                { label: language === 'EN' ? 'Staff' : 'Staf', value: summary.staff, icon: 'badge' },
                 { label: 'Administrator', value: summary.admins, icon: 'admin_panel_settings' },
-                { label: 'Total Chats', value: summary.totalChats, icon: 'forum' },
+                { label: language === 'EN' ? 'Total Chats' : 'Total Chat', value: summary.totalChats, icon: 'forum' },
               ].map((item) => (
                 <article key={item.label} className="rounded-2xl border border-white/10 bg-[#0d1425] p-5 shadow-xl">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 text-cyan-300">
                     <span className="material-symbols-outlined">{item.icon}</span>
                   </div>
                   <p className="mt-5 text-sm font-semibold text-slate-400">{item.label}</p>
-                  <p className="mt-1 text-3xl font-black text-white">{item.value.toLocaleString('en-US')}</p>
+                  <p className="mt-1 text-3xl font-black text-white">
+                    {item.value.toLocaleString(language === 'EN' ? 'en-US' : 'id-ID')}
+                  </p>
                 </article>
               ))}
             </section>
@@ -412,36 +456,48 @@ export const AdminStaffManagement: React.FC = () => {
             <section className="mt-7 overflow-hidden rounded-2xl border border-white/10 bg-[#0d1425] shadow-2xl">
               <div className="flex items-center justify-between border-b border-white/5 px-5 py-4 md:px-6">
                 <div>
-                  <h2 className="font-bold text-white">Account List</h2>
-                  <p className="mt-1 text-xs text-slate-500">Total chats are calculated from stored query logs.</p>
+                  <h2 className="font-bold text-white">
+                    {language === 'EN' ? 'Account List' : 'Daftar Akun'}
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {language === 'EN'
+                      ? 'Total chats are calculated from active conversation history.'
+                      : 'Total chat dihitung dari riwayat percakapan aktif.'}
+                  </p>
                 </div>
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs text-slate-400">
-                  {users.length} accounts
+                  {users.length} {language === 'EN' ? 'accounts' : 'akun'}
                 </span>
               </div>
 
               {isLoading ? (
                 <div className="flex min-h-[280px] items-center justify-center gap-3 text-slate-400">
                   <span className="material-symbols-outlined animate-spin text-cyan-300">progress_activity</span>
-                  Loading accounts...
+                  {language === 'EN' ? 'Loading accounts...' : 'Memuat akun...'}
                 </div>
               ) : users.length === 0 ? (
                 <div className="flex min-h-[280px] flex-col items-center justify-center px-6 text-center">
                   <span className="material-symbols-outlined text-5xl text-slate-700">group_off</span>
-                  <p className="mt-3 font-semibold text-slate-300">No accounts found</p>
-                  <p className="mt-1 text-sm text-slate-500">Create the first account using the Add Account button.</p>
+                  <p className="mt-3 font-semibold text-slate-300">
+                    {language === 'EN' ? 'No accounts found' : 'Akun tidak ditemukan'}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {language === 'EN'
+                      ? 'Create the first account using the Add Account button.'
+                      : 'Buat akun pertama dengan tombol Tambah Akun.'}
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[980px] text-left">
                     <thead className="bg-[#090f1e] font-mono text-[11px] uppercase tracking-[0.16em] text-slate-500">
                       <tr>
-                        <th className="px-6 py-4 font-medium">Account</th>
-                        <th className="px-6 py-4 font-medium">Username</th>
-                        <th className="px-6 py-4 font-medium">Role</th>
-                        <th className="px-6 py-4 font-medium">Total Chats</th>
-                        <th className="px-6 py-4 font-medium">Created</th>
-                        <th className="px-6 py-4 text-right font-medium">Actions</th>
+                        <th className="px-6 py-4 font-medium">{language === 'EN' ? 'Account' : 'Akun'}</th>
+                        <th className="px-6 py-4 font-medium">{language === 'EN' ? 'Username' : 'Nama pengguna'}</th>
+                        <th className="px-6 py-4 font-medium">{language === 'EN' ? 'Role' : 'Peran'}</th>
+                        <th className="px-6 py-4 font-medium">{language === 'EN' ? 'Total Chats' : 'Total Chat'}</th>
+                        <th className="px-6 py-4 font-medium">{language === 'EN' ? 'Created' : 'Dibuat'}</th>
+                        <th className="px-6 py-4 text-right font-medium">{language === 'EN' ? 'Actions' : 'Tindakan'}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -461,7 +517,11 @@ export const AdminStaffManagement: React.FC = () => {
                                 <div>
                                   <p className="font-semibold text-white">
                                     {managedUser.name}
-                                    {isCurrentAccount && <span className="ml-2 text-[10px] uppercase text-cyan-400">Anda</span>}
+                                    {isCurrentAccount && (
+                                      <span className="ml-2 text-[10px] uppercase text-cyan-400">
+                                        {language === 'EN' ? 'You' : 'Anda'}
+                                      </span>
+                                    )}
                                   </p>
                                   <p className="mt-0.5 font-mono text-[11px] text-slate-600">{managedUser.id}</p>
                                 </div>
@@ -470,13 +530,13 @@ export const AdminStaffManagement: React.FC = () => {
                             <td className="px-6 py-4 font-mono text-sm text-slate-300">@{managedUser.username}</td>
                             <td className="px-6 py-4">
                               <span className={`inline-flex rounded-full border px-3 py-1 font-mono text-[11px] font-bold uppercase ${roleClassName(managedUser.role)}`}>
-                                {roleLabel(managedUser.role)}
+                                {roleLabel(managedUser.role, language)}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-lg font-black text-white">
-                              {managedUser.totalChats.toLocaleString('en-US')}
+                              {managedUser.totalChats.toLocaleString(language === 'EN' ? 'en-US' : 'id-ID')}
                             </td>
-                            <td className="px-6 py-4 text-sm text-slate-400">{formatAccountDate(managedUser.createdAt)}</td>
+                            <td className="px-6 py-4 text-sm text-slate-400">{formatAccountDate(managedUser.createdAt, language)}</td>
                             <td className="px-6 py-4">
                               <div className="flex justify-end gap-2">
                                 <button
@@ -484,10 +544,12 @@ export const AdminStaffManagement: React.FC = () => {
                                   onClick={() => openEdit(managedUser)}
                                   disabled={!canManage}
                                   className="inline-flex h-9 items-center gap-2 rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 text-xs font-bold text-cyan-300 disabled:opacity-30"
-                                  title={canManage ? 'Edit account' : 'Administrator accounts are protected'}
+                                  title={canManage
+                                    ? language === 'EN' ? 'Edit account' : 'Ubah akun'
+                                    : language === 'EN' ? 'Administrator accounts are protected' : 'Akun administrator dilindungi'}
                                 >
                                   <span className="material-symbols-outlined text-[18px]">edit</span>
-                                  Edit
+                                  {language === 'EN' ? 'Edit' : 'Ubah'}
                                 </button>
                                 <button
                                   type="button"
@@ -501,17 +563,19 @@ export const AdminStaffManagement: React.FC = () => {
                                   className="inline-flex h-9 items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 text-xs font-bold text-amber-300 disabled:opacity-30"
                                 >
                                   <span className="material-symbols-outlined text-[18px]">key</span>
-                                  Password
+                                  {language === 'EN' ? 'Password' : 'Kata Sandi'}
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => canDelete && setDeleteTarget(managedUser)}
                                   disabled={!canDelete}
                                   className="inline-flex h-9 items-center gap-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 text-xs font-bold text-rose-300 disabled:opacity-30"
-                                  title={canDelete ? 'Delete account' : 'This account cannot be deleted'}
+                                  title={canDelete
+                                    ? language === 'EN' ? 'Delete account' : 'Hapus akun'
+                                    : language === 'EN' ? 'This account cannot be deleted' : 'Akun ini tidak dapat dihapus'}
                                 >
                                   <span className="material-symbols-outlined text-[18px]">delete</span>
-                                  Delete
+                                  {language === 'EN' ? 'Delete' : 'Hapus'}
                                 </button>
                               </div>
                             </td>
@@ -529,8 +593,10 @@ export const AdminStaffManagement: React.FC = () => {
 
       {isCreateOpen && (
         <ModalShell
-          title="Create account"
-          description="The account can sign in immediately after it is created."
+          title={language === 'EN' ? 'Create account' : 'Buat akun'}
+          description={language === 'EN'
+            ? 'The account can sign in immediately after it is created.'
+            : 'Akun dapat langsung masuk setelah dibuat.'}
           icon="person_add"
           onClose={() => {
             if (isCreating) return;
@@ -548,7 +614,9 @@ export const AdminStaffManagement: React.FC = () => {
               onRoleChange={setCreateRole}
             />
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Temporary password</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                {language === 'EN' ? 'Temporary password' : 'Kata sandi sementara'}
+              </span>
               <div className="relative mt-2">
                 <input
                   type={showCreatePassword ? 'text' : 'password'}
@@ -557,14 +625,16 @@ export const AdminStaffManagement: React.FC = () => {
                   required
                   minLength={6}
                   maxLength={128}
-                  placeholder="At least 6 characters"
+                  placeholder={language === 'EN' ? 'At least 6 characters' : 'Minimal 6 karakter'}
                   className="w-full rounded-xl border border-white/10 bg-[#050918] px-4 py-3 pr-12 text-sm text-white outline-none focus:border-cyan-400/50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCreatePassword((value) => !value)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
-                  aria-label={showCreatePassword ? 'Hide password' : 'Show password'}
+                  aria-label={showCreatePassword
+                    ? language === 'EN' ? 'Hide password' : 'Sembunyikan kata sandi'
+                    : language === 'EN' ? 'Show password' : 'Tampilkan kata sandi'}
                 >
                   <span className="material-symbols-outlined text-[20px]">{showCreatePassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
@@ -572,10 +642,12 @@ export const AdminStaffManagement: React.FC = () => {
             </label>
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => setIsCreateOpen(false)} disabled={isCreating} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300">
-                Cancel
+                {language === 'EN' ? 'Cancel' : 'Batal'}
               </button>
               <button type="submit" disabled={isCreating} className="rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-black text-slate-950 disabled:opacity-60">
-                {isCreating ? 'Creating...' : 'Create Account'}
+                {isCreating
+                  ? language === 'EN' ? 'Creating...' : 'Membuat...'
+                  : language === 'EN' ? 'Create Account' : 'Buat Akun'}
               </button>
             </div>
           </form>
@@ -584,8 +656,10 @@ export const AdminStaffManagement: React.FC = () => {
 
       {editTarget && (
         <ModalShell
-          title="Edit account"
-          description={`Update ${editTarget.name} (@${editTarget.username}).`}
+          title={language === 'EN' ? 'Edit account' : 'Ubah akun'}
+          description={language === 'EN'
+            ? `Update ${editTarget.name} (@${editTarget.username}).`
+            : `Perbarui ${editTarget.name} (@${editTarget.username}).`}
           icon="manage_accounts"
           onClose={() => !isUpdatingAccount && setEditTarget(null)}
         >
@@ -600,10 +674,12 @@ export const AdminStaffManagement: React.FC = () => {
             />
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => setEditTarget(null)} disabled={isUpdatingAccount} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300">
-                Cancel
+                {language === 'EN' ? 'Cancel' : 'Batal'}
               </button>
               <button type="submit" disabled={isUpdatingAccount} className="rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-black text-slate-950 disabled:opacity-60">
-                {isUpdatingAccount ? 'Saving...' : 'Save Changes'}
+                {isUpdatingAccount
+                  ? language === 'EN' ? 'Saving...' : 'Menyimpan...'
+                  : language === 'EN' ? 'Save Changes' : 'Simpan Perubahan'}
               </button>
             </div>
           </form>
@@ -612,14 +688,18 @@ export const AdminStaffManagement: React.FC = () => {
 
       {passwordTarget && (
         <ModalShell
-          title="Change password"
-          description={`Set a new password for ${passwordTarget.name} (@${passwordTarget.username}).`}
+          title={language === 'EN' ? 'Change password' : 'Ubah kata sandi'}
+          description={language === 'EN'
+            ? `Set a new password for ${passwordTarget.name} (@${passwordTarget.username}).`
+            : `Tetapkan kata sandi baru untuk ${passwordTarget.name} (@${passwordTarget.username}).`}
           icon="key"
           onClose={() => !isUpdatingPassword && setPasswordTarget(null)}
         >
           <form onSubmit={handleUpdatePassword} className="space-y-4 px-6 py-5">
             <label className="block">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">New password</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                {language === 'EN' ? 'New password' : 'Kata sandi baru'}
+              </span>
               <div className="relative mt-2">
                 <input
                   autoFocus
@@ -629,14 +709,16 @@ export const AdminStaffManagement: React.FC = () => {
                   required
                   minLength={6}
                   maxLength={128}
-                  placeholder="At least 6 characters"
+                  placeholder={language === 'EN' ? 'At least 6 characters' : 'Minimal 6 karakter'}
                   className="w-full rounded-xl border border-white/10 bg-[#050918] px-4 py-3 pr-12 text-sm text-white outline-none focus:border-amber-400/50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword((value) => !value)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
-                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showNewPassword
+                    ? language === 'EN' ? 'Hide password' : 'Sembunyikan kata sandi'
+                    : language === 'EN' ? 'Show password' : 'Tampilkan kata sandi'}
                 >
                   <span className="material-symbols-outlined text-[20px]">{showNewPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
@@ -644,10 +726,12 @@ export const AdminStaffManagement: React.FC = () => {
             </label>
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => setPasswordTarget(null)} disabled={isUpdatingPassword} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300">
-                Cancel
+                {language === 'EN' ? 'Cancel' : 'Batal'}
               </button>
               <button type="submit" disabled={isUpdatingPassword} className="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-black text-slate-950 disabled:opacity-60">
-                {isUpdatingPassword ? 'Updating...' : 'Change Password'}
+                {isUpdatingPassword
+                  ? language === 'EN' ? 'Updating...' : 'Memperbarui...'
+                  : language === 'EN' ? 'Change Password' : 'Ubah Kata Sandi'}
               </button>
             </div>
           </form>
@@ -656,21 +740,27 @@ export const AdminStaffManagement: React.FC = () => {
 
       {deleteTarget && (
         <ModalShell
-          title="Delete account?"
-          description={`${deleteTarget.name} (@${deleteTarget.username}) will no longer be able to sign in.`}
+          title={language === 'EN' ? 'Delete account?' : 'Hapus akun?'}
+          description={language === 'EN'
+            ? `${deleteTarget.name} (@${deleteTarget.username}) will no longer be able to sign in.`
+            : `${deleteTarget.name} (@${deleteTarget.username}) tidak akan dapat masuk lagi.`}
           icon="person_remove"
           onClose={() => !isDeleting && setDeleteTarget(null)}
         >
           <div className="px-6 py-5">
             <div className="rounded-2xl border border-rose-400/15 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-200">
-              Existing query logs will remain for reporting. The account data will be deleted permanently.
+              {language === 'EN'
+                ? 'Existing query logs will remain for reporting. The account data will be deleted permanently.'
+                : 'Log kueri yang ada tetap disimpan untuk laporan. Data akun akan dihapus permanen.'}
             </div>
             <div className="mt-5 flex justify-end gap-3">
               <button type="button" onClick={() => setDeleteTarget(null)} disabled={isDeleting} className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300">
-                Cancel
+                {language === 'EN' ? 'Cancel' : 'Batal'}
               </button>
               <button type="button" onClick={() => void handleDeleteUser()} disabled={isDeleting} className="rounded-xl bg-rose-500 px-4 py-2.5 text-sm font-black text-white disabled:opacity-60">
-                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+                {isDeleting
+                  ? language === 'EN' ? 'Deleting...' : 'Menghapus...'
+                  : language === 'EN' ? 'Yes, Delete' : 'Ya, Hapus'}
               </button>
             </div>
           </div>

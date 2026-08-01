@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import time
 from pathlib import Path
 from typing import Any
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    def load_dotenv(*_args: Any, **_kwargs: Any) -> bool:
+        return False
 
 try:
     from .dataset_utils import dataset_summary, load_ground_truth_files
@@ -29,7 +34,11 @@ RETRIEVAL_DEBUG_URL = os.getenv(
     "LAPISAI_RETRIEVAL_DEBUG_URL",
     "http://localhost:8000/api/admin/retrieval-debug",
 )
-SNAPSHOT_SCHEMA_VERSION = 2
+EVALUATION_READINESS_URL = os.getenv(
+    "LAPISAI_EVALUATION_READINESS_URL",
+    "http://localhost:8000/api/admin/evaluation/readiness",
+)
+SNAPSHOT_SCHEMA_VERSION = 3
 
 
 def load_existing(path: Path) -> dict[str, dict[str, Any]]:
@@ -76,13 +85,73 @@ def compact_candidate(candidate: Any, rank: int) -> dict[str, Any]:
         "reranker_score": item.get("rerankerScore"),
         "reranker_raw_score": item.get("rerankerRawScore"),
         "reranker_rank": item.get("rerankerRank"),
+        "semantic_query_variant": item.get("semanticQueryVariant"),
+        "keyword_query_variant": item.get("keywordQueryVariant"),
+        "reranker_query_variant": item.get("rerankerQueryVariant"),
         "evidence_supported": item.get("evidenceSupported"),
         "evidence_score": item.get("evidenceScore"),
         "evidence_hard_failures": item.get("evidenceHardFailures") or [],
+        "evidence_hard_contradictions": item.get("evidenceHardContradictions") or [],
+        "evidence_contradictions": item.get("evidenceContradictions") or [],
+        "evidence_missing_requirements": item.get("evidenceMissingRequirements") or [],
         "answerability_accepted": item.get("answerabilityAccepted"),
         "answerability_strictly_supported": item.get("answerabilityStrictlySupported"),
         "answerability_evidence_selected": item.get("answerabilityEvidenceSelected"),
+        "answerability_score": item.get("answerabilityScore"),
+        "answerability_score_margin": item.get("answerabilityScoreMargin"),
+        "answerability_requirement_coverage": item.get(
+            "answerabilityRequirementCoverage"
+        ),
+        "answerability_concept_coverage": item.get("answerabilityConceptCoverage"),
+        "answerability_requires_coherent_evidence": item.get(
+            "answerabilityRequiresCoherentEvidence"
+        ),
+        "answerability_coherent_evidence": item.get(
+            "answerabilityCoherentEvidence"
+        ),
+        "answerability_diagnostics": item.get("answerabilityDiagnostics") or {},
     }
+
+
+def expected_document_names(questions: list[dict[str, Any]]) -> list[str]:
+    """Return the unique source filenames required by answerable rows."""
+    names: dict[str, str] = {}
+    for question in questions:
+        for reference in question.get("references") or []:
+            if isinstance(reference, dict):
+                document = str(reference.get("document") or "").strip()
+            else:
+                document = str(reference or "").strip()
+            if document:
+                names.setdefault(document.casefold(), document)
+    return sorted(names.values(), key=str.casefold)
+
+
+def assert_corpus_ready(questions: list[dict[str, Any]]) -> dict[str, Any]:
+    expected_documents = expected_document_names(questions)
+    status = post_json(
+        EVALUATION_READINESS_URL,
+        {"expectedDocuments": expected_documents},
+    )
+    if not status.get("ready"):
+        missing = [
+            str(document)
+            for document in status.get("missingDocuments") or []
+        ]
+        missing_preview = ", ".join(missing[:10]) or "unknown"
+        suffix = f" (+{len(missing) - 10} others)" if len(missing) > 10 else ""
+        raise RuntimeError(
+            "Corpus evaluasi belum siap pada collection Chroma aktif. "
+            f"Indexed chunks={status.get('chunkCount', 0)}, "
+            f"missing documents={missing_preview}{suffix}. "
+            "Upload dan Index All seluruh corpus, lalu jalankan evaluasi lagi."
+        )
+    print(
+        "[READINESS] PASS: "
+        f"{status.get('expectedDocumentCount', len(expected_documents))} dokumen wajib, "
+        f"{status.get('chunkCount', 0)} chunk terindeks."
+    )
+    return status
 
 
 def main() -> None:
@@ -100,6 +169,7 @@ def main() -> None:
     previous = load_existing(output) if args.resume else {}
 
     preflight()
+    assert_corpus_ready(questions)
     items: list[dict[str, Any]] = []
     for index, question in enumerate(questions, start=1):
         qid = str(question["id"])
@@ -122,6 +192,9 @@ def main() -> None:
         items.append({
             "id": qid,
             "question": question["question"],
+            "question_sha256": hashlib.sha256(
+                str(question["question"]).encode("utf-8")
+            ).hexdigest(),
             "language": question.get("language"),
             "answerable": question.get("answerable"),
             "expected_sources": question.get("references") or [],

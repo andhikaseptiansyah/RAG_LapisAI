@@ -7,13 +7,69 @@ from pathlib import Path
 from typing import Any
 
 from api.storage_paths import DOCUMENT_STORE_FILE
-from uploads.config import COLLECTION_NAME, EMBEDDING_MODEL
+from uploads.config import COLLECTION_NAME, EMBEDDING_MODEL, UPLOAD_DIR
 
 DOCUMENT_STORE_LOCK = threading.RLock()
 
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def normalized_document_filename(value: Any) -> str:
+    """Return a safe, cross-platform filename for identity comparisons."""
+    normalized_separators = str(value or "").strip().replace("\\", "/")
+    return Path(normalized_separators).name.strip()
+
+
+def resolve_document_source_path(document: dict[str, Any]) -> Path | None:
+    """Resolve a document source inside the active upload directory.
+
+    Older metadata may contain an absolute path from a different computer,
+    such as ``C:\\Users\\...``. The filename is the portable identity, so the
+    active upload directory is checked first. A stored path is accepted only
+    when it still points inside that same directory.
+    """
+    filename = normalized_document_filename(document.get("filename"))
+    if not filename:
+        return None
+
+    upload_root = Path(UPLOAD_DIR).resolve()
+    canonical_path = (upload_root / filename).resolve()
+    try:
+        canonical_path.relative_to(upload_root)
+    except ValueError:
+        return None
+    if canonical_path.is_file():
+        return canonical_path
+
+    # Windows filesystems are case-insensitive. Preserve that behavior when a
+    # project is copied to a case-sensitive filesystem.
+    try:
+        for candidate in upload_root.iterdir():
+            if (
+                candidate.is_file()
+                and candidate.name.casefold() == filename.casefold()
+            ):
+                return candidate.resolve()
+    except OSError:
+        pass
+
+    stored_filepath = str(document.get("filepath") or "").strip()
+    if not stored_filepath:
+        return None
+
+    stored_path = Path(stored_filepath).resolve()
+    try:
+        stored_path.relative_to(upload_root)
+    except ValueError:
+        return None
+    if (
+        stored_path.is_file()
+        and stored_path.name.casefold() == filename.casefold()
+    ):
+        return stored_path
+    return None
 
 
 def read_documents() -> list[dict[str, Any]]:
@@ -35,6 +91,11 @@ def read_documents() -> list[dict[str, Any]]:
                 if int(document.get("chunks") or 0) > 0:
                     document["collection"] = COLLECTION_NAME
                     document["embeddingModel"] = EMBEDDING_MODEL
+                resolved_source = resolve_document_source_path(document)
+                if resolved_source is not None:
+                    # Rebase stale absolute paths in memory. A subsequent
+                    # re-index/upsert persists this active-machine path.
+                    document["filepath"] = str(resolved_source)
             return data
     except (json.JSONDecodeError, OSError):
         return []
@@ -111,11 +172,16 @@ def create_document_record(
 def upsert_document(record: dict[str, Any]) -> dict[str, Any]:
     documents = read_documents()
     filepath = record.get("filepath")
-    filename = record.get("filename")
+    filename = normalized_document_filename(record.get("filename")).casefold()
 
     updated = False
     for index, current in enumerate(documents):
-        if current.get("filepath") == filepath or current.get("filename") == filename:
+        current_filename = normalized_document_filename(
+            current.get("filename")
+        ).casefold()
+        if current.get("filepath") == filepath or (
+            filename and current_filename == filename
+        ):
             record["id"] = current.get("id") or record.get("id")
             documents[index] = record
             updated = True
@@ -148,6 +214,34 @@ def delete_document(document_id: str) -> dict[str, Any] | None:
 
     if removed is not None:
         write_documents(remaining)
+
+    return removed
+
+
+def delete_documents_by_filename(filename: str) -> list[dict[str, Any]]:
+    """Delete every metadata record that resolves to the same safe filename."""
+    normalized_filename = Path(filename).name.strip().casefold()
+    if not normalized_filename:
+        return []
+
+    documents = read_documents()
+    removed = [
+        document
+        for document in documents
+        if Path(str(document.get("filename") or "")).name.strip().casefold()
+        == normalized_filename
+    ]
+
+    if removed:
+        removed_ids = {
+            str(document.get("id") or "")
+            for document in removed
+        }
+        write_documents([
+            document
+            for document in documents
+            if str(document.get("id") or "") not in removed_ids
+        ])
 
     return removed
 

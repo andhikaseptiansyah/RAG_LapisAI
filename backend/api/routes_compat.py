@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from api.build_info import BUILD_VERSION, public_build_info
 from api.cancellation import (
@@ -23,6 +23,8 @@ from api.cancellation import (
 )
 from api.conversation_store import (
     append_chat_turn,
+    conversation_chat_records,
+    conversation_chat_totals,
     delete_conversation,
     delete_conversations,
     get_conversation,
@@ -32,9 +34,11 @@ from api.conversation_store import (
 from api.document_store import (
     create_document_record,
     delete_document,
+    delete_documents_by_filename,
     filter_documents,
     get_document,
     read_documents,
+    resolve_document_source_path,
     to_repository_document,
     to_trained_document,
     to_upload_item,
@@ -42,7 +46,13 @@ from api.document_store import (
 )
 from api.auth_tokens import create_auth_token, resolve_auth_token
 from api.chat_service import retrieve_verified_chunks, run_chat
-from api.logger import delete_log, get_logs, resolve_query_log_status, save_log
+from api.logger import (
+    delete_log,
+    delete_logs_for_conversations,
+    get_logs,
+    resolve_query_log_status,
+    save_log,
+)
 from api.user_store import (
     UserStoreError,
     authenticate_user,
@@ -140,6 +150,10 @@ class EvaluationChatPayload(BaseModel):
     retrievalCandidates: list[dict[str, Any]] | None = None
 
 
+class EvaluationReadinessPayload(BaseModel):
+    expectedDocuments: list[str] = Field(default_factory=list)
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -194,12 +208,58 @@ def _staff_management_user(
 
 
 def _safe_filename(filename: str) -> str:
-    name = Path(filename).name.strip()
+    name = Path(str(filename or "").replace("\\", "/")).name.strip()
     return name or f"document_{uuid.uuid4().hex}.txt"
 
 
 def _normalize_filename(filename: str) -> str:
-    return _safe_filename(filename).casefold()
+    return Path(str(filename or "").replace("\\", "/")).name.strip().casefold()
+
+
+def _evaluation_corpus_readiness(
+    expected_documents: list[str],
+) -> dict[str, Any]:
+    """Compare benchmark sources against the active Chroma collection."""
+    expected_by_key = {
+        normalized: Path(str(document).replace("\\", "/")).name.strip()
+        for document in expected_documents
+        if (normalized := _normalize_filename(document))
+    }
+
+    try:
+        collection = get_collection()
+        chunk_count = int(collection.count())
+        stored = collection.get(include=["metadatas"])
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"The active vector collection cannot be inspected: {str(exc)}",
+        ) from exc
+
+    indexed_by_key: dict[str, str] = {}
+    for metadata in stored.get("metadatas") or []:
+        if not isinstance(metadata, dict):
+            continue
+        filename = Path(
+            str(metadata.get("filename") or "").replace("\\", "/")
+        ).name.strip()
+        normalized = _normalize_filename(filename)
+        if normalized:
+            indexed_by_key.setdefault(normalized, filename)
+
+    missing_documents = sorted(
+        expected_by_key[key]
+        for key in expected_by_key.keys() - indexed_by_key.keys()
+    )
+    ready = chunk_count > 0 and not missing_documents
+    return {
+        "ready": ready,
+        "collection": public_rag_config().get("collection"),
+        "chunkCount": chunk_count,
+        "indexedDocumentCount": len(indexed_by_key),
+        "expectedDocumentCount": len(expected_by_key),
+        "missingDocuments": missing_documents,
+    }
 
 
 def _validate_upload_content(filename: str, content: bytes) -> None:
@@ -647,10 +707,24 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
             "rerankerQueryVariant": candidate.get("rerankerQueryVariant"),
             "evidenceSupported": candidate.get("evidenceSupported"),
             "evidenceScore": candidate.get("evidenceScore"),
-            "evidenceHardFailures": candidate.get("evidenceHardFailures"),
+            "evidenceHardFailures": candidate.get("evidenceHardFailures") or [],
+            "evidenceHardContradictions": candidate.get("evidenceHardContradictions") or [],
+            "evidenceContradictions": candidate.get("evidenceContradictions") or [],
+            "evidenceMissingRequirements": candidate.get("evidenceMissingRequirements") or [],
             "answerabilityAccepted": candidate.get("answerabilityAccepted"),
             "answerabilityStrictlySupported": candidate.get("answerabilityStrictlySupported"),
             "answerabilityEvidenceSelected": candidate.get("answerabilityEvidenceSelected"),
+            "answerabilityScore": candidate.get("answerabilityScore"),
+            "answerabilityScoreMargin": candidate.get("answerabilityScoreMargin"),
+            "answerabilityRequirementCoverage": candidate.get("answerabilityRequirementCoverage"),
+            "answerabilityConceptCoverage": candidate.get("answerabilityConceptCoverage"),
+            "answerabilityRequiresCoherentEvidence": candidate.get(
+                "answerabilityRequiresCoherentEvidence"
+            ),
+            "answerabilityCoherentEvidence": candidate.get(
+                "answerabilityCoherentEvidence"
+            ),
+            "answerabilityDiagnostics": candidate.get("answerabilityDiagnostics") or {},
             "preview": content[:300],
         }
 
@@ -672,6 +746,19 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
         "baseCandidates": [compact(item) for item in base_candidates[:10]],
         "baselineVerified": [compact(item) for item in baseline_verified[:10]],
         "finalCandidates": [compact(item) for item in final_candidates[:top_k]],
+    }
+
+
+@router.post("/admin/evaluation/readiness")
+def compat_evaluation_readiness(
+    payload: EvaluationReadinessPayload,
+    request: Request,
+):
+    """Verify that every benchmark source exists in the active vector index."""
+    _require_admin(request)
+    return {
+        **public_build_info(),
+        **_evaluation_corpus_readiness(payload.expectedDocuments),
     }
 
 
@@ -765,6 +852,7 @@ def _persist_chat_result(
         answer=answer,
         confidence=confidence,
         sources=sources,
+        query_id=query_id,
         conversation_id=conversation_id,
         language=resolved_language,
         user_id=current_user["id"],
@@ -990,6 +1078,7 @@ async def compat_chat(request: Request):
             answer=answer,
             confidence=confidence,
             sources=sources,
+            query_id=query_id,
             conversation_id=conversation_id,
             language=resolved_language,
             user_id=current_user["id"],
@@ -1154,8 +1243,27 @@ def compat_delete_conversations(
             detail="Pilih minimal satu percakapan untuk dihapus.",
         )
 
+    target_conversations = [
+        conversation
+        for conversation_id in conversation_ids
+        if (
+            conversation := get_conversation(
+                conversation_id,
+                user_id=current_user["id"],
+            )
+        )
+    ]
     deleted_ids = delete_conversations(
         conversation_ids,
+        user_id=current_user["id"],
+    )
+    deleted_id_set = set(deleted_ids)
+    deleted_log_ids = delete_logs_for_conversations(
+        [
+            conversation
+            for conversation in target_conversations
+            if str(conversation.get("id") or "") in deleted_id_set
+        ],
         user_id=current_user["id"],
     )
 
@@ -1163,6 +1271,7 @@ def compat_delete_conversations(
         "message": f"{len(deleted_ids)} conversation(s) deleted",
         "deletedIds": deleted_ids,
         "deletedCount": len(deleted_ids),
+        "deletedQueryLogCount": len(deleted_log_ids),
     }
 
 
@@ -1218,20 +1327,29 @@ def compat_update_conversation(conversation_id: str, payload: ConversationUpdate
 @router.delete("/conversations/{conversation_id}")
 def compat_delete_conversation(conversation_id: str, request: Request):
     current_user = _require_user(request)
+    conversation = get_conversation(
+        conversation_id,
+        user_id=current_user["id"],
+    )
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Percakapan tidak ditemukan.")
+
     deleted = delete_conversation(conversation_id, user_id=current_user["id"])
     if not deleted:
         raise HTTPException(status_code=404, detail="Percakapan tidak ditemukan.")
-    return {"message": "Percakapan berhasil dihapus."}
+    deleted_log_ids = delete_logs_for_conversations(
+        [conversation],
+        user_id=current_user["id"],
+    )
+    return {
+        "message": "Percakapan berhasil dihapus.",
+        "deletedQueryLogCount": len(deleted_log_ids),
+    }
 
 
 @router.get("/admin/users")
 def compat_list_staff_users(request: Request):
     _require_admin(request)
-    chat_totals: dict[str, int] = {}
-    for log in get_logs(include_all=True):
-        user_id = str(log.get("user_id") or "dev-admin")
-        chat_totals[user_id] = chat_totals.get(user_id, 0) + 1
-
     users = sorted(
         read_users(),
         key=lambda user: (
@@ -1239,6 +1357,12 @@ def compat_list_staff_users(request: Request):
             str(user.get("name") or "").casefold(),
         ),
     )
+    active_user_ids = {
+        str(user.get("id") or "")
+        for user in users
+        if str(user.get("id") or "").strip()
+    }
+    chat_totals = conversation_chat_totals(active_user_ids)
     items = [
         _staff_management_user(user, chat_totals)
         for user in users
@@ -1489,12 +1613,13 @@ def compat_trained_documents(request: Request):
 
 def _reindex_document_record(document: dict[str, Any]) -> dict[str, Any]:
     document_id = str(document.get("id") or "")
-    filepath = str(document.get("filepath") or "")
-    if not filepath or not os.path.exists(filepath):
+    source_path = resolve_document_source_path(document)
+    if source_path is None:
         raise HTTPException(
             status_code=404,
             detail=f'Source file for "{document.get("filename") or document_id}" was not found.',
         )
+    filepath = str(source_path)
 
     try:
         result = ingest(filepath)
@@ -1548,10 +1673,6 @@ def compat_reindex_document(document_id: str, request: Request):
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    filepath = document.get("filepath")
-    if not filepath or not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="The document source file was not found.")
-
     updated = _reindex_document_record(document)
     return to_upload_item(updated)
 
@@ -1559,16 +1680,61 @@ def compat_reindex_document(document_id: str, request: Request):
 @router.delete("/admin/documents/{document_id}")
 def compat_delete_document(document_id: str, request: Request):
     _require_admin(request)
-    document = delete_document(document_id)
+    document = get_document(document_id)
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    try:
-        delete_document_chunks(document.get("filename", ""))
-    except Exception:
-        pass
+    filename = str(document.get("filename") or "")
+    matching_documents = _documents_with_filename(filename)
 
-    return None
+    try:
+        deleted_chunks = delete_document_chunks(
+            filename,
+            case_insensitive=True,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f'Failed to remove vector data for "{filename}": {str(exc)}',
+        ) from exc
+
+    upload_root = Path(UPLOAD_DIR).resolve()
+    source_paths = {
+        path.resolve()
+        for path in _upload_file_paths(filename)
+    }
+    for matching_document in matching_documents:
+        stored_filepath = str(matching_document.get("filepath") or "").strip()
+        if not stored_filepath:
+            continue
+
+        candidate_path = Path(stored_filepath).resolve()
+        try:
+            candidate_path.relative_to(upload_root)
+        except ValueError:
+            continue
+        source_paths.add(candidate_path)
+
+    try:
+        for source_path in source_paths:
+            source_path.unlink(missing_ok=True)
+    except OSError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f'Failed to remove source file for "{filename}": {str(exc)}',
+        ) from exc
+
+    removed_documents = delete_documents_by_filename(filename)
+
+    return {
+        "message": f'Document "{filename}" was deleted completely.',
+        "deletedDocumentIds": [
+            str(removed_document.get("id") or "")
+            for removed_document in removed_documents
+        ],
+        "deletedSourceFiles": len(source_paths),
+        "deletedChunks": deleted_chunks,
+    }
 
 
 @router.get("/admin/query-logs")
@@ -1673,14 +1839,23 @@ def compat_dashboard(
 ):
     current_user = _require_admin(request)
     logs = _logs_for_dashboard_user(current_user)
-    summary = _dashboard_summary(logs)
-    analytics = _chat_analytics(range, logs)
+    active_user_ids = {
+        str(user.get("id") or "")
+        for user in read_users()
+        if str(user.get("id") or "").strip()
+    }
+    chat_records = conversation_chat_records(
+        include_all=True,
+        active_user_ids=active_user_ids,
+    )
+    summary = _dashboard_summary(logs, chat_records)
+    analytics = _chat_analytics(range, chat_records)
     docs = [to_repository_document(doc) for doc in filter_documents(search=documentSearch)]
     page_docs, _, _, _ = _paginate(docs, documentPage, documentLimit)
 
     return {
         "summary": summary,
-        "chatSummary": _chat_summary(analytics),
+        "chatSummary": _chat_summary(analytics, chat_records),
         "analytics": analytics,
         "documents": page_docs,
         "ragConfig": public_rag_config(),
@@ -1690,16 +1865,42 @@ def compat_dashboard(
 @router.get("/admin/dashboard/summary")
 def compat_dashboard_summary(request: Request):
     current_user = _require_admin(request)
-    return _dashboard_summary(_logs_for_dashboard_user(current_user))
+    active_user_ids = {
+        str(user.get("id") or "")
+        for user in read_users()
+        if str(user.get("id") or "").strip()
+    }
+    chat_records = conversation_chat_records(
+        include_all=True,
+        active_user_ids=active_user_ids,
+    )
+    return _dashboard_summary(
+        _logs_for_dashboard_user(current_user),
+        chat_records,
+    )
 
 
 @router.get("/admin/dashboard/chat-analytics")
 def compat_dashboard_analytics(request: Request, range: str = "daily"):
-    current_user = _require_admin(request)
-    return _chat_analytics(range, _logs_for_dashboard_user(current_user))
+    _require_admin(request)
+    active_user_ids = {
+        str(user.get("id") or "")
+        for user in read_users()
+        if str(user.get("id") or "").strip()
+    }
+    return _chat_analytics(
+        range,
+        conversation_chat_records(
+            include_all=True,
+            active_user_ids=active_user_ids,
+        ),
+    )
 
 
-def _dashboard_summary(logs: list[dict[str, Any]]) -> dict[str, Any]:
+def _dashboard_summary(
+    logs: list[dict[str, Any]],
+    chat_records: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     documents = read_documents()
 
     # ChromaDB is the authoritative source for the number of indexed chunks.
@@ -1721,29 +1922,34 @@ def _dashboard_summary(logs: list[dict[str, Any]]) -> dict[str, Any]:
         else 0.0
     )
     unique_users = {
-        str(log.get("user_id") or "dev-admin")
-        for log in logs
+        str(record.get("user_id") or "dev-admin")
+        for record in (chat_records or [])
     }
 
     return {
         "totalDocuments": len(documents),
         "totalChunks": total_chunks,
         "averageResponseTime": round(avg_latency / 1000, 2),
-        "totalChats": len(logs),
+        "totalChats": len(chat_records or []),
         "totalUniqueUsers": len(unique_users),
     }
 
 
-def _chat_analytics(range_value: str = "daily", logs: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+def _chat_analytics(
+    range_value: str = "daily",
+    chat_records: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     # Lightweight analytics for the frontend chart. It groups visible chats by date.
     counts: dict[str, int] = {}
     unique_users_by_label: dict[str, set[str]] = {}
 
-    for log in logs or []:
-        timestamp = str(log.get("timestamp") or "")
+    for record in chat_records or []:
+        timestamp = str(record.get("timestamp") or "")
         label = timestamp[:10] if len(timestamp) >= 10 else "Unknown"
         counts[label] = counts.get(label, 0) + 1
-        unique_users_by_label.setdefault(label, set()).add(str(log.get("user_id") or "dev-admin"))
+        unique_users_by_label.setdefault(label, set()).add(
+            str(record.get("user_id") or "dev-admin")
+        )
 
     if not counts:
         return []
@@ -1758,14 +1964,20 @@ def _chat_analytics(range_value: str = "daily", logs: list[dict[str, Any]] | Non
     ]
 
 
-def _chat_summary(analytics: list[dict[str, Any]]) -> dict[str, Any]:
+def _chat_summary(
+    analytics: list[dict[str, Any]],
+    chat_records: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     total = sum(item["totalChats"] for item in analytics)
     peak = max(analytics, key=lambda item: item["totalChats"], default={"label": "-", "totalChats": 0})
     average = total / len(analytics) if analytics else 0.0
 
     return {
         "totalChatCount": total,
-        "totalUniqueUsers": 1 if total else 0,
+        "totalUniqueUsers": len({
+            str(record.get("user_id") or "dev-admin")
+            for record in (chat_records or [])
+        }),
         "averageChatCount": round(average, 2),
         "peakLabel": peak.get("label", "-"),
         "peakTotalChats": peak.get("totalChats", 0),

@@ -80,14 +80,55 @@ def embed_chunks(chunks: list[dict]) -> list[dict]:
     return chunks
 
 
-def delete_document_chunks(filename: str) -> None:
+def delete_document_chunks(
+    filename: str,
+    *,
+    case_insensitive: bool = False,
+) -> int:
+    """Delete vector chunks for a filename.
+
+    Normal ingestion uses Chroma's indexed equality filter. Administrative
+    deletion can opt into a metadata scan to also clean up legacy case variants.
+    """
     collection = get_collection()
+    normalized_filename = str(filename or "").strip().casefold()
+    if not normalized_filename:
+        return 0
+
+    if not case_insensitive:
+        try:
+            before_count = int(collection.count())
+        except Exception:
+            before_count = -1
+
+        collection.delete(where={"filename": filename})
+
+        if before_count < 0:
+            return 0
+        try:
+            return max(before_count - int(collection.count()), 0)
+        except Exception:
+            return 0
 
     try:
-        collection.delete(where={"filename": filename})
+        stored = collection.get(include=["metadatas"])
+        stored_ids = stored.get("ids") or []
+        stored_metadatas = stored.get("metadatas") or []
+        matching_ids = [
+            str(chunk_id)
+            for chunk_id, metadata in zip(stored_ids, stored_metadatas)
+            if isinstance(metadata, dict)
+            and str(metadata.get("filename") or "").strip().casefold()
+            == normalized_filename
+        ]
+        if matching_ids:
+            collection.delete(ids=matching_ids)
+        return len(matching_ids)
     except Exception:
-        # Safe to ignore when the document has never been indexed before.
-        pass
+        # Compatibility fallback for older Chroma clients that cannot list
+        # metadata with the current include contract.
+        collection.delete(where={"filename": filename})
+        return 0
 
 
 def index_chunks(chunks: list[dict]) -> dict:

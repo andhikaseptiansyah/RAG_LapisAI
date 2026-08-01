@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AdminSidebarProps {
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { language, t } = useUiLanguage();
 
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
 
@@ -26,8 +28,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           type="button"
           onClick={() => setIsDesktopOpen(true)}
           className="hidden md:inline-flex fixed left-4 top-5 z-[60] h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#0c0f1a] text-slate-300 shadow-xl hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400/30 transition-all"
-          aria-label="Open admin sidebar"
-          title="Open sidebar"
+          aria-label={language === 'EN' ? 'Open admin sidebar' : 'Buka bilah admin'}
+          title={language === 'EN' ? 'Open sidebar' : 'Buka bilah samping'}
         >
           <span className="material-symbols-outlined text-[24px]">chevron_right</span>
         </button>
@@ -59,8 +61,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={() => setIsDesktopOpen(false)}
               className="hidden md:inline-flex absolute -right-4 top-1/2 -translate-y-1/2 h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-[#0c0f1a] text-slate-300 shadow-lg hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400/30 transition-all"
-              aria-label="Close admin sidebar"
-              title="Close sidebar"
+              aria-label={language === 'EN' ? 'Close admin sidebar' : 'Tutup bilah admin'}
+              title={language === 'EN' ? 'Close sidebar' : 'Tutup bilah samping'}
             >
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
@@ -69,8 +71,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={onClose}
               className="md:hidden absolute right-0 p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
-              aria-label="Close admin sidebar"
-              title="Close admin sidebar"
+              aria-label={language === 'EN' ? 'Close admin sidebar' : 'Tutup bilah admin'}
+              title={language === 'EN' ? 'Close admin sidebar' : 'Tutup bilah admin'}
             >
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
@@ -79,7 +81,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           <nav className="flex-1 flex flex-col gap-5">
             <div className="space-y-2">
               <p className="px-1 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                Chat Area
+                {language === 'EN' ? 'Chat Area' : 'Area Chat'}
               </p>
 
               <Link
@@ -88,13 +90,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 className="flex items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-white bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border border-white/10 hover:border-cyan-400/30 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
               >
                 <span className="material-symbols-outlined icon-filled text-cyan-300">chat</span>
-                Knowledge Chat
+                {language === 'EN' ? 'Knowledge Chat' : 'Chat Pengetahuan'}
               </Link>
             </div>
 
             <div className="space-y-2 border-t border-white/5 pt-5">
               <p className="px-1 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                Admin Tools
+                {language === 'EN' ? 'Admin Tools' : 'Alat Admin'}
               </p>
 
               <Link
@@ -103,7 +105,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 className="flex items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <span className="material-symbols-outlined">dashboard</span>
-                Admin Dashboard
+                {t('adminDashboard')}
               </Link>
 
               <Link
@@ -112,7 +114,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 className="flex items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <span className="material-symbols-outlined">manage_accounts</span>
-                Account Management
+                {language === 'EN' ? 'Account Management' : 'Manajemen Akun'}
               </Link>
 
               <Link
@@ -121,7 +123,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 className="flex items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <span className="material-symbols-outlined">upload_file</span>
-                Upload File
+                {language === 'EN' ? 'Upload File' : 'Unggah File'}
               </Link>
 
               <Link
@@ -130,7 +132,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 className="flex items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <span className="material-symbols-outlined">receipt_long</span>
-                Query Logs
+                {language === 'EN' ? 'Query Logs' : 'Log Kueri'}
               </Link>
             </div>
           </nav>
@@ -151,7 +153,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               className="flex w-full items-center gap-3 px-4 py-3 rounded-xl font-mono text-sm transition-all duration-200 text-rose-400/80 hover:bg-rose-500/10 hover:text-rose-400"
             >
               <span className="material-symbols-outlined text-[20px]">logout</span>
-              Logout
+              {t('logout')}
             </button>
           </div>
         </div>

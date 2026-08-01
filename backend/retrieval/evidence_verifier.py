@@ -76,6 +76,7 @@ HARD_CONCEPTS = {
     "employee_parking",
     "bank_account_update",
     "onboarding_documents",
+    "vendor_onboarding",
     "phishing_report",
     "lost_company_device",
     "software_access",
@@ -145,6 +146,7 @@ SOFT_CONCEPTS = {
 MUTUALLY_EXCLUSIVE_CONCEPT_GROUPS: tuple[frozenset[str], ...] = (
     frozenset({"file_upload", "mailbox_quota"}),
     frozenset({"incident_p1", "incident_p2"}),
+    frozenset({"onboarding_documents", "vendor_onboarding"}),
 )
 
 STOPWORDS = {
@@ -369,17 +371,169 @@ def _concept_match(canonical: str, content: str) -> bool:
         )
     if canonical == "database_platform":
         return bool(re.search(r"\b(?:database|datastore|postgresql|mysql|sqlite|oracle|sql server)\b", normalized))
-    if canonical == "onboarding_documents":
-        document_markers = (
-            "valid id",
-            "tax id",
-            "npwp",
-            "bank account details",
-            "rekening bank",
+    if canonical == "audit_log":
+        return bool(
+            re.search(r"\baudit(?:\s+and\s+compliance)?\s+logs?\b", normalized)
+            or re.search(r"\blogs?\s+(?:for\s+)?audit\b", normalized)
+            or re.search(r"\blog\s+audit\b", normalized)
         )
-        return contains_alias(content, CONCEPT_ALIASES[canonical]) or sum(
-            marker in normalized for marker in document_markers
-        ) >= 2
+    if canonical == "audit_retention":
+        has_audit_log = bool(
+            re.search(r"\baudit(?:\s+and\s+compliance)?\s+logs?\b", normalized)
+            or re.search(r"\blogs?\s+(?:for\s+)?audit\b", normalized)
+        )
+        has_retention = bool(
+            re.search(
+                r"\b(?:retain|retained|retention|stored|kept|archive|archived|"
+                r"disimpan|retensi|arsip)\b",
+                normalized,
+            )
+        )
+        return has_audit_log and (has_retention or bool(TIME_PATTERN.search(content)))
+    if canonical == "classification_levels":
+        labels = {"public", "internal", "confidential", "restricted"}
+        present_labels = {
+            label for label in labels
+            if re.search(rf"\b{label}\b", normalized)
+        }
+        has_classification_heading = bool(
+            re.search(
+                r"\b(?:information\s+classification|classification\s+(?:levels?|categories)|"
+                r"klasifikasi\s+informasi|level\s+klasifikasi)\b",
+                normalized,
+            )
+        )
+        return len(present_labels) == len(labels) or (
+            has_classification_heading and len(present_labels) >= 2
+        )
+    if canonical == "outage_root_cause":
+        return bool(
+            re.search(
+                r"\b(?:root\s+cause|underlying\s+cause|primary\s+cause|"
+                r"akar\s+penyebab|penyebab\s+utama)\b",
+                normalized,
+            )
+        )
+    if canonical == "bank_account_update":
+        has_bank_details = bool(
+            re.search(
+                r"\b(?:bank\s+(?:account|details?|information)|payroll\s+bank|"
+                r"rekening\s+bank|data\s+rekening|detail\s+bank)\b",
+                normalized,
+            )
+        )
+        has_change = bool(
+            re.search(
+                r"\b(?:update|updated|change|changed|edit|amend|submit|"
+                r"memperbarui|perbarui|ubah|mengubah|ajukan|mengajukan)\b",
+                normalized,
+            )
+        )
+        return has_bank_details and has_change
+    if canonical == "lost_company_device":
+        # Corporate FAQs commonly phrase this as "What if I lose my laptop?"
+        # rather than repeating "company laptop" in both the question and
+        # answer. Bind a loss verb to a device within one short local span, or
+        # accept the stricter company-device wording. This remains subject-safe:
+        # a generic remote-wipe paragraph without a lost device or reporting
+        # action does not satisfy the concept.
+        qualified_device = bool(
+            re.search(
+                r"\b(?:company|corporate|work|office|kantor)\s+(?:laptop|device|notebook)\b",
+                normalized,
+            )
+        )
+        local_loss = bool(
+            re.search(
+                r"\b(?:lost|lose|loses|missing|stolen|hilang|kehilangan|dicuri)\b"
+                r".{0,48}\b(?:my|the|a|company|work|office|kantor)?\s*"
+                r"(?:laptop|device|notebook|perangkat)\b",
+                normalized,
+            )
+            or re.search(
+                r"\b(?:laptop|device|notebook|perangkat)\b.{0,48}"
+                r"\b(?:lost|missing|stolen|hilang|dicuri)\b",
+                normalized,
+            )
+        )
+        lost_device = bool(
+            (qualified_device and re.search(
+                r"\b(?:lost|lose|missing|stolen|hilang|kehilangan|dicuri)\b",
+                normalized,
+            ))
+            or local_loss
+        )
+        response_action = bool(
+            re.search(
+                r"\b(?:remote\s+wipe(?:d|s|ing)?|remotely\s+wip(?:e|ed|es|ing)|"
+                r"wipe(?:d|s|ing)?\s+remotely|hapus\s+jarak\s+jauh)\b",
+                normalized,
+            )
+            and re.search(r"\b(?:report|notify|lapor|laporkan|it)\b", normalized)
+        )
+        return lost_device or response_action
+    if canonical == "software_license":
+        return bool(
+            re.search(
+                r"\b(?:software|application|business[-\s]+tools?|perangkat\s+lunak)\b",
+                normalized,
+            )
+            and re.search(r"\blicen[cs](?:e|es|ed|ing)|\blisensi\b", normalized)
+        )
+    if canonical == "byod":
+        return bool(
+            re.search(r"\bbyod\b", normalized)
+            or re.search(
+                r"\b(?:personal|personally\s+owned)\s+devices?\b",
+                normalized,
+            )
+            or re.search(r"\bperangkat\s+pribadi\b", normalized)
+        )
+    if canonical == "medical_certificate":
+        return bool(
+            re.search(
+                r"\b(?:medical|doctor(?:\s+s|s)?|physician)\s+"
+                r"(?:certificate|note|letter)\b",
+                normalized,
+            )
+            or re.search(r"\bsurat\s+keterangan\s+dokter\b", normalized)
+        )
+    if canonical == "onboarding_documents":
+        employee_markers = bool(
+            re.search(
+                r"\b(?:new\s+(?:employee|hire|staff\s+member)|employee\s+onboarding|"
+                r"first\s+day(?:\s+of\s+work)?|karyawan\s+baru|pegawai\s+baru|"
+                r"hari\s+pertama\s+kerja)\b",
+                normalized,
+            )
+        )
+        document_markers = (
+            bool(re.search(r"\b(?:valid\s+id|identity\s+document|identitas)\b", normalized)),
+            bool(re.search(r"\b(?:tax\s+id|npwp)\b", normalized)),
+            bool(re.search(r"\b(?:bank\s+account\s+details|rekening\s+bank)\b", normalized)),
+        )
+        explicit_employee_documents = contains_alias(
+            content,
+            (
+                "new employee documents",
+                "new hire documents",
+                "employee onboarding documents",
+                "first day documents",
+                "dokumen karyawan baru",
+                "dokumen pegawai baru",
+            ),
+        )
+        # FAQ chunks can begin directly with ``A: A valid ID, tax ID, and bank
+        # account details`` after the paired question was split into a previous
+        # chunk. All three document types are specific enough to establish the
+        # employee-onboarding answer without a repeated "new employee" label.
+        # Vendor onboarding normally contains only tax ID and bank details, so
+        # it remains rejected by the three-item requirement and conflict guard.
+        return (
+            explicit_employee_documents
+            or sum(document_markers) == len(document_markers)
+            or (employee_markers and sum(document_markers) >= 2)
+        )
     return contains_alias(content, CONCEPT_ALIASES[canonical])
 
 
@@ -507,9 +661,22 @@ def verify_evidence(
         else:
             missing.append(canonical)
 
+    # HARD_CONCEPTS define the actual subject of the request. Generic helpers
+    # such as ``office`` or ``expense`` are useful retrieval hints, but their
+    # absence in a faithful cross-language passage must not lower a fully
+    # matched hard subject below the evidence threshold. When no hard concept
+    # exists, retain the original all-concept scoring behavior.
+    scoring_concepts = [
+        canonical for canonical in required
+        if canonical in HARD_CONCEPTS
+    ] or list(required)
+    matched_for_score = [
+        canonical for canonical in scoring_concepts
+        if canonical in matched
+    ]
     concept_coverage = (
-        len(matched) / len(required)
-        if required
+        len(matched_for_score) / len(scoring_concepts)
+        if scoring_concepts
         else 1.0
     )
     lexical_coverage = _lexical_coverage(question_text, content_text)

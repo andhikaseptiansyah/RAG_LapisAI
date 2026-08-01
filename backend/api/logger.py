@@ -204,3 +204,129 @@ def delete_log(log_id: str, user_id: str | None = None, include_all: bool = Fals
 
         write_logs(remaining)
         return True
+
+
+def _normalize_question(value: Any) -> str:
+    return " ".join(str(value or "").casefold().split())
+
+
+def _parse_timestamp(value: Any) -> datetime | None:
+    raw_value = str(value or "").strip()
+    if not raw_value:
+        return None
+
+    try:
+        parsed = datetime.fromisoformat(raw_value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def _message_query_id(message: dict[str, Any]) -> str:
+    metadata = message.get("metadata")
+    metadata = metadata if isinstance(metadata, dict) else {}
+    return str(
+        message.get("query_id")
+        or message.get("queryId")
+        or metadata.get("query_id")
+        or metadata.get("queryId")
+        or ""
+    ).strip()
+
+
+def delete_logs_for_conversations(
+    conversations: list[dict[str, Any]],
+    *,
+    user_id: str | None = None,
+    include_all: bool = False,
+) -> list[str]:
+    """Delete query logs belonging to deleted conversation turns.
+
+    New conversation messages carry their query-log ID explicitly. Older
+    records are linked by owner, normalized question, and the closest
+    timestamp so deleting a history entry also updates dashboard totals
+    without deleting another user's similarly worded query.
+    """
+    explicit_query_ids: set[str] = set()
+    legacy_turns: list[tuple[str, str, datetime | None]] = []
+
+    for conversation in conversations:
+        owner_id = str(conversation.get("user_id") or LEGACY_ADMIN_USER_ID)
+        if not include_all and (not user_id or owner_id != user_id):
+            continue
+
+        for raw_message in conversation.get("messages") or []:
+            if not isinstance(raw_message, dict):
+                continue
+
+            query_id = _message_query_id(raw_message)
+            if query_id:
+                explicit_query_ids.add(query_id)
+
+            if raw_message.get("role") != "user" or query_id:
+                continue
+
+            question = _normalize_question(raw_message.get("content"))
+            if question:
+                legacy_turns.append(
+                    (
+                        owner_id,
+                        question,
+                        _parse_timestamp(raw_message.get("created_at")),
+                    )
+                )
+
+    with LOG_LOCK:
+        logs = get_logs(include_all=True)
+        deleted_ids: set[str] = set()
+
+        def can_delete(log: dict[str, Any]) -> bool:
+            owner_id = str(log.get("user_id") or LEGACY_ADMIN_USER_ID)
+            return include_all or (user_id is not None and owner_id == user_id)
+
+        for log in logs:
+            log_id = str(log.get("id") or "")
+            if log_id in explicit_query_ids and can_delete(log):
+                deleted_ids.add(log_id)
+
+        # Backward-compatible cleanup for conversations created before query IDs
+        # were stored in message metadata. Match at most one log per user turn.
+        for owner_id, question, message_time in legacy_turns:
+            candidates: list[tuple[float, str]] = []
+            for log in logs:
+                log_id = str(log.get("id") or "")
+                log_owner_id = str(log.get("user_id") or LEGACY_ADMIN_USER_ID)
+                if (
+                    log_id in deleted_ids
+                    or log_owner_id != owner_id
+                    or not can_delete(log)
+                    or _normalize_question(log.get("question")) != question
+                ):
+                    continue
+
+                log_time = _parse_timestamp(log.get("timestamp"))
+                if message_time is not None and log_time is not None:
+                    delta_seconds = abs((log_time - message_time).total_seconds())
+                    if delta_seconds > 300:
+                        continue
+                else:
+                    delta_seconds = float("inf")
+
+                candidates.append((delta_seconds, log_id))
+
+            if candidates:
+                candidates.sort(key=lambda item: item[0])
+                deleted_ids.add(candidates[0][1])
+
+        if not deleted_ids:
+            return []
+
+        remaining = [
+            log
+            for log in logs
+            if str(log.get("id") or "") not in deleted_ids
+        ]
+        write_logs(remaining)
+        return sorted(deleted_ids)

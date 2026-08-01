@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { useDocuments } from '../hooks/useDocuments';
+import {
+  useUiLanguage,
+  type UiLanguage,
+} from '../i18n/LanguageContext';
 import type {
   DocumentType,
   UploadItem,
@@ -109,10 +113,10 @@ const formatBytes = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-const formatDateTime = (value: string) => {
+const formatDateTime = (value: string, language: UiLanguage) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString([], { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleString(language === 'EN' ? 'en-US' : 'id-ID', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
 const getDocumentIcon = (type: DocumentType) => {
@@ -148,6 +152,55 @@ const getUploadStatusStyle = (status: UploadStatus | 'Waiting' | 'Indexing') => 
   }
 };
 
+const getUploadStatusLabel = (
+  status: UploadStatus | 'Waiting' | 'Indexing',
+  language: UiLanguage,
+): string => {
+  if (language === 'EN') return status;
+  return {
+    Ready: 'Siap',
+    Waiting: 'Menunggu',
+    Parsing: 'Membaca',
+    Chunking: 'Memotong',
+    Embedding: 'Membuat Embedding',
+    Indexing: 'Mengindeks',
+    Indexed: 'Terindeks',
+    Rejected: 'Ditolak',
+    Failed: 'Gagal',
+  }[status] ?? status;
+};
+
+const localizeUploadNote = (
+  note: string | undefined,
+  language: UiLanguage,
+): string => {
+  const cleanNote = String(note ?? '').trim();
+  if (!cleanNote) {
+    return language === 'EN'
+      ? 'Waiting for batch indexing.'
+      : 'Menunggu pengindeksan massal.';
+  }
+  if (language === 'EN') return cleanNote;
+
+  const indexedMatch = cleanNote.match(/Indexed with Python RAG pipeline \((\d+) chunks?\)\.?/i);
+  if (indexedMatch) {
+    return `Terindeks melalui pipeline RAG Python (${indexedMatch[1]} potongan).`;
+  }
+  const reindexedMatch = cleanNote.match(/Re-indexing completed \((\d+) chunks?\)\.?/i);
+  if (reindexedMatch) {
+    return `Pengindeksan ulang selesai (${reindexedMatch[1]} potongan).`;
+  }
+
+  const translations: Record<string, string> = {
+    'Waiting in local repository.': 'Menunggu di repositori lokal.',
+    'Waiting for batch indexing.': 'Menunggu pengindeksan massal.',
+    'Ready to index.': 'Siap diindeks.',
+    'Moved to indexing queue.': 'Dipindahkan ke antrean pengindeksan.',
+    'Document parsed, but no chunks were created.': 'Dokumen berhasil dibaca, tetapi tidak menghasilkan potongan.',
+  };
+  return translations[cleanNote] ?? cleanNote;
+};
+
 const getPaginationNumbers = (totalPages: number, currentPage: number) => {
   if (totalPages <= 5) return Array.from({ length: totalPages }, (_, index) => index + 1);
   if (currentPage <= 3) return [1, 2, 3, 4, 5];
@@ -164,6 +217,7 @@ const getStagedItemId = (file: File) =>
   `staged-${normalizeFilename(file.name)}-${file.size}-${file.lastModified}`;
 
 export const AdminUploadFile: React.FC = () => {
+  const { language } = useUiLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
@@ -172,6 +226,7 @@ export const AdminUploadFile: React.FC = () => {
   const [stagedFiles, setStagedFiles] = useState<File[]>([]);
   const [duplicateFiles, setDuplicateFiles] = useState<File[]>([]);
   const [replacementFilenames, setReplacementFilenames] = useState<Set<string>>(new Set());
+  const [resumeIndexAfterDuplicateConfirm, setResumeIndexAfterDuplicateConfirm] = useState(false);
   const [deleteTargets, setDeleteTargets] = useState<Array<{ id: string; filename: string }>>([]);
   const [selectedRepositoryIds, setSelectedRepositoryIds] = useState<Set<string>>(new Set());
   const [selectedQueueIds, setSelectedQueueIds] = useState<Set<string>>(new Set());
@@ -183,7 +238,6 @@ export const AdminUploadFile: React.FC = () => {
   const [locallyMovedIds, setLocallyMovedIds] = useState<Set<string>>(new Set());
   const [forcedWaitingIds, setForcedWaitingIds] = useState<Set<string>>(new Set());
   
-  const pendingUploadNamesRef = useRef<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -227,11 +281,13 @@ export const AdminUploadFile: React.FC = () => {
       status: 'Waiting' as any, // Perbaikan TS agar tipe status diterima
       progress: 0,
       chunks: 0,
-      note: 'Waiting in local repository.',
+      note: language === 'EN'
+        ? 'Waiting in local repository.'
+        : 'Menunggu di repositori lokal.',
     } as UploadItem));
 
     return [...stagedAsItems, ...dbWaitingItems];
-  }, [stagedFiles, dbWaitingItems]);
+  }, [stagedFiles, dbWaitingItems, language]);
 
   // Antrean pipeline dari database
   const uploadQueueItems = useMemo(() => {
@@ -298,46 +354,27 @@ export const AdminUploadFile: React.FC = () => {
     });
   }, [uploadItems]);
 
-  useEffect(() => {
-    const pendingNames = pendingUploadNamesRef.current;
-    if (pendingNames.length === 0 || uploadItems.length === 0) return;
-
-    const remainingNames = [...pendingNames];
-    const matchedIds: string[] = [];
-
-    const newestFirst = [...uploadItems].sort((a, b) => {
-      const timeA = new Date(a.uploadedAt).getTime();
-      const timeB = new Date(b.uploadedAt).getTime();
-      return (Number.isNaN(timeB) ? 0 : timeB) - (Number.isNaN(timeA) ? 0 : timeA);
-    });
-
-    newestFirst.forEach((item) => {
-      const index = remainingNames.findIndex((name) => name === item.filename);
-      if (index >= 0) {
-        matchedIds.push(item.id);
-        remainingNames.splice(index, 1);
-      }
-    });
-
-    if (matchedIds.length === 0) return;
-
-    setForcedWaitingIds((current) => {
-      const next = new Set(current);
-      matchedIds.forEach((id) => next.add(id));
-      return next;
-    });
-
-    pendingUploadNamesRef.current = remainingNames;
-    setRepositoryPage(1);
-  }, [uploadItems]);
-
   const validateFiles = (files: File[]) => {
     const accepted: File[] = [];
     const rejected: string[] = [];
     for (const file of files) {
       const extension = getFileExtension(file.name);
-      if (!acceptedExtensions.includes(extension)) { rejected.push(`${file.name}: only PDF, DOCX, TXT supported.`); continue; }
-      if (file.size > maxFileSize) { rejected.push(`${file.name}: max file size 25 MB.`); continue; }
+      if (!acceptedExtensions.includes(extension)) {
+        rejected.push(
+          language === 'EN'
+            ? `${file.name}: only PDF, DOCX, and TXT are supported.`
+            : `${file.name}: hanya format PDF, DOCX, dan TXT yang didukung.`
+        );
+        continue;
+      }
+      if (file.size > maxFileSize) {
+        rejected.push(
+          language === 'EN'
+            ? `${file.name}: maximum file size is 25 MB.`
+            : `${file.name}: ukuran file maksimal 25 MB.`
+        );
+        continue;
+      }
       accepted.push(file);
     }
     return { accepted, rejected };
@@ -388,51 +425,60 @@ export const AdminUploadFile: React.FC = () => {
   const handleCancelDuplicateUpload = () => {
     // Keep the existing file and discard only the newly selected duplicate.
     setDuplicateFiles([]);
+    setResumeIndexAfterDuplicateConfirm(false);
+    setWarningMessage('');
   };
 
-  const handleConfirmDuplicateUpload = () => {
+  const handleConfirmDuplicateUpload = async () => {
     if (duplicateFiles.length === 0) return;
 
     const confirmedFiles = [...duplicateFiles];
+    const nextFiles = [...stagedFiles];
+    confirmedFiles.forEach((newFile) => {
+      const normalizedName = normalizeFilename(newFile.name);
+      const stagedIndex = nextFiles.findIndex(
+        (currentFile) =>
+          normalizeFilename(currentFile.name) === normalizedName
+      );
 
-    setStagedFiles((currentFiles) => {
-      const nextFiles = [...currentFiles];
-
-      confirmedFiles.forEach((newFile) => {
-        const normalizedName = normalizeFilename(newFile.name);
-        const stagedIndex = nextFiles.findIndex(
-          (currentFile) =>
-            normalizeFilename(currentFile.name) === normalizedName
-        );
-
-        if (stagedIndex >= 0) {
-          // Replace the old local selection instead of creating two queue rows.
-          nextFiles[stagedIndex] = newFile;
-        } else {
-          nextFiles.push(newFile);
-        }
-      });
-
-      return nextFiles;
+      if (stagedIndex >= 0) {
+        // Replace the old local selection instead of creating two queue rows.
+        nextFiles[stagedIndex] = newFile;
+      } else {
+        nextFiles.push(newFile);
+      }
     });
 
-    setReplacementFilenames((currentNames) => {
-      const nextNames = new Set(currentNames);
+    const nextReplacementNames = new Set(replacementFilenames);
+    confirmedFiles.forEach((file) => {
+      const normalizedName = normalizeFilename(file.name);
 
-      confirmedFiles.forEach((file) => {
-        const normalizedName = normalizeFilename(file.name);
-
-        // Always include the confirmed filename in the replacement list.
-        // This also handles files that exist on disk but are missing from the
-        // document metadata store.
-        nextNames.add(normalizedName);
-      });
-
-      return nextNames;
+      // Always include the confirmed filename in the replacement list.
+      // This also handles files that exist on disk but are missing from the
+      // document metadata store.
+      nextReplacementNames.add(normalizedName);
     });
 
+    setStagedFiles(nextFiles);
+    setReplacementFilenames(nextReplacementNames);
     setDuplicateFiles([]);
     setRepositoryPage(1);
+
+    if (!resumeIndexAfterDuplicateConfirm) return;
+
+    setResumeIndexAfterDuplicateConfirm(false);
+    setWarningMessage('');
+    const result = await uploadFiles(
+      nextFiles,
+      Array.from(nextReplacementNames)
+    );
+
+    if (result.success) {
+      setStagedFiles([]);
+      setReplacementFilenames(new Set());
+      setQueuePage(1);
+      await refreshAll();
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -455,15 +501,14 @@ export const AdminUploadFile: React.FC = () => {
     let shouldRefresh = false;
 
     if (stagedFiles.length > 0) {
-      const uploadedNames = stagedFiles.map(f => f.name);
       const replaceFilenames = stagedFiles
         .filter((file) => replacementFilenames.has(normalizeFilename(file.name)))
         .map((file) => file.name);
       const result = await uploadFiles(stagedFiles, replaceFilenames);
       if (result.success) {
-        pendingUploadNamesRef.current = [...pendingUploadNamesRef.current, ...uploadedNames];
         setStagedFiles([]);
         setReplacementFilenames(new Set());
+        setQueuePage(1);
         shouldRefresh = true;
       } else if (result.duplicateFilenames.length > 0) {
         const conflictNames = new Set(
@@ -475,7 +520,12 @@ export const AdminUploadFile: React.FC = () => {
         if (conflicts.length > 0) {
           clearError();
           setDuplicateFiles(conflicts);
-          setWarningMessage('One or more files already exist. Confirm replacement, then click Index All again.');
+          setResumeIndexAfterDuplicateConfirm(true);
+          setWarningMessage(
+            language === 'EN'
+              ? 'One or more files already exist. Confirm replacement to continue indexing automatically.'
+              : 'Satu atau beberapa file sudah ada. Konfirmasikan penggantian agar pengindeksan berlanjut otomatis.'
+          );
         }
       }
     }
@@ -643,7 +693,9 @@ export const AdminUploadFile: React.FC = () => {
       if (failedTargets.length > 0) {
         setDeleteTargets(failedTargets);
         setWarningMessage(
-          `${failedTargets.length} file${failedTargets.length === 1 ? '' : 's'} could not be deleted. Please try again.`
+          language === 'EN'
+            ? `${failedTargets.length} file${failedTargets.length === 1 ? '' : 's'} could not be deleted. Please try again.`
+            : `${failedTargets.length} file gagal dihapus. Silakan coba lagi.`
         );
         window.setTimeout(() => setWarningMessage(''), 6000);
       } else {
@@ -660,39 +712,39 @@ export const AdminUploadFile: React.FC = () => {
 
     return (
       <div className="flex flex-wrap items-center justify-end gap-1.5 pt-4 text-xs">
-        <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>Prev</button>
+        <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>{language === 'EN' ? 'Prev' : 'Sebelumnya'}</button>
         {pageNumbers[0] > 1 && (<><button type="button" onClick={() => setPage(1)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>1</button><span className="px-1 text-slate-600">...</span></>)}
         {pageNumbers.map((pageNumber) => (
           <button key={pageNumber} type="button" onClick={() => setPage(pageNumber)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${page === pageNumber ? buttonTone.yellow : buttonTone.cyan}`}>{pageNumber}</button>
         ))}
         {pageNumbers[pageNumbers.length - 1] < totalPages && (<><span className="px-1 text-slate-600">...</span><button type="button" onClick={() => setPage(totalPages)} className={`h-8 min-w-8 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>{totalPages}</button></>)}
-        <button type="button" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>Next</button>
+        <button type="button" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages} className={`h-8 px-3 rounded-lg ${baseButtonClass} ${buttonTone.cyan}`}>{language === 'EN' ? 'Next' : 'Berikutnya'}</button>
       </div>
     );
   };
 
   const renderRepositoryItem = (item: UploadItem) => (
     <div key={item.id} className="grid grid-cols-[32px_minmax(0,1fr)] md:grid-cols-[32px_minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-3 md:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
-      <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`Select ${item.filename}`}>
+      <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`${language === 'EN' ? 'Select' : 'Pilih'} ${item.filename}`}>
         <input
           type="checkbox"
           checked={selectedRepositoryIds.has(item.id)}
           onChange={() => toggleSelection(item.id, setSelectedRepositoryIds)}
           className="h-4 w-4 cursor-pointer rounded border-white/20 bg-slate-950 accent-cyan-400"
-          aria-label={`Select ${item.filename}`}
+          aria-label={`${language === 'EN' ? 'Select' : 'Pilih'} ${item.filename}`}
         />
       </label>
       <div className="flex items-center gap-3 min-w-0">
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-100 truncate">{item.filename}</p>
-          <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
+          <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt, language)}</p>
         </div>
       </div>
-      <div className="col-start-2 md:col-start-auto md:text-left"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle('Waiting')}`}>Waiting</span></div>
-      <p className="col-start-2 text-xs text-slate-500 line-clamp-2 md:col-start-auto">{item.note || 'Waiting for batch indexing.'}</p>
+      <div className="col-start-2 md:col-start-auto md:text-left"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle('Waiting')}`}>{getUploadStatusLabel('Waiting', language)}</span></div>
+      <p className="col-start-2 text-xs text-slate-500 line-clamp-2 md:col-start-auto">{localizeUploadNote(item.note, language)}</p>
       <div className="col-start-2 flex md:col-start-auto md:justify-end">
-        <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+        <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`${language === 'EN' ? 'Delete' : 'Hapus'} ${item.filename}`} title={language === 'EN' ? 'Delete' : 'Hapus'}><span className="material-symbols-outlined text-[18px]">delete</span></button>
       </div>
     </div>
   );
@@ -704,31 +756,35 @@ export const AdminUploadFile: React.FC = () => {
 
     return (
       <div key={item.id} className="grid grid-cols-[32px_minmax(0,1fr)] lg:grid-cols-[32px_minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-3 lg:gap-4 items-center py-4 border-b border-white/5 last:border-b-0">
-        <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`Select ${item.filename}`}>
+        <label className="flex h-8 w-8 cursor-pointer items-center justify-center" title={`${language === 'EN' ? 'Select' : 'Pilih'} ${item.filename}`}>
           <input
             type="checkbox"
             checked={selectedQueueIds.has(item.id)}
             onChange={() => toggleSelection(item.id, setSelectedQueueIds)}
             className="h-4 w-4 cursor-pointer rounded border-white/20 bg-slate-950 accent-cyan-400"
-            aria-label={`Select ${item.filename}`}
+            aria-label={`${language === 'EN' ? 'Select' : 'Pilih'} ${item.filename}`}
           />
         </label>
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${getDocumentIconStyle(item.type)}`}><span className="material-symbols-outlined text-[22px]">{getDocumentIcon(item.type)}</span></div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-100 truncate">{item.filename}</p>
-            <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt)}</p>
+            <p className="text-[11px] text-slate-500 font-mono truncate">{item.type} · {item.size} · {formatDateTime(item.uploadedAt, language)}</p>
           </div>
         </div>
-        <div className="col-start-2 lg:col-start-auto"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(visibleStatus)}`}>{visibleStatus}</span></div>
+        <div className="col-start-2 lg:col-start-auto"><span className={`inline-flex items-center px-2.5 py-1 rounded-full border font-mono text-[10px] ${getUploadStatusStyle(visibleStatus)}`}>{getUploadStatusLabel(visibleStatus, language)}</span></div>
         <div className="col-start-2 min-w-0 lg:col-start-auto">
           <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden"><div className="h-full bg-cyan-400 transition-all" style={{ width: `${progress}%` }} /></div>
-          <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{progress}% · {item.chunks} chunks</p>
+          <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{progress}% · {item.chunks} {language === 'EN' ? 'chunks' : 'potongan'}</p>
         </div>
-        <p className="col-start-2 text-xs text-slate-500 line-clamp-2 lg:col-start-auto">{wasMovedLocally ? 'Moved to indexing queue.' : item.note}</p>
+        <p className="col-start-2 text-xs text-slate-500 line-clamp-2 lg:col-start-auto">
+          {wasMovedLocally
+            ? localizeUploadNote('Moved to indexing queue.', language)
+            : localizeUploadNote(item.note, language)}
+        </p>
         <div className="col-start-2 flex gap-2 lg:col-start-auto lg:justify-end">
-          {item.status === 'Failed' && (<button type="button" onClick={() => void handleRetryIndexing(item.id)} disabled={isIndexing} className={`h-8 px-3 rounded-lg text-[11px] ${baseButtonClass} ${buttonTone.yellow}`}>Retry</button>)}
-          <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`Remove ${item.filename}`} title="Remove"><span className="material-symbols-outlined text-[18px]">delete</span></button>
+          {item.status === 'Failed' && (<button type="button" onClick={() => void handleRetryIndexing(item.id)} disabled={isIndexing} className={`h-8 px-3 rounded-lg text-[11px] ${baseButtonClass} ${buttonTone.yellow}`}>{language === 'EN' ? 'Retry' : 'Coba Lagi'}</button>)}
+          <button type="button" onClick={() => handleRemove(item.id, item.filename)} className={`w-8 h-8 rounded-lg flex items-center justify-center ${baseButtonClass} ${buttonTone.pink}`} aria-label={`${language === 'EN' ? 'Delete' : 'Hapus'} ${item.filename}`} title={language === 'EN' ? 'Delete' : 'Hapus'}><span className="material-symbols-outlined text-[18px]">delete</span></button>
         </div>
       </div>
     );
@@ -736,28 +792,28 @@ export const AdminUploadFile: React.FC = () => {
 
   const summaryCards = [
     {
-      label: 'Total Files',
+      label: language === 'EN' ? 'Total Files' : 'Total File',
       value: totalFiles,
       icon: 'folder_open',
       image: metricImages.documents,
       gradient: 'from-cyan-300 via-teal-300 to-cyan-500',
     },
     {
-      label: 'Waiting',
+      label: language === 'EN' ? 'Waiting' : 'Menunggu',
       value: waitingFiles,
       icon: 'hourglass_top',
       image: metricImages.chunks,
       gradient: 'from-amber-200 via-yellow-300 to-orange-400',
     },
     {
-      label: 'Indexed',
+      label: language === 'EN' ? 'Indexed' : 'Terindeks',
       value: indexedFiles,
       icon: 'task_alt',
       image: metricImages.indexed,
       gradient: 'from-emerald-300 via-green-300 to-emerald-500',
     },
     {
-      label: 'Failed',
+      label: language === 'EN' ? 'Failed' : 'Gagal',
       value: failedFiles,
       icon: 'report',
       image: metricImages.failed,
@@ -786,15 +842,21 @@ export const AdminUploadFile: React.FC = () => {
                   Python RAG Pipeline
                 </p>
                 <h1 className="font-headline text-2xl md:text-3xl font-bold tracking-tight text-white">
-                  Upload & Index <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">Knowledge Base</span>
+                  {language === 'EN' ? 'Upload & Index' : 'Unggah & Indeks'}{' '}
+                  <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">
+                    <span className={language === 'EN' ? '' : 'hidden'}>Knowledge Base</span>
+                    <span className={language === 'ID' ? '' : 'hidden'}>Basis Pengetahuan</span>
+                  </span>
                 </h1>
                 <p className="text-slate-400 text-xs md:text-sm mt-1.5 max-w-2xl">
-                  Stage files in the Trained Repository, then click Index All to upload and index them.
+                  {language === 'EN'
+                    ? 'Stage files in the Trained Repository, then click Index All to upload and index them.'
+                    : 'Siapkan file di Repositori Terlatih, lalu klik Indeks Semua untuk mengunggah dan mengindeksnya.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {isUploading && <span className="text-xs text-cyan-300 font-mono animate-pulse mr-2">Uploading...</span>}
-                {isIndexing && <span className="text-xs text-violet-300 font-mono animate-pulse mr-2">Indexing...</span>}
+                {isUploading && <span className="text-xs text-cyan-300 font-mono animate-pulse mr-2">{language === 'EN' ? 'Uploading...' : 'Mengunggah...'}</span>}
+                {isIndexing && <span className="text-xs text-violet-300 font-mono animate-pulse mr-2">{language === 'EN' ? 'Indexing...' : 'Mengindeks...'}</span>}
               </div>
             </div>
 
@@ -803,7 +865,7 @@ export const AdminUploadFile: React.FC = () => {
                 <span>{warningMessage || error}</span>
                 {error && (
                   <button type="button" onClick={clearError} className={`h-8 px-3 rounded-lg text-xs ${baseButtonClass} ${buttonTone.pink}`}>
-                    Close
+                    {language === 'EN' ? 'Close' : 'Tutup'}
                   </button>
                 )}
               </div>
@@ -857,10 +919,12 @@ export const AdminUploadFile: React.FC = () => {
                     <span className="material-symbols-outlined text-[34px]">cloud_upload</span>
                   </div>
                   <h2 className="font-headline text-xl font-bold text-white mb-2">
-                    Upload Files
+                    {language === 'EN' ? 'Upload Files' : 'Unggah File'}
                   </h2>
                   <p className="text-sm text-slate-400 max-w-xl mb-5">
-                    Add PDF, DOCX, or TXT files. Files remain local until you click Index All, then the backend uploads and indexes them immediately.
+                    {language === 'EN'
+                      ? 'Add PDF, DOCX, or TXT files. Files remain local until you click Index All, then the backend uploads and indexes them immediately.'
+                      : 'Tambahkan file PDF, DOCX, atau TXT. File tetap lokal sampai Anda mengeklik Indeks Semua, lalu backend langsung mengunggah dan mengindeksnya.'}
                   </p>
                   <button
                     type="button"
@@ -868,7 +932,9 @@ export const AdminUploadFile: React.FC = () => {
                     disabled={isUploading}
                     className={`px-5 py-2.5 rounded-xl text-sm ${baseButtonClass} ${buttonTone.cyan}`}
                   >
-                    {isUploading ? 'Uploading...' : 'Choose Files'}
+                    {isUploading
+                      ? language === 'EN' ? 'Uploading...' : 'Mengunggah...'
+                      : language === 'EN' ? 'Choose Files' : 'Pilih File'}
                   </button>
                 </div>
               </div>
@@ -876,14 +942,16 @@ export const AdminUploadFile: React.FC = () => {
               <div className="min-h-[360px] flex flex-col bg-transparent border border-white/10 rounded-[1.2rem] p-5 md:p-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/5">
                   <div>
-                    <h2 className="font-headline text-lg font-bold text-slate-100">Trained Repository</h2>
+                    <h2 className="font-headline text-lg font-bold text-slate-100">
+                      {language === 'EN' ? 'Trained Repository' : 'Repositori Terlatih'}
+                    </h2>
                     <p className="text-xs text-slate-500 mt-1">
-                      Waiting files before batch indexing.
+                      {language === 'EN' ? 'Waiting files before batch indexing.' : 'File yang menunggu pengindeksan massal.'}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
-                      {waitingRepositoryItems.length} waiting files
+                      {waitingRepositoryItems.length} {language === 'EN' ? 'waiting files' : 'file menunggu'}
                     </span>
                     <button
                       type="button"
@@ -891,7 +959,9 @@ export const AdminUploadFile: React.FC = () => {
                       disabled={waitingRepositoryItems.length === 0 || isDeletingDocument}
                       className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.cyan}`}
                     >
-                      {allRepositorySelected ? 'Deselect All' : 'Select All'}
+                      {allRepositorySelected
+                        ? language === 'EN' ? 'Deselect All' : 'Batalkan Semua'
+                        : language === 'EN' ? 'Select All' : 'Pilih Semua'}
                     </button>
                     <button
                       type="button"
@@ -899,7 +969,8 @@ export const AdminUploadFile: React.FC = () => {
                       disabled={selectedRepositoryItems.length === 0 || isDeletingDocument}
                       className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.pink}`}
                     >
-                      Delete Selected{selectedRepositoryItems.length > 0 ? ` (${selectedRepositoryItems.length})` : ''}
+                      {language === 'EN' ? 'Delete Selected' : 'Hapus Terpilih'}
+                      {selectedRepositoryItems.length > 0 ? ` (${selectedRepositoryItems.length})` : ''}
                     </button>
                     <button
                       type="button"
@@ -907,17 +978,19 @@ export const AdminUploadFile: React.FC = () => {
                       disabled={isIndexing || waitingRepositoryItems.length === 0}
                       className={`px-4 py-2 rounded-xl text-sm ${baseButtonClass} ${buttonTone.yellow}`}
                     >
-                      {isIndexing ? 'Indexing...' : 'Index All'}
+                      {isIndexing
+                        ? language === 'EN' ? 'Indexing...' : 'Mengindeks...'
+                        : language === 'EN' ? 'Index All' : 'Indeks Semua'}
                     </button>
                   </div>
                 </div>
 
                 <div className="hidden md:grid grid-cols-[32px_minmax(0,1.7fr)_110px_minmax(0,1fr)_78px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
-                  <span className="text-center">Select</span>
-                  <span>Document</span>
+                  <span className="text-center">{language === 'EN' ? 'Select' : 'Pilih'}</span>
+                  <span>{language === 'EN' ? 'Document' : 'Dokumen'}</span>
                   <span>Status</span>
-                  <span>Repository Note</span>
-                  <span className="text-right">Action</span>
+                  <span>{language === 'EN' ? 'Repository Note' : 'Catatan Repositori'}</span>
+                  <span className="text-right">{language === 'EN' ? 'Action' : 'Tindakan'}</span>
                 </div>
 
                 <div className="flex-1 min-h-0">
@@ -925,7 +998,9 @@ export const AdminUploadFile: React.FC = () => {
                     repositoryPageItems.map(renderRepositoryItem)
                   ) : (
                     <div className="h-full min-h-[190px] flex items-center justify-center text-center text-sm text-slate-500 px-6">
-                      No waiting files yet. Upload files first, then they will appear here before indexing.
+                      {language === 'EN'
+                        ? 'No waiting files yet. Upload files first, then they will appear here before indexing.'
+                        : 'Belum ada file menunggu. Unggah file terlebih dahulu; file akan muncul di sini sebelum diindeks.'}
                     </div>
                   )}
                 </div>
@@ -937,14 +1012,18 @@ export const AdminUploadFile: React.FC = () => {
             <section className="bg-transparent border border-white/10 rounded-[1.2rem] p-5 md:p-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-white/5">
                 <div>
-                  <h2 className="font-headline text-lg font-bold text-slate-100">Upload Queue from Database</h2>
+                  <h2 className="font-headline text-lg font-bold text-slate-100">
+                    {language === 'EN' ? 'Upload Queue from Database' : 'Antrean Unggah dari Basis Data'}
+                  </h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    Files appear here after Index All starts the backend pipeline. Indexed means parsing, chunking, embedding, and indexing are complete.
+                    {language === 'EN'
+                      ? 'Files appear here after Index All starts the backend pipeline. Indexed means parsing, chunking, embedding, and indexing are complete.'
+                      : 'File muncul di sini setelah Indeks Semua memulai pipeline backend. Terindeks berarti parsing, pemotongan, embedding, dan pengindeksan selesai.'}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-full border border-cyan-400 bg-cyan-400 px-3 py-1 text-[11px] font-semibold text-slate-950 font-mono">
-                    {pipelineFiles} pipeline files
+                    {pipelineFiles} {language === 'EN' ? 'pipeline files' : 'file pipeline'}
                   </span>
                   <button
                     type="button"
@@ -952,7 +1031,9 @@ export const AdminUploadFile: React.FC = () => {
                     disabled={uploadQueueItems.length === 0 || isDeletingDocument}
                     className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.cyan}`}
                   >
-                    {allQueueSelected ? 'Deselect All' : 'Select All'}
+                    {allQueueSelected
+                      ? language === 'EN' ? 'Deselect All' : 'Batalkan Semua'
+                      : language === 'EN' ? 'Select All' : 'Pilih Semua'}
                   </button>
                   <button
                     type="button"
@@ -960,19 +1041,20 @@ export const AdminUploadFile: React.FC = () => {
                     disabled={selectedQueueItems.length === 0 || isDeletingDocument}
                     className={`px-3 py-2 rounded-xl text-xs ${baseButtonClass} ${buttonTone.pink}`}
                   >
-                    Delete Selected{selectedQueueItems.length > 0 ? ` (${selectedQueueItems.length})` : ''}
+                    {language === 'EN' ? 'Delete Selected' : 'Hapus Terpilih'}
+                    {selectedQueueItems.length > 0 ? ` (${selectedQueueItems.length})` : ''}
                   </button>
-                  {isLoading && <span className="text-xs text-cyan-300 font-mono animate-pulse">Loading...</span>}
+                  {isLoading && <span className="text-xs text-cyan-300 font-mono animate-pulse">{language === 'EN' ? 'Loading...' : 'Memuat...'}</span>}
                 </div>
               </div>
 
               <div className="hidden lg:grid grid-cols-[32px_minmax(0,1.6fr)_110px_minmax(0,1fr)_minmax(0,1.25fr)_86px] gap-4 pt-4 pb-2 text-[10px] uppercase tracking-wider text-slate-600 font-mono">
-                <span className="text-center">Select</span>
-                <span>Document</span>
+                <span className="text-center">{language === 'EN' ? 'Select' : 'Pilih'}</span>
+                <span>{language === 'EN' ? 'Document' : 'Dokumen'}</span>
                 <span>Status</span>
-                <span>Progress</span>
-                <span>Pipeline Note</span>
-                <span className="text-right">Action</span>
+                <span>{language === 'EN' ? 'Progress' : 'Progres'}</span>
+                <span>{language === 'EN' ? 'Pipeline Note' : 'Catatan Pipeline'}</span>
+                <span className="text-right">{language === 'EN' ? 'Action' : 'Tindakan'}</span>
               </div>
 
               <div>
@@ -980,7 +1062,9 @@ export const AdminUploadFile: React.FC = () => {
                   queuePageItems.map(renderQueueItem)
                 ) : (
                   <div className="min-h-[170px] flex items-center justify-center text-center text-sm text-slate-500 px-6">
-                    No pipeline files yet. Start batch indexing from the Trained Repository.
+                    {language === 'EN'
+                      ? 'No pipeline files yet. Start batch indexing from the Trained Repository.'
+                      : 'Belum ada file pipeline. Mulai pengindeksan massal dari Repositori Terlatih.'}
                   </div>
                 )}
               </div>
@@ -1008,12 +1092,18 @@ export const AdminUploadFile: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h2 id="delete-file-title" className="font-headline text-lg font-bold text-white">
-                  {deleteTargets.length === 1 ? 'Delete this file?' : `Delete ${deleteTargets.length} files?`}
+                  {deleteTargets.length === 1
+                    ? language === 'EN' ? 'Delete this file?' : 'Hapus file ini?'
+                    : language === 'EN' ? `Delete ${deleteTargets.length} files?` : `Hapus ${deleteTargets.length} file?`}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-400">
                   {deleteTargets.length === 1
-                    ? 'Are you sure you want to delete this file? This action will remove it from the repository and cannot be undone.'
-                    : 'Are you sure you want to delete all selected files? They will be removed from the repository and this action cannot be undone.'}
+                    ? language === 'EN'
+                      ? 'Are you sure you want to delete this file? This action will remove it from the repository and cannot be undone.'
+                      : 'Yakin ingin menghapus file ini? File akan dihapus dari repositori dan tindakan ini tidak dapat dibatalkan.'
+                    : language === 'EN'
+                      ? 'Are you sure you want to delete all selected files? They will be removed from the repository and this action cannot be undone.'
+                      : 'Yakin ingin menghapus semua file terpilih? File akan dihapus dari repositori dan tindakan ini tidak dapat dibatalkan.'}
                 </p>
               </div>
             </div>
@@ -1029,7 +1119,7 @@ export const AdminUploadFile: React.FC = () => {
               ))}
               {deleteTargets.length > 8 && (
                 <p className="px-1 text-xs font-mono text-slate-500">
-                  +{deleteTargets.length - 8} more files selected
+                  +{deleteTargets.length - 8} {language === 'EN' ? 'more files selected' : 'file lain dipilih'}
                 </p>
               )}
             </div>
@@ -1041,7 +1131,7 @@ export const AdminUploadFile: React.FC = () => {
                 disabled={isDeletingDocument}
                 className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.cyan}`}
               >
-                No, Cancel
+                {language === 'EN' ? 'No, Cancel' : 'Tidak, Batal'}
               </button>
               <button
                 type="button"
@@ -1050,10 +1140,10 @@ export const AdminUploadFile: React.FC = () => {
                 className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.pink}`}
               >
                 {isDeletingDocument
-                  ? 'Deleting...'
+                  ? language === 'EN' ? 'Deleting...' : 'Menghapus...'
                   : deleteTargets.length === 1
-                    ? 'Yes, Delete'
-                    : `Yes, Delete ${deleteTargets.length} Files`}
+                    ? language === 'EN' ? 'Yes, Delete' : 'Ya, Hapus'
+                    : language === 'EN' ? `Yes, Delete ${deleteTargets.length} Files` : `Ya, Hapus ${deleteTargets.length} File`}
               </button>
             </div>
           </div>
@@ -1075,13 +1165,17 @@ export const AdminUploadFile: React.FC = () => {
               <div>
                 <h2 id="duplicate-upload-title" className="font-headline text-lg font-bold text-white">
                   {duplicateFiles.length === 1
-                    ? 'File already exists'
-                    : 'Files already exist'}
+                    ? language === 'EN' ? 'File already exists' : 'File sudah ada'
+                    : language === 'EN' ? 'Files already exist' : 'File sudah ada'}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-400">
                   {duplicateFiles.length === 1
-                    ? 'This file was uploaded previously. Are you sure you want to replace it with the newly selected file?'
-                    : 'These files were uploaded previously. Are you sure you want to replace them with the newly selected files?'}
+                    ? language === 'EN'
+                      ? 'This file was uploaded previously. Are you sure you want to replace it with the newly selected file?'
+                      : 'File ini pernah diunggah. Yakin ingin menggantinya dengan file yang baru dipilih?'
+                    : language === 'EN'
+                      ? 'These files were uploaded previously. Are you sure you want to replace them with the newly selected files?'
+                      : 'File-file ini pernah diunggah. Yakin ingin menggantinya dengan file yang baru dipilih?'}
                 </p>
               </div>
             </div>
@@ -1092,7 +1186,7 @@ export const AdminUploadFile: React.FC = () => {
                   <span className="material-symbols-outlined text-yellow-300">description</span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-100">{file.name}</p>
-                    <p className="text-xs font-mono text-slate-500">New file · {formatBytes(file.size)}</p>
+                    <p className="text-xs font-mono text-slate-500">{language === 'EN' ? 'New file' : 'File baru'} · {formatBytes(file.size)}</p>
                   </div>
                 </div>
               ))}
@@ -1104,14 +1198,17 @@ export const AdminUploadFile: React.FC = () => {
                 onClick={handleCancelDuplicateUpload}
                 className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.pink}`}
               >
-                No, Cancel
+                {language === 'EN' ? 'No, Cancel' : 'Tidak, Batal'}
               </button>
               <button
                 type="button"
-                onClick={handleConfirmDuplicateUpload}
+                onClick={() => void handleConfirmDuplicateUpload()}
+                disabled={isUploading}
                 className={`h-10 rounded-xl px-5 text-sm ${baseButtonClass} ${buttonTone.yellow}`}
               >
-                Yes, Replace
+                {isUploading
+                  ? language === 'EN' ? 'Replacing...' : 'Mengganti...'
+                  : language === 'EN' ? 'Yes, Replace' : 'Ya, Ganti'}
               </button>
             </div>
           </div>

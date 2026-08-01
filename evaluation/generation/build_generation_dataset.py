@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import sys
@@ -17,8 +18,13 @@ import time
 from pathlib import Path
 from typing import Any
 
-import requests
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    # Dataset-only validation must work before runtime dependencies are
+    # installed. Real API evaluation still checks ``requests`` explicitly.
+    def load_dotenv(*_args: Any, **_kwargs: Any) -> bool:
+        return False
 
 try:
     from .dataset_utils import (
@@ -81,8 +87,8 @@ CHAT_URL = os.getenv(
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
-CONTEXT_MODE = "source_locked_snapshot_native_model_v5"
-SNAPSHOT_SCHEMA_VERSION = 2
+CONTEXT_MODE = "source_locked_snapshot_native_model_v8"
+SNAPSHOT_SCHEMA_VERSION = 3
 VALID_MODELS = ("ollama", "gemini", "groq")
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
@@ -105,6 +111,17 @@ def classify_chat_failure(response: dict[str, Any]) -> str:
     generation_mode = str(response.get("generation_mode") or "").strip().casefold()
     retrieval_mode = str(response.get("retrieval_mode") or "").strip().casefold()
 
+    if "evaluation_snapshot_contract" in stage:
+        return "pipeline_contract"
+    # Stage is authoritative. A late failure used to be wrapped by the generic
+    # retrieval-refusal payload, causing valid retrieved contexts to be counted
+    # as retrieval misses. Check the precise stage before compatibility modes.
+    if "citation_validation" in stage or "answer_or_source" in stage:
+        return "answer_postprocessing"
+    if "native_model_refusal" in stage:
+        return "generation_output"
+    if "native_answer_empty" in stage or "wrong_output_language" in stage:
+        return "generation_or_provider"
     if (
         generation_mode == "retrieval_refusal"
         or retrieval_mode == "refused"
@@ -114,17 +131,148 @@ def classify_chat_failure(response: dict[str, Any]) -> str:
         )
     ):
         return "retrieval_or_context"
-    if "answer_or_source" in stage:
-        return "answer_postprocessing"
     if generation_mode and generation_mode != "native_model":
         return "pipeline_contract"
     return "generation_or_provider"
 
 
 def candidate_value(candidate: dict[str, Any], snake: str, camel: str) -> Any:
-    """Read snapshot v5 snake_case fields with compatibility for older snapshots."""
+    """Read normalized snapshot fields with camelCase API compatibility."""
     value = candidate.get(snake)
     return candidate.get(camel) if value is None else value
+
+
+def snapshot_candidate_payload(
+    candidate: dict[str, Any],
+    retrieval_item: dict[str, Any],
+    question: str,
+) -> dict[str, Any]:
+    """Build the complete locked candidate contract sent to the backend."""
+    return {
+        "chunkId": candidate.get("chunk_id") or candidate.get("chunkId"),
+        "documentName": candidate.get("document") or candidate.get("documentName"),
+        "page": candidate.get("page"),
+        "score": candidate.get("score"),
+        "contentSha256": candidate_value(candidate, "content_sha256", "contentSha256"),
+        "baseScore": candidate_value(candidate, "base_score", "baseScore"),
+        "semanticScore": candidate_value(candidate, "semantic_score", "semanticScore"),
+        "keywordScore": candidate_value(candidate, "keyword_score", "keywordScore"),
+        "exactTokenCoverage": candidate_value(
+            candidate,
+            "exact_token_coverage",
+            "exactTokenCoverage",
+        ),
+        "inventoryFieldScore": candidate_value(
+            candidate,
+            "inventory_field_score",
+            "inventoryFieldScore",
+        ),
+        "rerankerApplied": candidate_value(
+            candidate,
+            "reranker_applied",
+            "rerankerApplied",
+        ),
+        "rerankerScore": candidate_value(candidate, "reranker_score", "rerankerScore"),
+        "rerankerRawScore": candidate_value(
+            candidate,
+            "reranker_raw_score",
+            "rerankerRawScore",
+        ),
+        "rerankerRank": candidate_value(candidate, "reranker_rank", "rerankerRank"),
+        "semanticQueryVariant": candidate_value(
+            candidate,
+            "semantic_query_variant",
+            "semanticQueryVariant",
+        ),
+        "keywordQueryVariant": candidate_value(
+            candidate,
+            "keyword_query_variant",
+            "keywordQueryVariant",
+        ),
+        "rerankerQueryVariant": candidate_value(
+            candidate,
+            "reranker_query_variant",
+            "rerankerQueryVariant",
+        ),
+        "evidenceSupported": candidate_value(
+            candidate,
+            "evidence_supported",
+            "evidenceSupported",
+        ),
+        "evidenceScore": candidate_value(candidate, "evidence_score", "evidenceScore"),
+        "evidenceHardFailures": candidate_value(
+            candidate,
+            "evidence_hard_failures",
+            "evidenceHardFailures",
+        ),
+        "evidenceHardContradictions": candidate_value(
+            candidate,
+            "evidence_hard_contradictions",
+            "evidenceHardContradictions",
+        ),
+        "evidenceContradictions": candidate_value(
+            candidate,
+            "evidence_contradictions",
+            "evidenceContradictions",
+        ),
+        "evidenceMissingRequirements": candidate_value(
+            candidate,
+            "evidence_missing_requirements",
+            "evidenceMissingRequirements",
+        ),
+        "answerabilityAccepted": candidate_value(
+            candidate,
+            "answerability_accepted",
+            "answerabilityAccepted",
+        ),
+        "answerabilityStrictlySupported": candidate_value(
+            candidate,
+            "answerability_strictly_supported",
+            "answerabilityStrictlySupported",
+        ),
+        "answerabilityEvidenceSelected": candidate_value(
+            candidate,
+            "answerability_evidence_selected",
+            "answerabilityEvidenceSelected",
+        ),
+        "answerabilityScore": candidate_value(
+            candidate,
+            "answerability_score",
+            "answerabilityScore",
+        ),
+        "answerabilityScoreMargin": candidate_value(
+            candidate,
+            "answerability_score_margin",
+            "answerabilityScoreMargin",
+        ),
+        "answerabilityRequirementCoverage": candidate_value(
+            candidate,
+            "answerability_requirement_coverage",
+            "answerabilityRequirementCoverage",
+        ),
+        "answerabilityConceptCoverage": candidate_value(
+            candidate,
+            "answerability_concept_coverage",
+            "answerabilityConceptCoverage",
+        ),
+        "answerabilityRequiresCoherentEvidence": candidate_value(
+            candidate,
+            "answerability_requires_coherent_evidence",
+            "answerabilityRequiresCoherentEvidence",
+        ),
+        "answerabilityCoherentEvidence": candidate_value(
+            candidate,
+            "answerability_coherent_evidence",
+            "answerabilityCoherentEvidence",
+        ),
+        "answerabilityDiagnostics": candidate_value(
+            candidate,
+            "answerability_diagnostics",
+            "answerabilityDiagnostics",
+        ),
+        "snapshotRetrievalMode": retrieval_item.get("retrieval_mode"),
+        "snapshotRetrievalQuery": retrieval_item.get("retrieval_query") or question,
+    }
 
 
 def resolved_model_name(provider: str) -> str:
@@ -145,6 +293,17 @@ def validate_provider_configuration(provider: str) -> None:
 
 
 _AUTH_TOKEN: str | None = None
+
+
+def requests_module():
+    try:
+        import requests
+    except ModuleNotFoundError as exc:
+        raise RuntimeError(
+            "Dependency 'requests' belum terpasang. Jalankan: "
+            "python -m pip install -r backend/requirements.txt"
+        ) from exc
+    return requests
 
 
 def resolve_evaluation_token() -> str:
@@ -172,7 +331,7 @@ def resolve_evaluation_token() -> str:
             "atur LAPISAI_EVAL_USERNAME dan LAPISAI_EVAL_PASSWORD di .env."
         )
 
-    response = requests.post(
+    response = requests_module().post(
         LOGIN_URL,
         json={"username": username, "password": password},
         timeout=min(TIMEOUT_SECONDS, 30),
@@ -187,7 +346,7 @@ def resolve_evaluation_token() -> str:
 
 
 def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
-    response = requests.post(
+    response = requests_module().post(
         url,
         json=payload,
         headers={"Authorization": f"Bearer {resolve_evaluation_token()}"},
@@ -202,7 +361,7 @@ def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
 
 def preflight() -> None:
     try:
-        response = requests.get(HEALTH_URL, timeout=10)
+        response = requests_module().get(HEALTH_URL, timeout=10)
         response.raise_for_status()
     except Exception as error:
         raise RuntimeError(
@@ -339,6 +498,138 @@ def retrieved_sources_from_contexts(contexts: list[dict[str, Any]]) -> list[dict
     return output
 
 
+def validate_snapshot_contract(
+    ground_truth: list[dict[str, Any]],
+    snapshot: dict[str, dict[str, Any]],
+) -> None:
+    """Fail before generation when the snapshot and dataset do not match."""
+    expected_ids = {str(item.get("id") or "") for item in ground_truth}
+    snapshot_ids = set(snapshot)
+    missing_ids = sorted(expected_ids - snapshot_ids)
+    extra_ids = sorted(snapshot_ids - expected_ids)
+    if missing_ids or extra_ids:
+        raise ValueError(
+            "Retrieval snapshot IDs do not match the evaluation dataset. "
+            f"Missing={missing_ids[:10]}, extra={extra_ids[:10]}. "
+            "Rebuild the retrieval snapshot."
+        )
+
+    required_candidate_fields = (
+        ("content_sha256", "contentSha256"),
+        ("evidence_supported", "evidenceSupported"),
+        ("evidence_hard_failures", "evidenceHardFailures"),
+        ("evidence_hard_contradictions", "evidenceHardContradictions"),
+        ("answerability_accepted", "answerabilityAccepted"),
+        ("answerability_strictly_supported", "answerabilityStrictlySupported"),
+        ("answerability_evidence_selected", "answerabilityEvidenceSelected"),
+        (
+            "answerability_requires_coherent_evidence",
+            "answerabilityRequiresCoherentEvidence",
+        ),
+        ("answerability_coherent_evidence", "answerabilityCoherentEvidence"),
+    )
+
+    for item in ground_truth:
+        qid = str(item.get("id") or "")
+        snapshot_item = snapshot[qid]
+        question = str(item.get("question") or "")
+        expected_question_hash = hashlib.sha256(question.encode("utf-8")).hexdigest()
+        if snapshot_item.get("question") != question:
+            raise ValueError(
+                f"Retrieval snapshot question changed for {qid}. Rebuild the snapshot."
+            )
+        if snapshot_item.get("question_sha256") != expected_question_hash:
+            raise ValueError(
+                f"Retrieval snapshot question hash is invalid for {qid}. "
+                "Rebuild the snapshot."
+            )
+        if str(snapshot_item.get("language") or "").upper() != str(
+            item.get("language") or ""
+        ).upper():
+            raise ValueError(
+                f"Retrieval snapshot language changed for {qid}. Rebuild the snapshot."
+            )
+        if bool(snapshot_item.get("answerable")) != bool(item.get("answerable")):
+            raise ValueError(
+                f"Retrieval snapshot answerability label changed for {qid}. "
+                "Rebuild the snapshot."
+            )
+
+        for candidate in snapshot_item.get("ranked_candidates") or []:
+            chunk_id = str(
+                candidate.get("chunk_id") or candidate.get("chunkId") or ""
+            )
+            missing_fields = [
+                snake
+                for snake, camel in required_candidate_fields
+                if candidate_value(candidate, snake, camel) is None
+            ]
+            if not chunk_id or missing_fields:
+                raise ValueError(
+                    f"Retrieval snapshot candidate contract is incomplete for {qid} "
+                    f"({chunk_id or 'missing chunk ID'}): {missing_fields}. "
+                    "Rebuild the snapshot."
+                )
+
+            content_hash = str(
+                candidate_value(candidate, "content_sha256", "contentSha256") or ""
+            ).lower()
+            if len(content_hash) != 64 or any(
+                character not in "0123456789abcdef" for character in content_hash
+            ):
+                raise ValueError(
+                    f"Retrieval snapshot content hash is invalid for {qid}/{chunk_id}. "
+                    "Rebuild the snapshot."
+                )
+            if candidate_value(
+                candidate,
+                "answerability_accepted",
+                "answerabilityAccepted",
+            ) is not True or candidate_value(
+                candidate,
+                "answerability_strictly_supported",
+                "answerabilityStrictlySupported",
+            ) is not True or candidate_value(
+                candidate,
+                "answerability_evidence_selected",
+                "answerabilityEvidenceSelected",
+            ) is not True:
+                raise ValueError(
+                    f"Retrieval snapshot contains a non-strict candidate for "
+                    f"{qid}/{chunk_id}. Rebuild the snapshot."
+                )
+            if candidate_value(
+                candidate,
+                "evidence_hard_failures",
+                "evidenceHardFailures",
+            ) or candidate_value(
+                candidate,
+                "evidence_hard_contradictions",
+                "evidenceHardContradictions",
+            ):
+                raise ValueError(
+                    f"Retrieval snapshot contains contradictory evidence for "
+                    f"{qid}/{chunk_id}. Rebuild the snapshot."
+                )
+            requires_coherent = bool(
+                candidate_value(
+                    candidate,
+                    "answerability_requires_coherent_evidence",
+                    "answerabilityRequiresCoherentEvidence",
+                )
+            )
+            coherent = candidate_value(
+                candidate,
+                "answerability_coherent_evidence",
+                "answerabilityCoherentEvidence",
+            ) is True
+            if requires_coherent and not coherent:
+                raise ValueError(
+                    f"Retrieval snapshot lost coherent evidence for {qid}/{chunk_id}. "
+                    "Rebuild the snapshot."
+                )
+
+
 def load_retrieval_snapshot(
     path: Path | None,
 ) -> dict[str, dict[str, Any]] | None:
@@ -356,11 +647,15 @@ def load_retrieval_snapshot(
     items = payload.get("items") if isinstance(payload, dict) else None
     if not isinstance(items, list):
         raise ValueError("Retrieval snapshot must contain an items array")
-    return {
-        str(item.get("id") or ""): item
-        for item in items
-        if isinstance(item, dict) and item.get("id")
-    }
+    mapped: dict[str, dict[str, Any]] = {}
+    for item in items:
+        if not isinstance(item, dict) or not item.get("id"):
+            raise ValueError("Retrieval snapshot contains an item without a valid ID")
+        qid = str(item["id"])
+        if qid in mapped:
+            raise ValueError(f"Retrieval snapshot contains duplicate ID: {qid}")
+        mapped[qid] = item
+    return mapped
 
 
 def _existing_results(output: Path, model: str) -> dict[str, dict[str, Any]]:
@@ -409,6 +704,8 @@ def build_dataset(
     print(f"Generate {len(ground_truth)} answers with model={model} ({CONTEXT_MODE})")
     snapshot_locked = retrieval_snapshot is not None
     retrieval_snapshot = retrieval_snapshot or {}
+    if snapshot_locked:
+        validate_snapshot_contract(ground_truth, retrieval_snapshot)
 
     for index, item in enumerate(ground_truth, start=1):
         qid = str(item["id"])
@@ -440,49 +737,7 @@ def build_dataset(
                 }
                 if snapshot_locked:
                     chat_payload["retrievalCandidates"] = [
-                        {
-                            "chunkId": candidate.get("chunk_id") or candidate.get("chunkId"),
-                            "documentName": candidate.get("document") or candidate.get("documentName"),
-                            "page": candidate.get("page"),
-                            "score": candidate.get("score"),
-                            "contentSha256": candidate_value(
-                                candidate, "content_sha256", "contentSha256"
-                            ),
-                            "baseScore": candidate_value(
-                                candidate, "base_score", "baseScore"
-                            ),
-                            "semanticScore": candidate_value(
-                                candidate, "semantic_score", "semanticScore"
-                            ),
-                            "keywordScore": candidate_value(
-                                candidate, "keyword_score", "keywordScore"
-                            ),
-                            "exactTokenCoverage": candidate_value(
-                                candidate, "exact_token_coverage", "exactTokenCoverage"
-                            ),
-                            "inventoryFieldScore": candidate_value(
-                                candidate, "inventory_field_score", "inventoryFieldScore"
-                            ),
-                            "rerankerApplied": candidate_value(
-                                candidate, "reranker_applied", "rerankerApplied"
-                            ),
-                            "rerankerScore": candidate_value(
-                                candidate, "reranker_score", "rerankerScore"
-                            ),
-                            "rerankerRawScore": candidate_value(
-                                candidate, "reranker_raw_score", "rerankerRawScore"
-                            ),
-                            "rerankerRank": candidate_value(
-                                candidate, "reranker_rank", "rerankerRank"
-                            ),
-                            "snapshotRetrievalMode": retrieval_item.get(
-                                "retrieval_mode"
-                            ),
-                            "snapshotRetrievalQuery": (
-                                retrieval_item.get("retrieval_query")
-                                or question
-                            ),
-                        }
+                        snapshot_candidate_payload(candidate, retrieval_item, question)
                         for candidate in ranked_candidates
                         if isinstance(candidate, dict)
                         and (candidate.get("chunk_id") or candidate.get("chunkId"))
@@ -520,6 +775,15 @@ def build_dataset(
                 last_answer = answer
                 if not answer:
                     raise RuntimeError("The chat endpoint returned an empty answer")
+
+                if str(chat_response.get("failure_stage") or "").casefold() == (
+                    "evaluation_snapshot_contract"
+                ):
+                    raise NonRetryableEvaluationError(
+                        str(chat_response.get("pipeline_error") or "")
+                        or "Backend rejected the locked retrieval snapshot contract.",
+                        category="pipeline_contract",
+                    )
 
                 contexts = contexts_from_chat(chat_response)
                 answerable = bool(item.get("answerable"))
@@ -586,6 +850,18 @@ def build_dataset(
                         "retrieval_mode": chat_response.get("retrieval_mode"),
                         "retrieval_query": chat_response.get("retrieval_query"),
                         "failure_stage": chat_response.get("failure_stage"),
+                        "failure_reason": chat_response.get("failure_reason"),
+                        "rejected_native_answer": chat_response.get(
+                            "rejected_native_answer"
+                        ),
+                        "citation_validation": chat_response.get(
+                            "citation_validation"
+                        ),
+                        "context_count_before_failure": chat_response.get(
+                            "context_count_before_failure",
+                            len(contexts),
+                        ),
+                        "pipeline_error": chat_response.get("pipeline_error"),
                         "pipeline_failed": False,
                         "failure_category": None,
                         "generation_failed": False,
@@ -669,9 +945,37 @@ def build_dataset(
                         if last_chat_response
                         else None
                     ),
+                    "failure_reason": (
+                        last_chat_response.get("failure_reason")
+                        if last_chat_response
+                        else None
+                    ),
+                    "rejected_native_answer": (
+                        last_chat_response.get("rejected_native_answer")
+                        if last_chat_response
+                        else None
+                    ),
+                    "citation_validation": (
+                        last_chat_response.get("citation_validation")
+                        if last_chat_response
+                        else None
+                    ),
+                    "context_count_before_failure": (
+                        last_chat_response.get(
+                            "context_count_before_failure",
+                            len(failure_contexts),
+                        )
+                        if last_chat_response
+                        else len(failure_contexts)
+                    ),
                     "pipeline_failed": True,
                     "failure_category": last_failure_category,
-                    "pipeline_error": str(last_error),
+                    "pipeline_error": (
+                        last_chat_response.get("pipeline_error")
+                        if last_chat_response
+                        and last_chat_response.get("pipeline_error")
+                        else str(last_error)
+                    ),
                     "generation_failed": generation_failed,
                     "generation_error": str(last_error) if generation_failed else "",
                 }

@@ -47,6 +47,27 @@ def parse_keywords(value: Any) -> list[str]:
     return output
 
 
+def parse_source_documents(value: Any) -> list[str]:
+    """Parse explicitly interchangeable source documents.
+
+    ``||`` means that any listed document independently supports the complete
+    ground-truth answer. A single ``|`` remains reserved for keyword lists and
+    is deliberately not accepted here, preventing accidental filename splits.
+    """
+    text = normalize_optional(value)
+    if not text:
+        return []
+    output: list[str] = []
+    seen: set[str] = set()
+    for part in re.split(r"\s*\|\|\s*", text):
+        clean = part.strip()
+        key = clean.casefold()
+        if clean and key not in NULL_VALUES and key not in seen:
+            seen.add(key)
+            output.append(clean)
+    return output
+
+
 def infer_language_from_path(path: Path) -> str:
     name = path.name.casefold()
     if "indonesia" in name or "indonesian" in name or re.search(r"(^|[_-])id([_.-]|$)", name):
@@ -74,16 +95,17 @@ def _canonical_row(
         raise ValueError(f"Empty expected_answer at {source_path}:{index + 1}")
 
     answerable = parse_bool(row.get("answerable"), field_name="answerable")
-    source_document = normalize_optional(row.get("source_document"))
+    source_documents = parse_source_documents(row.get("source_document"))
     keywords = parse_keywords(row.get("expected_answer_keywords"))
 
-    if answerable and not source_document:
+    if answerable and not source_documents:
         raise ValueError(
             f"Answerable row has no source_document at {source_path}:{index + 1}"
         )
-    if not answerable and source_document:
+    if not answerable and source_documents:
         raise ValueError(
-            f"Unanswerable row unexpectedly has source_document={source_document!r} "
+            "Unanswerable row unexpectedly has source_document="
+            f"{source_documents!r} "
             f"at {source_path}:{index + 1}"
         )
 
@@ -96,11 +118,14 @@ def _canonical_row(
         "answerable": answerable,
         "expected_answer": expected_answer,
         "expected_answer_keywords": keywords,
-        "references": (
-            [{"document": source_document, "page": ""}]
-            if source_document
-            else []
-        ),
+        "references": [
+            {
+                "document": document,
+                "page": "",
+                "acceptable_alternative": len(source_documents) > 1,
+            }
+            for document in source_documents
+        ],
         "source_dataset": source_path.name,
     }
 

@@ -25,9 +25,13 @@ import { Header } from './components/Header';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatFooter } from './components/ChatFooter';
 import { TTSButton } from './components/TTSButton'; // <-- IMPORT BARU TTS
+import {
+  useUiLanguage,
+  type UiLanguage,
+} from './i18n/LanguageContext';
 
 // UI VERSION: ANSWER + STRUCTURED CITATIONS + CONFIDENCE
-type DetectedLanguage = 'ID' | 'EN';
+type DetectedLanguage = UiLanguage;
 type UploadMode = 'photo' | 'file';
 
 const TypewriterMarkdown: React.FC<{
@@ -143,7 +147,8 @@ const toPercent = (
 };
 
 const getSourceLocationLabels = (
-  source: MessageSource
+  source: MessageSource,
+  language: UiLanguage
 ): string[] => {
   const labels: string[] = [];
   const documentType = (
@@ -166,13 +171,17 @@ const getSourceLocationLabels = (
     source.page !== null &&
     String(source.page).trim() !== ''
   ) {
-    labels.push(`Page ${source.page}`);
+    labels.push(
+      `${language === 'EN' ? 'Page' : 'Halaman'} ${source.page}`
+    );
   }
 
   const chapter =
     source.chapter ?? source.section;
   if (chapter && documentType !== 'txt') {
-    labels.push(`Chapter: ${chapter}`);
+    labels.push(
+      `${language === 'EN' ? 'Chapter' : 'Bab'}: ${chapter}`
+    );
   }
 
   if (
@@ -185,8 +194,8 @@ const getSourceLocationLabels = (
     labels.push(
       paragraphEnd ===
         source.paragraphStart
-        ? `Paragraph ${source.paragraphStart}`
-        : `Paragraphs ${source.paragraphStart}–${paragraphEnd}`
+        ? `${language === 'EN' ? 'Paragraph' : 'Paragraf'} ${source.paragraphStart}`
+        : `${language === 'EN' ? 'Paragraphs' : 'Paragraf'} ${source.paragraphStart}–${paragraphEnd}`
     );
   }
 
@@ -216,6 +225,7 @@ const CitationPanel: React.FC<{
 }> = ({
   message,
 }) => {
+  const { language, t } = useUiLanguage();
   const [expandedSources, setExpandedSources] =
     useState<Set<number>>(() => new Set());
 
@@ -273,10 +283,10 @@ const CitationPanel: React.FC<{
   return (
     <section
       className="mt-5 pt-2 text-white"
-      aria-label="Sumber jawaban"
+      aria-label={t('sources')}
     >
       <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white md:text-[13px]">
-        Sumber
+        {t('sources')}
       </p>
 
       <div className="mt-3 grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
@@ -284,7 +294,8 @@ const CitationPanel: React.FC<{
           (source, index) => {
             const locationLabels =
               getSourceLocationLabels(
-                source
+                source,
+                language
               );
             const sourceMatch =
               toPercent(
@@ -336,7 +347,7 @@ const CitationPanel: React.FC<{
 
                       {sourceMatch !== undefined && (
                         <span className="font-medium text-[#AFC7FF]">
-                          Relevance {sourceMatch}%
+                          {language === 'EN' ? 'Relevance' : 'Relevansi'} {sourceMatch}%
                         </span>
                       )}
                     </span>
@@ -379,7 +390,15 @@ const CitationPanel: React.FC<{
       {confidence !== undefined &&
         confidenceLevel && (
           <p className="mt-4 text-[12px] font-medium text-white md:text-[13px]">
-            Confidence: {confidenceLevel} ({confidence}%)
+            {language === 'EN' ? 'Confidence' : 'Keyakinan'}:{' '}
+            {language === 'EN'
+              ? confidenceLevel
+              : confidenceLevel === 'High'
+                ? 'Tinggi'
+                : confidenceLevel === 'Medium'
+                  ? 'Sedang'
+                  : 'Rendah'}{' '}
+            ({confidence}%)
           </p>
         )}
     </section>
@@ -469,6 +488,7 @@ const ProgressIndicator: React.FC<{
   events,
 }) => {
   const reduceMotion = useReducedMotion();
+  const { language, t } = useUiLanguage();
 
   if (!active || events.length === 0) {
     return null;
@@ -478,11 +498,11 @@ const ProgressIndicator: React.FC<{
     <section
       className="mx-1 max-w-[720px] bg-transparent px-1 py-2 md:mx-2 md:px-0"
       aria-live="polite"
-      aria-label="Progres penyusunan jawaban"
+      aria-label={t('answerProgress')}
     >
       <div className="mb-2.5 flex items-center justify-between gap-3 border-b border-white/[0.07] pb-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-white/58 md:text-[11px]">
-          Progres jawaban
+          {t('answerProgress')}
         </p>
 
         <div className="flex items-center gap-1.5 text-[9px] text-white/35 md:text-[10px]">
@@ -496,7 +516,7 @@ const ProgressIndicator: React.FC<{
             transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
             aria-hidden="true"
           />
-          Tahap backend aktual
+          {language === 'EN' ? 'Live backend stages' : 'Tahap backend aktual'}
         </div>
       </div>
 
@@ -577,6 +597,12 @@ const ProgressIndicator: React.FC<{
 };
 
 export const App: React.FC = () => {
+  const {
+    language: detectedLanguage,
+    setLanguage: setUiLanguage,
+    t,
+  } = useUiLanguage();
+
   const [isFirstMessage, setIsFirstMessage] =
     useState(true);
 
@@ -607,19 +633,18 @@ export const App: React.FC = () => {
     progressEvents,
     sendMessage,
     loadConversation,
-    setLanguage,
+    setLanguage: setChatLanguage,
     model,
     setModel,
     stopGenerating,
     clearChat,
   } = useChat({
-    initialLanguage: 'ID',
+    initialLanguage: detectedLanguage,
   });
 
-  const [
-    detectedLanguage,
-    setDetectedLanguage,
-  ] = useState<DetectedLanguage>('ID');
+  useEffect(() => {
+    setChatLanguage(detectedLanguage);
+  }, [detectedLanguage, setChatLanguage]);
 
   const chatContainerRef =
     useRef<HTMLDivElement>(null);
@@ -784,24 +809,6 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const handleAttachFileClick = (
-    mode: UploadMode = 'file'
-  ) => {
-    if (!fileInputRef.current) {
-      return;
-    }
-
-    fileInputRef.current.accept =
-      mode === 'photo'
-        ? 'image/png,image/jpeg,image/jpg,image/webp'
-        : '.pdf,.doc,.docx,.txt,.csv';
-
-    fileInputRef.current.dataset.uploadMode =
-      mode;
-
-    fileInputRef.current.click();
-  };
-
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -855,8 +862,8 @@ export const App: React.FC = () => {
       ) {
         alert(
           uploadMode === 'photo'
-            ? 'Upload Foto hanya menerima PNG, JPG, JPEG, atau WEBP.'
-            : 'Upload File hanya menerima PDF, DOC, DOCX, TXT, atau CSV.'
+            ? t('photoFormatError')
+            : t('fileFormatError')
         );
       }
 
@@ -893,7 +900,7 @@ export const App: React.FC = () => {
 
     if (!SpeechRecognition) {
       alert(
-        'Maaf, browser Anda tidak mendukung fitur mikrofon. Harap gunakan Google Chrome atau Edge.'
+        t('microphoneUnsupported')
       );
 
       return;
@@ -970,8 +977,8 @@ export const App: React.FC = () => {
   const handleLanguageChange = (
     language: DetectedLanguage
   ) => {
-    setDetectedLanguage(language);
-    setLanguage(language);
+    setUiLanguage(language);
+    setChatLanguage(language);
   };
 
   const handleSendMessage = async (
@@ -988,7 +995,7 @@ export const App: React.FC = () => {
             id: `stopped-${Date.now()}`,
             role: 'system',
             content:
-              'Permintaan dihentikan oleh pengguna. Jawaban tidak dibuat.',
+              t('requestStopped'),
           },
         ]
       );
@@ -1025,7 +1032,7 @@ export const App: React.FC = () => {
   const handleClearChat = () => {
     const shouldClear =
       window.confirm(
-        'Hapus seluruh riwayat obrolan di layar?'
+        t('clearChatConfirm')
       );
 
     if (!shouldClear) {
@@ -1103,7 +1110,7 @@ export const App: React.FC = () => {
               id: `invalid-conversation-${Date.now()}`,
               role: 'system',
               content:
-                'ID percakapan tidak valid. Riwayat tidak bisa dibuka.',
+                t('invalidConversation'),
             },
           ]
         );
@@ -1157,8 +1164,8 @@ export const App: React.FC = () => {
         conversationLanguage === 'ID' ||
         conversationLanguage === 'EN'
       ) {
-        setDetectedLanguage(conversationLanguage);
-        setLanguage(conversationLanguage);
+        setUiLanguage(conversationLanguage);
+        setChatLanguage(conversationLanguage);
       }
 
       window.setTimeout(() => {
@@ -1180,11 +1187,11 @@ export const App: React.FC = () => {
       );
 
       window.alert(
-        'Teks jawaban berhasil disalin!'
+        t('answerCopied')
       );
     } catch {
       window.alert(
-        'Teks jawaban gagal disalin.'
+        t('answerCopyFailed')
       );
     }
   };
@@ -1258,8 +1265,8 @@ export const App: React.FC = () => {
                   ? 'opacity-100 translate-y-0 scale-100'
                   : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
               }`}
-              aria-label="Gulir ke pesan terbaru"
-              title="Gulir ke pesan terbaru"
+              aria-label={t('scrollLatest')}
+              title={t('scrollLatest')}
             >
               <span className="material-symbols-outlined text-xl">
                 arrow_downward
@@ -1280,9 +1287,6 @@ export const App: React.FC = () => {
             <WelcomeScreen
               onSendMessage={
                 handleSendMessage
-              }
-              onAttachFileClick={
-                handleAttachFileClick
               }
               onMicClick={
                 handleMicClick
@@ -1418,8 +1422,8 @@ export const App: React.FC = () => {
                                 )
                               }
                               className="material-symbols-outlined p-0 text-[19px] text-white/60 transition-colors hover:text-white"
-                              title="Salin Teks"
-                              aria-label="Salin teks"
+                              title={detectedLanguage === 'EN' ? 'Copy text' : 'Salin teks'}
+                              aria-label={detectedLanguage === 'EN' ? 'Copy text' : 'Salin teks'}
                             >
                               content_copy
                             </button>
@@ -1463,9 +1467,6 @@ export const App: React.FC = () => {
                       index
                   )
               )
-            }
-            onAttachFileClick={
-              handleAttachFileClick
             }
             onMicClick={
               handleMicClick

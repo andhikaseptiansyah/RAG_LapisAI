@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTTS } from '../hooks/useTTS';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 interface TTSButtonProps {
   text: string;
@@ -15,6 +16,7 @@ export const TTSButton: React.FC<TTSButtonProps> = ({
   language,
 }) => {
   const { speak, stop, isPlaying } = useTTS();
+  const { language: uiLanguage } = useUiLanguage();
 
   if (!isSpeechSupported()) return null;
 
@@ -35,8 +37,16 @@ export const TTSButton: React.FC<TTSButtonProps> = ({
           ? 'text-[#AFC7FF] animate-pulse'
           : 'text-white/60 hover:text-white'
       }`}
-      title={isPlaying ? 'Hentikan' : 'Dengarkan'}
-      aria-label={isPlaying ? 'Hentikan pembacaan teks' : 'Putar pembacaan teks'}
+      title={
+        isPlaying
+          ? uiLanguage === 'EN' ? 'Stop' : 'Hentikan'
+          : uiLanguage === 'EN' ? 'Listen' : 'Dengarkan'
+      }
+      aria-label={
+        isPlaying
+          ? uiLanguage === 'EN' ? 'Stop text playback' : 'Hentikan pembacaan teks'
+          : uiLanguage === 'EN' ? 'Play text aloud' : 'Putar pembacaan teks'
+      }
     >
       <span className="material-symbols-outlined">
         {isPlaying ? 'stop_circle' : 'volume_up'}

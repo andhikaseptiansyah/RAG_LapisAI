@@ -64,7 +64,7 @@ GroundingValidation = GroundingDecision
 STOPWORDS = {
     "yang", "dan", "atau", "adalah", "dengan", "untuk", "dalam", "pada", "dari",
     "ke", "sebagai", "oleh", "ini", "itu", "tersebut", "harus", "dapat", "akan",
-    "juga", "kepada",
+    "juga", "kepada", "terhadap", "atas",
     "the", "and", "or", "is", "are", "was", "were", "with", "for", "to", "in",
     "on", "of", "by", "this", "that", "must", "can", "will", "a", "an",
     "according", "based", "berdasarkan", "document", "dokumen", "source", "sumber",
@@ -90,9 +90,14 @@ PERCENT_PATTERN = re.compile(
 )
 NUMBER_UNIT_PATTERN = re.compile(
     rf"\b({NUMBER_CORE}|\d+\s*[x×]\s*\d+)\s*"
-    r"(GB|MB|TB|KB|minutes?|mins?|hours?|hrs?|working\s+days?|business\s+days?|days?|weeks?|months?|years?|"
-    r"seconds?|secs?|menit|jam|hari\s+kerja|hari|minggu|bulan|tahun|detik|characters?|chars?|karakter|"
-    r"requests?|calls?|customers?|pelanggan)\b",
+    r"(GB|MB|TB|KB|minutes?|mins?|hours?|hrs?|working\s+days?|business\s+days?|"
+    r"consecutive\s+days?|days?|weeks?|months?|years?|seconds?|secs?|menit|jam|"
+    r"hari\s+kerja|hari\s+berturut-turut|hari|minggu|bulan|tahun|detik|"
+    r"characters?|chars?|karakter|requests?|calls?|customers?|pelanggan)\b",
+    flags=re.I,
+)
+LEAVE_DAY_QUANTITY_PATTERN = re.compile(
+    rf"\b({NUMBER_CORE})\s+(?:unused\s+)?leave\s+days?\b",
     flags=re.I,
 )
 PLAIN_NUMBER_PATTERN = re.compile(r"\b\d+(?:[.,]\d+)?(?:st|nd|rd|th)?\b", flags=re.I)
@@ -111,8 +116,9 @@ CONDITIONAL_COMMA_PREFIX = re.compile(
 )
 GROUNDING_PREAMBLE = re.compile(
     r"^\s*(?:"
-    r"berdasarkan\s+(?:ketentuan\s+pada\s+)?(?:dokumen|sumber)(?:\s+yang\s+tersedia)?"
-    r"|menurut\s+(?:dokumen|sumber)"
+    r"berdasarkan\s+(?:ketentuan\s+pada\s+)?(?:dokumen|sumber|bukti|konteks|informasi)"
+    r"(?:\s+yang\s+(?:tersedia|diberikan))?"
+    r"|menurut\s+(?:dokumen|sumber|bukti|konteks|informasi)"
     r"|according\s+to\s+(?:the\s+)?(?:document|source|evidence)"
     r"|based\s+on\s+(?:the\s+)?(?:document|source|evidence)"
     r")\s*[:,]?\s*",
@@ -243,6 +249,332 @@ GROUNDING_CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
         "infrastructure head",
         "kepala infrastruktur",
     ),
+    # BILINGUAL_POLICY_GROUNDING_V15: the local model often uses natural
+    # Indonesian word order instead of the exact retrieval alias. These remain
+    # subject/relation aliases only; answer values are still verified strictly
+    # by ``_fact_entries`` against one evidence unit.
+    "payslip": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("payslip", ()),
+        "slip pembayaran gaji",
+        "dokumen slip gaji",
+        "akses slip gaji",
+        "menemukan slip gaji",
+    ))),
+    "salary_payment": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("salary_payment", ()),
+        "jadwal pembayaran gaji",
+        "tanggal pembayaran gaji",
+        "gaji diterima",
+        "gaji masuk",
+    ))),
+    "remote_work": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("remote_work", ()),
+        "melakukan pekerjaan dari rumah",
+        "menjalankan pekerjaan dari rumah",
+        "izin kerja dari rumah",
+        "hari kerja dari rumah",
+    ))),
+    "lost_company_device": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("lost_company_device", ()),
+        "kehilangan laptop kantor",
+        "kehilangan laptop perusahaan",
+        "kehilangan perangkat kantor",
+        "laptop kerja hilang",
+        "perangkat perusahaan hilang",
+        "melaporkan laptop hilang",
+    ))),
+    "harassment_reporting": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("harassment_reporting", ()),
+        "kebijakan anti pelecehan",
+        "sikap terhadap pelecehan",
+        "pelaporan pelecehan",
+        "pengaduan pelecehan",
+    ))),
+    "byod": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("byod", ()),
+        "perangkat milik pribadi",
+        "gawai pribadi",
+        "data pada perangkat pribadi",
+        "menghapus data perangkat pribadi",
+    ))),
+    "conflict_of_interest": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("conflict_of_interest", ()),
+        "potensi benturan kepentingan",
+        "deklarasi konflik kepentingan",
+        "melaporkan konflik kepentingan",
+        "menyampaikan konflik kepentingan",
+    ))),
+    "annual_leave": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("annual_leave", ()),
+        "hak cuti tahunan",
+        "jatah cuti tahunan",
+        "jumlah cuti tahunan",
+        "cuti per tahun",
+    ))),
+    "hotel_limit": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("hotel_limit", ()),
+        "batas biaya hotel",
+        "maksimal biaya hotel",
+        "biaya hotel dibatasi",
+        "hotel dibatasi maksimal",
+        "tarif hotel maksimum",
+        "plafon hotel",
+    ))),
+    "remote_work_eligibility": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("remote_work_eligibility", ()),
+        "kelayakan kerja jarak jauh",
+        "syarat kerja jarak jauh",
+        "boleh mengajukan kerja jarak jauh",
+        "dapat mengajukan remote work",
+        "hak untuk bekerja jarak jauh",
+    ))),
+}
+
+
+# Concept aliases establish the subject. These narrower equivalence groups
+# establish translated relationship words inside one claim. A group contributes
+# only when one of its phrases occurs in the claim and another phrase from the
+# same group occurs in the same evidence unit. Unsupported explanatory tails
+# therefore remain uncovered instead of receiving a blanket translation pass.
+GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
+    "organization": (
+        "company", "the company", "corporate", "organization",
+        "perusahaan", "organisasi",
+    ),
+    "employee": (
+        "employee", "employees", "staff", "worker", "workers",
+        "karyawan", "pegawai", "pekerja",
+    ),
+    "confirmed_employee": (
+        "confirmed employee", "confirmed employees", "permanent employee",
+        "permanent employees", "karyawan tetap", "pegawai tetap",
+    ),
+    "all": ("all", "every", "seluruh", "semua"),
+    "person": (
+        "person", "people", "persons", "dependent", "dependents",
+        "orang", "tanggungan",
+    ),
+    "cover": (
+        "cover", "covers", "covered", "include", "includes", "included",
+        "mencakup", "meliputi", "tercakup",
+    ),
+    "up_to": (
+        "up to", "a maximum of", "maximum of", "maximum", "hingga", "sampai dengan",
+        "maksimal", "maksimum", "paling banyak",
+    ),
+    "unused": ("unused", "not used", "tidak terpakai", "belum terpakai"),
+    "calendar_option": (
+        "calendar sharing option", "sharing option", "share calendar option",
+        "opsi berbagi kalender", "opsi membagikan kalender",
+    ),
+    "grant": (
+        "grant", "grants", "give", "gives", "provide", "provides",
+        "berikan", "memberikan", "beri",
+    ),
+    "view_access": (
+        "view access", "read access", "access to view",
+        "akses lihat", "akses membaca", "akses baca",
+    ),
+    "colleague": (
+        "colleague", "colleagues", "coworker", "coworkers", "co worker",
+        "rekan kerja", "kolega",
+    ),
+    "relevant": ("relevant", "related", "terkait", "bersangkutan"),
+    "available": (
+        "available", "accessible", "can find", "can access",
+        "find", "found", "locate", "located", "access",
+        "tersedia", "dapat ditemukan", "dapat diakses", "menemukan",
+        "mengakses", "berada", "terletak",
+    ),
+    "portal": ("portal", "hr portal", "portal hr"),
+    "section": (
+        "under", "in the section", "under the section", "menu", "section",
+        "pada bagian", "di bagian", "bagian", "di menu", "melalui menu",
+    ),
+    "after": ("after", "following", "once past", "setelah", "sesudah"),
+    "salary": ("salary", "salaries", "payroll salary", "gaji"),
+    "paid": (
+        "paid", "is paid", "are paid", "payment", "dibayar", "dibayarkan",
+        "pembayaran",
+    ),
+    "following": ("following", "next", "subsequent", "berikutnya", "selanjutnya"),
+    "month": ("month", "monthly", "each month", "bulan", "bulanan", "setiap bulan"),
+    "calendar_frequency": (
+        "each", "every", "per", "setiap", "tiap", "per bulan", "per month",
+    ),
+    "approved": ("approved", "authorized", "disetujui", "telah disetujui"),
+    "business": (
+        "business", "business tool", "business tools", "work purpose",
+        "bisnis", "keperluan kerja",
+    ),
+    "budget": ("budget", "it budget", "anggaran", "anggaran it"),
+    "funded": (
+        "covered by", "paid by", "paid from", "funded by",
+        "ditanggung", "dibayar dari", "dibiayai",
+    ),
+    "policy": (
+        "policy", "policies", "policy rule", "zero tolerance",
+        "kebijakan", "ketentuan",
+    ),
+    "apply_policy": (
+        "apply", "applies", "implement", "implements", "has",
+        "menerapkan", "memberlakukan", "memiliki",
+    ),
+    "zero_tolerance": (
+        "zero tolerance", "no tolerance", "without tolerance",
+        "tanpa toleransi", "nol toleransi",
+    ),
+    "harassment": (
+        "harassment", "workplace harassment", "pelecehan",
+        "pelecehan di tempat kerja", "tindakan pelecehan",
+    ),
+    "any_form": ("any form", "all forms", "every form", "segala bentuk", "semua bentuk"),
+    "complaint": ("complaint", "complaints", "grievance", "keluhan", "pengaduan"),
+    "report": (
+        "report", "reports", "reported", "raise", "raised", "submit",
+        "notify", "inform", "contact",
+        "lapor", "laporkan", "melaporkan", "dilaporkan", "diajukan",
+        "mengajukan", "beri tahu", "memberi tahu", "hubungi", "menghubungi",
+    ),
+    "immediately": (
+        "immediately", "at once", "without delay", "promptly",
+        "segera", "secepatnya", "langsung", "tanpa penundaan",
+    ),
+    "it_team": (
+        "it", "it team", "it support", "service desk", "helpdesk",
+        "tim it", "bagian it", "dukungan it", "meja layanan it",
+    ),
+    "device": (
+        "device", "devices", "laptop", "equipment",
+        "perangkat", "laptop", "gawai", "peralatan",
+    ),
+    "purpose_link": (
+        "so that", "so the", "to allow", "in order to", "so it can",
+        "agar", "supaya", "sehingga dapat", "untuk memungkinkan",
+    ),
+    "confidential": (
+        "confidential", "confidentially", "in confidence",
+        "rahasia", "secara rahasia", "dengan rahasia",
+    ),
+    "via": (
+        "via", "through", "using", "use",
+        "melalui", "menggunakan", "gunakan",
+    ),
+    "channel": ("channel", "channels", "jalur", "saluran"),
+    "enroll": (
+        "enroll", "enrolled", "register", "registered",
+        "daftarkan", "didaftarkan", "terdaftar",
+    ),
+    "work_email": (
+        "work email", "corporate email", "company email",
+        "email kantor", "email perusahaan",
+    ),
+    "remote_wipe": (
+        "remote wipe", "remotely wipe", "remotely wiped", "wipe remotely",
+        "remote wiping", "erase remotely", "remotely erase",
+        "hapus jarak jauh", "menghapus dari jarak jauh", "dihapus dari jarak jauh",
+        "penghapusan jarak jauh", "menghapus data secara jarak jauh", "jarak jauh",
+    ),
+    "remove_data": (
+        "wipe", "wiped", "remotely wiped", "wipe data", "wipe corporate data",
+        "erase data", "delete data", "remove data", "data can be wiped",
+        "data can be erased",
+        "hapus data", "menghapus data", "penghapusan data", "data dihapus",
+        "dihapus datanya", "membersihkan data",
+    ),
+    "corporate_data": (
+        "corporate data", "company data", "business data",
+        "data korporat", "data perusahaan",
+    ),
+    "right_or_permission": (
+        "reserves the right", "has the right", "may", "is permitted", "can",
+        "berhak", "memiliki hak", "diperbolehkan", "diizinkan", "boleh", "dapat",
+    ),
+    "potential": ("potential", "possible", "potensi", "berpotensi"),
+    "disclose": (
+        "disclose", "disclosed", "declare", "declared",
+        "ungkapkan", "mengungkapkan", "diungkapkan", "dideklarasikan",
+    ),
+    "in_writing": ("in writing", "written", "written disclosure", "secara tertulis", "tertulis"),
+    "entitled": (
+        "entitled", "eligible", "entitlement", "has the right",
+        "berhak", "memiliki hak", "hak",
+    ),
+    "accrue_monthly": (
+        "accrue monthly", "accrues monthly", "accruing monthly",
+        "accrued monthly", "monthly accrual",
+        "terakumulasi setiap bulan", "terakumulasi tiap bulan",
+        "diakumulasi setiap bulan", "diakumulasi tiap bulan",
+        "bertambah setiap bulan", "bertambah tiap bulan",
+    ),
+    "required": (
+        "require", "requires", "required", "must", "mandatory", "needed",
+        "diperlukan", "harus", "wajib", "dibutuhkan",
+    ),
+    "condition": ("if", "when", "for", "beyond", "apabila", "jika", "ketika"),
+    "longer_than": (
+        "beyond", "longer than", "more than", "exceed", "exceeds",
+        "lebih dari", "melebihi",
+    ),
+    "duration_relation": (
+        "last", "lasts", "lasting", "longer than",
+        "berlangsung", "selama",
+    ),
+    "consecutive": ("consecutive", "consecutively", "berturut turut", "berturut-turut"),
+    "per_year": ("per year", "each year", "annually", "per tahun", "setiap tahun"),
+    "password": ("password", "passwords", "kata sandi", "sandi"),
+    "minimum": ("at least", "minimum", "minimal", "sekurang kurangnya"),
+    "contain": (
+        "include", "includes", "including", "contain", "contains", "comprise",
+        "mencakup", "terdiri dari", "memiliki",
+    ),
+    "uppercase": (
+        "upper case", "uppercase", "capital letter", "capital letters", "huruf besar",
+    ),
+    "lowercase": (
+        "lower case", "lowercase", "lowercase letter", "lowercase letters",
+        "small letter", "small letters", "huruf kecil",
+    ),
+    "numeric_character": ("number", "numbers", "digit", "digits", "angka"),
+    "symbol": ("symbol", "symbols", "special character", "special characters", "simbol"),
+    "purchase": ("purchase", "purchases", "procurement", "pembelian", "pengadaan"),
+    "below": (
+        "below", "under", "less than", "valued below", "with a value below",
+        "di bawah", "kurang dari", "dengan nilai di bawah",
+    ),
+    "approve": (
+        "approval", "approve", "approves", "approved by", "requires approval from",
+        "menyetujui", "disetujui oleh", "persetujuan dari",
+    ),
+    "manager": ("manager", "managers", "manajer"),
+    "eligible": ("eligible", "may request", "can request", "berhak", "dapat mengajukan"),
+    "manager_approval": (
+        "manager approval", "approval from the manager", "with manager approval",
+        "subject to manager approval", "manager's approval", "requires manager approval",
+        "persetujuan manajer", "dengan persetujuan manajer",
+        "atas persetujuan manajer", "setelah disetujui manajer",
+        "memerlukan persetujuan manajer", "harus mendapat persetujuan manajer",
+        "setelah mendapat persetujuan manajer", "dengan izin manajer",
+    ),
+    "weekly": (
+        "per week", "each week", "weekly", "in a week",
+        "per minggu", "setiap minggu", "dalam seminggu", "tiap minggu",
+    ),
+    "hotel_cost": (
+        "hotel cost", "hotel rate", "hotel expense", "lodging cost",
+        "biaya hotel", "tarif hotel", "ongkos hotel", "biaya penginapan",
+    ),
+    "cap": (
+        "capped", "is capped", "limited to", "limit", "maximum",
+        "dibatasi", "batas", "maksimal", "maksimum", "plafon",
+    ),
+    "per_night": (
+        "per night", "each night", "nightly", "per malam", "setiap malam",
+    ),
+    "domestic_travel": (
+        "domestic travel", "domestic business travel", "domestic trip",
+        "perjalanan domestik", "perjalanan dinas domestik", "dinas dalam negeri",
+    ),
 }
 
 # These qualifiers materially change the meaning of a claim. A generated claim
@@ -256,13 +588,15 @@ QUALIFIER_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "exclusive": re.compile(r"\b(?:only|solely|exclusively|hanya)\b", flags=re.I),
     "minimum": re.compile(
-        r"\b(?:at\s+least|minimum|minimal|no\s+less\s+than|sekurang-kurangnya)\b",
+        r"\b(?:at\s+least|minimum|minimal|no\s+less\s+than|more\s+than|"
+        r"longer\s+than|beyond|exceed(?:s|ed)?|sekurang-kurangnya|lebih\s+dari|"
+        r"melebihi)\b",
         flags=re.I,
     ),
     "maximum": re.compile(
-        r"\b(?:up\s+to|within|maximum|maximal|maksimal|no\s+more\s+than|"
-        r"no\s+later\s+than|paling\s+banyak|paling\s+lambat|selambat-lambatnya|"
-        r"dalam\s+waktu)\b",
+        r"\b(?:up\s+to|within|maximum|maximal|maksimal|maksimum|no\s+more\s+than|"
+        r"capped|cap|limited\s+to|no\s+later\s+than|paling\s+banyak|paling\s+lambat|selambat-lambatnya|"
+        r"dalam\s+waktu|below|under|di\s+bawah)\b",
         flags=re.I,
     ),
     "exception": re.compile(r"\b(?:except|unless|excluding|kecuali)\b", flags=re.I),
@@ -352,6 +686,47 @@ def _grounding_concepts(value: str) -> set[str]:
     }
 
 
+def _normalized_phrase(value: str) -> str:
+    normalized = re.sub(
+        r"[^a-z0-9à-ÿ]+",
+        " ",
+        normalize_text(value),
+    )
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _matched_equivalent_tokens(
+    value: str,
+    aliases: tuple[str, ...],
+) -> set[str]:
+    """Return tokens belonging to aliases that occur as complete phrases."""
+    normalized = _normalized_phrase(value)
+    if not normalized:
+        return set()
+    padded = f" {normalized} "
+    matched: set[str] = set()
+    for alias in aliases:
+        candidate = _normalized_phrase(alias)
+        if candidate and f" {candidate} " in padded:
+            matched.update(_tokenize(candidate))
+    return matched
+
+
+def _equivalent_group_occurs(
+    value: str,
+    aliases: tuple[str, ...],
+) -> bool:
+    """Return True even when a matched phrase contains only short words."""
+    normalized = _normalized_phrase(value)
+    if not normalized:
+        return False
+    padded = f" {normalized} "
+    return any(
+        candidate and f" {candidate} " in padded
+        for candidate in (_normalized_phrase(alias) for alias in aliases)
+    )
+
+
 def _span_overlaps(span: tuple[int, int], occupied: list[tuple[int, int]]) -> bool:
     start, end = span
     return any(start < other_end and end > other_start for other_start, other_end in occupied)
@@ -408,6 +783,16 @@ def _fact_entries(value: str) -> list[tuple[str, str, str]]:
         unit = canonical_unit(match.group(2))
         canonical = f"{number} {unit}".strip()
         add(f"quantity:{number}:{unit}", display, canonical, match.span())
+
+    # English leave prose often places modifiers between the count and unit,
+    # for example ``6 unused leave days``. Record the same strict quantity key
+    # as Indonesian ``enam hari`` without accepting arbitrary separated units.
+    for match in LEAVE_DAY_QUANTITY_PATTERN.finditer(raw):
+        if _span_overlaps(match.span(), occupied):
+            continue
+        display = match.group(0)
+        number = _normalize_number(match.group(1))
+        add(f"quantity:{number}:days", display, f"{number} days", match.span())
 
     for match in VERSION_PATTERN.finditer(raw):
         if _span_overlaps(match.span(), occupied):
@@ -513,7 +898,12 @@ def _atomic_claims(value: Any) -> list[str]:
     seen: set[str] = set()
 
     for raw_sentence in SENTENCE_SPLIT.split(raw_text):
-        sentence = _clean(raw_sentence).lstrip("-? ")
+        sentence = _clean(raw_sentence)
+        sentence = re.sub(
+            r"^(?:(?:#{1,6}|[-*•])\s+|\d{1,2}[.)]\s+)",
+            "",
+            sentence,
+        ).lstrip("-? ")
         # Attribution is presentation text, not an independent factual claim.
         # Removing it before comma splitting prevents false rejection of
         # sentences such as 'Berdasarkan dokumen, ...'.
@@ -694,7 +1084,7 @@ def _canonical_claim_token_coverage(
     claim_tokens = _tokenize(claim)
     if not claim_tokens:
         return 1.0
-    if not claim_concepts or not claim_concepts.issubset(unit_concepts):
+    if claim_concepts and not claim_concepts.issubset(unit_concepts):
         return 0.0
 
     covered = set(claim_tokens.intersection(_tokenize(unit)))
@@ -702,6 +1092,16 @@ def _canonical_claim_token_coverage(
     for concept in claim_concepts:
         for alias in GROUNDING_CONCEPT_ALIASES.get(concept, ()):
             covered.update(claim_tokens.intersection(_tokenize(alias)))
+
+    # Cover only the claim-side words from an equivalence group that is also
+    # explicitly represented in this evidence unit. This supports faithful
+    # translation while keeping unrelated additions visible as uncovered.
+    for aliases in GROUNDING_EQUIVALENT_TERMS.values():
+        claim_alias_tokens = _matched_equivalent_tokens(claim, aliases)
+        if not claim_alias_tokens:
+            continue
+        if _equivalent_group_occurs(unit, aliases):
+            covered.update(claim_tokens.intersection(claim_alias_tokens))
 
     for _, raw, canonical in _fact_entries(claim):
         covered.update(claim_tokens.intersection(_tokenize(raw)))
@@ -755,11 +1155,15 @@ def _claim_support(
         else:
             score = lexical
 
-        canonical_coverage = _canonical_claim_token_coverage(
-            claim,
-            unit,
-            claim_concepts,
-            unit_concepts,
+        canonical_coverage = (
+            _canonical_claim_token_coverage(
+                claim,
+                unit,
+                claim_concepts,
+                unit_concepts,
+            )
+            if claim_tokens
+            else 1.0
         )
         has_explicit_facts = bool(_fact_entries(claim))
         required_coverage = 0.85 if has_explicit_facts else 0.95

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 export interface ConversationQuestion {
   id: string;
@@ -38,6 +39,7 @@ export const ConversationSearch: React.FC<
   onBack,
   sidebarVisible = true,
 }) => {
+  const { language, t } = useUiLanguage();
   const [searchKeyword, setSearchKeyword] =
     useState('');
   const [isSelectionMode, setIsSelectionMode] =
@@ -103,7 +105,7 @@ export const ConversationSearch: React.FC<
     () =>
       filteredConversations.reduce(
         (total, conversation) =>
-          total + Math.max(conversation.questions.length, 1),
+          total + conversation.questions.length,
         0
       ),
     [filteredConversations]
@@ -243,7 +245,7 @@ export const ConversationSearch: React.FC<
       setDeleteError(
         error instanceof Error
           ? error.message
-          : 'Gagal menghapus percakapan terpilih.'
+          : t('failedDeleteSelected')
       );
     } finally {
       setIsDeleting(false);
@@ -268,7 +270,7 @@ export const ConversationSearch: React.FC<
                 type="button"
                 onClick={onBack}
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-white/65 transition-colors hover:bg-white/[0.10] hover:text-white"
-                aria-label="Tutup pencarian percakapan"
+                aria-label={t('closeConversationSearch')}
               >
                 <span className="material-symbols-outlined">
                   arrow_back
@@ -285,7 +287,7 @@ export const ConversationSearch: React.FC<
                   onChange={(event) =>
                     setSearchKeyword(event.target.value)
                   }
-                  placeholder="Cari pertanyaan Anda"
+                  placeholder={t('searchYourQuestions')}
                   autoFocus
                   className="h-12 w-full rounded-2xl border border-white/10 bg-[rgba(27,29,38,0.90)] py-3 pl-14 pr-12 text-[15px] text-white outline-none shadow-[0_14px_40px_rgba(0,0,0,0.34)] backdrop-blur-md placeholder:text-white/35 transition-all focus:border-primary/70 focus:ring-1 focus:ring-primary/30"
                 />
@@ -294,7 +296,7 @@ export const ConversationSearch: React.FC<
                     type="button"
                     onClick={() => setSearchKeyword('')}
                     className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl text-white/40 hover:bg-white/[0.08] hover:text-white"
-                    aria-label="Bersihkan pencarian"
+                    aria-label={t('clearSearch')}
                   >
                     <span className="material-symbols-outlined text-[19px]">
                       close
@@ -307,14 +309,16 @@ export const ConversationSearch: React.FC<
             <div className="my-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
-                  Riwayat percakapan
+                  {t('conversationHistory')}
                 </p>
                 <h1 className="mt-1 font-headline text-xl font-semibold text-white md:text-2xl">
-                  Pertanyaan percakapan Anda
+                  {t('yourConversationQuestions')}
                 </h1>
                 <p className="mt-1 text-xs text-white/40">
-                  {questionCount} pertanyaan dalam{' '}
-                  {filteredConversations.length} percakapan
+                  {t('questionCount', {
+                    questions: questionCount,
+                    conversations: filteredConversations.length,
+                  })}
                 </p>
               </div>
 
@@ -328,7 +332,7 @@ export const ConversationSearch: React.FC<
                   <span className="material-symbols-outlined text-[18px]">
                     select_check_box
                   </span>
-                  Pilih percakapan
+                  {t('selectConversations')}
                 </button>
               ) : (
                 <div className="flex flex-wrap items-center gap-2">
@@ -338,15 +342,15 @@ export const ConversationSearch: React.FC<
                     className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-semibold text-white/70 hover:bg-white/[0.10] hover:text-white"
                   >
                     {allFilteredSelected
-                      ? 'Batalkan semua pilihan'
-                      : 'Pilih semua'}
+                      ? t('deselectAll')
+                      : t('selectAll')}
                   </button>
                   <button
                     type="button"
                     onClick={exitSelectionMode}
                     className="rounded-2xl px-3 py-2.5 text-xs font-semibold text-white/55 hover:bg-white/[0.06] hover:text-white"
                   >
-                    Batal
+                    {t('cancel')}
                   </button>
                   <button
                     type="button"
@@ -360,7 +364,7 @@ export const ConversationSearch: React.FC<
                     <span className="material-symbols-outlined text-[18px]">
                       delete
                     </span>
-                    Hapus {selectedCount || ''}
+                    {t('delete')} {selectedCount || ''}
                   </button>
                 </div>
               )}
@@ -428,7 +432,8 @@ export const ConversationSearch: React.FC<
                           {conversation.title}
                         </p>
                         <p className="mt-0.5 text-[11px] text-white/35">
-                          {questions.length} pertanyaan
+                          {questions.length}{' '}
+                          {language === 'EN' ? 'questions' : 'pertanyaan'}
                         </p>
                       </div>
 
@@ -481,10 +486,10 @@ export const ConversationSearch: React.FC<
                   search_off
                 </span>
                 <p className="font-headline text-base font-semibold text-white/80">
-                  Percakapan tidak ditemukan
+                  {t('conversationsNotFound')}
                 </p>
                 <p className="mt-1 text-sm text-white/35">
-                  Coba pertanyaan atau kata kunci lain.
+                  {t('tryAnotherKeyword')}
                 </p>
               </div>
             )}
@@ -520,11 +525,12 @@ export const ConversationSearch: React.FC<
               id="delete-conversations-title"
               className="mt-5 font-headline text-xl font-semibold text-white"
             >
-              Hapus percakapan terpilih?
+              {t('deleteConversations')}
             </h2>
             <p className="mt-2 text-sm leading-6 text-white/55">
-              Anda akan menghapus {selectedCount} percakapan.
-              Tindakan ini tidak dapat dibatalkan.
+              {t('deleteConversationCount', {
+                count: selectedCount,
+              })}
             </p>
 
             {deleteError && (
@@ -545,7 +551,7 @@ export const ConversationSearch: React.FC<
                 disabled={isDeleting}
                 className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-white/70 hover:bg-white/[0.08] hover:text-white disabled:opacity-50"
               >
-                Tidak, Batal
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -558,7 +564,7 @@ export const ConversationSearch: React.FC<
                     ? 'progress_activity'
                     : 'delete'}
                 </span>
-                {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
+                {isDeleting ? t('deleting') : t('confirmDelete')}
               </button>
             </div>
           </div>

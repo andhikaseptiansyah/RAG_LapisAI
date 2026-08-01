@@ -329,12 +329,20 @@ export const apiRequest = async <
   }
 
   let response: Response;
+  const requestMethod = String(
+    requestOptions.method ?? 'GET'
+  ).toUpperCase();
 
   try {
     response = await fetch(
       `${API_BASE_URL}${endpoint}`,
       {
         ...requestOptions,
+        cache:
+          requestOptions.cache ??
+          (requestMethod === 'GET'
+            ? 'no-store'
+            : undefined),
         headers,
         body: requestBody,
         credentials: 'include',

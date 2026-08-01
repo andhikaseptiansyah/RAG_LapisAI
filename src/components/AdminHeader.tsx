@@ -1,10 +1,12 @@
 import React from 'react';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 interface AdminHeaderProps {
   onToggleSidebar: () => void;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => {
+  const { language } = useUiLanguage();
   return (
     <header className="h-14 md:h-16 relative flex items-center px-4 md:px-8 bg-[#05070d] border-b border-white/5 sticky top-0 z-40 shrink-0">
       {/* Tombol menu mobile */}
@@ -12,8 +14,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => 
         type="button"
         onClick={onToggleSidebar}
         className="md:hidden p-1.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors z-10"
-        aria-label="Open admin menu"
-        title="Open admin menu"
+        aria-label={language === 'EN' ? 'Open admin menu' : 'Buka menu admin'}
+        title={language === 'EN' ? 'Open admin menu' : 'Buka menu admin'}
       >
         <span className="material-symbols-outlined">menu</span>
       </button>

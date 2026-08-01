@@ -4,6 +4,7 @@ import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { useDashboard } from '../hooks/useDashboard';
 import { getQueryLogsDashboard, type QueryLog } from '../services/queryLogService';
+import { useUiLanguage } from '../i18n/LanguageContext';
 
 const svgToDataUri = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
@@ -239,30 +240,12 @@ const parseQueryLogTimestamp = (timestamp: string | undefined): Date | null => {
   return !Number.isNaN(parsedDate.getTime()) ? parsedDate : null;
 };
 
-const getQueryLogDateKey = (timestamp: string | undefined): string | null => {
-  const parsedDate = parseQueryLogTimestamp(timestamp);
-  if (parsedDate) return getDateKeyInDashboardTimeZone(parsedDate);
-  const fallbackDate = timestamp?.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-  if (!fallbackDate) return null;
-  return `${fallbackDate[1]}-${fallbackDate[2].padStart(2, '0')}-${fallbackDate[3].padStart(2, '0')}`;
-};
-
 const normalizeAnalyticsDateKey = (label: string): string | null => {
   const parsedDate = parseQueryLogTimestamp(label);
   if (parsedDate) return getDateKeyInDashboardTimeZone(parsedDate);
   const fallbackDate = label?.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
   if (!fallbackDate) return null;
   return `${fallbackDate[1]}-${fallbackDate[2].padStart(2, '0')}-${fallbackDate[3].padStart(2, '0')}`;
-};
-
-const buildDailyAnalyticsFromQueryLogs = (logs: QueryLog[]): ChatAnalyticsPoint[] => {
-  const countsByDate = logs.reduce<Record<string, number>>((acc, log) => {
-    const dateKey = getQueryLogDateKey(log.timestamp);
-    if (!dateKey) return acc;
-    acc[dateKey] = (acc[dateKey] ?? 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(countsByDate).map(([label, totalChats]) => ({ label, totalChats })).sort((a, b) => a.label.localeCompare(b.label));
 };
 
 const parseResponseTimeSeconds = (value: unknown): number => {
@@ -302,6 +285,7 @@ const normalizeDashboardAnalytics = (items: Array<{ label: string; totalChats: n
 };
 
 export const AdminDashboard: React.FC = () => {
+  const { language } = useUiLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
@@ -322,9 +306,15 @@ export const AdminDashboard: React.FC = () => {
     width: 280,
   });
 
-  const { summary, chatSummary, analytics, documents, isLoading, error } = useDashboard({ initialRange: 'daily', initialDocumentLimit: 1000 });
+  const {
+    summary,
+    chatSummary,
+    analytics,
+    documents,
+    isLoading,
+    error,
+  } = useDashboard({ initialRange: 'daily', initialDocumentLimit: 1000 });
 
-  const [queryLogAnalytics, setQueryLogAnalytics] = useState<ChatAnalyticsPoint[]>([]);
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
   const [queryLogAverageResponseTime, setQueryLogAverageResponseTime] = useState<number | null>(null);
   const [isQueryLogSyncing, setIsQueryLogSyncing] = useState(false);
@@ -336,10 +326,9 @@ export const AdminDashboard: React.FC = () => {
       const logs = Array.isArray(response.logs) ? response.logs : [];
       const averageResponseTime = getReliableAverageResponseTime(response.performance?.averageResponseTime, logs);
       setQueryLogs(logs);
-      setQueryLogAnalytics(buildDailyAnalyticsFromQueryLogs(logs));
       setQueryLogAverageResponseTime(averageResponseTime > 0 ? averageResponseTime : null);
     } catch {
-      if (!signal?.aborted) { setQueryLogs([]); setQueryLogAnalytics([]); setQueryLogAverageResponseTime(null); }
+      if (!signal?.aborted) { setQueryLogs([]); setQueryLogAverageResponseTime(null); }
     } finally {
       if (!signal?.aborted) setIsQueryLogSyncing(false);
     }
@@ -425,13 +414,13 @@ export const AdminDashboard: React.FC = () => {
   }, [isCalendarPickerOpen, updateCalendarPickerLayout]);
 
   const normalizedHookAnalytics = useMemo(() => normalizeDashboardAnalytics(analytics), [analytics]);
-  const dashboardAnalytics = queryLogAnalytics.length > 0 ? queryLogAnalytics : normalizedHookAnalytics;
+  const dashboardAnalytics = normalizedHookAnalytics;
   const dashboardTotalChats = dashboardAnalytics.reduce((total, item) => total + item.totalChats, 0);
 
   const summaryCards = [
-    { label: 'Total Documents', value: summary?.totalDocuments ?? 0, helper: 'Documents stored in the database', icon: 'folder_open', image: metricImages.documents, gradient: 'from-cyan-300 via-teal-300 to-cyan-500' },
-    { label: 'Total Chunks', value: summary?.totalChunks ?? 0, helper: 'Indexed document chunks', icon: 'database', image: metricImages.chunks, gradient: 'from-amber-200 via-yellow-300 to-orange-400' },
-    { label: 'Total Chats', value: summary?.totalChats ?? 0, helper: 'Conversations recorded in query logs', icon: 'forum', image: metricImages.chats, gradient: 'from-fuchsia-300 via-pink-300 to-violet-400' },
+    { label: language === 'EN' ? 'Total Documents' : 'Total Dokumen', value: summary?.totalDocuments ?? 0, helper: language === 'EN' ? 'Documents stored in the database' : 'Dokumen tersimpan di basis data', icon: 'folder_open', image: metricImages.documents, gradient: 'from-cyan-300 via-teal-300 to-cyan-500' },
+    { label: language === 'EN' ? 'Total Chunks' : 'Total Potongan', value: summary?.totalChunks ?? 0, helper: language === 'EN' ? 'Indexed document chunks' : 'Potongan dokumen terindeks', icon: 'database', image: metricImages.chunks, gradient: 'from-amber-200 via-yellow-300 to-orange-400' },
+    { label: language === 'EN' ? 'Total Chats' : 'Total Chat', value: summary?.totalChats ?? 0, helper: language === 'EN' ? 'Questions stored in active conversation history' : 'Pertanyaan dalam riwayat percakapan aktif', icon: 'forum', image: metricImages.chats, gradient: 'from-fuchsia-300 via-pink-300 to-violet-400' },
   ];
 
   const effectiveViewDate = useMemo(() => {
@@ -447,7 +436,7 @@ export const AdminDashboard: React.FC = () => {
   const { currentMonthName, calendarGrid } = useMemo(() => {
     const year = effectiveViewDate.getFullYear();
     const month = effectiveViewDate.getMonth();
-    const monthName = effectiveViewDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    const monthName = effectiveViewDate.toLocaleString(language === 'EN' ? 'en-US' : 'id-ID', { month: 'long', year: 'numeric' });
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
     const prevMonthDays = new Date(year, month, 0).getDate();
@@ -462,7 +451,7 @@ export const AdminDashboard: React.FC = () => {
       grid.push({ value: i.toString(), muted: false, fullDate: dateStr, hasData: activeDates.has(dateStr) });
     }
     return { currentMonthName: monthName, calendarGrid: grid };
-  }, [effectiveViewDate, dashboardAnalytics]);
+  }, [effectiveViewDate, dashboardAnalytics, language]);
 
   const calendarPickerYear = effectiveViewDate.getFullYear();
   const calendarPickerMonth = effectiveViewDate.getMonth();
@@ -551,10 +540,15 @@ export const AdminDashboard: React.FC = () => {
     return {
       total: summary?.totalDocuments ?? totalLoadedDocuments,
       loadedTotal: totalLoadedDocuments,
-      items: documentTypeOrder.map((type) => ({ label: type, count: counts[type], value: percentages[type], dot: documentTypeConfig[type].dot })),
+      items: documentTypeOrder.map((type) => ({
+        label: type === 'Others' && language === 'ID' ? 'Lainnya' : type,
+        count: counts[type],
+        value: percentages[type],
+        dot: documentTypeConfig[type].dot,
+      })),
       donutStyle: { background: totalLoadedDocuments === 0 ? '#1e293b' : `conic-gradient(${documentTypeConfig.PDF.color} 0 ${pdfStop}%, ${documentTypeConfig.DOCX.color} ${pdfStop}% ${docxStop}%, ${documentTypeConfig.TXT.color} ${docxStop}% ${txtStop}%, ${documentTypeConfig.Others.color} ${txtStop}% 100%)` } as React.CSSProperties,
     };
-  }, [documents, summary?.totalDocuments]); 
+  }, [documents, language, summary?.totalDocuments]); 
 
   const performanceStats = useMemo<Array<{ label: string; value: string | number; badge: string; badgeTone: 'emerald' | 'rose' | 'cyan' | 'violet' | 'slate'; }>>(() => {
     const totalDocuments = summary?.totalDocuments ?? documents.length ?? 0;
@@ -567,15 +561,17 @@ export const AdminDashboard: React.FC = () => {
     const latestChatPoint = dashboardAnalytics.length > 0 ? dashboardAnalytics[dashboardAnalytics.length - 1] : null;
     const previousChatPoint = dashboardAnalytics.length > 1 ? dashboardAnalytics[dashboardAnalytics.length - 2] : null;
     const chatChangePercent = previousChatPoint && previousChatPoint.totalChats > 0 ? ((latestChatPoint?.totalChats ?? 0) - previousChatPoint.totalChats) / previousChatPoint.totalChats * 100 : null;
-    const chatBadge = chatChangePercent === null ? `${latestChatPoint?.totalChats ?? 0} latest` : `${chatChangePercent >= 0 ? '▲' : '▼'} ${Math.abs(chatChangePercent).toFixed(1)}%`;
+    const chatBadge = chatChangePercent === null
+      ? `${latestChatPoint?.totalChats ?? 0} ${language === 'EN' ? 'latest' : 'terbaru'}`
+      : `${chatChangePercent >= 0 ? '▲' : '▼'} ${Math.abs(chatChangePercent).toFixed(1)}%`;
 
     return [
-      { label: 'Total Documents', value: totalDocuments, badge: `${loadedDocumentPercent}% loaded`, badgeTone: 'cyan' },
-      { label: 'Total Chunks', value: totalChunks, badge: `${chunksPerDocument.toFixed(1)}/doc`, badgeTone: 'violet' },
-      { label: 'Total Chats', value: totalChats, badge: chatBadge, badgeTone: chatChangePercent !== null && chatChangePercent < 0 ? 'rose' : 'emerald' },
-      { label: 'Avg Response', value: `${averageResponseTime.toFixed(2).replace(/\.00$/, '')}s`, badge: averageResponseTime > 0 ? 'DB avg' : 'No data', badgeTone: averageResponseTime > 0 ? 'slate' : 'rose' },
+      { label: language === 'EN' ? 'Total Documents' : 'Total Dokumen', value: totalDocuments, badge: `${loadedDocumentPercent}% ${language === 'EN' ? 'loaded' : 'dimuat'}`, badgeTone: 'cyan' },
+      { label: language === 'EN' ? 'Total Chunks' : 'Total Potongan', value: totalChunks, badge: `${chunksPerDocument.toFixed(1)}/${language === 'EN' ? 'doc' : 'dok'}`, badgeTone: 'violet' },
+      { label: language === 'EN' ? 'Total Chats' : 'Total Chat', value: totalChats, badge: chatBadge, badgeTone: chatChangePercent !== null && chatChangePercent < 0 ? 'rose' : 'emerald' },
+      { label: language === 'EN' ? 'Avg Response' : 'Rata-rata Respons', value: `${averageResponseTime.toFixed(2).replace(/\.00$/, '')}s`, badge: averageResponseTime > 0 ? language === 'EN' ? 'DB avg' : 'rata-rata DB' : language === 'EN' ? 'No data' : 'Tidak ada data', badgeTone: averageResponseTime > 0 ? 'slate' : 'rose' },
     ];
-  }, [dashboardAnalytics, chatSummary?.totalChatCount, documentTypeStats.loadedTotal, documents.length, queryLogAverageResponseTime, summary?.averageResponseTime, summary?.totalChats, summary?.totalChunks, summary?.totalDocuments]);
+  }, [dashboardAnalytics, chatSummary?.totalChatCount, documentTypeStats.loadedTotal, documents.length, language, queryLogAverageResponseTime, summary?.averageResponseTime, summary?.totalChats, summary?.totalChunks, summary?.totalDocuments]);
 
   const topQuestionAccent = [
     'from-[#ffb347] via-[#ff9f1a] to-[#ff7a18]',
@@ -595,16 +591,30 @@ export const AdminDashboard: React.FC = () => {
   const topQuestionMaxCount = Math.max(...topQuestions.map((item) => item.count), 1);
 
   const topQuestionRangeLabel = {
-    day: selectedDate ? `Day ${selectedDate}` : 'Current day',
-    week: 'This week',
+    day: selectedDate
+      ? `${language === 'EN' ? 'Day' : 'Hari'} ${selectedDate}`
+      : language === 'EN' ? 'Current day' : 'Hari ini',
+    week: language === 'EN' ? 'This week' : 'Minggu ini',
     month: currentMonthName,
     year: `${effectiveViewDate.getFullYear()}`,
-    all: 'All time',
+    all: language === 'EN' ? 'All time' : 'Semua waktu',
   } as const;
 
   const selectedTopQuestionRangeOption =
     topQuestionRangeOptions.find((option) => option.value === topQuestionRange) ??
     topQuestionRangeOptions[2];
+  const localizedTopQuestionOptionLabel = (value: TopQuestionRange): string => {
+    if (language === 'EN') {
+      return topQuestionRangeOptions.find((option) => option.value === value)?.label ?? value;
+    }
+    return {
+      day: 'Hari',
+      week: 'Minggu',
+      month: 'Bulan',
+      year: 'Tahun',
+      all: 'Semua waktu',
+    }[value];
+  };
 
   const performanceBadgeClass = {
     emerald: 'text-emerald-400 bg-emerald-400/10', rose: 'text-rose-400 bg-rose-400/10',
@@ -684,13 +694,20 @@ export const AdminDashboard: React.FC = () => {
             
             <div className="shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1 animate-fade-in-up">
               <div>
-                <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.28em] text-slate-500 mb-1">Database Connected</p>
+                <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.28em] text-slate-500 mb-1">
+                  {language === 'EN' ? 'Database Connected' : 'Basis Data Terhubung'}
+                </p>
                 <h1 className="font-headline text-2xl md:text-3xl font-bold tracking-tight">
-                  Hello, <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">Admin</span>
+                  {language === 'EN' ? 'Hello' : 'Halo'},{' '}
+                  <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">Admin</span>
                 </h1>
               </div>
               <div className="flex items-center gap-2">
-                {(isLoading || isQueryLogSyncing) && <span className="text-xs text-cyan-300 font-mono animate-pulse mr-2">Syncing...</span>}
+                {(isLoading || isQueryLogSyncing) && (
+                  <span className="text-xs text-cyan-300 font-mono animate-pulse mr-2">
+                    {language === 'EN' ? 'Syncing...' : 'Menyinkronkan...'}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -729,15 +746,19 @@ export const AdminDashboard: React.FC = () => {
               <div className="animate-fade-in-up flex-1 flex flex-col rounded-[1.2rem] border border-white/5 bg-transparent p-3.5 md:p-4 min-w-0 overflow-hidden relative min-h-[360px] sm:min-h-[400px] lg:min-h-0" style={{ animationDelay: '0.4s' }}>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 shrink-0">
                   <div>
-                    <h2 className="font-headline text-base md:text-lg font-bold">Chat Analytics</h2>
+                    <h2 className="font-headline text-base md:text-lg font-bold">
+                      {language === 'EN' ? 'Chat Analytics' : 'Analitik Chat'}
+                    </h2>
                     <p className="text-[11px] md:text-xs text-slate-400 mt-0.5">
-                      {selectedDate ? `Data date ${selectedDate}` : `${dashboardTotalChats || chatSummary?.totalChatCount || 0} total chats`}
+                      {selectedDate
+                        ? `${language === 'EN' ? 'Data date' : 'Data tanggal'} ${selectedDate}`
+                        : `${dashboardTotalChats || chatSummary?.totalChatCount || 0} ${language === 'EN' ? 'total chats' : 'total chat'}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {selectedDate && (
                       <button onClick={() => setSelectedDate(null)} className="min-h-10 px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 text-[11px] text-rose-300 hover:bg-rose-500/20 touch-manipulation">
-                        Clear Date
+                        {language === 'EN' ? 'Clear Date' : 'Hapus Tanggal'}
                       </button>
                     )}
                   </div>
@@ -792,13 +813,15 @@ export const AdminDashboard: React.FC = () => {
                       </svg>
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-500 bg-white/[0.02] rounded-xl border border-white/5">No query log data yet.</div>
+                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-500 bg-white/[0.02] rounded-xl border border-white/5">
+                      {language === 'EN' ? 'No conversation data yet.' : 'Belum ada data percakapan.'}
+                    </div>
                   )}
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 pt-3 border-t border-white/5 text-[10px] md:text-xs text-slate-400 shrink-0">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gradient-to-r from-[#7dd3fc] to-[#22d3ee]" /> Total</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gradient-to-r from-[#d8b4fe] to-[#c084fc]" /> Average</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gradient-to-r from-[#d8b4fe] to-[#c084fc]" /> {language === 'EN' ? 'Average' : 'Rata-rata'}</span>
                   <span className="ml-auto font-mono text-slate-500 font-semibold tracking-wider">MAX: {chatChart.maxValue}</span>
                 </div>
               </div>
@@ -806,7 +829,9 @@ export const AdminDashboard: React.FC = () => {
               {/* CALENDAR PANEL */}
               <div className="animate-fade-in-up w-full xl:w-[280px] min-h-[390px] sm:min-h-[360px] xl:min-h-0 flex flex-col rounded-[1.2rem] border border-white/5 bg-transparent p-3.5 md:p-4 shrink-0 overflow-hidden" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center justify-between mb-4 shrink-0">
-                  <h2 className="font-headline text-base md:text-lg font-bold">Calendar</h2>
+                  <h2 className="font-headline text-base md:text-lg font-bold">
+                    {language === 'EN' ? 'Calendar' : 'Kalender'}
+                  </h2>
                   <div className="flex items-center gap-1.5">
                     <button onClick={() => setViewDate(new Date(effectiveViewDate.getFullYear(), effectiveViewDate.getMonth() - 1, 1))} className="w-10 h-10 xl:w-7 xl:h-7 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/15 text-slate-400 hover:text-white transition-all touch-manipulation">
                       <span className="material-symbols-outlined text-[16px] md:text-[14px]">chevron_left</span>
@@ -846,7 +871,7 @@ export const AdminDashboard: React.FC = () => {
                     <>
                       <button
                         type="button"
-                        aria-label="Close month picker"
+                        aria-label={language === 'EN' ? 'Close month picker' : 'Tutup pemilih bulan'}
                         onClick={() => setIsCalendarPickerOpen(false)}
                         className={`fixed inset-0 z-[9998] cursor-default ${calendarPickerLayout.isMobile ? 'bg-black/65 backdrop-blur-[2px]' : 'bg-transparent'}`}
                       />
@@ -855,7 +880,7 @@ export const AdminDashboard: React.FC = () => {
                         ref={calendarPickerPanelRef}
                         role="dialog"
                         aria-modal={calendarPickerLayout.isMobile}
-                        aria-label="Choose calendar month and year"
+                        aria-label={language === 'EN' ? 'Choose calendar month and year' : 'Pilih bulan dan tahun kalender'}
                         className={`fixed z-[9999] overflow-hidden rounded-[18px] border border-white/10 bg-[#0b1019] shadow-[0_24px_80px_rgba(0,0,0,0.72)] ${
                           calendarPickerLayout.isMobile
                             ? 'left-1/2 bottom-4 w-[min(288px,calc(100vw-32px))] max-h-[calc(100vh-32px)] -translate-x-1/2'
@@ -869,14 +894,18 @@ export const AdminDashboard: React.FC = () => {
                       >
                         <div className="flex items-center justify-between border-b border-white/[0.07] px-3.5 py-2.5">
                           <div>
-                            <p className="text-[8px] font-mono uppercase tracking-[0.18em] text-slate-500">Calendar</p>
-                            <h3 className="mt-0.5 text-xs font-bold text-white">Select month and year</h3>
+                            <p className="text-[8px] font-mono uppercase tracking-[0.18em] text-slate-500">
+                              {language === 'EN' ? 'Calendar' : 'Kalender'}
+                            </p>
+                            <h3 className="mt-0.5 text-xs font-bold text-white">
+                              {language === 'EN' ? 'Select month and year' : 'Pilih bulan dan tahun'}
+                            </h3>
                           </div>
                           <button
                             type="button"
                             onClick={() => setIsCalendarPickerOpen(false)}
                             className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#151b27] text-slate-400 transition hover:bg-pink-400 hover:text-slate-950"
-                            aria-label="Close month picker"
+                            aria-label={language === 'EN' ? 'Close month picker' : 'Tutup pemilih bulan'}
                           >
                             <span className="material-symbols-outlined text-[17px]">close</span>
                           </button>
@@ -888,13 +917,15 @@ export const AdminDashboard: React.FC = () => {
                               type="button"
                               onClick={() => changeCalendarYear(-1)}
                               className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400 text-slate-950 transition hover:bg-cyan-300 active:scale-95"
-                              aria-label="Previous year"
+                              aria-label={language === 'EN' ? 'Previous year' : 'Tahun sebelumnya'}
                             >
                               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                             </button>
 
                             <div className="min-w-0 text-center">
-                              <p className="text-[8px] font-mono uppercase tracking-[0.18em] text-slate-500">Selected year</p>
+                              <p className="text-[8px] font-mono uppercase tracking-[0.18em] text-slate-500">
+                                {language === 'EN' ? 'Selected year' : 'Tahun terpilih'}
+                              </p>
                               <p className="mt-0.5 text-xl font-black tracking-tight text-white">{calendarPickerYear}</p>
                             </div>
 
@@ -902,7 +933,7 @@ export const AdminDashboard: React.FC = () => {
                               type="button"
                               onClick={() => changeCalendarYear(1)}
                               className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400 text-slate-950 transition hover:bg-cyan-300 active:scale-95"
-                              aria-label="Next year"
+                              aria-label={language === 'EN' ? 'Next year' : 'Tahun berikutnya'}
                             >
                               <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                             </button>
@@ -923,7 +954,10 @@ export const AdminDashboard: React.FC = () => {
                                       : 'bg-[#151b27] text-slate-300 hover:bg-yellow-400 hover:text-slate-950'
                                   }`}
                                 >
-                                  {month.slice(0, 3)}
+                                  {new Intl.DateTimeFormat(
+                                    language === 'EN' ? 'en-US' : 'id-ID',
+                                    { month: 'short' }
+                                  ).format(new Date(2026, monthIndex, 1))}
                                 </button>
                               );
                             })}
@@ -939,7 +973,7 @@ export const AdminDashboard: React.FC = () => {
                             }}
                             className="mt-2.5 w-full min-h-9 rounded-lg bg-pink-400 px-3 text-[10px] font-bold text-slate-950 transition hover:bg-pink-300 active:scale-[0.99]"
                           >
-                            Go to current month
+                            {language === 'EN' ? 'Go to current month' : 'Ke bulan saat ini'}
                           </button>
                         </div>
                       </div>
@@ -949,7 +983,10 @@ export const AdminDashboard: React.FC = () => {
                 </div>
                 
                 <div className="flex-1 grid grid-cols-7 gap-1 md:gap-1.5 text-center text-[12px] md:text-[11px] content-start overflow-visible pr-1">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                  {(language === 'EN'
+                    ? ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                    : ['M', 'S', 'S', 'R', 'K', 'J', 'S']
+                  ).map((day, index) => (
                     <span key={`day-${day}-${index}`} className="text-slate-500 font-semibold py-1 md:py-1.5">{day}</span>
                   ))}
                   {calendarGrid.map((day, index) => {
@@ -987,14 +1024,18 @@ export const AdminDashboard: React.FC = () => {
           >
             <div className="shrink-0 dashboard-document-panel rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-headline text-base md:text-lg font-bold text-slate-200">Document Types</h2>
+                <h2 className="font-headline text-base md:text-lg font-bold text-slate-200">
+                  {language === 'EN' ? 'Document Types' : 'Jenis Dokumen'}
+                </h2>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-5 sm:gap-6 lg:gap-5">
                 <div className="relative w-[120px] h-[120px] md:w-28 md:h-28 shrink-0 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.1)]" style={documentTypeStats.donutStyle}>
                   <div className="absolute w-[5rem] h-[5rem] md:w-[4.5rem] md:h-[4.5rem] bg-[#05070d] rounded-full flex flex-col items-center justify-center">
                     <span className="font-headline text-xl md:text-lg font-black text-white leading-none">{documentTypeStats.total}</span>
-                    <span className="text-[9px] md:text-[8px] text-slate-500 uppercase tracking-wider mt-1">Docs</span>
+                    <span className="text-[9px] md:text-[8px] text-slate-500 uppercase tracking-wider mt-1">
+                      {language === 'EN' ? 'Docs' : 'Dok'}
+                    </span>
                   </div>
                 </div>
 
@@ -1016,7 +1057,9 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="shrink-0 dashboard-performance-panel rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-headline text-base md:text-lg font-bold text-slate-200">Performance Summary</h2>
+                <h2 className="font-headline text-base md:text-lg font-bold text-slate-200">
+                  {language === 'EN' ? 'Performance Summary' : 'Ringkasan Performa'}
+                </h2>
               </div>
 
               <div className="dashboard-performance-list flex flex-col gap-2.5 md:gap-2.5">
@@ -1039,8 +1082,13 @@ export const AdminDashboard: React.FC = () => {
             <section className="flex-none lg:flex-1 min-h-0 pb-1 flex flex-col rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0" aria-labelledby="top-questions-title">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 shrink-0">
                 <div>
-                  <h2 id="top-questions-title" className="font-headline text-base md:text-lg font-bold text-slate-200">Top Questions</h2>
-                  <p className="text-[10px] md:text-[11px] text-slate-500 mt-1">{topQuestionRangeLabel[topQuestionRange]} · {totalTopQuestionMentions} mentions</p>
+                  <h2 id="top-questions-title" className="font-headline text-base md:text-lg font-bold text-slate-200">
+                    {language === 'EN' ? 'Top Questions' : 'Pertanyaan Teratas'}
+                  </h2>
+                  <p className="text-[10px] md:text-[11px] text-slate-500 mt-1">
+                    {topQuestionRangeLabel[topQuestionRange]} · {totalTopQuestionMentions}{' '}
+                    {language === 'EN' ? 'mentions' : 'kemunculan'}
+                  </p>
                 </div>
 
                 <div ref={topQuestionRangeRef} className="relative w-full sm:w-auto shrink-0 z-50">
@@ -1060,7 +1108,7 @@ export const AdminDashboard: React.FC = () => {
                         {selectedTopQuestionRangeOption.icon}
                       </span>
                       <span className="truncate text-[11px] sm:text-xs font-semibold text-slate-200">
-                        {selectedTopQuestionRangeOption.label}
+                        {localizedTopQuestionOptionLabel(selectedTopQuestionRangeOption.value)}
                       </span>
                     </span>
                     <span className={`material-symbols-outlined text-[17px] text-slate-500 transition-transform duration-200 ${isTopQuestionRangeOpen ? 'rotate-180 text-cyan-300' : ''}`}>
@@ -1070,7 +1118,7 @@ export const AdminDashboard: React.FC = () => {
 
                   <div
                     role="listbox"
-                    aria-label="Top questions range"
+                    aria-label={language === 'EN' ? 'Top questions range' : 'Rentang pertanyaan teratas'}
                     className={`absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+8px)] w-full sm:w-[180px] origin-top rounded-2xl border border-white/10 bg-[#0d111c] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.65)] transition-all duration-200 ${
                       isTopQuestionRangeOpen
                         ? 'visible translate-y-0 scale-100 opacity-100'
@@ -1078,7 +1126,7 @@ export const AdminDashboard: React.FC = () => {
                     }`}
                   >
                     <div className="px-2.5 py-2 text-[9px] font-mono uppercase tracking-[0.18em] text-slate-600">
-                      Time range
+                      {language === 'EN' ? 'Time range' : 'Rentang waktu'}
                     </div>
 
                     {topQuestionRangeOptions.map((option) => {
@@ -1104,7 +1152,9 @@ export const AdminDashboard: React.FC = () => {
                             <span className={`material-symbols-outlined text-[17px] ${isSelected ? 'text-cyan-300' : 'text-slate-600 group-hover/option:text-slate-300'}`}>
                               {option.icon}
                             </span>
-                            <span className="text-[11px] sm:text-xs font-medium">{option.label}</span>
+                            <span className="text-[11px] sm:text-xs font-medium">
+                              {localizedTopQuestionOptionLabel(option.value)}
+                            </span>
                           </span>
 
                           {isSelected && (
@@ -1128,7 +1178,9 @@ export const AdminDashboard: React.FC = () => {
                       </p>
                     ) : (
                       <p className="text-center text-[10px] sm:text-[11px] leading-relaxed text-slate-500">
-                        Hover or tap a bar to view the question
+                        {language === 'EN'
+                          ? 'Hover or tap a bar to view the question'
+                          : 'Arahkan atau ketuk batang untuk melihat pertanyaan'}
                       </p>
                     )}
                   </div>
@@ -1150,7 +1202,7 @@ export const AdminDashboard: React.FC = () => {
                           onBlur={() => setActiveTopQuestionIndex(null)}
                           onTouchStart={() => setActiveTopQuestionIndex(index)}
                           onClick={() => setActiveTopQuestionIndex(index)}
-                          aria-label={`Question ${index + 1}: ${item.question}`}
+                          aria-label={`${language === 'EN' ? 'Question' : 'Pertanyaan'} ${index + 1}: ${item.question}`}
                         >
                           <span className={`text-[9px] sm:text-[10px] font-mono transition-colors ${isActive ? 'text-white' : 'text-slate-500'}`}>
                             {item.count}
@@ -1194,7 +1246,9 @@ export const AdminDashboard: React.FC = () => {
               ) : (
                 <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.015] px-4 py-7 text-center">
                   <span className="material-symbols-outlined text-[25px] text-slate-600 mb-2">query_stats</span>
-                  <p className="text-xs text-slate-500">No question data available yet.</p>
+                  <p className="text-xs text-slate-500">
+                    {language === 'EN' ? 'No question data available yet.' : 'Belum ada data pertanyaan.'}
+                  </p>
                 </div>
               )}
             </section>

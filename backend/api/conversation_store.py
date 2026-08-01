@@ -67,6 +67,7 @@ def append_chat_turn(
     answer: str,
     confidence: float,
     sources: list[dict[str, Any]],
+    query_id: str | None = None,
     conversation_id: str | None = None,
     language: str | None = None,
     user_id: str | None = None,
@@ -114,6 +115,9 @@ def append_chat_turn(
         "user_id": owner_id,
         "user_name": owner_name,
     }
+    if query_id:
+        base_metadata["query_id"] = str(query_id)
+        base_metadata["queryId"] = str(query_id)
 
     user_message = {
         "id": str(uuid.uuid4()),
@@ -170,6 +174,21 @@ def list_summaries(user_id: str | None = None, include_all: bool = False) -> lis
         if not _can_access_conversation(conversation, user_id=user_id, include_all=include_all):
             continue
 
+        user_messages = [
+            {
+                "id": str(message.get("id") or ""),
+                "content": str(message.get("content") or ""),
+                "created_at": message.get("created_at"),
+            }
+            for message in conversation.get("messages", [])
+            if (
+                isinstance(message, dict)
+                and str(message.get("role") or "").lower() == "user"
+                and str(message.get("id") or "").strip()
+                and str(message.get("content") or "").strip()
+            )
+        ]
+
         summaries.append({
             "id": conversation.get("id"),
             "user_id": _conversation_owner_id(conversation),
@@ -183,8 +202,86 @@ def list_summaries(user_id: str | None = None, include_all: bool = False) -> lis
             "last_message_at": conversation.get("last_message_at"),
             "created_at": conversation.get("created_at"),
             "updated_at": conversation.get("updated_at"),
+            "user_messages": user_messages,
         })
     return summaries
+
+
+def conversation_chat_records(
+    user_id: str | None = None,
+    include_all: bool = False,
+    active_user_ids: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Return one active chat record for every stored user question.
+
+    Conversation history is the source of truth for "Total Chats". Query logs
+    remain useful diagnostics, but may include failed requests or records that
+    belonged to users/conversations that have since been deleted.
+    """
+    records: list[dict[str, Any]] = []
+
+    for conversation in read_conversations():
+        if not _can_access_conversation(
+            conversation,
+            user_id=user_id,
+            include_all=include_all,
+        ):
+            continue
+
+        owner_id = _conversation_owner_id(conversation)
+        if active_user_ids is not None and owner_id not in active_user_ids:
+            continue
+
+        conversation_id = str(conversation.get("id") or "")
+        owner_name = str(conversation.get("user_name") or "User")
+        fallback_timestamp = (
+            conversation.get("updated_at")
+            or conversation.get("created_at")
+            or now_iso()
+        )
+
+        for message in conversation.get("messages", []):
+            if not isinstance(message, dict):
+                continue
+            if str(message.get("role") or "").lower() != "user":
+                continue
+
+            content = str(message.get("content") or "").strip()
+            if not content:
+                continue
+
+            metadata = message.get("metadata")
+            if not isinstance(metadata, dict):
+                metadata = {}
+
+            records.append({
+                "id": str(message.get("id") or ""),
+                "query_id": str(
+                    metadata.get("query_id")
+                    or metadata.get("queryId")
+                    or ""
+                ),
+                "conversation_id": conversation_id,
+                "user_id": owner_id,
+                "user_name": owner_name,
+                "question": content,
+                "timestamp": message.get("created_at") or fallback_timestamp,
+            })
+
+    return records
+
+
+def conversation_chat_totals(
+    active_user_ids: set[str] | None = None,
+) -> dict[str, int]:
+    totals: dict[str, int] = {}
+    for record in conversation_chat_records(
+        include_all=True,
+        active_user_ids=active_user_ids,
+    ):
+        owner_id = str(record.get("user_id") or LEGACY_ADMIN_USER_ID)
+        totals[owner_id] = totals.get(owner_id, 0) + 1
+    return totals
 
 
 def get_conversation(
@@ -286,4 +383,3 @@ def delete_conversations(
         write_conversations(remaining)
 
     return deleted_ids
-

@@ -22,6 +22,7 @@ from api.answer_formatter import (
 from api.build_info import BUILD_VERSION
 from api.cancellation import raise_if_cancelled
 from api.follow_up_service import build_dataset_follow_up_question
+from api.grounding_validator import validate_grounded_answer
 from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
 from api.progress import emit_progress, progress_scope
@@ -31,9 +32,6 @@ from retrieval.context_selector import select_context_bundle
 from retrieval.hybrid_search import (
     _apply_evidence_verification,
     _base_hybrid_candidates,
-    _exact_token_coverage,
-    _inventory_field_score,
-    _is_inventory_query,
     hybrid_search,
 )
 from retrieval.query_expansion import (
@@ -49,6 +47,10 @@ from uploads.config import (
     MAX_SOURCE_CITATIONS,
     MIN_RESULT_SCORE,
 )
+
+
+class EvaluationSnapshotContractError(RuntimeError):
+    """Raised when a locked evaluation snapshot cannot be replayed safely."""
 
 def _sanitize_verified_scalar_answer(answer: str) -> str:
     """Clean malformed or duplicated deterministic scalar fallbacks.
@@ -252,22 +254,47 @@ def _refusal_payload(
     language: str,
     *,
     failure_stage: str,
+    generation_mode: str = "retrieval_refusal",
+    model: str = "retrieval-refusal",
+    retrieval_mode: str = "refused",
+    retrieval_query: str = "",
+    generation_contexts: list[dict[str, Any]] | None = None,
+    preserve_generation_contexts: bool = False,
+    failure_reason: str = "",
+    rejected_native_answer: str = "",
+    citation_validation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    return {
+    contexts = list(generation_contexts or [])
+    payload = {
         "answer": build_refusal_answer(language),
         "confidence": 0.0,
         "sources": [],
-        "generation_contexts": [],
+        # Production refusals do not expose internal context. The dedicated
+        # evaluation endpoint may preserve it so context metrics and failure
+        # taxonomy remain accurate after generation or citation validation.
+        "generation_contexts": contexts if preserve_generation_contexts else [],
+        "context_count_before_failure": len(contexts),
         "follow_up_question": None,
         "response_time_ms": int(round((time.perf_counter() - started_at) * 1000)),
-        "model": "retrieval-refusal",
-        "generation_mode": "retrieval_refusal",
+        "model": model,
+        "generation_mode": generation_mode,
         "language": language,
         "buildVersion": BUILD_VERSION,
-        "retrieval_mode": "refused",
-        "retrieval_query": "",
+        "retrieval_mode": retrieval_mode,
+        "retrieval_query": retrieval_query,
         "failure_stage": failure_stage,
     }
+    if failure_reason:
+        payload["failure_reason"] = failure_reason
+    if preserve_generation_contexts and rejected_native_answer:
+        # Evaluation-only diagnostics. Production refusals must not expose a
+        # rejected answer that failed the public citation contract.
+        payload["rejected_native_answer"] = answer_text_only(
+            rejected_native_answer
+        )
+    if preserve_generation_contexts and citation_validation:
+        payload["citation_validation"] = dict(citation_validation)
+    return payload
 
 
 def _strict_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -355,12 +382,15 @@ def _materialize_locked_candidates(
     *,
     requested_k: int,
 ) -> list[dict[str, Any]]:
-    """Hydrate and revalidate retrieval candidates captured in an evaluation snapshot.
+    """Hydrate candidates while preserving the captured retrieval decision.
 
     The benchmark records chunk identifiers and calibrated retrieval scores once,
     then every evaluated model receives the same evidence. Document text is read
-    back from Chroma by ID; client-provided text is never trusted. All evidence
-    and answerability checks are rerun against the original question.
+    back from Chroma by ID; client-provided text is never trusted. The content
+    hash and strict gate state are verified, but the evidence and answerability
+    gates are deliberately not run a second time. Re-running them here made a
+    supposedly locked snapshot non-deterministic, especially for bilingual
+    bridge queries.
     """
     if not locked_candidates:
         return []
@@ -398,23 +428,29 @@ def _materialize_locked_candidates(
     for rank, (chunk_id, compact) in enumerate(normalized, start=1):
         record = hydrated_by_id.get(chunk_id)
         if record is None:
-            print(f"[EVALUATION] Snapshot chunk is missing from Chroma: {chunk_id}")
-            continue
+            raise EvaluationSnapshotContractError(
+                f"Snapshot chunk is missing from the active Chroma index: {chunk_id}"
+            )
         content, metadata = record
         if not content.strip():
-            continue
+            raise EvaluationSnapshotContractError(
+                f"Snapshot chunk has empty indexed content: {chunk_id}"
+            )
         expected_hash = str(
             compact.get("contentSha256")
             or compact.get("content_sha256")
             or ""
         ).strip().lower()
-        actual_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        if expected_hash and expected_hash != actual_hash:
-            print(
-                "[EVALUATION] Snapshot chunk content changed after capture: "
-                f"{chunk_id}"
+        if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+            raise EvaluationSnapshotContractError(
+                f"Snapshot chunk is missing a valid content SHA-256: {chunk_id}"
             )
-            continue
+        actual_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        if expected_hash != actual_hash:
+            raise EvaluationSnapshotContractError(
+                "Snapshot chunk content changed after capture: "
+                f"{chunk_id}. Rebuild the retrieval snapshot."
+            )
 
         def number(*keys: str, default: float = 0.0) -> float:
             for key in keys:
@@ -437,6 +473,63 @@ def _materialize_locked_candidates(
                 return bool(value)
             return default
 
+        def items(*keys: str) -> list[Any]:
+            for key in keys:
+                value = compact.get(key)
+                if isinstance(value, (list, tuple)):
+                    return list(value)
+            return []
+
+        def object_value(*keys: str) -> dict[str, Any]:
+            for key in keys:
+                value = compact.get(key)
+                if isinstance(value, dict):
+                    return dict(value)
+            return {}
+
+        required_gate_fields = {
+            "evidenceSupported": ("evidenceSupported", "evidence_supported"),
+            "evidenceHardFailures": (
+                "evidenceHardFailures",
+                "evidence_hard_failures",
+            ),
+            "evidenceHardContradictions": (
+                "evidenceHardContradictions",
+                "evidence_hard_contradictions",
+            ),
+            "answerabilityAccepted": (
+                "answerabilityAccepted",
+                "answerability_accepted",
+            ),
+            "answerabilityStrictlySupported": (
+                "answerabilityStrictlySupported",
+                "answerability_strictly_supported",
+            ),
+            "answerabilityEvidenceSelected": (
+                "answerabilityEvidenceSelected",
+                "answerability_evidence_selected",
+            ),
+            "answerabilityRequiresCoherentEvidence": (
+                "answerabilityRequiresCoherentEvidence",
+                "answerability_requires_coherent_evidence",
+            ),
+            "answerabilityCoherentEvidence": (
+                "answerabilityCoherentEvidence",
+                "answerability_coherent_evidence",
+            ),
+        }
+        missing_gate_fields = [
+            field
+            for field, keys in required_gate_fields.items()
+            if not any(key in compact and compact.get(key) is not None for key in keys)
+        ]
+        if missing_gate_fields:
+            raise EvaluationSnapshotContractError(
+                f"Snapshot candidate {chunk_id} is missing locked gate fields: "
+                + ", ".join(missing_gate_fields)
+                + ". Rebuild the retrieval snapshot."
+            )
+
         score = number("score", default=0.0)
         base_score = number("baseScore", "base_score", default=score)
         semantic_score = number("semanticScore", "semantic_score", default=0.0)
@@ -452,17 +545,7 @@ def _materialize_locked_candidates(
             or compact.get("snapshot_retrieval_query")
             or question
         ).strip()
-        searchable_text = f"{document_name} {content}"
-        exact_token_coverage = _exact_token_coverage(
-            coverage_query,
-            searchable_text,
-        )
-        inventory_field_score = (
-            _inventory_field_score(searchable_text)
-            if _is_inventory_query(coverage_query)
-            else 0.0
-        )
-        hydrated.append({
+        candidate = {
             "chunkId": chunk_id,
             "documentName": document_name,
             "page": metadata.get("page", compact.get("page", "-")),
@@ -474,8 +557,16 @@ def _materialize_locked_candidates(
             "keywordScore": keyword_score,
             "semanticRank": rank - 1,
             "keywordRank": rank - 1,
-            "exactTokenCoverage": round(exact_token_coverage, 6),
-            "inventoryFieldScore": round(inventory_field_score, 6),
+            "exactTokenCoverage": number(
+                "exactTokenCoverage",
+                "exact_token_coverage",
+                default=0.0,
+            ),
+            "inventoryFieldScore": number(
+                "inventoryFieldScore",
+                "inventory_field_score",
+                default=0.0,
+            ),
             "rerankerApplied": flag(
                 "rerankerApplied",
                 "reranker_applied",
@@ -496,27 +587,98 @@ def _materialize_locked_candidates(
                 "reranker_rank",
                 default=float(rank),
             ),
+            "semanticQueryVariant": compact.get("semanticQueryVariant")
+            or compact.get("semantic_query_variant"),
+            "keywordQueryVariant": compact.get("keywordQueryVariant")
+            or compact.get("keyword_query_variant"),
+            "rerankerQueryVariant": compact.get("rerankerQueryVariant")
+            or compact.get("reranker_query_variant"),
+            "evidenceSupported": flag(
+                "evidenceSupported",
+                "evidence_supported",
+            ),
+            "evidenceScore": number(
+                "evidenceScore",
+                "evidence_score",
+                default=0.0,
+            ),
+            "evidenceHardFailures": items(
+                "evidenceHardFailures",
+                "evidence_hard_failures",
+            ),
+            "evidenceHardContradictions": items(
+                "evidenceHardContradictions",
+                "evidence_hard_contradictions",
+            ),
+            "evidenceContradictions": items(
+                "evidenceContradictions",
+                "evidence_contradictions",
+            ),
+            "evidenceMissingRequirements": items(
+                "evidenceMissingRequirements",
+                "evidence_missing_requirements",
+            ),
+            "answerabilityAccepted": flag(
+                "answerabilityAccepted",
+                "answerability_accepted",
+            ),
+            "answerabilityStrictlySupported": flag(
+                "answerabilityStrictlySupported",
+                "answerability_strictly_supported",
+            ),
+            "answerabilityEvidenceSelected": flag(
+                "answerabilityEvidenceSelected",
+                "answerability_evidence_selected",
+            ),
+            "answerabilityScore": number(
+                "answerabilityScore",
+                "answerability_score",
+                default=0.0,
+            ),
+            "answerabilityScoreMargin": number(
+                "answerabilityScoreMargin",
+                "answerability_score_margin",
+                default=0.0,
+            ),
+            "answerabilityRequirementCoverage": number(
+                "answerabilityRequirementCoverage",
+                "answerability_requirement_coverage",
+                default=0.0,
+            ),
+            "answerabilityConceptCoverage": number(
+                "answerabilityConceptCoverage",
+                "answerability_concept_coverage",
+                default=0.0,
+            ),
+            "answerabilityRequiresCoherentEvidence": flag(
+                "answerabilityRequiresCoherentEvidence",
+                "answerability_requires_coherent_evidence",
+            ),
+            "answerabilityCoherentEvidence": flag(
+                "answerabilityCoherentEvidence",
+                "answerability_coherent_evidence",
+            ),
+            "answerabilityDiagnostics": object_value(
+                "answerabilityDiagnostics",
+                "answerability_diagnostics",
+            ),
             "snapshotRetrievalMode": compact.get("snapshotRetrievalMode")
             or compact.get("snapshot_retrieval_mode"),
             "snapshotRetrievalQuery": coverage_query,
             "metadata": metadata,
             "evaluationSnapshotRank": rank,
-        })
+            "evaluationSnapshotLocked": True,
+        }
+        if not _strict_chunk(candidate):
+            raise EvaluationSnapshotContractError(
+                f"Snapshot candidate was not strictly accepted at capture: {chunk_id}. "
+                "Rebuild the retrieval snapshot."
+            )
+        hydrated.append(candidate)
 
     if not hydrated:
         return []
-
-    snapshot_query = str(
-        hydrated[0].get("snapshotRetrievalQuery")
-        or question
-    )
-    return _validate_for_original_question(
-        question,
-        hydrated,
-        requested_k=requested_k,
-        bridge_query=snapshot_query,
-        stage="evaluation_snapshot",
-    )
+    return hydrated[:requested_k]
 
 
 def _retrieve_with_language_fallback(
@@ -750,11 +912,6 @@ def _run_chat_impl(
     )
     if locked_candidates is not None:
         requested_k = max(top_k, MAX_GENERATION_CONTEXTS)
-        retrieved_chunks = _materialize_locked_candidates(
-            question,
-            locked_candidates,
-            requested_k=requested_k,
-        )
         retrieval_mode = "evaluation_snapshot"
         retrieval_query = str(
             next(
@@ -771,6 +928,25 @@ def _run_chat_impl(
                 question,
             )
         )
+        try:
+            retrieved_chunks = _materialize_locked_candidates(
+                question,
+                locked_candidates,
+                requested_k=requested_k,
+            )
+        except EvaluationSnapshotContractError as error:
+            payload = _refusal_payload(
+                started_at,
+                normalized_language,
+                failure_stage="evaluation_snapshot_contract",
+                generation_mode="evaluation_snapshot_contract_failure",
+                model="evaluation-snapshot-contract",
+                retrieval_mode=retrieval_mode,
+                retrieval_query=retrieval_query,
+                failure_reason="snapshot_contract_rejected",
+            )
+            payload["pipeline_error"] = str(error)
+            return payload
     else:
         retrieved_chunks, retrieval_mode, retrieval_query = _retrieve_with_language_fallback(
             question,
@@ -837,9 +1013,10 @@ def _run_chat_impl(
             started_at,
             normalized_language,
             failure_stage="context_or_answerability",
+            retrieval_mode=retrieval_mode,
+            retrieval_query=retrieval_query,
+            failure_reason="no_strict_answerable_context",
         )
-        payload["retrieval_mode"] = retrieval_mode
-        payload["retrieval_query"] = retrieval_query
         return payload
 
     confidence = round(top_confidence(chunks, question=question), 4)
@@ -849,9 +1026,16 @@ def _run_chat_impl(
             started_at,
             normalized_language,
             failure_stage="confidence_or_generation_context",
+            retrieval_mode=retrieval_mode,
+            retrieval_query=retrieval_query,
+            generation_contexts=generation_contexts,
+            preserve_generation_contexts=evaluation_mode,
+            failure_reason=(
+                "non_positive_confidence"
+                if confidence <= 0.0
+                else "empty_generation_context"
+            ),
         )
-        payload["retrieval_mode"] = retrieval_mode
-        payload["retrieval_query"] = retrieval_query
         return payload
 
     print(
@@ -1070,14 +1254,44 @@ def _run_chat_impl(
         },
     )
 
-    if not answer or is_refusal_answer(answer) or not sources:
+    answer_is_refusal = bool(answer and is_refusal_answer(answer))
+    if not answer or answer_is_refusal or not sources:
+        citation_validation: dict[str, Any] | None = None
+        if not answer:
+            failure_stage = "native_answer_empty"
+            failure_reason = "native_model_returned_empty_answer"
+            failure_generation_mode = "native_answer_empty"
+        elif answer_is_refusal:
+            failure_stage = "native_model_refusal"
+            failure_reason = "native_model_returned_refusal"
+            failure_generation_mode = "native_model_refusal"
+        else:
+            failure_stage = "citation_validation_failed"
+            failure_reason = "generated_answer_has_no_valid_supporting_citation"
+            failure_generation_mode = "citation_validation_failed"
+            citation_validation = validate_grounded_answer(
+                question,
+                answer,
+                chunks,
+            ).to_dict()
         payload = _refusal_payload(
             started_at,
             normalized_language,
-            failure_stage="answer_or_source_build",
+            failure_stage=failure_stage,
+            generation_mode=failure_generation_mode,
+            model=f"{selected_provider}-rag",
+            retrieval_mode=retrieval_mode,
+            retrieval_query=retrieval_query,
+            generation_contexts=generation_contexts,
+            preserve_generation_contexts=evaluation_mode,
+            failure_reason=failure_reason,
+            rejected_native_answer=(
+                answer
+                if failure_stage == "citation_validation_failed"
+                else ""
+            ),
+            citation_validation=citation_validation,
         )
-        payload["retrieval_mode"] = retrieval_mode
-        payload["retrieval_query"] = retrieval_query
         return payload
 
     raise_if_cancelled(cancel_event)

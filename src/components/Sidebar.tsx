@@ -17,6 +17,10 @@ import type {
   ConversationHistory,
   ConversationQuestion,
 } from './ConversationSearch';
+import {
+  useUiLanguage,
+  type UiLanguage,
+} from '../i18n/LanguageContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -45,15 +49,18 @@ interface MenuPosition {
   left: number;
 }
 
-const toDateLabel = (value?: string): string => {
+const toDateLabel = (
+  value: string | undefined,
+  language: UiLanguage
+): string => {
   if (!value) {
-    return 'Terbaru';
+    return language === 'EN' ? 'Latest' : 'Terbaru';
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return 'Terbaru';
+    return language === 'EN' ? 'Latest' : 'Terbaru';
   }
 
   const now = new Date();
@@ -73,10 +80,10 @@ const toDateLabel = (value?: string): string => {
     diffMs / (1000 * 60 * 60 * 24)
   );
 
-  if (diffDays === 0) return 'Hari ini';
-  if (diffDays === 1) return 'Kemarin';
+  if (diffDays === 0) return language === 'EN' ? 'Today' : 'Hari ini';
+  if (diffDays === 1) return language === 'EN' ? 'Yesterday' : 'Kemarin';
 
-  return date.toLocaleDateString('id-ID', {
+  return date.toLocaleDateString(language === 'EN' ? 'en-US' : 'id-ID', {
     day: '2-digit',
     month: 'short',
   });
@@ -99,7 +106,8 @@ const normalizeConversationTitle = (
 };
 
 const buildConversationDisplayTitle = (
-  conversation: ConversationSummary
+  conversation: ConversationSummary,
+  language: UiLanguage
 ): string => {
   const customTitle = normalizeConversationTitle(
     conversation.title
@@ -123,11 +131,12 @@ const buildConversationDisplayTitle = (
     return lastMessage;
   }
 
-  return 'Percakapan Baru';
+  return language === 'EN' ? 'New Conversation' : 'Percakapan Baru';
 };
 
 const mapConversationToRecentChat = (
-  conversation: ConversationSummary
+  conversation: ConversationSummary,
+  language: UiLanguage
 ): RecentChat => {
   const dateValue =
     conversation.last_message_at ??
@@ -137,13 +146,14 @@ const mapConversationToRecentChat = (
   return {
     id: conversation.id,
     title: buildConversationDisplayTitle(
-      conversation
+      conversation,
+      language
     ),
     pinned: Boolean(
       conversation.is_pinned ?? conversation.pinned
     ),
-    dateLabel: toDateLabel(dateValue),
-    group: 'Terbaru',
+    dateLabel: toDateLabel(dateValue, language),
+    group: language === 'EN' ? 'Latest' : 'Terbaru',
     lastMessage: conversation.last_message,
     lastUserMessage: conversation.last_user_message,
     questions: (conversation.user_messages ?? []).map(
@@ -151,7 +161,7 @@ const mapConversationToRecentChat = (
         id: question.id,
         content: question.content,
         createdAt: question.created_at,
-        dateLabel: toDateLabel(question.created_at),
+        dateLabel: toDateLabel(question.created_at, language),
       })
     ),
   };
@@ -166,6 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user, isAdmin, logout } = useAuth();
+  const { language, t } = useUiLanguage();
 
   const [recentChats, setRecentChats] =
     useState<RecentChat[]>([]);
@@ -197,21 +208,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       setRecentChats(
         conversations.map(
-          mapConversationToRecentChat
+          (conversation) =>
+            mapConversationToRecentChat(conversation, language)
         )
       );
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal memuat riwayat percakapan.';
+          : t('failedHistory');
 
       setHistoryError(message);
       setRecentChats([]);
     } finally {
       setIsLoadingChats(false);
     }
-  }, []);
+  }, [language, t]);
 
   useEffect(() => {
     if (isOpen || isConversationSearchOpen) {
@@ -382,9 +394,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       await navigator.clipboard.writeText(
         `${window.location.origin}/?conversationId=${chat.id}`
       );
-      window.alert('Tautan percakapan berhasil disalin.');
+      window.alert(t('copiedConversationLink'));
     } catch {
-      window.alert(`Bagikan percakapan: ${chat.title}`);
+      window.alert(`${t('shareConversation')}: ${chat.title}`);
     }
   };
 
@@ -405,7 +417,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setRecentChats((previousChats) =>
         previousChats.map((item) =>
           item.id === chat.id
-            ? mapConversationToRecentChat(updatedConversation)
+            ? mapConversationToRecentChat(updatedConversation, language)
             : item
         )
       );
@@ -413,7 +425,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal memperbarui status sematan.';
+          : t('failedPin');
       window.alert(message);
     }
   };
@@ -422,7 +434,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const newTitle = window.prompt(
-      'Ubah nama percakapan',
+      t('renameConversation'),
       chat.title
     );
 
@@ -443,7 +455,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setRecentChats((previousChats) =>
         previousChats.map((item) =>
           item.id === chat.id
-            ? mapConversationToRecentChat(updatedConversation)
+            ? mapConversationToRecentChat(updatedConversation, language)
             : item
         )
       );
@@ -451,7 +463,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal menyimpan nama percakapan.';
+          : t('failedRename');
       window.alert(message);
     }
   };
@@ -460,7 +472,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     chat: RecentChat
   ) => {
     const shouldDelete = window.confirm(
-      `Hapus percakapan "${chat.title}"?`
+      t('confirmDeleteConversation', { title: chat.title })
     );
 
     if (!shouldDelete) return;
@@ -477,7 +489,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const message =
         error instanceof Error
           ? error.message
-          : 'Gagal menghapus percakapan.';
+          : t('failedDeleteConversation');
       window.alert(message);
     }
   };
@@ -575,8 +587,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onToggle}
             className="pointer-events-auto absolute left-1/2 top-4 -translate-x-1/2 flex h-9 w-9 items-center justify-center rounded-xl text-white transition-all hover:bg-white/10 active:scale-95"
-            aria-label="Buka bilah samping"
-            title="Buka bilah samping"
+            aria-label={t('openMainMenu')}
+            title={t('openMainMenu')}
           >
             <img
               src="/icon.png"
@@ -601,7 +613,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onToggle();
             }
           }}
-          aria-label={!isOpen ? 'Buka bilah samping' : undefined}
+          aria-label={!isOpen ? t('openMainMenu') : undefined}
         >
           {/* Ikon Profil */}
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-transparent text-white/80">
@@ -613,10 +625,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {isOpen && (
             <div className="min-w-0 flex-1">
               <p className="text-[12px] font-medium text-white/50">
-                Selamat datang 👋
+                {t('welcome')}
               </p>
               <p className="truncate text-[16px] font-bold text-white/90">
-                {user?.name ?? user?.username ?? 'Staf'}
+                {user?.name ?? user?.username ?? t('staff')}
               </p>
             </div>
           )}
@@ -626,8 +638,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               onClick={onClose}
               className="absolute right-0 top-1 flex h-8 w-8 items-center justify-center text-white/45 transition-colors hover:text-white"
-              aria-label="Tutup bilah samping"
-              title="Tutup bilah samping"
+              aria-label={t('closeMainMenu')}
+              title={t('closeMainMenu')}
             >
               <svg
                 viewBox="0 0 24 24"
@@ -657,7 +669,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={handleNewChat}
-            title="Percakapan Baru"
+            title={t('newChat')}
             className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
               isOpen 
                 ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -667,13 +679,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="material-symbols-outlined text-[20px]">
               edit_square
             </span>
-            {isOpen && <span>Percakapan Baru</span>}
+            {isOpen && <span>{t('newChat')}</span>}
           </button>
 
           <button
             type="button"
             onClick={handleOpenConversationSearch}
-            title="Cari Percakapan"
+            title={t('searchChats')}
             className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
               isOpen 
                 ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -683,14 +695,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="material-symbols-outlined text-[20px]">
               search
             </span>
-            {isOpen && <span>Cari Percakapan</span>}
+            {isOpen && <span>{t('searchChats')}</span>}
           </button>
 
           {isAdmin && (
             <Link
               to="/admin"
               onClick={isOpen ? onClose : undefined}
-              title="Panel Admin"
+              title={t('adminDashboard')}
               className={`flex items-center transition-all hover:bg-white/10 hover:text-white active:scale-[0.98] ${
                 isOpen 
                   ? 'w-full gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-medium text-white/70' 
@@ -700,7 +712,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 admin_panel_settings
               </span>
-              {isOpen && <span>Panel Admin</span>}
+              {isOpen && <span>{t('adminDashboard')}</span>}
             </Link>
           )}
         </nav>
@@ -709,7 +721,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {isOpen && (
           <>
             <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-widest text-white/40">
-              <span>Percakapan Terbaru: {sortedChats.length}</span>
+              <span>{t('recentChats')}: {sortedChats.length}</span>
               <span className="material-symbols-outlined text-[14px]">
                 history
               </span>
@@ -720,7 +732,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex flex-col gap-1">
                   {isLoadingChats && sortedChats.length === 0 ? (
                     <p className="py-4 text-center text-[13px] text-white/40">
-                      Memuat riwayat...
+                      {t('loadingHistory')}
                     </p>
                   ) : historyError ? (
                     <div className="m-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/60">
@@ -754,7 +766,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           {chat.pinned && (
                             <span
                               className="material-symbols-outlined shrink-0 text-[16px] text-white/80"
-                              title="Percakapan disematkan"
+                              title={t('pin')}
                             >
                               push_pin
                             </span>
@@ -798,7 +810,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">share</span>
-                                Bagikan
+                                {t('share')}
                               </button>
                               <button
                                 type="button"
@@ -806,7 +818,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">push_pin</span>
-                                {chat.pinned ? 'Lepas Sematan' : 'Sematkan'}
+                                {chat.pinned ? t('unpin') : t('pin')}
                               </button>
                               <button
                                 type="button"
@@ -814,7 +826,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">edit</span>
-                                Ubah Nama
+                                {t('rename')}
                               </button>
                               <div className="my-1 border-t border-white/10" />
                               <button
@@ -823,7 +835,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
                               >
                                 <span className="material-symbols-outlined text-[19px]">delete</span>
-                                Hapus
+                                {t('delete')}
                               </button>
                             </div>,
                             document.body
@@ -832,7 +844,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ))
                   ) : (
                     <p className="py-4 text-center text-[13px] text-white/40">
-                      Belum ada percakapan.
+                      {t('noChatHistory')}
                     </p>
                   )}
                 </div>
@@ -847,7 +859,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={handleLogout}
-              title="Keluar"
+              title={t('logout')}
               className={`flex items-center justify-center transition-colors hover:bg-white/10 hover:text-white active:scale-[0.98] ${
                 isOpen 
                   ? 'w-full gap-2 rounded-[16px] bg-white/5 py-3 text-[14px] font-medium text-white/60' 
@@ -857,7 +869,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[20px]">
                 logout
               </span>
-              {isOpen && <span>Keluar</span>}
+              {isOpen && <span>{t('logout')}</span>}
             </button>
           </div>
         </div>

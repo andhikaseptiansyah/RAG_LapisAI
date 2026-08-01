@@ -424,7 +424,7 @@ def build_ollama_grounded_answer(
         else (
             "MANDATORY OUTPUT LANGUAGE: Bahasa Indonesia only. Translate English evidence into natural "
             "Bahasa Indonesia. Do not copy English sentences except proper names, product names, codes, "
-            "and acronyms. "
+            "acronyms, UI labels, portal/menu names, button names, channel names, and team names. "
         )
     )
     system_prompt = (
@@ -477,7 +477,9 @@ def build_ollama_grounded_answer(
             "bukti hanya jika semuanya menjawab pertanyaan. Jangan "
             "mengulang fakta, menambah basa-basi, atau menyimpulkan hal yang tidak ada dalam bukti. "
             "Jangan menyalin kalimat bahasa Inggris kecuali nama diri, "
-            "nama produk, kode, dan akronim. Keluarkan teks jawaban saja. BAHASA INDONESIA SAJA."
+            "nama produk, kode, akronim, label antarmuka, nama portal/menu, nama tombol, nama kanal, "
+            "dan nama tim yang harus dipertahankan persis seperti bukti. Keluarkan teks jawaban saja. "
+            "BAHASA INDONESIA SAJA."
         )
 
     try:

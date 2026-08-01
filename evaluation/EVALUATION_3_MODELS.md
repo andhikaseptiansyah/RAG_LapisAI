@@ -1,62 +1,41 @@
-# Evaluasi 3 Model LapisAI
+# Evaluasi Ollama, Gemini, dan Groq
 
-Evaluasi ini membandingkan **Ollama, Gemini, dan Groq** pada pertanyaan dan bukti retrieval yang sama.
+Pipeline ini membandingkan provider generation pada dataset dan retrieval
+snapshot yang sama. Endpoint evaluasi hanya dapat diakses administrator dan
+tidak menambah riwayat percakapan maupun query log aplikasi.
 
-## Dataset pengguna
-
-Dataset aktif berasal dari:
-
-- `evaluation/datasets/raw_user/qna_english.csv`
-- `evaluation/datasets/raw_user/qna_indonesia.csv`
-
-Sebelum evaluasi, dataset dibersihkan oleh `evaluation/prepare_evaluation_dataset.py`.
-Satu duplikat persis pada pertanyaan **How long are audit logs retained?** digabung agar tidak menggandakan bobot satu kasus.
-
-Dataset final:
+## Dataset aktif
 
 | Bahasa | Total | Answerable | Unanswerable |
 |---|---:|---:|---:|
-| Inggris | 74 | 69 | 5 |
-| Indonesia | 15 | 10 | 5 |
-| **Total** | **89** | **79** | **10** |
+| English | 50 | 45 | 5 |
+| Indonesia | 50 | 45 | 5 |
+| **Total** | **100** | **90** | **10** |
 
-Audit tersedia di `evaluation/datasets/dataset_audit_user.json`.
+Sumber dataset adalah `datasets/qna_english_user.csv` dan
+`datasets/qna_indonesia_user.csv`. Dataset final tidak memiliki pertanyaan
+duplikat.
 
-## Requirement Project 1 yang dicakup
+## Metrik
 
-Evaluasi mencakup dua lapisan:
+Retrieval:
 
-1. **Retrieval quality**
-   - Precision@K
-   - Recall@K
-   - Hit@K
-   - Mean Reciprocal Rank atau MRR
-   - Context precision dan context recall
+- Precision@K, Recall@K, Hit@K, MRR, NDCG@K, dan Top-1 accuracy.
+- Context precision/recall dan kecocokan dokumen rujukan.
 
-2. **Answer quality**
-   - Token F1
-   - Expected-keyword coverage
-   - Faithfulness 1–5
-   - Answer relevance 1–5
-   - Citation accuracy
-   - False-refusal rate
-   - Unanswerable safety rate
-   - Hallucination rate
-   - Generation failure rate
-   - Average, median, dan P95 latency
+Jawaban dan grounding:
 
-Faithfulness dan answer relevance memakai **satu judge model yang sama** untuk semua provider. Gunakan `--skip-llm-judge` bila judge belum tersedia. Metrik deterministik tetap dihitung.
+- Token F1 dan expected-keyword coverage.
+- Citation precision, recall, dan F1.
+- Faithfulness serta answer relevance bila LLM judge diaktifkan.
+- False-refusal rate, unanswerable safety rate, hallucination rate, dan
+  generation failure rate.
+- Average, median, dan P95 latency.
 
-## Keadilan perbandingan
+Perbandingan utama memakai macro average per bahasa agar English dan Indonesia
+mendapat bobot seimbang. Latency dilaporkan terpisah dari skor kualitas.
 
-- Satu snapshot retrieval dibuat sebelum ketiga model dijalankan.
-- Snapshot tersebut dipakai untuk menghitung Precision@K, Recall@K, Hit@K, dan MRR.
-- Karena ketiga model memakai pipeline retrieval yang sama, metrik retrieval seharusnya sama. Perbedaan antar-model terutama terlihat pada jawaban, grounding, safety, dan latency.
-- Fingerprint konteks generasi dibandingkan antar-model.
-- Perbandingan utama memakai **bilingual macro average**. Bahasa Inggris dan Indonesia mendapat bobot sama meskipun jumlah pertanyaannya berbeda.
-- Latency ditampilkan terpisah dan tidak menaikkan skor kualitas.
-
-Skor komposit:
+Jika judge tersedia, komposisi overall score adalah:
 
 ```text
 Overall = 35% Answer Quality
@@ -65,115 +44,118 @@ Overall = 35% Answer Quality
         + 15% Safety
 ```
 
-## Persiapan
+Tanpa judge, pipeline tetap menghasilkan deterministic score dan menandai skor
+komposit sebagai belum lengkap.
 
-Tambahkan konfigurasi ke `.env`:
+## Persiapan `.env`
+
+Konfigurasi minimum untuk Ollama:
 
 ```env
-GEMINI_API_KEY=...
-GROQ_API_KEY=...
-
 LAPISAI_EVAL_USERNAME=admin
-LAPISAI_EVAL_PASSWORD=...
+LAPISAI_EVAL_PASSWORD=PASSWORD_ADMIN_LOKAL_ANDA
+LAPISAI_LOGIN_URL=http://127.0.0.1:8000/api/auth/login
+LAPISAI_HEALTH_URL=http://127.0.0.1:8000/health
+LAPISAI_RETRIEVAL_DEBUG_URL=http://127.0.0.1:8000/api/admin/retrieval-debug
+LAPISAI_EVALUATION_READINESS_URL=http://127.0.0.1:8000/api/admin/evaluation/readiness
+LAPISAI_EVALUATION_CHAT_URL=http://127.0.0.1:8000/api/admin/evaluation/chat
+LAPISAI_EVAL_TIMEOUT=240
 
 OLLAMA_MODEL=qwen3-custom:latest
+```
+
+Untuk provider eksternal, tambahkan key dan nama model masing-masing:
+
+```env
+GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash
+
+GROQ_API_KEY=
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-Untuk LLM judge lokal:
+Untuk judge lokal yang kompatibel dengan OpenAI API:
 
 ```env
-EVAL_LLM_BASE_URL=http://localhost:11434/v1
+EVAL_LLM_BASE_URL=http://127.0.0.1:11434/v1
 EVAL_LLM_API_KEY=ollama
 EVAL_LLM_MODEL=qwen3-custom:latest
 ```
 
-## Jalankan backend
+Jangan commit key, token, atau password asli.
+
+## Urutan menjalankan
+
+1. Jalankan backend:
+
+   ```powershell
+   python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000 --app-dir backend
+   ```
+
+2. Pastikan Ollama/provider aktif.
+3. Upload dan index seluruh dokumen corpus.
+4. Validasi dataset saja:
+
+   ```powershell
+   python .\evaluation\run_user_100_evaluation.py --models ollama --validate-only
+   ```
+
+5. Validasi corpus dan local index:
+
+   ```powershell
+   python .\evaluation\validate_user_100_setup.py
+   ```
+
+6. Jalankan Ollama terlebih dahulu:
+
+   ```powershell
+   python .\evaluation\run_user_100_evaluation.py `
+     --models ollama `
+     --skip-llm-judge `
+     --output-dir .\evaluation\generation\results\ollama_100
+   ```
+
+Runner akan login, memeriksa health endpoint, lalu memastikan setiap dokumen
+yang dirujuk 90 pertanyaan answerable benar-benar ada di Chroma collection
+aktif. Proses berhenti dengan daftar dokumen yang kurang bila readiness gagal.
+
+Lanjutkan checkpoint dengan output directory yang sama:
 
 ```powershell
-python -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000 --app-dir backend
+python .\evaluation\run_user_100_evaluation.py `
+  --models ollama `
+  --skip-llm-judge `
+  --resume `
+  --output-dir .\evaluation\generation\results\ollama_100
 ```
 
-Endpoint evaluasi khusus tersedia di:
-
-```text
-POST /api/admin/evaluation/chat
-```
-
-Endpoint ini hanya dapat dipakai admin dan **tidak menyimpan percakapan atau query log**, sehingga benchmark tidak mengotori data aplikasi.
-
-## Validasi dataset
+Evaluasi tiga provider:
 
 ```powershell
-python .\evaluation\generation\run_three_model_evaluation.py --validate-only
+python .\evaluation\run_user_100_evaluation.py `
+  --models ollama gemini groq `
+  --output-dir .\evaluation\generation\results\three_models_100
 ```
 
-Hasil yang benar:
+## Fairness
 
-```text
-Total: 89
-English: 74
-Indonesia: 15
-Answerable: 79
-Unanswerable: 10
-```
-
-## Jalankan evaluasi penuh
-
-```powershell
-python .\evaluation\generation\run_three_model_evaluation.py
-```
-
-Atau:
-
-```powershell
-.\evaluation\run_three_model_evaluation.ps1
-```
-
-Linux atau macOS:
-
-```bash
-./evaluation/run_three_model_evaluation.sh
-```
-
-Evaluasi melakukan:
-
-- 89 retrieval snapshot
-- 89 jawaban Ollama
-- 89 jawaban Gemini
-- 89 jawaban Groq
-- Sampai 267 penilaian judge bila LLM judge diaktifkan
-
-## Melanjutkan proses
-
-```powershell
-python .\evaluation\generation\run_three_model_evaluation.py --resume
-```
-
-Checkpoint disimpan setelah setiap pertanyaan.
-
-## Evaluasi tanpa LLM judge
-
-```powershell
-python .\evaluation\generation\run_three_model_evaluation.py --skip-llm-judge
-```
+- Retrieval snapshot hanya dibuat satu kali per run.
+- Setiap provider menerima ranked candidates dan generation contexts yang sama.
+- Context fingerprint dicatat untuk mendeteksi perbedaan bukti antar-model.
+- Provider yang gagal tidak diam-diam diganti provider lain.
+- `--resume` memakai checkpoint yang sama dan tidak mengulang baris selesai.
 
 ## Output
 
 ```text
-evaluation/generation/results/three_model_<timestamp>/
+evaluation/generation/results/<run>/
 ├── retrieval_snapshot.json
 ├── raw/
 │   ├── input_answers_ollama.json
 │   ├── input_answers_gemini.json
 │   └── input_answers_groq.json
-├── generation_results_ollama.csv
-├── generation_results_gemini.csv
-├── generation_results_groq.csv
-├── generation_summary_ollama.json
-├── generation_summary_gemini.json
-├── generation_summary_groq.json
+├── generation_results_<model>.csv
+├── generation_summary_<model>.json
 ├── comparison_3_models.csv
 ├── comparison_3_models.json
 ├── comparison_3_models.md
@@ -187,12 +169,6 @@ evaluation/generation/results/three_model_<timestamp>/
     └── evaluation_dashboard.html
 ```
 
-## Membaca hasil
-
-Jangan memilih model hanya dari satu skor.
-
-- Pilih **retrieval score** tinggi bila sumber sering gagal ditemukan.
-- Pilih **grounding score** tinggi bila risiko hallucination menjadi perhatian utama.
-- Pilih **safety score** tinggi bila pertanyaan unanswerable harus ditolak dengan benar.
-- Gunakan diagram latency untuk menilai pengalaman pengguna.
-- Periksa baris dengan confidence tinggi tetapi citation accuracy rendah secara manual.
+Jangan memilih model dari satu angka saja. Periksa retrieval, citation F1,
+false-refusal, hallucination, generation failure, dan latency bersama-sama;
+lalu audit manual kasus dengan confidence tinggi tetapi citation F1 rendah.

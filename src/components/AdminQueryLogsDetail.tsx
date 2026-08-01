@@ -10,6 +10,8 @@ import {
   type QueryRange,
 } from '../services/queryLogService';
 import { getAdminApiErrorMessage } from '../services/api';
+import { useUiLanguage } from '../i18n/LanguageContext';
+import type { UiLanguage } from '../i18n/LanguageContext';
 
 const queryRangeLabels: Record<QueryRange, string> = {
   daily: 'Today',
@@ -33,8 +35,16 @@ const getStatusStyle = (status: QueryLogStatus): string => {
   }
 };
 
-const formatStatusLabel = (status: QueryLogStatus): string => {
-  return status.replace(/_/g, ' ');
+const formatStatusLabel = (
+  status: QueryLogStatus,
+  language: UiLanguage,
+): string => {
+  const labels: Record<QueryLogStatus, Record<UiLanguage, string>> = {
+    ANSWERED: { EN: 'ANSWERED', ID: 'TERJAWAB' },
+    NO_REFERENCE: { EN: 'NO REFERENCE', ID: 'TANPA REFERENSI' },
+    NOT_FOUND: { EN: 'NOT FOUND', ID: 'TIDAK DITEMUKAN' },
+  };
+  return labels[status]?.[language] ?? status.replace(/_/g, ' ');
 };
 
 const normalizeTimestamp = (timestamp: string): string => {
@@ -47,10 +57,10 @@ const parseTimestampToDate = (timestamp: string): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-const formatLogTime = (timestamp: string): string => {
+const formatLogTime = (timestamp: string, language: UiLanguage): string => {
   const date = parseTimestampToDate(timestamp);
   if (!date) return timestamp?.split(' ')[1] ?? '-';
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString(language === 'EN' ? 'en-US' : 'id-ID', {
     timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
@@ -58,10 +68,10 @@ const formatLogTime = (timestamp: string): string => {
   });
 };
 
-const formatLogDateTime = (timestamp: string): string => {
+const formatLogDateTime = (timestamp: string, language: UiLanguage): string => {
   const date = parseTimestampToDate(timestamp);
   if (!date) return timestamp || '-';
-  return date.toLocaleString('en-US', {
+  return date.toLocaleString(language === 'EN' ? 'en-US' : 'id-ID', {
     timeZone: 'Asia/Jakarta',
     year: 'numeric',
     month: 'short',
@@ -129,33 +139,40 @@ const formatPercent = (value: number): string => {
   return `${Math.round((Number.isFinite(value) ? value : 0) * 100)}%`;
 };
 
-const formatSourceLocation = (source: RetrievedSource): string => {
+const formatSourceLocation = (
+  source: RetrievedSource,
+  language: UiLanguage,
+): string => {
   const labels: string[] = [];
 
   if (source.page?.trim()) {
-    labels.push(`Page ${source.page}`);
+    labels.push(`${language === 'EN' ? 'Page' : 'Halaman'} ${source.page}`);
   }
   if (source.section?.trim()) {
-    labels.push(`Bagian: ${source.section}`);
+    labels.push(`${language === 'EN' ? 'Section' : 'Bagian'}: ${source.section}`);
   }
   if (source.paragraphStart !== undefined) {
     const end = source.paragraphEnd ?? source.paragraphStart;
     labels.push(
       end === source.paragraphStart
-        ? `Paragraf ${source.paragraphStart}`
-        : `Paragraf ${source.paragraphStart}-${end}`
+        ? `${language === 'EN' ? 'Paragraph' : 'Paragraf'} ${source.paragraphStart}`
+        : `${language === 'EN' ? 'Paragraphs' : 'Paragraf'} ${source.paragraphStart}-${end}`
     );
   }
   if (source.lineStart !== undefined) {
     const end = source.lineEnd ?? source.lineStart;
     labels.push(
       end === source.lineStart
-        ? `Baris ${source.lineStart}`
-        : `Baris ${source.lineStart}-${end}`
+        ? `${language === 'EN' ? 'Line' : 'Baris'} ${source.lineStart}`
+        : `${language === 'EN' ? 'Lines' : 'Baris'} ${source.lineStart}-${end}`
     );
   }
 
-  return labels.join(' • ') || 'Source location unavailable';
+  return labels.join(' • ') || (
+    language === 'EN'
+      ? 'Source location unavailable'
+      : 'Lokasi sumber tidak tersedia'
+  );
 };
 
 const normalizeConfidenceScore = (value: unknown): number => {
@@ -239,6 +256,7 @@ const metricStyles: Record<MetricTone, { bg: string, text: string }> = {
 };
 
 const AdminQueryLogsDetail: React.FC = () => {
+  const { language } = useUiLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null);
   const [queryPage, setQueryPage] = useState(1);
@@ -311,13 +329,13 @@ const AdminQueryLogsDetail: React.FC = () => {
 
   // Metrik dikonfigurasi mengikuti palet warna gambar referensi
   const performanceSummary = useMemo<PerformanceMetric[]>(() => [
-    { label: 'Total Queries', value: String(performance.totalQueries ?? totalLogs), icon: 'folder', decoIcon: 'folder', tone: 'cyan' },
-    { label: 'Answered', value: String(performance.answered ?? 0), icon: 'check_circle', decoIcon: 'fact_check', tone: 'green' },
-    { label: 'No Reference', value: String(performance.noReference ?? 0), icon: 'link_off', decoIcon: 'description', tone: 'orange' },
-    { label: 'Not Found', value: String(performance.notFound ?? 0), icon: 'error', decoIcon: 'folder_off', tone: 'pink' },
-    { label: 'Avg Confidence', value: `${Math.round((performance.averageConfidence || 0) * 100)}%`, icon: 'bar_chart', decoIcon: 'insert_chart', tone: 'yellow' },
-    { label: 'Avg Response', value: `${(performance.averageResponseTime || 0).toFixed(2)}s`, icon: 'speed', decoIcon: 'speed', tone: 'purple' },
-  ], [performance, totalLogs]);
+    { label: language === 'EN' ? 'Total Queries' : 'Total Kueri', value: String(performance.totalQueries ?? totalLogs), icon: 'folder', decoIcon: 'folder', tone: 'cyan' },
+    { label: language === 'EN' ? 'Answered' : 'Terjawab', value: String(performance.answered ?? 0), icon: 'check_circle', decoIcon: 'fact_check', tone: 'green' },
+    { label: language === 'EN' ? 'No Reference' : 'Tanpa Referensi', value: String(performance.noReference ?? 0), icon: 'link_off', decoIcon: 'description', tone: 'orange' },
+    { label: language === 'EN' ? 'Not Found' : 'Tidak Ditemukan', value: String(performance.notFound ?? 0), icon: 'error', decoIcon: 'folder_off', tone: 'pink' },
+    { label: language === 'EN' ? 'Avg Confidence' : 'Rata-rata Keyakinan', value: `${Math.round((performance.averageConfidence || 0) * 100)}%`, icon: 'bar_chart', decoIcon: 'insert_chart', tone: 'yellow' },
+    { label: language === 'EN' ? 'Avg Response' : 'Rata-rata Respons', value: `${(performance.averageResponseTime || 0).toFixed(2)}s`, icon: 'speed', decoIcon: 'speed', tone: 'purple' },
+  ], [language, performance, totalLogs]);
 
   return (
     <div className="bg-slate-950 text-slate-200 font-sans flex h-screen w-full selection:bg-blue-500/30 overflow-hidden">
@@ -339,22 +357,13 @@ const AdminQueryLogsDetail: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
-                Query Logs
+                {language === 'EN' ? 'Query Logs' : 'Log Kueri'}
               </h1>
               <p className="text-sm text-slate-400 mt-1.5 max-w-2xl">
-                Monitor user questions, retrieved source documents, and system response performance.
+                {language === 'EN'
+                  ? 'Monitor user questions, retrieved source documents, and system response performance.'
+                  : 'Pantau pertanyaan pengguna, dokumen sumber yang diambil, dan performa respons sistem.'}
               </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => void loadQueryLogs()}
-                disabled={isLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-800 bg-slate-900 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-50 transition-colors shadow-sm"
-              >
-                <span className="material-symbols-outlined text-[18px]">refresh</span>
-                {isLoading ? 'Refreshing...' : 'Refresh'}
-              </button>
             </div>
           </div>
 
@@ -409,12 +418,21 @@ const AdminQueryLogsDetail: React.FC = () => {
                       isActive ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                     }`}
                   >
-                    {queryRangeLabels[range]}
+                    {language === 'EN'
+                      ? queryRangeLabels[range]
+                      : {
+                          daily: 'Hari Ini',
+                          weekly: 'Minggu Ini',
+                          monthly: 'Bulan Ini',
+                          yearly: 'Tahun Ini',
+                        }[range]}
                   </button>
                 );
               })}
             </div>
-            <span className="text-xs font-medium text-slate-400 px-2">Total: {totalLogs} logs</span>
+            <span className="text-xs font-medium text-slate-400 px-2">
+              Total: {totalLogs} {language === 'EN' ? 'logs' : 'log'}
+            </span>
           </div>
 
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start relative">
@@ -423,7 +441,9 @@ const AdminQueryLogsDetail: React.FC = () => {
               <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm flex flex-col">
                 <div className="flex-1 divide-y divide-slate-800/50">
                   {isLoading && queryLogs.length === 0 ? (
-                    <div className="p-8 text-center text-sm text-slate-500">Loading query logs...</div>
+                    <div className="p-8 text-center text-sm text-slate-500">
+                      {language === 'EN' ? 'Loading query logs...' : 'Memuat log kueri...'}
+                    </div>
                   ) : queryLogs.length > 0 ? (
                     queryLogs.map((log) => {
                       const isSelected = selectedQueryId === log.queryId;
@@ -440,23 +460,28 @@ const AdminQueryLogsDetail: React.FC = () => {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <p className="text-sm font-medium text-slate-200 line-clamp-2">"{log.userQuestion}"</p>
                             <span className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-medium border ${getStatusStyle(log.status)}`}>
-                              {formatStatusLabel(log.status)}
+                              {formatStatusLabel(log.status, language)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-xs text-slate-500">
-                            <span>{formatLogTime(log.timestamp)}</span>
-                            <span>{formatPercent(log.confidenceScore)} confidence</span>
+                            <span>{formatLogTime(log.timestamp, language)}</span>
+                            <span>{formatPercent(log.confidenceScore)} {language === 'EN' ? 'confidence' : 'keyakinan'}</span>
                           </div>
                         </button>
                       );
                     })
                   ) : (
-                    <div className="p-8 text-center text-sm text-slate-500">No logs found for this period.</div>
+                    <div className="p-8 text-center text-sm text-slate-500">
+                      {language === 'EN' ? 'No logs found for this period.' : 'Tidak ada log pada periode ini.'}
+                    </div>
                   )}
                 </div>
 
                 <div className="p-4 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
-                  <span>Menampilkan {queryStartNumber}-{queryEndNumber} dari {totalLogs} log</span>
+                  <span>
+                    {language === 'EN' ? 'Showing' : 'Menampilkan'} {queryStartNumber}-{queryEndNumber}{' '}
+                    {language === 'EN' ? 'of' : 'dari'} {totalLogs} {language === 'EN' ? 'logs' : 'log'}
+                  </span>
                   
                   {totalQueryPages > 1 && (
                     <div className="flex items-center gap-3">
@@ -465,7 +490,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                         disabled={safeQueryPage === 1}
                         className="px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors flex items-center"
                       >
-                        Prev
+                        {language === 'EN' ? 'Prev' : 'Sebelumnya'}
                       </button>
                       
                       <span className="font-medium text-slate-300">
@@ -477,7 +502,7 @@ const AdminQueryLogsDetail: React.FC = () => {
                         disabled={safeQueryPage === totalQueryPages}
                         className="px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors flex items-center"
                       >
-                        Next
+                        {language === 'EN' ? 'Next' : 'Berikutnya'}
                       </button>
                     </div>
                   )}
@@ -490,26 +515,34 @@ const AdminQueryLogsDetail: React.FC = () => {
                 <>
                   <div className="p-5 md:p-6 border-b border-slate-800 sticky top-0 bg-slate-900/95 backdrop-blur z-10">
                     <div className="flex flex-wrap items-center gap-3 mb-1.5">
-                      <h2 className="text-lg font-semibold text-white">Detail Log</h2>
+                      <h2 className="text-lg font-semibold text-white">
+                        {language === 'EN' ? 'Log Detail' : 'Detail Log'}
+                      </h2>
                       <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-medium border ${getStatusStyle(selectedLog.status)}`}>
-                        {formatStatusLabel(selectedLog.status)}
+                        {formatStatusLabel(selectedLog.status, language)}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 font-mono truncate">ID: {selectedLog.queryId} • {formatLogDateTime(selectedLog.timestamp)}</p>
+                    <p className="text-xs text-slate-400 font-mono truncate">ID: {selectedLog.queryId} • {formatLogDateTime(selectedLog.timestamp, language)}</p>
                   </div>
 
                   <div className="p-5 md:p-6 space-y-6">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                       <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800">
-                        <p className="text-xs font-medium text-slate-500 mb-1">User</p>
+                        <p className="text-xs font-medium text-slate-500 mb-1">
+                          {language === 'EN' ? 'User' : 'Pengguna'}
+                        </p>
                         <p className="text-sm font-medium text-slate-200 truncate">{selectedLog.userName}</p>
                       </div>
                       <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800">
-                        <p className="text-xs font-medium text-slate-500 mb-1">Response Time</p>
+                        <p className="text-xs font-medium text-slate-500 mb-1">
+                          {language === 'EN' ? 'Response Time' : 'Waktu Respons'}
+                        </p>
                         <p className="text-sm font-medium text-slate-200">{selectedLog.responseTime}</p>
                       </div>
                       <div className="p-3.5 md:p-4 rounded-lg bg-slate-950 border border-slate-800 hidden md:block">
-                        <p className="text-xs font-medium text-slate-500 mb-1">Confidence</p>
+                        <p className="text-xs font-medium text-slate-500 mb-1">
+                          {language === 'EN' ? 'Confidence' : 'Keyakinan'}
+                        </p>
                         <p className="text-sm font-medium text-slate-200">{formatPercent(selectedLog.confidenceScore)}</p>
                       </div>
                     </div>
@@ -517,7 +550,8 @@ const AdminQueryLogsDetail: React.FC = () => {
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">help</span> User Question
+                          <span className="material-symbols-outlined text-[16px]">help</span>{' '}
+                          {language === 'EN' ? 'User Question' : 'Pertanyaan Pengguna'}
                         </h3>
                         <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-200">
                           {selectedLog.userQuestion}
@@ -526,10 +560,12 @@ const AdminQueryLogsDetail: React.FC = () => {
 
                       <div>
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">smart_toy</span> System Answer
+                          <span className="material-symbols-outlined text-[16px]">smart_toy</span>{' '}
+                          {language === 'EN' ? 'System Answer' : 'Jawaban Sistem'}
                         </h3>
                         <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-800 text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
-                          {selectedLog.answerGenerated || 'No answer was generated.'}
+                          {selectedLog.answerGenerated ||
+                            (language === 'EN' ? 'No answer was generated.' : 'Tidak ada jawaban yang dibuat.')}
                         </div>
                       </div>
                     </div>
@@ -537,10 +573,12 @@ const AdminQueryLogsDetail: React.FC = () => {
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">description</span> Retrieved Sources
+                          <span className="material-symbols-outlined text-[16px]">description</span>{' '}
+                          {language === 'EN' ? 'Retrieved Sources' : 'Sumber yang Diambil'}
                         </h3>
                         <span className="text-xs text-slate-500 bg-slate-950 border border-slate-800 px-2 py-1 rounded-md">
-                          {(selectedLog.retrievedDocuments ?? []).length} documents
+                          {(selectedLog.retrievedDocuments ?? []).length}{' '}
+                          {language === 'EN' ? 'documents' : 'dokumen'}
                         </span>
                       </div>
 
@@ -550,7 +588,9 @@ const AdminQueryLogsDetail: React.FC = () => {
                             <div key={`${source.documentName}-${source.chunkId}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-slate-800 bg-slate-950">
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-medium text-slate-200 truncate">{source.documentName}</p>
-                                <p className="text-xs text-slate-500 mt-0.5">{formatSourceLocation(source)} • Chunk {source.chunkId}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  {formatSourceLocation(source, language)} • {language === 'EN' ? 'Chunk' : 'Potongan'} {source.chunkId}
+                                </p>
                                 {source.excerpt && (
                                   <blockquote className="mt-2 rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs italic leading-relaxed text-slate-400">
                                     “{source.excerpt}”
@@ -558,14 +598,16 @@ const AdminQueryLogsDetail: React.FC = () => {
                                 )}
                               </div>
                               <span className="w-fit text-xs font-medium text-blue-400 bg-blue-500/10 px-2.5 py-1.5 rounded-md">
-                                {formatPercent(source.relevanceScore)} relevan
+                                {formatPercent(source.relevanceScore)} {language === 'EN' ? 'relevant' : 'relevan'}
                               </span>
                             </div>
                           ))}
                         </div>
                       ) : (
                         <p className="text-sm text-slate-500 p-4 rounded-lg border border-slate-800 border-dashed text-center">
-                          No reference documents were found in the vector database.
+                          {language === 'EN'
+                            ? 'No reference documents were found in the vector database.'
+                            : 'Tidak ada dokumen referensi yang ditemukan di basis data vektor.'}
                         </p>
                       )}
                     </div>
@@ -573,7 +615,9 @@ const AdminQueryLogsDetail: React.FC = () => {
                 </>
               ) : (
                 <div className="h-[400px] flex items-center justify-center text-sm text-slate-500 p-6">
-                  Select a log from the list on the left to view its details.
+                  {language === 'EN'
+                    ? 'Select a log from the list on the left to view its details.'
+                    : 'Pilih log dari daftar di kiri untuk melihat detailnya.'}
                 </div>
               )}
             </div>
