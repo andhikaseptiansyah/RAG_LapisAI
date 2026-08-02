@@ -306,6 +306,27 @@ def requests_module():
     return requests
 
 
+def evaluation_credentials() -> tuple[str, str]:
+    """Resolve evaluation credentials, treating blank overrides as unset.
+
+    ``python-dotenv`` loads ``KEY=`` as an empty string. The previous nested
+    ``os.getenv`` calls treated that empty value as authoritative and therefore
+    never reached the configured bootstrap credentials. This helper preserves
+    explicit evaluation credentials while making a blank override fall back to
+    the administrator configured for a fresh local installation.
+    """
+    username = (
+        os.getenv("LAPISAI_EVAL_USERNAME", "").strip()
+        or os.getenv("BOOTSTRAP_ADMIN_USERNAME", "").strip()
+        or "admin"
+    )
+    password = (
+        os.getenv("LAPISAI_EVAL_PASSWORD", "").strip()
+        or os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "").strip()
+    )
+    return username, password
+
+
 def resolve_evaluation_token() -> str:
     """Return an explicit token or authenticate with evaluation credentials."""
     global _AUTH_TOKEN
@@ -317,18 +338,12 @@ def resolve_evaluation_token() -> str:
         _AUTH_TOKEN = configured_token
         return configured_token
 
-    username = os.getenv(
-        "LAPISAI_EVAL_USERNAME",
-        os.getenv("BOOTSTRAP_ADMIN_USERNAME", "admin"),
-    ).strip()
-    password = os.getenv(
-        "LAPISAI_EVAL_PASSWORD",
-        os.getenv("BOOTSTRAP_ADMIN_PASSWORD", ""),
-    ).strip()
+    username, password = evaluation_credentials()
     if not username or not password:
         raise RuntimeError(
             "Evaluasi memerlukan autentikasi. Atur LAPISAI_AUTH_TOKEN, atau "
-            "atur LAPISAI_EVAL_USERNAME dan LAPISAI_EVAL_PASSWORD di .env."
+            "isi LAPISAI_EVAL_PASSWORD maupun BOOTSTRAP_ADMIN_PASSWORD di "
+            f"{PROJECT_ROOT / '.env'}."
         )
 
     response = requests_module().post(

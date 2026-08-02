@@ -258,7 +258,18 @@ def _references_exist(documents: list[str]) -> bool:
         # The dataset remains the source of truth in packaged/test environments
         # where the corpus directory may intentionally be omitted.
         return True
-    return all((FOLLOW_UP_CORPUS_PATH / document).is_file() for document in documents)
+    available_files = {
+        path.name.casefold()
+        for path in FOLLOW_UP_CORPUS_PATH.iterdir()
+        if path.is_file()
+    }
+    if not available_files:
+        # Test setup and first-run packaging may create the directory before
+        # populating it. Treat an empty directory exactly like an omitted
+        # corpus; otherwise test order and harmless folder creation change the
+        # follow-up result.
+        return True
+    return all(Path(document).name.casefold() in available_files for document in documents)
 
 
 def _localized_question(item: dict[str, Any], language: str) -> str:

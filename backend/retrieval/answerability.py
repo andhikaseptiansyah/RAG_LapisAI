@@ -491,17 +491,28 @@ def assess_answerability(
         and strongest_exact_coverage >= ANSWERABILITY_STRONG_EXACT_COVERAGE
     )
 
-    # A low retrieval score may be overridden only by unusually strong, literal
-    # single-query evidence. This preserves the original verified-evidence escape
-    # hatch for short factual answers while preventing a generic low-score passage
-    # (or a cross-encoder-only lift) from becoming answerable.
+    # A low display score may be overridden only by a fully coherent, verified
+    # answer. Literal same-language evidence uses the stricter exact-token path.
+    # Cross-language evidence cannot reasonably meet that token-overlap floor, so
+    # it must instead clear the original hybrid base floor plus a stronger
+    # evidence-verifier floor. A reranker alone can never activate either path.
     reranker_applied = any(bool(item.get("rerankerApplied")) for item in selected)
-    strong_evidence_override = bool(
+    literal_evidence_override = bool(
         strictly_supported
         and has_semantic_requirements
         and not reranker_applied
         and strongest_evidence_score >= max(min_evidence_score, 0.88)
         and strongest_exact_coverage >= 0.50
+    )
+    coherent_verified_override = bool(
+        strictly_supported
+        and has_semantic_requirements
+        and not reranker_applied
+        and strongest_base_score >= min_base_score
+        and strongest_evidence_score >= max(min_evidence_score, 0.75)
+    )
+    strong_evidence_override = (
+        literal_evidence_override or coherent_verified_override
     )
 
     if top_score >= min_top_score:

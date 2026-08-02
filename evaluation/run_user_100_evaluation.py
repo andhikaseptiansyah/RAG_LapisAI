@@ -27,6 +27,7 @@ def main() -> None:
     )
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--require-final-report", action="store_true")
     args = parser.parse_args()
 
     readiness_command = [
@@ -58,6 +59,8 @@ def main() -> None:
         command.append("--validate-only")
     if args.output_dir:
         command.extend(["--output-dir", str(args.output_dir)])
+    if args.require_final_report:
+        command.append("--require-final-report")
 
     print("> " + " ".join(command))
     subprocess.run(command, cwd=PROJECT_ROOT, check=True)

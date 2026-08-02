@@ -38,6 +38,11 @@ def main() -> None:
     )
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument(
+        "--require-final-report",
+        action="store_true",
+        help="Fail unless holdout, judge, reproducibility, and consistency gates pass.",
+    )
     args = parser.parse_args()
 
     english = args.english.resolve()
@@ -67,12 +72,13 @@ def main() -> None:
     output_dir = (args.output_dir or (SCRIPT_DIR / "results" / f"three_model_{timestamp}")).resolve()
     raw_dir = output_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
+    benchmark_audit = output_dir / "benchmark_leakage_audit.json"
     run([
         sys.executable,
         str(EVALUATION_DIR / "audit_benchmark_leakage.py"),
         *common_dataset_args,
         "--role", args.benchmark_role,
-        "--output", str(output_dir / "benchmark_leakage_audit.json"),
+        "--output", str(benchmark_audit),
     ])
 
     retrieval_snapshot = output_dir / "retrieval_snapshot.json"
@@ -120,26 +126,36 @@ def main() -> None:
         run(evaluate_command)
         summary_paths.append(output_dir / f"generation_summary_{model}.json")
 
+    model_count = len(summary_paths)
+    comparison_stem = (
+        f"comparison_{model_count}_model"
+        if model_count == 1
+        else f"comparison_{model_count}_models"
+    )
     compare_command = [
         sys.executable,
         str(SCRIPT_DIR / "compare_models.py"),
         "--output-dir", str(output_dir),
+        "--benchmark-audit", str(benchmark_audit),
+        "--output-stem", comparison_stem,
     ]
     for summary in summary_paths:
         compare_command.extend(["--summary", str(summary)])
+    if args.require_final_report:
+        compare_command.append("--require-final-report")
     run(compare_command)
 
     charts_dir = output_dir / "charts"
     run([
         sys.executable,
         str(SCRIPT_DIR / "generate_evaluation_charts.py"),
-        "--comparison", str(output_dir / "comparison_3_models.csv"),
+        "--comparison", str(output_dir / f"{comparison_stem}.csv"),
         "--output-dir", str(charts_dir),
     ])
 
     print("\nEvaluation completed.")
     print(f"Results directory: {output_dir}")
-    print(f"Main comparison : {output_dir / 'comparison_3_models.csv'}")
+    print(f"Main comparison : {output_dir / f'{comparison_stem}.csv'}")
     print(f"Charts          : {charts_dir}")
     print(f"HTML dashboard  : {charts_dir / 'evaluation_dashboard.html'}")
 

@@ -178,7 +178,8 @@ def test_admin_evaluation_chat_uses_native_mode_without_persistence(monkeypatch)
             "question": "Berapa target P1?",
             "top_k": 7,
             "language": "ID",
-            "model": "groq",
-            "evaluation_mode": True,
-        }
-    ]
+                "model": "groq",
+                "evaluation_mode": True,
+                "locked_candidates": None,
+            }
+        ]

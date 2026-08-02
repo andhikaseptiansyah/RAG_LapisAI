@@ -50,7 +50,8 @@ Overall = 35% Answer Quality
 ```
 
 Tanpa judge, pipeline tetap menghasilkan deterministic score dan menandai skor
-komposit sebagai belum lengkap.
+komposit sebagai belum lengkap. Deterministic score adalah diagnostik dan tidak
+boleh diberi label overall score.
 
 ## Persiapan `.env`
 
@@ -70,6 +71,11 @@ LAPISAI_EVAL_TIMEOUT=240
 OLLAMA_MODEL=qwen3-custom:2026-08-01
 OLLAMA_SEED=42
 ```
+
+`LAPISAI_EVAL_PASSWORD` boleh dibiarkan kosong pada instalasi lokal baru;
+evaluator akan memakai `BOOTSTRAP_ADMIN_PASSWORD`. Jika `backend/users_store.json`
+sudah ada, gunakan password akun admin yang tersimpan karena mengubah nilai
+bootstrap tidak mengubah akun lama.
 
 Untuk provider eksternal, tambahkan key dan nama model masing-masing:
 
@@ -146,6 +152,17 @@ python .\evaluation\run_user_100_evaluation.py `
   --output-dir .\evaluation\generation\results\three_models_100
 ```
 
+Untuk report yang akan dipakai sebagai hasil final, gunakan dataset holdout
+bersih, model/judge yang dipin, lalu aktifkan quality gate ketat:
+
+```powershell
+python .\evaluation\run_user_100_evaluation.py `
+  --models ollama gemini groq `
+  --benchmark-role holdout `
+  --require-final-report `
+  --output-dir .\evaluation\generation\results\three_models_holdout
+```
+
 ## Fairness
 
 - Retrieval snapshot hanya dibuat satu kali per run.
@@ -170,9 +187,9 @@ evaluation/generation/results/<run>/
 │   └── input_answers_groq.json
 ├── generation_results_<model>.csv
 ├── generation_summary_<model>.json
-├── comparison_3_models.csv
-├── comparison_3_models.json
-├── comparison_3_models.md
+├── comparison_<N>_model(s).csv
+├── comparison_<N>_model(s).json
+├── comparison_<N>_model(s).md
 └── charts/
     ├── 01_overall_model_score.png
     ├── 02_retrieval_quality.png

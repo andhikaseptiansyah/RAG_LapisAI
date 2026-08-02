@@ -1,8 +1,13 @@
 import hashlib
 
-from evaluation.generation.compare_models import derived_scores
+from evaluation.generation.compare_models import (
+    comparison_output_stem,
+    dataset_signature,
+    derived_scores,
+)
 from evaluation.generation.build_generation_dataset import (
     classify_chat_failure,
+    evaluation_credentials,
     load_retrieval_snapshot,
     snapshot_candidate_payload,
     validate_snapshot_contract,
@@ -13,6 +18,7 @@ from evaluation.generation.evaluate_generation import (
     detect_abstention,
     ranked_retrieval_metrics,
     source_metrics,
+    validate_answer_records,
 )
 
 
@@ -26,6 +32,27 @@ def test_supported_caveat_is_not_counted_as_a_refusal():
         "The requested information was not found with sufficient evidence "
         "in the indexed documents."
     ) is True
+
+
+def test_blank_evaluation_password_falls_back_to_bootstrap(monkeypatch):
+    monkeypatch.setenv("LAPISAI_EVAL_USERNAME", "admin")
+    monkeypatch.setenv("LAPISAI_EVAL_PASSWORD", "   ")
+    monkeypatch.setenv("BOOTSTRAP_ADMIN_USERNAME", "bootstrap-admin")
+    monkeypatch.setenv("BOOTSTRAP_ADMIN_PASSWORD", "local-test-password")
+
+    assert evaluation_credentials() == ("admin", "local-test-password")
+
+
+def test_explicit_evaluation_credentials_override_bootstrap(monkeypatch):
+    monkeypatch.setenv("LAPISAI_EVAL_USERNAME", "evaluation-admin")
+    monkeypatch.setenv("LAPISAI_EVAL_PASSWORD", "evaluation-password")
+    monkeypatch.setenv("BOOTSTRAP_ADMIN_USERNAME", "bootstrap-admin")
+    monkeypatch.setenv("BOOTSTRAP_ADMIN_PASSWORD", "bootstrap-password")
+
+    assert evaluation_credentials() == (
+        "evaluation-admin",
+        "evaluation-password",
+    )
 
 
 def test_citation_f1_penalizes_an_extra_wrong_citation():
@@ -77,6 +104,73 @@ def test_composite_is_incomplete_without_llm_judge():
     assert result["score_status"] == "INCOMPLETE_MISSING_JUDGE"
 
 
+def test_composite_is_incomplete_when_only_some_answers_are_judged():
+    result = derived_scores(
+        {
+            "token_f1": 0.8,
+            "keyword_coverage": 0.9,
+            "answer_relevance_1_to_5": 4.5,
+            "faithfulness_1_to_5": 4.5,
+            "hallucination_rate": 0.0,
+            "judge_coverage": 0.75,
+            "citation_f1": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "mrr": 1.0,
+            "false_refusal_rate": 0.0,
+            "unanswerable_safety_rate": 1.0,
+            "generation_failure_rate": 0.0,
+        }
+    )
+    assert result["overall_score"] is None
+    assert result["score_status"] == "INCOMPLETE_JUDGE_COVERAGE"
+
+
+def test_dataset_hash_signature_supports_windows_paths():
+    signature = dataset_signature(
+        {
+            "reproducibility": {
+                "files": [
+                    {
+                        "path": r"C:\project\evaluation\datasets\qna_english_user.csv",
+                        "sha256": "ABC123",
+                    }
+                ]
+            }
+        }
+    )
+    assert signature == (("evaluation/datasets/qna_english_user.csv", "abc123"),)
+    assert comparison_output_stem(1) == "comparison_1_model"
+    assert comparison_output_stem(3) == "comparison_3_models"
+
+
+def test_answer_input_rejects_duplicate_and_unknown_ids():
+    ground_truth = {
+        "EN-001": {"id": "EN-001"},
+        "EN-002": {"id": "EN-002"},
+    }
+    try:
+        validate_answer_records(
+            [{"id": "EN-001"}, {"id": "EN-001"}],
+            ground_truth,
+        )
+    except ValueError as error:
+        assert "duplicate IDs" in str(error)
+    else:
+        raise AssertionError("Duplicate answer IDs must be rejected")
+
+    try:
+        validate_answer_records(
+            [{"id": "EN-001"}, {"id": "EN-999"}],
+            ground_truth,
+        )
+    except RuntimeError as error:
+        assert "Missing=['EN-002']" in str(error)
+        assert "extra=['EN-999']" in str(error)
+    else:
+        raise AssertionError("Unknown answer IDs must be rejected")
+
+
 def test_failure_taxonomy_and_optional_snapshot_mode():
     assert load_retrieval_snapshot(None) is None
     assert classify_chat_failure(
@@ -116,6 +210,12 @@ def test_failure_taxonomy_and_optional_snapshot_mode():
         {
             "generation_mode": "native_model",
             "failure_stage": "native_answer_empty",
+        }
+    ) == "generation_or_provider"
+    assert classify_chat_failure(
+        {
+            "generation_mode": "wrong_output_language",
+            "failure_stage": "wrong_output_language",
         }
     ) == "generation_or_provider"
 

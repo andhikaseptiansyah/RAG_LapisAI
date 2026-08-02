@@ -1,0 +1,408 @@
+{
+  "report_schema_version": 2,
+  "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
+  "evaluation": "Bilingual RAG generation evaluation",
+  "benchmark_role": "development",
+  "model": "ollama",
+  "model_name": "qwen3-custom:latest",
+  "judge_model": null,
+  "judge_independent": false,
+  "ground_truth_files": [
+    "evaluation/datasets/qna_english_user.csv",
+    "evaluation/datasets/qna_indonesia_user.csv"
+  ],
+  "dataset": {
+    "total": 100,
+    "answerable": 90,
+    "unanswerable": 10,
+    "by_language": {
+      "EN": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      },
+      "ID": {
+        "total": 50,
+        "answerable": 45,
+        "unanswerable": 5
+      }
+    }
+  },
+  "language_pairing": {
+    "status": "descriptive_only_unpaired_targets",
+    "paired_id_count": 50,
+    "same_expected_source_pair_count": 3,
+    "direct_language_gap_interpretation_supported": false
+  },
+  "evaluation_status": {
+    "status": "DIAGNOSTIC_ONLY",
+    "final_eligible": false,
+    "blockers": [
+      "Benchmark is a development/regression set, not a blind holdout.",
+      "Independent LLM-judge coverage is incomplete; faithfulness, answer relevance, and hallucination metrics are not final.",
+      "The evaluated model reference is mutable; pin a versioned tag or digest."
+    ],
+    "warnings": [
+      "English and Indonesian subsets have non-equivalent targets; their score gap is descriptive only.",
+      "Sequential E2E latency is retrieval time plus the generation API call, not one directly instrumented wall-clock request."
+    ]
+  },
+  "reproducibility": {
+    "generated_at_utc": "2026-08-01T20:48:17.055550+00:00",
+    "git_commit": null,
+    "python_version": "3.12.13",
+    "platform": "Linux-6.12.13-x86_64-with-glibc2.39",
+    "dependency_versions": {
+      "chromadb": "not-installed",
+      "fastapi": "not-installed",
+      "google-genai": "not-installed",
+      "httpx": "not-installed",
+      "matplotlib": "3.10.8",
+      "numpy": "2.3.5",
+      "pymupdf": "1.26.6",
+      "pytest": "not-installed",
+      "python-docx": "1.2.0",
+      "python-dotenv": "not-installed",
+      "python-multipart": "not-installed",
+      "rank-bm25": "not-installed",
+      "requests": "not-installed",
+      "sentence-transformers": "not-installed",
+      "uvicorn": "not-installed"
+    },
+    "files": [
+      {
+        "path": "evaluation/datasets/qna_english_user.csv",
+        "sha256": "0eaaab183a49b7a8eb484399d89a11a09cd098c93e505d9670b5068fc9324624",
+        "bytes": 8274
+      },
+      {
+        "path": "evaluation/datasets/qna_indonesia_user.csv",
+        "sha256": "ee8c8186f9b0501bf3251818b5b698f51eda525808f4d09dbb22e645bf65295d",
+        "bytes": 10934
+      },
+      {
+        "path": "evaluation/generation/results/ollama_v17_integrity_20260802/raw/input_answers_ollama.json",
+        "sha256": "99d39c82741dfa0286eb22c780025be73281e06eb8604772478ac97b40a2d0bb",
+        "bytes": 638047
+      },
+      {
+        "path": "backend/requirements.txt",
+        "sha256": "d4c80f33071c7323f88b5ff21cdc19bc9b2d900fb2e12c018ab8d6d073dbc1f5",
+        "bytes": 158
+      },
+      {
+        "path": "backend/requirements-dev.txt",
+        "sha256": "19987de0b0309954207f1e0c0f703e4f43775098440e3dc4f6b25a26999c9e7f",
+        "bytes": 34
+      },
+      {
+        "path": "evaluation/generation/evaluate_generation.py",
+        "sha256": "847f85b9cb0a6212f0bda15616701d82a8cb4a583ed1c61a3565d1b793295dc6",
+        "bytes": 55750
+      }
+    ],
+    "model_name": "qwen3-custom:latest",
+    "model_reference_mutable": true,
+    "judge_model": null,
+    "judge_independent": false,
+    "backend_build_versions": [
+      "rag-bilingual-eval-v16-20260802"
+    ],
+    "retrieval_snapshot_builds": [
+      "rag-bilingual-eval-v16-20260802"
+    ],
+    "evaluation_context_modes": [
+      "source_locked_snapshot_native_model_v8"
+    ],
+    "retrieval_top_k": [
+      5
+    ]
+  },
+  "overall": {
+    "total_questions": 100,
+    "answerable_questions": 90,
+    "unanswerable_questions": 10,
+    "normalized_exact_match": 0.0333,
+    "token_f1": 0.591,
+    "keyword_coverage": 0.7806,
+    "question_keyword_coverage": 0.1417,
+    "question_answer_keyword_coverage": 0.7843,
+    "faithfulness_1_to_5": null,
+    "answer_relevance_1_to_5": null,
+    "judge_eligible_questions": 100,
+    "judge_attempted_questions": 0,
+    "judge_successful_questions": 0,
+    "judge_coverage": 0.0,
+    "context_precision": 0.9833,
+    "context_recall": 1.0,
+    "citation_precision": 1.0,
+    "citation_recall": 1.0,
+    "citation_f1": 1.0,
+    "citation_accuracy": 1.0,
+    "precision_at_k": 0.2022,
+    "recall_at_k": 1.0,
+    "hit_at_k": 1.0,
+    "mrr": 0.9889,
+    "top1_accuracy": 0.9778,
+    "ndcg_at_k": 0.9918,
+    "retrieval_debug_coverage": 1.0,
+    "average_retrieval_time_ms": 11077.5427,
+    "retrieval_latency_coverage": 1.0,
+    "false_refusal_rate": 0.0,
+    "unanswerable_safety_rate": 1.0,
+    "unanswerable_no_citation_rate": 1.0,
+    "unanswerable_no_result_rate": 1.0,
+    "hallucination_rate": null,
+    "pipeline_failure_rate": 0.0,
+    "retrieval_or_context_failure_rate": 0.0,
+    "answer_postprocessing_failure_rate": 0.0,
+    "generation_output_failure_rate": 0.0,
+    "generation_failure_rate": 0.0,
+    "failure_category_counts": {},
+    "failure_stage_counts": {},
+    "judge_error_rate": null,
+    "average_response_time_ms": 7113.9012,
+    "median_response_time_ms": 5282.18,
+    "p95_response_time_ms": 17421.72,
+    "client_latency_coverage": 1.0,
+    "average_estimated_sequential_e2e_ms": 18191.4439,
+    "median_estimated_sequential_e2e_ms": 17414.97,
+    "p95_estimated_sequential_e2e_ms": 28637.74,
+    "estimated_e2e_latency_coverage": 1.0,
+    "confidence_intervals_95": {
+      "pipeline_failure_rate": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.037,
+        "n": 100
+      },
+      "false_refusal_rate": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0409,
+        "n": 90
+      },
+      "unanswerable_safety_rate": {
+        "estimate": 1.0,
+        "lower": 0.7225,
+        "upper": 1.0,
+        "n": 10
+      },
+      "unanswerable_no_result_rate": {
+        "estimate": 1.0,
+        "lower": 0.7225,
+        "upper": 1.0,
+        "n": 10
+      },
+      "hit_at_k": {
+        "estimate": 1.0,
+        "lower": 0.9591,
+        "upper": 1.0,
+        "n": 90
+      },
+      "top1_accuracy": {
+        "estimate": 0.9778,
+        "lower": 0.9226,
+        "upper": 0.9939,
+        "n": 90
+      }
+    }
+  },
+  "by_language": {
+    "EN": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0444,
+      "token_f1": 0.578,
+      "keyword_coverage": 0.8815,
+      "question_keyword_coverage": 0.0889,
+      "question_answer_keyword_coverage": 0.8815,
+      "faithfulness_1_to_5": null,
+      "answer_relevance_1_to_5": null,
+      "judge_eligible_questions": 50,
+      "judge_attempted_questions": 0,
+      "judge_successful_questions": 0,
+      "judge_coverage": 0.0,
+      "context_precision": 0.9778,
+      "context_recall": 1.0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "citation_f1": 1.0,
+      "citation_accuracy": 1.0,
+      "precision_at_k": 0.2,
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "mrr": 0.9889,
+      "top1_accuracy": 0.9778,
+      "ndcg_at_k": 0.9918,
+      "retrieval_debug_coverage": 1.0,
+      "average_retrieval_time_ms": 9134.9912,
+      "retrieval_latency_coverage": 1.0,
+      "false_refusal_rate": 0.0,
+      "unanswerable_safety_rate": 1.0,
+      "unanswerable_no_citation_rate": 1.0,
+      "unanswerable_no_result_rate": 1.0,
+      "hallucination_rate": null,
+      "pipeline_failure_rate": 0.0,
+      "retrieval_or_context_failure_rate": 0.0,
+      "answer_postprocessing_failure_rate": 0.0,
+      "generation_output_failure_rate": 0.0,
+      "generation_failure_rate": 0.0,
+      "failure_category_counts": {},
+      "failure_stage_counts": {},
+      "judge_error_rate": null,
+      "average_response_time_ms": 7543.9212,
+      "median_response_time_ms": 5236.1,
+      "p95_response_time_ms": 18023.52,
+      "client_latency_coverage": 1.0,
+      "average_estimated_sequential_e2e_ms": 16678.9124,
+      "median_estimated_sequential_e2e_ms": 15131.9,
+      "p95_estimated_sequential_e2e_ms": 27254.22,
+      "estimated_e2e_latency_coverage": 1.0,
+      "confidence_intervals_95": {
+        "pipeline_failure_rate": {
+          "estimate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0713,
+          "n": 50
+        },
+        "false_refusal_rate": {
+          "estimate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0787,
+          "n": 45
+        },
+        "unanswerable_safety_rate": {
+          "estimate": 1.0,
+          "lower": 0.5655,
+          "upper": 1.0,
+          "n": 5
+        },
+        "unanswerable_no_result_rate": {
+          "estimate": 1.0,
+          "lower": 0.5655,
+          "upper": 1.0,
+          "n": 5
+        },
+        "hit_at_k": {
+          "estimate": 1.0,
+          "lower": 0.9213,
+          "upper": 1.0,
+          "n": 45
+        },
+        "top1_accuracy": {
+          "estimate": 0.9778,
+          "lower": 0.8843,
+          "upper": 0.9961,
+          "n": 45
+        }
+      }
+    },
+    "ID": {
+      "total_questions": 50,
+      "answerable_questions": 45,
+      "unanswerable_questions": 5,
+      "normalized_exact_match": 0.0222,
+      "token_f1": 0.6041,
+      "keyword_coverage": 0.6796,
+      "question_keyword_coverage": 0.1944,
+      "question_answer_keyword_coverage": 0.687,
+      "faithfulness_1_to_5": null,
+      "answer_relevance_1_to_5": null,
+      "judge_eligible_questions": 50,
+      "judge_attempted_questions": 0,
+      "judge_successful_questions": 0,
+      "judge_coverage": 0.0,
+      "context_precision": 0.9889,
+      "context_recall": 1.0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "citation_f1": 1.0,
+      "citation_accuracy": 1.0,
+      "precision_at_k": 0.2044,
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "mrr": 0.9889,
+      "top1_accuracy": 0.9778,
+      "ndcg_at_k": 0.9918,
+      "retrieval_debug_coverage": 1.0,
+      "average_retrieval_time_ms": 13020.0942,
+      "retrieval_latency_coverage": 1.0,
+      "false_refusal_rate": 0.0,
+      "unanswerable_safety_rate": 1.0,
+      "unanswerable_no_citation_rate": 1.0,
+      "unanswerable_no_result_rate": 1.0,
+      "hallucination_rate": null,
+      "pipeline_failure_rate": 0.0,
+      "retrieval_or_context_failure_rate": 0.0,
+      "answer_postprocessing_failure_rate": 0.0,
+      "generation_output_failure_rate": 0.0,
+      "generation_failure_rate": 0.0,
+      "failure_category_counts": {},
+      "failure_stage_counts": {},
+      "judge_error_rate": null,
+      "average_response_time_ms": 6683.8812,
+      "median_response_time_ms": 5355.96,
+      "p95_response_time_ms": 15812.12,
+      "client_latency_coverage": 1.0,
+      "average_estimated_sequential_e2e_ms": 19703.9754,
+      "median_estimated_sequential_e2e_ms": 18599.22,
+      "p95_estimated_sequential_e2e_ms": 30292.91,
+      "estimated_e2e_latency_coverage": 1.0,
+      "confidence_intervals_95": {
+        "pipeline_failure_rate": {
+          "estimate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0713,
+          "n": 50
+        },
+        "false_refusal_rate": {
+          "estimate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0787,
+          "n": 45
+        },
+        "unanswerable_safety_rate": {
+          "estimate": 1.0,
+          "lower": 0.5655,
+          "upper": 1.0,
+          "n": 5
+        },
+        "unanswerable_no_result_rate": {
+          "estimate": 1.0,
+          "lower": 0.5655,
+          "upper": 1.0,
+          "n": 5
+        },
+        "hit_at_k": {
+          "estimate": 1.0,
+          "lower": 0.9213,
+          "upper": 1.0,
+          "n": 45
+        },
+        "top1_accuracy": {
+          "estimate": 0.9778,
+          "lower": 0.8843,
+          "upper": 0.9961,
+          "n": 45
+        }
+      }
+    }
+  },
+  "notes": [
+    "Precision@K, Recall@K, Hit@K, MRR, Top-1 Accuracy, and NDCG@K are evaluated at document level because the CSV has no page labels.",
+    "Precision@K remains a standard ranking metric; with one relevant document its maximum at K=5 is 0.2. Use Hit@K, MRR, Top-1 Accuracy, or NDCG@K for easier interpretation.",
+    "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
+    "Citation F1 combines citation precision and recall. Citation Accuracy is retained as a compatibility alias for Citation F1.",
+    "Pipeline failures are classified by their precise stage; late answer/citation failures preserve evaluation contexts and are not counted as retrieval misses.",
+    "Retrieval Debug Available records whether diagnostics were captured; an explicitly empty candidate list remains valid debug data for an unanswerable item.",
+    "Unanswerable safety requires a refusal and no citation.",
+    "The same configured judge model must be used for every compared model.",
+    "A final-eligible report requires a clean holdout, complete independent judge coverage, and an immutable evaluated-model reference.",
+    "Keyword Coverage is answer-only. Question Keyword Coverage and Question+Answer Keyword Coverage are diagnostics for annotation leakage and historical comparability.",
+    "Estimated Sequential E2E is retrieval time plus client generation-call time, not a directly instrumented wall-clock request latency.",
+    "Wilson 95% confidence intervals are reported for binary rates; small unanswerable sets can therefore have wide intervals.",
+    "English-vs-Indonesian scores are descriptive only because the two language sets do not use equivalent source targets."
+  ]
+}

@@ -5,8 +5,9 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-BUILD_VERSION = "rag-bilingual-eval-v16-20260802"
+BUILD_VERSION = "rag-bilingual-eval-v18-20260802"
 BUILD_FEATURES = (
+    "blank-evaluation-auth-overrides-fall-back-to-bootstrap",
     "evidence-first-context-selection-over-heading-only-hybrid-hits",
     "complementary-locked-requirement-context-bundling",
     "bilingual-policy-relation-grounding-with-strict-fact-binding",

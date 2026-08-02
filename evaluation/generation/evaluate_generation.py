@@ -17,13 +17,22 @@ import platform
 import re
 import statistics
 import subprocess
-import requests
-from dotenv import load_dotenv
 from collections import Counter
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Iterable
+
+try:
+    import requests
+except ModuleNotFoundError:
+    requests = None  # type: ignore[assignment]
+
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    def load_dotenv(*_args: Any, **_kwargs: Any) -> bool:
+        return False
 
 try:
     from .dataset_utils import dataset_summary, load_ground_truth_files
@@ -98,6 +107,64 @@ CONTRAST_MARKERS = (
     " meskipun ",
     " akan tetapi ",
 )
+
+
+def model_reference_is_mutable(model_name: str) -> bool:
+    """Conservatively identify explicitly mutable local model references."""
+    normalized = str(model_name or "").strip().casefold()
+    return normalized.endswith(":latest") or normalized in {"latest", "default"}
+
+
+def validate_answer_records(
+    answers: Any,
+    ground_truth: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Require exactly one well-formed answer row for every benchmark item."""
+    if not isinstance(answers, list):
+        raise ValueError("Input answers file must contain a JSON array")
+
+    invalid_rows = [
+        index
+        for index, item in enumerate(answers, start=1)
+        if not isinstance(item, dict)
+    ]
+    if invalid_rows:
+        raise ValueError(
+            "Input answers contains non-object rows at positions: "
+            + ", ".join(str(index) for index in invalid_rows[:10])
+        )
+
+    typed_answers = list(answers)
+    answer_ids = [str(item.get("id") or "").strip() for item in typed_answers]
+    blank_positions = [
+        index
+        for index, qid in enumerate(answer_ids, start=1)
+        if not qid
+    ]
+    if blank_positions:
+        raise ValueError(
+            "Input answers contains blank IDs at positions: "
+            + ", ".join(str(index) for index in blank_positions[:10])
+        )
+
+    counts = Counter(answer_ids)
+    duplicate_ids = sorted(qid for qid, count in counts.items() if count > 1)
+    if duplicate_ids:
+        raise ValueError(
+            "Input answers contains duplicate IDs: "
+            + ", ".join(duplicate_ids[:10])
+        )
+
+    expected_ids = set(ground_truth)
+    actual_ids = set(answer_ids)
+    missing_ids = sorted(expected_ids - actual_ids)
+    extra_ids = sorted(actual_ids - expected_ids)
+    if missing_ids or extra_ids:
+        raise RuntimeError(
+            "Input answer IDs do not match the evaluation dataset. "
+            f"Missing={missing_ids[:10]}, extra={extra_ids[:10]}."
+        )
+    return typed_answers
 
 
 def normalize_document(name: Any) -> str:
@@ -467,6 +534,17 @@ def llm_judge(
     answer: str,
     answerable: bool,
 ) -> dict[str, Any]:
+    if requests is None:
+        return {
+            "faithfulness": None,
+            "answer_relevance": None,
+            "is_hallucination": None,
+            "reason": "",
+            "judge_error": (
+                "Dependency 'requests' is required when the LLM judge is enabled."
+            ),
+        }
+
     task_rule = (
         "The question is ANSWERABLE. The response should answer correctly using only the context."
         if answerable
@@ -684,7 +762,7 @@ def reproducibility_manifest(
             for path in files
         ],
         "model_name": model_name,
-        "model_reference_mutable": model_name.casefold().endswith(":latest"),
+        "model_reference_mutable": model_reference_is_mutable(model_name),
         "judge_model": judge_model,
         "judge_independent": bool(
             judge_model
@@ -764,15 +842,23 @@ def bilingual_pairing_diagnostics(
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     answerable_rows = [row for row in rows if row["Answerable"]]
     unanswerable_rows = [row for row in rows if not row["Answerable"]]
-    judge_attempted = [
+    judge_eligible_rows = [
         row for row in rows
         if row["Judge Error"] not in {
-            "SKIPPED",
             "GENERATION_FAILED",
             "PIPELINE_FAILED",
         }
     ]
+    judge_attempted = [
+        row for row in judge_eligible_rows
+        if row["Judge Error"] != "SKIPPED"
+    ]
     judge_rows = [row for row in judge_attempted if not row["Judge Error"]]
+    retrieval_latencies = [
+        float(row["Retrieval Time (ms)"])
+        for row in rows
+        if row.get("Retrieval Time (ms)") is not None
+    ]
     latencies = [
         float(row["Client Response Time (ms)"])
         for row in rows
@@ -809,6 +895,13 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         "faithfulness_1_to_5": mean(row["Faithfulness"] for row in judge_rows),
         "answer_relevance_1_to_5": mean(row["Answer Relevance"] for row in judge_rows),
+        "judge_eligible_questions": len(judge_eligible_rows),
+        "judge_attempted_questions": len(judge_attempted),
+        "judge_successful_questions": len(judge_rows),
+        "judge_coverage": round(
+            len(judge_rows) / len(judge_eligible_rows),
+            4,
+        ) if judge_eligible_rows else None,
         "context_precision": mean(row["Context Precision"] for row in answerable_rows),
         "context_recall": mean(row["Context Recall"] for row in answerable_rows),
         "citation_precision": mean(row["Citation Precision"] for row in answerable_rows),
@@ -822,7 +915,11 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "top1_accuracy": mean(row["Top-1 Accuracy"] for row in answerable_rows),
         "ndcg_at_k": mean(row["NDCG@K"] for row in answerable_rows),
         "retrieval_debug_coverage": mean(row["Retrieval Debug Available"] for row in rows),
-        "average_retrieval_time_ms": mean(row["Retrieval Time (ms)"] for row in rows),
+        "average_retrieval_time_ms": mean(retrieval_latencies),
+        "retrieval_latency_coverage": round(
+            len(retrieval_latencies) / len(rows),
+            4,
+        ) if rows else None,
         "false_refusal_rate": mean(row["False Refusal"] for row in answerable_rows),
         "unanswerable_safety_rate": mean(row["Correct Unanswerable Refusal"] for row in unanswerable_rows),
         "unanswerable_no_citation_rate": mean(row["No Citation On Unanswerable"] for row in unanswerable_rows),
@@ -858,6 +955,10 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "average_response_time_ms": mean(latencies),
         "median_response_time_ms": round(statistics.median(latencies), 2) if latencies else None,
         "p95_response_time_ms": percentile(latencies, 0.95),
+        "client_latency_coverage": round(
+            len(latencies) / len(rows),
+            4,
+        ) if rows else None,
         "average_estimated_sequential_e2e_ms": mean(estimated_e2e_latencies),
         "median_estimated_sequential_e2e_ms": (
             round(statistics.median(estimated_e2e_latencies), 2)
@@ -868,6 +969,10 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
             estimated_e2e_latencies,
             0.95,
         ),
+        "estimated_e2e_latency_coverage": round(
+            len(estimated_e2e_latencies) / len(rows),
+            4,
+        ) if rows else None,
         "confidence_intervals_95": {
             "pipeline_failure_rate": wilson_interval_95(
                 row["Pipeline Failed"] for row in rows
@@ -888,6 +993,63 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 row["Top-1 Accuracy"] for row in answerable_rows
             ),
         },
+    }
+
+
+def build_evaluation_status(
+    *,
+    benchmark_role: str,
+    overall: dict[str, Any],
+    model_name: str,
+    judge_model: str | None,
+    judge_independent: bool,
+    pairing: dict[str, Any],
+) -> dict[str, Any]:
+    """State whether a run is suitable for a final model-quality claim."""
+    blockers: list[str] = []
+    warnings: list[str] = []
+
+    if benchmark_role != "holdout":
+        blockers.append(
+            "Benchmark is a development/regression set, not a blind holdout."
+        )
+    judge_coverage = overall.get("judge_coverage")
+    if judge_coverage is None or float(judge_coverage) < 1.0:
+        blockers.append(
+            "Independent LLM-judge coverage is incomplete; faithfulness, "
+            "answer relevance, and hallucination metrics are not final."
+        )
+    if judge_model and not judge_independent:
+        blockers.append("The evaluated model was also used as its own judge.")
+    if model_reference_is_mutable(model_name):
+        blockers.append(
+            "The evaluated model reference is mutable; pin a versioned tag or digest."
+        )
+
+    for field, label in (
+        ("retrieval_latency_coverage", "retrieval latency"),
+        ("client_latency_coverage", "generation-call latency"),
+        ("estimated_e2e_latency_coverage", "estimated sequential E2E latency"),
+    ):
+        value = overall.get(field)
+        if value is None or float(value) < 1.0:
+            warnings.append(f"Coverage for {label} is below 100%.")
+
+    if not pairing.get("direct_language_gap_interpretation_supported"):
+        warnings.append(
+            "English and Indonesian subsets have non-equivalent targets; "
+            "their score gap is descriptive only."
+        )
+    warnings.append(
+        "Sequential E2E latency is retrieval time plus the generation API call, "
+        "not one directly instrumented wall-clock request."
+    )
+
+    return {
+        "status": "FINAL_ELIGIBLE" if not blockers else "DIAGNOSTIC_ONLY",
+        "final_eligible": not blockers,
+        "blockers": blockers,
+        "warnings": warnings,
     }
 
 
@@ -923,16 +1085,10 @@ def main() -> None:
     datasets = args.ground_truth_files or DEFAULT_DATASETS
     gt_items = load_ground_truth_files(datasets)
     ground_truth = {str(item["id"]): item for item in gt_items}
-    answers = json.loads(args.input.resolve().read_text(encoding="utf-8"))
-    if not isinstance(answers, list):
-        raise ValueError("Input answers file must contain a JSON array")
-
-    answer_ids = {str(item.get("id") or "") for item in answers if isinstance(item, dict)}
-    missing_ids = sorted(set(ground_truth) - answer_ids)
-    if missing_ids:
-        raise RuntimeError(
-            f"Input is missing {len(missing_ids)} questions: {', '.join(missing_ids[:10])}"
-        )
+    answers = validate_answer_records(
+        json.loads(args.input.resolve().read_text(encoding="utf-8")),
+        ground_truth,
+    )
 
     model_names = {str(item.get("model") or "unknown") for item in answers}
     if len(model_names) != 1:
@@ -1209,7 +1365,12 @@ def main() -> None:
                 else None
             ),
             "First Relevant Rank": ranked_metrics["first_relevant_rank"],
-            "Retrieval Debug Available": int(bool(item.get("ranked_candidates"))),
+            # An explicitly captured empty candidate list is valid diagnostics
+            # for an unanswerable query; it must not be treated as missing data.
+            "Retrieval Debug Available": int(
+                "ranked_candidates" in item
+                and isinstance(item.get("ranked_candidates"), list)
+            ),
             "Retrieval Time (ms)": retrieval_time_value,
             "Retrieval No Result": metadata["retrieval_no_result"],
             "Hallucination": (
@@ -1235,28 +1396,44 @@ def main() -> None:
         raise RuntimeError("No matching evaluation rows were found")
 
     pairing = bilingual_pairing_diagnostics(gt_items)
+    overall = summarize_rows(rows)
+    judge_model = None if args.skip_llm_judge else LLM_MODEL
+    judge_independent = bool(
+        judge_model
+        and model_name.strip().casefold() != judge_model.strip().casefold()
+    )
+    reproducibility = reproducibility_manifest(
+        datasets=[Path(path).resolve() for path in datasets],
+        input_path=args.input.resolve(),
+        answers=answers,
+        model_name=model_name,
+        judge_model=judge_model,
+    )
+    evaluation_status = build_evaluation_status(
+        benchmark_role=args.benchmark_role,
+        overall=overall,
+        model_name=model_name,
+        judge_model=judge_model,
+        judge_independent=judge_independent,
+        pairing=pairing,
+    )
     summary = {
+        "report_schema_version": 2,
         "project": "LapisAI Enterprise Knowledge Assistant (RAG)",
         "evaluation": "Bilingual RAG generation evaluation",
         "benchmark_role": args.benchmark_role,
         "model": model,
         "model_name": model_name,
-        "judge_model": None if args.skip_llm_judge else LLM_MODEL,
-        "judge_independent": bool(
-            not args.skip_llm_judge
-            and model_name.strip().casefold() != LLM_MODEL.strip().casefold()
-        ),
-        "ground_truth_files": [str(path.resolve()) for path in datasets],
+        "judge_model": judge_model,
+        "judge_independent": judge_independent,
+        "ground_truth_files": [
+            _manifest_path(Path(path)) for path in datasets
+        ],
         "dataset": dataset_summary(gt_items),
         "language_pairing": pairing,
-        "reproducibility": reproducibility_manifest(
-            datasets=[Path(path).resolve() for path in datasets],
-            input_path=args.input.resolve(),
-            answers=answers,
-            model_name=model_name,
-            judge_model=None if args.skip_llm_judge else LLM_MODEL,
-        ),
-        "overall": summarize_rows(rows),
+        "evaluation_status": evaluation_status,
+        "reproducibility": reproducibility,
+        "overall": overall,
         "by_language": {
             language: summarize_rows([row for row in rows if row["Language"] == language])
             for language in ("EN", "ID")
@@ -1267,8 +1444,10 @@ def main() -> None:
             "Context precision/recall evaluate the final generation contexts; ranked retrieval metrics evaluate the pre-generation retrieval snapshot.",
             "Citation F1 combines citation precision and recall. Citation Accuracy is retained as a compatibility alias for Citation F1.",
             "Pipeline failures are classified by their precise stage; late answer/citation failures preserve evaluation contexts and are not counted as retrieval misses.",
+            "Retrieval Debug Available records whether diagnostics were captured; an explicitly empty candidate list remains valid debug data for an unanswerable item.",
             "Unanswerable safety requires a refusal and no citation.",
             "The same configured judge model must be used for every compared model.",
+            "A final-eligible report requires a clean holdout, complete independent judge coverage, and an immutable evaluated-model reference.",
             "Keyword Coverage is answer-only. Question Keyword Coverage and Question+Answer Keyword Coverage are diagnostics for annotation leakage and historical comparability.",
             "Estimated Sequential E2E is retrieval time plus client generation-call time, not a directly instrumented wall-clock request latency.",
             "Wilson 95% confidence intervals are reported for binary rates; small unanswerable sets can therefore have wide intervals.",

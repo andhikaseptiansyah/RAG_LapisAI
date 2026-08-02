@@ -1067,6 +1067,7 @@ def _run_chat_impl(
     used_extractive_fallback = False
     used_language_retry = False
     used_verified_scalar_fallback = False
+    wrong_output_language_rejected = False
 
     raise_if_cancelled(cancel_event)
     emit_progress(
@@ -1153,6 +1154,7 @@ def _run_chat_impl(
             "[CHAT] fallback answer rejected because it does not match "
             f"requested language={normalized_language}"
         )
+        wrong_output_language_rejected = True
         answer = ""
         used_extractive_fallback = False
         used_verified_scalar_fallback = False
@@ -1257,7 +1259,11 @@ def _run_chat_impl(
     answer_is_refusal = bool(answer and is_refusal_answer(answer))
     if not answer or answer_is_refusal or not sources:
         citation_validation: dict[str, Any] | None = None
-        if not answer:
+        if wrong_output_language_rejected:
+            failure_stage = "wrong_output_language"
+            failure_reason = "generated_answer_used_wrong_output_language"
+            failure_generation_mode = "wrong_output_language"
+        elif not answer:
             failure_stage = "native_answer_empty"
             failure_reason = "native_model_returned_empty_answer"
             failure_generation_mode = "native_answer_empty"

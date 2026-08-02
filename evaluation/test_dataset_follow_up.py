@@ -26,6 +26,11 @@ def _answerable_questions() -> set[str]:
     return questions
 
 
+def test_empty_packaged_corpus_is_treated_as_omitted(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(follow_up_service, "FOLLOW_UP_CORPUS_PATH", tmp_path)
+    assert follow_up_service._references_exist(["FAQ_IT_Support.txt"])
+
+
 def test_indonesian_password_follow_up_is_grounded_and_related() -> None:
     original_verifier = follow_up_service._question_is_retrievable
     follow_up_service._question_is_retrievable = lambda question, documents: True

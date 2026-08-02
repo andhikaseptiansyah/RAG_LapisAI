@@ -1,4 +1,4 @@
-"""Generate presentation-ready PNG diagrams from the three-model comparison."""
+"""Generate presentation-ready charts from a one-or-more-model evaluation."""
 
 from __future__ import annotations
 
@@ -10,6 +10,10 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+PALETTE = ("#2F5D8C", "#D79A2B", "#718355", "#7A5C99", "#4F7C78")
+GRID_COLOR = "#AEB8C5"
 
 
 def number(value: Any, default: float = 0.0) -> float:
@@ -47,13 +51,13 @@ def save_bar(
 ) -> None:
     fig, ax = plt.subplots(figsize=(10, 5.6))
     positions = np.arange(len(labels))
-    bars = ax.barh(positions, values)
+    bars = ax.barh(positions, values, color=PALETTE[0])
     ax.set_yticks(positions, labels)
     ax.invert_yaxis()
     ax.set_xlabel(x_label)
-    ax.set_title(title, loc="left", fontsize=16, fontweight="bold", pad=18)
-    fig.text(0.125, 0.91, subtitle, fontsize=10)
-    ax.grid(axis="x", alpha=0.2)
+    fig.suptitle(title, x=0.125, y=0.97, ha="left", fontsize=16, fontweight="bold")
+    fig.text(0.125, 0.91, subtitle, fontsize=10, color="#526078")
+    ax.grid(axis="x", alpha=0.35, color=GRID_COLOR)
     if maximum is not None:
         ax.set_xlim(0, maximum)
     for bar, value in zip(bars, values):
@@ -64,7 +68,7 @@ def save_bar(
             va="center",
             fontsize=10,
         )
-    fig.tight_layout(rect=(0, 0, 1, 0.89))
+    fig.tight_layout(rect=(0, 0, 1, 0.86))
     fig.savefig(output, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
@@ -77,18 +81,29 @@ def save_grouped(
     series: list[tuple[str, list[float]]],
     *,
     y_label: str,
-    maximum: float = 100.0,
+    maximum: float | None = 100.0,
 ) -> None:
     fig, ax = plt.subplots(figsize=(11, 6.2))
     x = np.arange(len(models))
     width = 0.8 / max(len(series), 1)
+    observed_maximum = max(
+        (value for _, values in series for value in values),
+        default=1.0,
+    )
+    plot_maximum = maximum or max(observed_maximum * 1.22, 1.0)
     for index, (label, values) in enumerate(series):
         offset = (index - (len(series) - 1) / 2) * width
-        bars = ax.bar(x + offset, values, width, label=label)
+        bars = ax.bar(
+            x + offset,
+            values,
+            width,
+            label=label,
+            color=PALETTE[index % len(PALETTE)],
+        )
         for bar, value in zip(bars, values):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + maximum * 0.012,
+                bar.get_height() + plot_maximum * 0.012,
                 f"{value:.1f}",
                 ha="center",
                 va="bottom",
@@ -96,13 +111,13 @@ def save_grouped(
                 rotation=0,
             )
     ax.set_xticks(x, models)
-    ax.set_ylim(0, maximum)
+    ax.set_ylim(0, plot_maximum)
     ax.set_ylabel(y_label)
-    ax.set_title(title, loc="left", fontsize=16, fontweight="bold", pad=18)
-    fig.text(0.125, 0.91, subtitle, fontsize=10)
-    ax.grid(axis="y", alpha=0.2)
+    fig.suptitle(title, x=0.125, y=0.97, ha="left", fontsize=16, fontweight="bold")
+    fig.text(0.125, 0.91, subtitle, fontsize=10, color="#526078")
+    ax.grid(axis="y", alpha=0.35, color=GRID_COLOR)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=min(4, len(series)), frameon=False)
-    fig.tight_layout(rect=(0, 0.06, 1, 0.89))
+    fig.tight_layout(rect=(0, 0.06, 1, 0.86))
     fig.savefig(output, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
@@ -286,14 +301,36 @@ def main() -> None:
         y_label="Skor keberhasilan aman (%)",
     )
 
-    save_bar(
+    save_grouped(
         output_dir / "05_average_latency.png",
-        "Rata-rata latensi respons",
-        "Waktu respons end-to-end dari sisi klien. Lebih rendah lebih baik.",
+        "Rata-rata komponen latensi",
+        "Retrieval dan panggilan generation diukur terpisah; sequential E2E adalah jumlah estimasi keduanya. Lebih rendah lebih baik.",
         models,
-        [number(row.get("average_response_time_ms")) / 1000 for row in overall],
-        x_label="Detik",
-        suffix=" s",
+        [
+            (
+                "Retrieval",
+                [
+                    number(row.get("average_retrieval_time_ms")) / 1000
+                    for row in overall
+                ],
+            ),
+            (
+                "Generation API call",
+                [
+                    number(row.get("average_response_time_ms")) / 1000
+                    for row in overall
+                ],
+            ),
+            (
+                "Estimated sequential E2E",
+                [
+                    number(row.get("average_estimated_sequential_e2e_ms")) / 1000
+                    for row in overall
+                ],
+            ),
+        ],
+        y_label="Detik",
+        maximum=None,
     )
 
     language_rows = [row for row in rows if row.get("Scope") in {"EN", "ID"}]
@@ -325,25 +362,41 @@ def main() -> None:
         ),
         models,
         language_series,
-        y_label="Skor keseluruhan (0–100)",
+        y_label=(
+            "Skor diagnostik deterministik (0–100)"
+            if uses_deterministic_fallback
+            else "Skor keseluruhan (0–100)"
+        ),
     )
 
     images = sorted(output_dir.glob("*.png"))
     model_count = len(overall)
+    report_statuses = {
+        str(row.get("Report Status") or "UNKNOWN") for row in overall
+    }
+    report_status = (
+        next(iter(report_statuses))
+        if len(report_statuses) == 1
+        else "MIXED"
+    )
     table_headers = [
         "Model",
-        "Status",
+        "Report status",
+        "Score status",
         "Overall",
         "Deterministic",
         "Answer",
         "Grounding",
         "Retrieval",
         "Safety",
-        "Avg latency (ms)",
+        "Judge coverage",
+        "Avg generation call (ms)",
+        "Estimated E2E (ms)",
     ]
     table_rows = [
         [
-            html.escape(str(row.get("Model") or "")),
+            row.get("Model"),
+            row.get("Report Status"),
             row.get("score_status"),
             row.get("overall_score"),
             row.get("deterministic_score"),
@@ -351,19 +404,33 @@ def main() -> None:
             row.get("grounding_score"),
             row.get("retrieval_score"),
             row.get("safety_score"),
+            row.get("judge_coverage"),
             row.get("average_response_time_ms"),
+            row.get("average_estimated_sequential_e2e_ms"),
         ]
         for row in overall
     ]
+    dashboard_title = (
+        "LapisAI 1-model evaluation"
+        if model_count == 1
+        else f"LapisAI {model_count}-model comparison"
+    )
     report = [
-        f"<!doctype html><html><head><meta charset='utf-8'><title>LapisAI {model_count}-Model Evaluation</title>",
-        "<style>body{font-family:Arial,sans-serif;max-width:1180px;margin:36px auto;padding:0 20px;color:#172033}h1{margin-bottom:6px}p{color:#526078}img{width:100%;margin:18px 0 36px;border:1px solid #dfe5ef;border-radius:12px}table{border-collapse:collapse;width:100%;margin:24px 0}th,td{border-bottom:1px solid #dfe5ef;padding:10px;text-align:left}th{background:#f4f7fb}</style></head><body>",
-        f"<h1>LapisAI {model_count}-model evaluation</h1>",
-        "<p>Model evaluated on the bilingual question set with source-locked retrieval evidence.</p>",
+        f"<!doctype html><html><head><meta charset='utf-8'><title>{html.escape(dashboard_title)}</title>",
+        "<style>body{font-family:Arial,sans-serif;max-width:1180px;margin:36px auto;padding:0 20px;color:#172033}h1{margin-bottom:6px}p{color:#526078}.status{padding:12px 16px;border-radius:10px;background:#fff4d6;color:#704b00;font-weight:700;margin:18px 0}.status.final{background:#e5f7ed;color:#165c36}img{width:100%;margin:18px 0 36px;border:1px solid #dfe5ef;border-radius:12px}table{border-collapse:collapse;width:100%;margin:24px 0}th,td{border-bottom:1px solid #dfe5ef;padding:10px;text-align:left}th{background:#f4f7fb}</style></head><body>",
+        f"<h1>{html.escape(dashboard_title)}</h1>",
+        f"<div class='status{' final' if report_status == 'FINAL_ELIGIBLE' else ''}'>Report status: {html.escape(report_status)}</div>",
+        "<p>Evaluation uses source-locked retrieval evidence. A diagnostic report must not be presented as a final holdout result.</p>",
         "<table><thead><tr>" + "".join(f"<th>{header}</th>" for header in table_headers) + "</tr></thead><tbody>",
     ]
     for row in table_rows:
-        report.append("<tr>" + "".join(f"<td>{value}</td>" for value in row) + "</tr>")
+        report.append(
+            "<tr>"
+            + "".join(
+                f"<td>{html.escape(str(value))}</td>" for value in row
+            )
+            + "</tr>"
+        )
     report.append("</tbody></table>")
     for image in images:
         report.append(f"<img src='{html.escape(image.name)}' alt='{html.escape(image.stem)}'>")

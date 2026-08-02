@@ -203,7 +203,8 @@ def test_chat_pipeline_rejects_wrong_language_output(monkeypatch) -> None:
 
     response = chat_service.run_chat(question, language="ID", model="groq")
 
-    assert response["generation_mode"] == "retrieval_refusal"
+    assert response["generation_mode"] == "wrong_output_language"
+    assert response["failure_stage"] == "wrong_output_language"
     assert response["language"] == "ID"
     assert response["sources"] == []
     assert "The maximum" not in response["answer"]

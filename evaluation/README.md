@@ -66,7 +66,15 @@ Output baru dibuat di directory yang diberikan dan mencakup retrieval snapshot,
 audit kebocoran benchmark, raw model answers, CSV per pertanyaan, JSON summary,
 model comparison, chart, serta dashboard HTML. Summary menyertakan hash input,
 versi build, referensi model, interval kepercayaan Wilson 95%, dan estimasi
-latency sequential retrieval plus generation.
+latency sequential retrieval plus generation. Setiap report sekarang memiliki
+quality gate `FINAL_ELIGIBLE` atau `DIAGNOSTIC_ONLY`; blocker final (misalnya
+development set, judge tidak lengkap, model `:latest`, atau kebocoran benchmark)
+ditulis eksplisit pada JSON, Markdown, CSV, dan dashboard.
+
+Nama file perbandingan mengikuti jumlah model, misalnya
+`comparison_1_model.*` atau `comparison_3_models.*`. Untuk workflow publikasi,
+tambahkan `--require-final-report` agar command gagal bila quality gate final
+belum terpenuhi.
 
 File lama di `evaluation/results` atau `evaluation/generation/results` adalah
 artefak eksperimen/regresi dan bukan hasil final setelah perubahan strict RAG.
