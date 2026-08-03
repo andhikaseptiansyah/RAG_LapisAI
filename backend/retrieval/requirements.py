@@ -610,7 +610,8 @@ def requirement_satisfied(requirement: EvidenceRequirement, evidence_texts: list
         return bool(NUMBER_PATTERN.search(combined))
     if requirement.kind == "approval":
         if re.search(
-            r"\b(?:approval|approved|approve|approver|persetujuan|disetujui|menyetujui)\b",
+            r"\b(?:approval|approved|approve|approves|approver|"
+            r"persetujuan|disetujui|menyetujui)\b",
             combined,
             flags=re.I,
         ):

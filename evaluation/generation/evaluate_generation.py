@@ -37,8 +37,10 @@ except ModuleNotFoundError:
 
 try:
     from .dataset_utils import dataset_summary, load_ground_truth_files
+    from .atomic_io import replace_file_with_retry
 except ImportError:  # Direct script execution.
     from dataset_utils import dataset_summary, load_ground_truth_files
+    from atomic_io import replace_file_with_retry
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -51,6 +53,18 @@ LLM_BASE_URL = os.getenv("EVAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_API_KEY = os.getenv("EVAL_LLM_API_KEY", "ollama")
 LLM_MODEL = os.getenv("EVAL_LLM_MODEL", "").strip()
 JUDGE_MAX_RETRIES = max(0, int(os.getenv("EVAL_JUDGE_MAX_RETRIES", "5")))
+JUDGE_REQUEST_TIMEOUT_SECONDS = max(
+    1.0,
+    float(os.getenv("EVAL_JUDGE_REQUEST_TIMEOUT_SECONDS", "180")),
+)
+JUDGE_MAX_FORMAT_RETRIES = max(
+    0,
+    int(os.getenv("EVAL_JUDGE_MAX_FORMAT_RETRIES", "2")),
+)
+JUDGE_MAX_TOKENS = max(
+    64,
+    int(os.getenv("EVAL_JUDGE_MAX_TOKENS", "256")),
+)
 JUDGE_MIN_INTERVAL_SECONDS = max(
     0.0,
     float(os.getenv("EVAL_JUDGE_MIN_INTERVAL_SECONDS", "0")),
@@ -537,6 +551,60 @@ def clamp_score(value: Any) -> float | None:
     return max(1.0, min(score, 5.0))
 
 
+class JudgePayloadError(ValueError):
+    """The judge returned JSON, but it did not satisfy the scoring contract."""
+
+
+def validate_judge_payload(result: Any) -> dict[str, Any]:
+    """Validate all semantic-judge fields before a row counts as successful."""
+    if not isinstance(result, dict):
+        raise JudgePayloadError("Judge response must be one JSON object.")
+
+    scores: dict[str, float] = {}
+    for key in ("faithfulness", "answer_relevance"):
+        if key not in result:
+            raise JudgePayloadError(f"Judge response is missing required field {key!r}.")
+        try:
+            score = float(result[key])
+        except (TypeError, ValueError) as error:
+            raise JudgePayloadError(f"Judge field {key!r} must be numeric.") from error
+        if not math.isfinite(score) or not 1.0 <= score <= 5.0:
+            raise JudgePayloadError(
+                f"Judge field {key!r} must be a finite number from 1 to 5."
+            )
+        scores[key] = score
+
+    if "is_hallucination" not in result:
+        raise JudgePayloadError(
+            "Judge response is missing required field 'is_hallucination'."
+        )
+    raw_hallucination = result["is_hallucination"]
+    if isinstance(raw_hallucination, bool):
+        is_hallucination = raw_hallucination
+    elif isinstance(raw_hallucination, int) and raw_hallucination in {0, 1}:
+        is_hallucination = bool(raw_hallucination)
+    elif isinstance(raw_hallucination, str):
+        normalized = raw_hallucination.strip().casefold()
+        if normalized in {"true", "1", "yes"}:
+            is_hallucination = True
+        elif normalized in {"false", "0", "no"}:
+            is_hallucination = False
+        else:
+            raise JudgePayloadError(
+                "Judge field 'is_hallucination' must be true or false."
+            )
+    else:
+        raise JudgePayloadError(
+            "Judge field 'is_hallucination' must be true or false."
+        )
+
+    return {
+        **scores,
+        "is_hallucination": is_hallucination,
+        "reason": str(result.get("reason") or "")[:240],
+    }
+
+
 def parse_json_object(text: str) -> dict[str, Any]:
     clean = re.sub(r"```(?:json)?|```", "", str(text or ""), flags=re.I).strip()
     try:
@@ -556,6 +624,22 @@ def _judge_retry_after(response: Any) -> float | None:
         return None
 
 
+def _is_transient_judge_exception(error: Exception) -> bool:
+    """Return whether a request exception is safe to retry."""
+    exceptions = getattr(requests, "exceptions", None)
+    if exceptions is None:
+        return False
+    retryable = tuple(
+        exception_type
+        for exception_type in (
+            getattr(exceptions, "Timeout", None),
+            getattr(exceptions, "ConnectionError", None),
+        )
+        if isinstance(exception_type, type)
+    )
+    return bool(retryable) and isinstance(error, retryable)
+
+
 def _post_judge_request(
     endpoint: str,
     headers: dict[str, str],
@@ -571,12 +655,24 @@ def _post_judge_request(
             time.sleep(pacing_delay)
 
         _LAST_JUDGE_REQUEST_AT = time.monotonic()
-        response = requests.post(
-            endpoint,
-            headers=headers,
-            json=request,
-            timeout=120,
-        )
+        try:
+            response = requests.post(
+                endpoint,
+                headers=headers,
+                json=request,
+                timeout=JUDGE_REQUEST_TIMEOUT_SECONDS,
+            )
+        except Exception as error:
+            if not _is_transient_judge_exception(error) or attempt >= JUDGE_MAX_RETRIES:
+                raise
+            delay = min(2**attempt, 8)
+            print(
+                f"[JUDGE TRANSIENT ERROR] {type(error).__name__}; "
+                f"wait {delay:.1f}s before retry "
+                f"{attempt + 1}/{JUDGE_MAX_RETRIES}"
+            )
+            time.sleep(delay)
+            continue
         if response.status_code != 429 and response.status_code < 500:
             return response
         if attempt >= JUDGE_MAX_RETRIES:
@@ -586,8 +682,9 @@ def _post_judge_request(
         delay = retry_delay if retry_delay is not None else min(2**attempt, 8)
         if delay > JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS:
             return response
+        label = "RATE LIMIT" if response.status_code == 429 else "SERVER ERROR"
         print(
-            f"[JUDGE RATE LIMIT] wait {delay:.1f}s before retry "
+            f"[JUDGE {label}] wait {delay:.1f}s before retry "
             f"{attempt + 1}/{JUDGE_MAX_RETRIES}"
         )
         time.sleep(delay)
@@ -668,37 +765,43 @@ Return JSON only:
             "Authorization": f"Bearer {LLM_API_KEY}",
             "Content-Type": "application/json",
         }
-        request = {
-            "model": LLM_MODEL,
-            "temperature": 0,
-            "messages": [
-                {"role": "system", "content": "Return one valid JSON object only."},
-                {"role": "user", "content": prompt},
-            ],
-            "response_format": {"type": "json_object"},
-        }
-        response = _post_judge_request(endpoint, headers, request)
-        # Some OpenAI-compatible servers do not implement response_format.
-        # Retry without it only for request-schema errors, never for 429/5xx.
-        if response.status_code in {400, 422}:
-            request.pop("response_format", None)
+        last_payload_error: Exception | None = None
+        for format_attempt in range(JUDGE_MAX_FORMAT_RETRIES + 1):
+            request = {
+                "model": LLM_MODEL,
+                "temperature": 0,
+                "max_tokens": JUDGE_MAX_TOKENS,
+                "messages": [
+                    {"role": "system", "content": "Return one valid JSON object only."},
+                    {"role": "user", "content": prompt},
+                ],
+                "response_format": {"type": "json_object"},
+            }
             response = _post_judge_request(endpoint, headers, request)
-        response.raise_for_status()
-        payload = response.json()
-        content = payload["choices"][0]["message"].get("content") or ""
-        result = parse_json_object(content)
-        raw_hallucination = result.get("is_hallucination", False)
-        if isinstance(raw_hallucination, str):
-            is_hallucination = raw_hallucination.strip().casefold() in {"true", "1", "yes"}
-        else:
-            is_hallucination = bool(raw_hallucination)
-        return {
-            "faithfulness": clamp_score(result.get("faithfulness")),
-            "answer_relevance": clamp_score(result.get("answer_relevance")),
-            "is_hallucination": is_hallucination,
-            "reason": str(result.get("reason") or "")[:240],
-            "judge_error": "",
-        }
+            # Some OpenAI-compatible servers do not implement response_format.
+            # Retry without it only for request-schema errors, never for 429/5xx.
+            if response.status_code in {400, 422}:
+                request.pop("response_format", None)
+                response = _post_judge_request(endpoint, headers, request)
+            response.raise_for_status()
+            try:
+                payload = response.json()
+                content = payload["choices"][0]["message"].get("content") or ""
+                validated = validate_judge_payload(parse_json_object(content))
+            except (IndexError, KeyError, TypeError, ValueError) as error:
+                last_payload_error = error
+                if format_attempt >= JUDGE_MAX_FORMAT_RETRIES:
+                    raise
+                print(
+                    f"[JUDGE INVALID PAYLOAD] {error}; retry "
+                    f"{format_attempt + 1}/{JUDGE_MAX_FORMAT_RETRIES}"
+                )
+                continue
+            return {
+                **validated,
+                "judge_error": "",
+            }
+        raise RuntimeError(f"Unreachable judge format retry state: {last_payload_error}")
     except Exception as error:
         response = getattr(error, "response", None)
         if response is not None and getattr(response, "status_code", None) == 429:
@@ -863,6 +966,18 @@ def reproducibility_manifest(
             judge_model
             and judge_model.strip().casefold() != model_name.strip().casefold()
         ),
+        "judge_request_settings": (
+            {
+                "max_http_retries": JUDGE_MAX_RETRIES,
+                "request_timeout_seconds": JUDGE_REQUEST_TIMEOUT_SECONDS,
+                "max_format_retries": JUDGE_MAX_FORMAT_RETRIES,
+                "max_tokens": JUDGE_MAX_TOKENS,
+                "minimum_interval_seconds": JUDGE_MIN_INTERVAL_SECONDS,
+                "max_rate_limit_wait_seconds": JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS,
+            }
+            if judge_model
+            else None
+        ),
         "private_holdout_manifest": (
             _manifest_path(private_manifest) if private_manifest else None
         ),
@@ -948,6 +1063,122 @@ def bilingual_pairing_diagnostics(
     }
 
 
+def has_complete_judge_result(row: dict[str, Any]) -> bool:
+    """Require every semantic metric before a judge call counts as successful."""
+    if row.get("Judge Error"):
+        return False
+    try:
+        scores = [float(row[field]) for field in ("Faithfulness", "Answer Relevance")]
+    except (KeyError, TypeError, ValueError):
+        return False
+    if any(not math.isfinite(score) or not 1.0 <= score <= 5.0 for score in scores):
+        return False
+    return row.get("Hallucination") in {0, 1, False, True}
+
+
+def write_csv_rows_atomic(path: Path, rows: list[dict[str, Any]]) -> None:
+    """Write an interruption-safe CSV checkpoint for judge resume."""
+    if not rows:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", newline="", encoding="utf-8-sig") as file:
+        writer = csv.DictWriter(file, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    replace_file_with_retry(temporary, path)
+
+
+def write_json_lf(path: Path, payload: Any) -> None:
+    """Write stable UTF-8 JSON with LF endings on every operating system."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="\n") as file:
+        json.dump(payload, file, indent=2, ensure_ascii=False)
+        file.write("\n")
+    replace_file_with_retry(temporary, path)
+
+
+def load_judge_resume_rows(
+    csv_path: Path,
+    summary_path: Path,
+    *,
+    model_name: str,
+    judge_model: str,
+) -> dict[str, dict[str, str]]:
+    """Load prior complete judge rows while preventing cross-model reuse."""
+    if not csv_path.is_file():
+        return {}
+
+    summary_judge = ""
+    summary_model = ""
+    if summary_path.is_file():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        summary_judge = str(summary.get("judge_model") or "").strip()
+        summary_model = str(summary.get("model_name") or "").strip()
+        if summary_judge and summary_judge.casefold() != judge_model.casefold():
+            raise ValueError(
+                "Cannot resume judge rows: cached summary uses a different judge model."
+            )
+        if summary_model and summary_model.casefold() != model_name.casefold():
+            raise ValueError(
+                "Cannot resume judge rows: cached summary evaluates a different model."
+            )
+
+    cached: dict[str, dict[str, str]] = {}
+    with csv_path.open(encoding="utf-8-sig", newline="") as file:
+        for row in csv.DictReader(file):
+            qid = str(row.get("ID") or "").strip()
+            if not qid:
+                continue
+            row_judge = str(row.get("Judge Model") or summary_judge).strip()
+            if not row_judge:
+                raise ValueError(
+                    "Cannot resume judge rows without a recorded judge-model reference."
+                )
+            if row_judge.casefold() != judge_model.casefold():
+                raise ValueError(
+                    f"Cannot resume {qid}: cached row uses a different judge model."
+                )
+            cached[qid] = row
+    return cached
+
+
+def reusable_judge_result(
+    row: dict[str, str] | None,
+    *,
+    item: dict[str, Any],
+    ground_truth: dict[str, Any],
+    model_name: str,
+    generated_answer: str,
+) -> dict[str, Any] | None:
+    """Return a cached semantic result only when every judge input still matches."""
+    if not row or str(row.get("Judge Error") or "").strip():
+        return None
+    expected = {
+        "Model Name": model_name,
+        "Question": str(ground_truth.get("question") or ""),
+        "Expected Answer": str(ground_truth.get("expected_answer") or ""),
+        "Generated Answer": generated_answer,
+        "Answerable": str(bool(ground_truth.get("answerable"))),
+        "Context Fingerprint": str(item.get("context_fingerprint") or ""),
+    }
+    if any(str(row.get(key) or "") != value for key, value in expected.items()):
+        return None
+    try:
+        validated = validate_judge_payload(
+            {
+                "faithfulness": row.get("Faithfulness"),
+                "answer_relevance": row.get("Answer Relevance"),
+                "is_hallucination": row.get("Hallucination"),
+                "reason": row.get("Judge Reason"),
+            }
+        )
+    except JudgePayloadError:
+        return None
+    return {**validated, "judge_error": ""}
+
+
 def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     answerable_rows = [row for row in rows if row["Answerable"]]
     unanswerable_rows = [row for row in rows if not row["Answerable"]]
@@ -962,7 +1193,12 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         row for row in judge_eligible_rows
         if row["Judge Error"] != "SKIPPED"
     ]
-    judge_rows = [row for row in judge_attempted if not row["Judge Error"]]
+    judge_rows = [row for row in judge_attempted if has_complete_judge_result(row)]
+    judge_incomplete_rows = [
+        row
+        for row in judge_attempted
+        if not row["Judge Error"] and not has_complete_judge_result(row)
+    ]
     retrieval_latencies = [
         float(row["Retrieval Time (ms)"])
         for row in rows
@@ -1007,6 +1243,7 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "judge_eligible_questions": len(judge_eligible_rows),
         "judge_attempted_questions": len(judge_attempted),
         "judge_successful_questions": len(judge_rows),
+        "judge_incomplete_response_questions": len(judge_incomplete_rows),
         "judge_coverage": round(
             len(judge_rows) / len(judge_eligible_rows),
             4,
@@ -1034,6 +1271,12 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "unanswerable_no_citation_rate": mean(row["No Citation On Unanswerable"] for row in unanswerable_rows),
         "unanswerable_no_result_rate": mean(row["Retrieval No Result"] for row in unanswerable_rows),
         "hallucination_rate": mean(row["Hallucination"] for row in judge_rows),
+        "grounding_repaired_questions": sum(
+            int(row.get("Grounding Repaired") or 0) for row in rows
+        ),
+        "grounding_repair_rate": mean(
+            int(row.get("Grounding Repaired") or 0) for row in rows
+        ),
         "pipeline_failure_rate": mean(row["Pipeline Failed"] for row in rows),
         "retrieval_or_context_failure_rate": mean(
             int(row["Failure Category"] == "retrieval_or_context")
@@ -1200,6 +1443,11 @@ def build_evaluation_status(
         )
     if judge_model and not judge_independent:
         blockers.append("The evaluated model was also used as its own judge.")
+    elif judge_model:
+        warnings.append(
+            "Judge independence is based on distinct model-reference strings only; "
+            "verify checkpoint digest and model-family independence separately."
+        )
     if model_reference_is_mutable(model_name):
         blockers.append(
             "The evaluated model reference is mutable; pin a versioned tag or digest."
@@ -1254,6 +1502,14 @@ def main() -> None:
     parser.add_argument("--output-prefix", default=None)
     parser.add_argument("--skip-llm-judge", action="store_true")
     parser.add_argument(
+        "--resume-judge",
+        action="store_true",
+        help=(
+            "Reuse complete judge rows from the destination CSV when the judge "
+            "model, evaluated model, question, answer, and context fingerprint match."
+        ),
+    )
+    parser.add_argument(
         "--allow-self-judge",
         action="store_true",
         help="Explicitly allow the evaluated model to judge its own answers.",
@@ -1264,6 +1520,8 @@ def main() -> None:
         default="development",
     )
     args = parser.parse_args()
+    if args.resume_judge and args.skip_llm_judge:
+        parser.error("--resume-judge cannot be combined with --skip-llm-judge")
 
     datasets = args.ground_truth_files or DEFAULT_DATASETS
     gt_items = load_ground_truth_files(datasets)
@@ -1313,12 +1571,28 @@ def main() -> None:
             "acknowledge the limitation with --allow-self-judge."
         )
     prefix = args.output_prefix or model
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = args.output_dir / f"generation_results_{prefix}.csv"
+    json_path = args.output_dir / f"generation_summary_{prefix}.json"
+    preserving_existing_judge_cache = args.resume_judge and csv_path.is_file()
+    resume_judge_rows = (
+        load_judge_resume_rows(
+            csv_path,
+            json_path,
+            model_name=model_name,
+            judge_model=LLM_MODEL,
+        )
+        if args.resume_judge
+        else {}
+    )
 
     rows: list[dict[str, Any]] = []
     print(f"Dataset: {dataset_summary(gt_items)}")
     print(f"Provider under evaluation: {model}")
     print(f"Concrete model: {model_name}")
     print(f"LLM judge: {'SKIPPED' if args.skip_llm_judge else LLM_MODEL}")
+    if args.resume_judge:
+        print(f"Judge resume cache: {len(resume_judge_rows)} row(s)")
 
     for index, item in enumerate(answers, start=1):
         qid = str(item.get("id") or "")
@@ -1411,13 +1685,23 @@ def main() -> None:
                 "judge_error": "SKIPPED",
             }
         else:
-            semantic = llm_judge(
-                question=str(gt.get("question") or ""),
-                expected_answer=expected_answer,
-                context=str(item.get("retrieved_context") or ""),
-                answer=generated_answer,
-                answerable=answerable,
+            semantic = reusable_judge_result(
+                resume_judge_rows.get(qid),
+                item=item,
+                ground_truth=gt,
+                model_name=model_name,
+                generated_answer=generated_answer,
             )
+            if semantic is not None:
+                print(f"[JUDGE RESUME] {qid}")
+            else:
+                semantic = llm_judge(
+                    question=str(gt.get("question") or ""),
+                    expected_answer=expected_answer,
+                    context=str(item.get("retrieved_context") or ""),
+                    answer=generated_answer,
+                    answerable=answerable,
+                )
 
         citations = item.get("citation") or []
         correct_unanswerable = int(
@@ -1477,6 +1761,12 @@ def main() -> None:
                 ensure_ascii=False,
                 sort_keys=True,
             ),
+            "Grounding Validation": json.dumps(
+                item.get("grounding_validation") or {},
+                ensure_ascii=False,
+                sort_keys=True,
+            ),
+            "Grounding Repaired": int(bool(item.get("grounding_repaired"))),
             "Generation Mode": str(item.get("generation_mode") or ""),
             "Pipeline Error": str(item.get("pipeline_error") or ""),
             "Context Count Before Failure": int(
@@ -1584,6 +1874,7 @@ def main() -> None:
             ),
             "Judge Reason": semantic["reason"],
             "Judge Error": semantic["judge_error"],
+            "Judge Model": None if args.skip_llm_judge else LLM_MODEL,
             "System Confidence": item.get("system_confidence"),
             "Backend Response Time (ms)": item.get("backend_response_time_ms"),
             "Client Response Time (ms)": client_time_value,
@@ -1595,6 +1886,10 @@ def main() -> None:
             "Context Fingerprint": item.get("context_fingerprint"),
         }
         rows.append(row)
+        # A fresh run checkpoints after every row. During resume, keep the
+        # original full cache intact until the replacement report is complete.
+        if not args.skip_llm_judge and not preserving_existing_judge_cache:
+            write_csv_rows_atomic(csv_path, rows)
 
     if not rows:
         raise RuntimeError("No matching evaluation rows were found")
@@ -1638,6 +1933,11 @@ def main() -> None:
         "model_name": model_name,
         "judge_model": judge_model,
         "judge_independent": judge_independent,
+        "judge_independence_basis": (
+            "distinct_model_reference_strings_only"
+            if judge_independent
+            else "not_independent_or_not_configured"
+        ),
         "ground_truth_files": [
             _manifest_path(Path(path)) for path in datasets
         ],
@@ -1676,14 +1976,8 @@ def main() -> None:
         ],
     }
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    csv_path = args.output_dir / f"generation_results_{prefix}.csv"
-    json_path = args.output_dir / f"generation_summary_{prefix}.json"
-    with csv_path.open("w", newline="", encoding="utf-8-sig") as file:
-        writer = csv.DictWriter(file, fieldnames=rows[0].keys())
-        writer.writeheader()
-        writer.writerows(rows)
-    json_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_csv_rows_atomic(csv_path, rows)
+    write_json_lf(json_path, summary)
 
     print("\n[SUCCESS]")
     print(json.dumps(summary, indent=2, ensure_ascii=False))

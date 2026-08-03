@@ -32,12 +32,14 @@ try:
         dataset_summary,
         load_ground_truth_files,
     )
+    from .atomic_io import replace_file_with_retry
 except ImportError:  # Direct script execution.
     from dataset_utils import (
         context_fingerprint,
         dataset_summary,
         load_ground_truth_files,
     )
+    from atomic_io import replace_file_with_retry
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_DIR = PROJECT_ROOT / "backend"
@@ -87,10 +89,15 @@ CHAT_URL = os.getenv(
 HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
-CONTEXT_MODE = "source_locked_snapshot_native_model_v8"
+CONTEXT_MODE = "source_locked_snapshot_grounded_repair_v9"
 SNAPSHOT_SCHEMA_VERSION = 4
 LATENCY_MEASUREMENT_MODE = "single_strict_retrieval_without_debug_baseline"
 VALID_MODELS = ("ollama", "gemini", "groq")
+ALLOWED_EVALUATION_GENERATION_MODES = {
+    "native_model",
+    "grounding_pruned",
+    "verified_scalar_fallback",
+}
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
     "gemini": ("GEMINI_MODEL", "gemini-3.5-flash"),
@@ -101,6 +108,16 @@ MAX_RATE_LIMIT_WAIT_SECONDS = max(
     0.0,
     float(os.getenv("EVAL_MAX_RATE_LIMIT_WAIT_SECONDS", "90")),
 )
+
+
+def write_json_lf(path: Path, payload: Any) -> None:
+    """Persist canonical LF-delimited JSON so byte hashes survive Windows/Git."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="\n") as file:
+        json.dump(payload, file, indent=2, ensure_ascii=False)
+        file.write("\n")
+    replace_file_with_retry(temporary, path)
 
 
 class NonRetryableEvaluationError(RuntimeError):
@@ -152,7 +169,11 @@ def classify_chat_failure(response: dict[str, Any]) -> str:
     # Stage is authoritative. A late failure used to be wrapped by the generic
     # retrieval-refusal payload, causing valid retrieved contexts to be counted
     # as retrieval misses. Check the precise stage before compatibility modes.
-    if "citation_validation" in stage or "answer_or_source" in stage:
+    if (
+        "citation_validation" in stage
+        or "grounding_validation" in stage
+        or "answer_or_source" in stage
+    ):
         return "answer_postprocessing"
     if "native_model_refusal" in stage:
         return "generation_output"
@@ -167,7 +188,7 @@ def classify_chat_failure(response: dict[str, Any]) -> str:
         )
     ):
         return "retrieval_or_context"
-    if generation_mode and generation_mode != "native_model":
+    if generation_mode and generation_mode not in ALLOWED_EVALUATION_GENERATION_MODES:
         return "pipeline_contract"
     return "generation_or_provider"
 
@@ -850,11 +871,7 @@ def build_dataset(
             ):
                 checkpoint.append(previous_row)
 
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(
-            json.dumps(checkpoint, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        write_json_lf(output, checkpoint)
 
     for index, item in enumerate(ground_truth, start=1):
         qid = str(item["id"])
@@ -953,9 +970,13 @@ def build_dataset(
                         "Inspect failure_stage and retrieval diagnostics.",
                         category=classify_chat_failure(chat_response),
                     )
-                if answerable and chat_response.get("generation_mode") != "native_model":
+                if (
+                    answerable
+                    and chat_response.get("generation_mode")
+                    not in ALLOWED_EVALUATION_GENERATION_MODES
+                ):
                     raise NonRetryableEvaluationError(
-                        "Backend did not return native model output. "
+                        "Backend did not return native or deterministically grounded output. "
                         "Inspect generation_mode and failure_stage.",
                         category=classify_chat_failure(chat_response),
                     )
@@ -1022,6 +1043,12 @@ def build_dataset(
                         ),
                         "citation_validation": chat_response.get(
                             "citation_validation"
+                        ),
+                        "grounding_validation": chat_response.get(
+                            "grounding_validation"
+                        ),
+                        "grounding_repaired": bool(
+                            chat_response.get("grounding_repaired")
                         ),
                         "context_count_before_failure": chat_response.get(
                             "context_count_before_failure",
@@ -1149,6 +1176,15 @@ def build_dataset(
                         if last_chat_response
                         else None
                     ),
+                    "grounding_validation": (
+                        last_chat_response.get("grounding_validation")
+                        if last_chat_response
+                        else None
+                    ),
+                    "grounding_repaired": bool(
+                        last_chat_response
+                        and last_chat_response.get("grounding_repaired")
+                    ),
                     "context_count_before_failure": (
                         last_chat_response.get(
                             "context_count_before_failure",
@@ -1177,8 +1213,7 @@ def build_dataset(
     # resumed rows use ``continue`` and therefore skip the per-item checkpoint write.
     # Without this final write, a run that only reprocesses one failed item can leave
     # the JSON truncated at that item even though all remaining rows were resumed.
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json_lf(output, results)
 
     if errors:
         preview = "\n".join(f"- {item}" for item in errors[:10])

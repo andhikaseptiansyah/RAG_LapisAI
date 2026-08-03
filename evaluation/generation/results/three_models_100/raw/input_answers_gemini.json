@@ -5818,8 +5818,8 @@
     "id": "EN-037",
     "model": "gemini",
     "model_name": "gemini-3.5-flash",
-    "backend_model": null,
-    "generation_mode": null,
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
     "question": "What should an employee do after receiving a suspicious email?",
     "language": "EN",
     "answerable": true,
@@ -5835,16 +5835,41 @@
         "acceptable_alternative": false
       }
     ],
-    "retrieved_context": "",
-    "retrieved_sources": [],
-    "retrieved_chunks": [],
-    "generation_contexts": [],
-    "context_fingerprint": "4f53cda18c2baa0c",
-    "generated_answer": "",
-    "citation": [],
-    "system_confidence": 0,
-    "backend_response_time_ms": null,
-    "client_response_time_ms": 0.0,
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Security_Awareness.txt\nPage: -\nEvidence: Do not click links; report it using the Report Phishing button.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Security_Awareness.txt_para1_c0",
+        "content": "Do not click links; report it using the Report Phishing button.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Do not click links; report it using the Report Phishing button.",
+        "document_name": "FAQ_Security_Awareness.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Security_Awareness.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "876a9827e5506b58",
+    "generated_answer": "An employee should not click any links and must report the suspicious email using the Report Phishing button.",
+    "citation": [
+      {
+        "document": "FAQ_Security_Awareness.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8219,
+    "backend_response_time_ms": 18073,
+    "client_response_time_ms": 18103.53,
     "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
     "source_dataset": "qna_english_user.csv",
     "retrieval_top_k": 5,
@@ -5924,19 +5949,19 @@
     "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
     "snapshot_retrieval_mode": "original",
     "snapshot_retrieval_query": "What should an employee do after receiving a suspicious email?",
-    "backend_build_version": null,
-    "retrieval_mode": "original",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
     "retrieval_query": "What should an employee do after receiving a suspicious email?",
     "failure_stage": null,
     "failure_reason": null,
     "rejected_native_answer": null,
     "citation_validation": null,
-    "context_count_before_failure": 0,
-    "pipeline_failed": true,
-    "failure_category": "generation_or_provider",
-    "pipeline_error": "503 Server Error: Service Unavailable for url: http://127.0.0.1:8000/api/admin/evaluation/chat",
-    "generation_failed": true,
-    "generation_error": "503 Server Error: Service Unavailable for url: http://127.0.0.1:8000/api/admin/evaluation/chat"
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
   },
   {
     "id": "EN-038",
@@ -6867,6 +6892,1043 @@
     "generation_error": ""
   },
   {
+    "id": "EN-042",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "How quickly must a suspected data breach be reported, and to which address?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "A suspected data breach must be reported within one hour to security@nusantaradynamics.co.id.",
+    "expected_answer_keywords": [
+      "within 1 hour",
+      "security@nusantaradynamics.co.id"
+    ],
+    "expected_sources": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Data_Security.docx\nPage: -\nEvidence: Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": "-",
+        "chunk_id": "Policy_Data_Security.docx_para7_c4",
+        "content": "Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Reporting Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+        "document_name": "Policy_Data_Security.docx",
+        "page": "-",
+        "chunk_id": "Policy_Data_Security.docx_para7_c4"
+      }
+    ],
+    "context_fingerprint": "e4ea2ff93a3a6c48",
+    "generated_answer": "A suspected data breach must be reported within 1 hour to security@nusantaradynamics.co.id.",
+    "citation": [
+      {
+        "document": "Policy_Data_Security.docx",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9115,
+    "backend_response_time_ms": 13271,
+    "client_response_time_ms": 13282.35,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_english_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Policy_Data_Security.docx_para7_c4",
+        "document": "Policy_Data_Security.docx",
+        "page": "-",
+        "content_sha256": "41c754f9a50a927eedb25f39f393c5f496914a2d8b86ce55ffb7e8be9cd69ad4",
+        "score": 0.914764,
+        "base_score": 0.880213,
+        "semantic_score": 0.823843,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.5,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 7.089237,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "How quickly must a suspected data breach be reported, and to which address?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": true,
+        "evidence_score": 0.928576,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.911527,
+        "answerability_score_margin": 0.332136,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.911527,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:data_breach",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.914764,
+          "top_base_score": 0.880213,
+          "top_evidence_score": 0.928576,
+          "top_exact_coverage": 0.5,
+          "score_margin": 0.332136,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Data_Security.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Policy_Data_Security.docx_para7_c4"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 5235.57,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "525ad78bd37082f8ab9508195059acc6e8d41a990fba326067e3817e783ea45c",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "How quickly must a suspected data breach be reported, and to which address?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "How quickly must a suspected data breach be reported, and to which address?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "EN-043",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "What are the four information-classification levels?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "The four levels are Public, Internal, Confidential, and Restricted.",
+    "expected_answer_keywords": [
+      "Public",
+      "Internal",
+      "Confidential",
+      "Restricted"
+    ],
+    "expected_sources": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Information_Classification.docx\nPage: -\nEvidence: Levels Information is classified as Public, Internal, Confidential, or Restricted.\n\n[CONTEXT 2]\nDocument: Policy_Information_Classification.docx\nPage: -\nEvidence: Information Classification Policy",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "-",
+        "chunk_id": "Policy_Information_Classification.docx_para3_c2",
+        "content": "Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+        "generation_context": true
+      },
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": "-",
+        "chunk_id": "Policy_Information_Classification.docx_para2_c1",
+        "content": "Information Classification Policy",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Levels Information is classified as Public, Internal, Confidential, or Restricted.",
+        "document_name": "Policy_Information_Classification.docx",
+        "page": "-",
+        "chunk_id": "Policy_Information_Classification.docx_para3_c2"
+      },
+      {
+        "text": "Information Classification Policy",
+        "document_name": "Policy_Information_Classification.docx",
+        "page": "-",
+        "chunk_id": "Policy_Information_Classification.docx_para2_c1"
+      }
+    ],
+    "context_fingerprint": "01b8dc84c060d165",
+    "generated_answer": "The four information-classification levels are Public, Internal, Confidential, and Restricted. These levels are established as part of the Information Classification Policy.",
+    "citation": [
+      {
+        "document": "Policy_Information_Classification.docx",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.634,
+    "backend_response_time_ms": 5689,
+    "client_response_time_ms": 5708.4,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_english_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Policy_Information_Classification.docx_para3_c2",
+        "document": "Policy_Information_Classification.docx",
+        "page": "-",
+        "content_sha256": "c35b72b240985373bf19abcf3edb68f6c71b875dad1ad73973cfbdb854947d49",
+        "score": 0.843485,
+        "base_score": 0.791314,
+        "semantic_score": 0.693109,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.5,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 6.023912,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the four information-classification levels?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.633966,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:information_classification"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.931898,
+        "answerability_score_margin": 0.054902,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.931898,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:classification_levels",
+            "concept:information_classification",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.843485,
+          "top_base_score": 0.911617,
+          "top_evidence_score": 0.633966,
+          "top_exact_coverage": 0.5,
+          "score_margin": 0.054902,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 2,
+        "chunk_id": "Policy_Information_Classification.docx_para2_c1",
+        "document": "Policy_Information_Classification.docx",
+        "page": "-",
+        "content_sha256": "fca0e954bd4350cd49e49545a3744a719a47ff64f50bf40288cdd676e7f5b8d5",
+        "score": 0.788583,
+        "base_score": 0.911617,
+        "semantic_score": 0.883461,
+        "keyword_score": 0.97145,
+        "exact_token_coverage": 0.5,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.41948,
+        "reranker_raw_score": -3.616549,
+        "reranker_rank": 2,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the four information-classification levels?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.632519,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:classification_levels"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.931898,
+        "answerability_score_margin": 0.054902,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.931898,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:classification_levels",
+            "concept:information_classification",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.843485,
+          "top_base_score": 0.911617,
+          "top_evidence_score": 0.633966,
+          "top_exact_coverage": 0.5,
+          "score_margin": 0.054902,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 3,
+        "chunk_id": "Policy_Information_Classification.docx_para1_c0",
+        "document": "Policy_Information_Classification.docx",
+        "page": "-",
+        "content_sha256": "c4b1b6f1c3051cffed9813486089d75d4bd0861736287eed5cc4f864706bc7dd",
+        "score": 0.651095,
+        "base_score": 0.780918,
+        "semantic_score": 0.0,
+        "keyword_score": 0.780918,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.261626,
+        "reranker_raw_score": -6.237967,
+        "reranker_rank": 3,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the four information-classification levels?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.15,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:classification_levels",
+          "missing_concept:information_classification"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.931898,
+        "answerability_score_margin": 0.054902,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.931898,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:classification_levels",
+            "concept:information_classification",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.843485,
+          "top_base_score": 0.911617,
+          "top_evidence_score": 0.633966,
+          "top_exact_coverage": 0.5,
+          "score_margin": 0.054902,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Information_Classification.docx_para1_c0",
+            "Policy_Information_Classification.docx_para2_c1",
+            "Policy_Information_Classification.docx_para3_c2"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 5449.82,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "79978fbd5dbebac745835867fd7cd42a4dc079e96366605fd166267a39ef6b7e",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "What are the four information-classification levels?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "What are the four information-classification levels?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 2,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "EN-044",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "What are the password length, complexity, and rotation requirements?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "Passwords must be at least 12 characters, include uppercase and lowercase letters, a number, and a symbol, and be changed every 90 days.",
+    "expected_answer_keywords": [
+      "12 characters",
+      "upper case",
+      "lower case",
+      "number",
+      "symbol",
+      "90 days"
+    ],
+    "expected_sources": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_Password.docx\nPage: -\nEvidence: Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol.\n\n[CONTEXT 2]\nDocument: Policy_Password.docx\nPage: -\nEvidence: Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para3_c2",
+        "content": "Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol.",
+        "generation_context": true
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para5_c3",
+        "content": "Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Length Passwords must be at least 12 characters and include upper case, lower case, a number, and a symbol.",
+        "document_name": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para3_c2"
+      },
+      {
+        "text": "Rotation Passwords must be changed every 90 days. The last 5 passwords cannot be reused.",
+        "document_name": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para5_c3"
+      }
+    ],
+    "context_fingerprint": "76b012b3543ed8e1",
+    "generated_answer": "Passwords must be at least 12 characters long, include uppercase and lowercase letters, a number, and",
+    "citation": [
+      {
+        "document": "Policy_Password.docx",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.5932,
+    "backend_response_time_ms": 15762,
+    "client_response_time_ms": 15795.29,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_english_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Policy_Password.docx_para3_c2",
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "content_sha256": "e7c108bb9e2a58aaf25b3dcc0e09936709686079f613f372fdb831b82a637779",
+        "score": 0.80681,
+        "base_score": 0.742414,
+        "semantic_score": 0.621196,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.333333,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 0.800212,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the password length, complexity, and rotation requirements?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.593179,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:password_rotation"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.902215,
+        "answerability_score_margin": 0.00654,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.902215,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:password_complexity",
+            "concept:password_rotation",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.80681,
+          "top_base_score": 0.819449,
+          "top_evidence_score": 0.593179,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.00654,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3",
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para1_c0",
+            "Policy_Password.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 2,
+        "chunk_id": "Policy_Password.docx_para5_c3",
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "content_sha256": "a30d5ba9daef00c90806ac1b4669811ea59bf99879da9e7a0e03bfe13f16366d",
+        "score": 0.80027,
+        "base_score": 0.819449,
+        "semantic_score": 0.734484,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.166667,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.742734,
+        "reranker_raw_score": -2.119474,
+        "reranker_rank": 2,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the password length, complexity, and rotation requirements?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.590173,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:password_complexity"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.902215,
+        "answerability_score_margin": 0.00654,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.902215,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:password_complexity",
+            "concept:password_rotation",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.80681,
+          "top_base_score": 0.819449,
+          "top_evidence_score": 0.593179,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.00654,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3",
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para1_c0",
+            "Policy_Password.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 3,
+        "chunk_id": "Policy_Password.docx_para2_c1",
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "content_sha256": "11831de5b6d62b7ce70eda95c74b4f0af0c40650f27fd42b0abca7571b46bd59",
+        "score": 0.640401,
+        "base_score": 0.752101,
+        "semantic_score": 0.635443,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.166667,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.305301,
+        "reranker_raw_score": -7.083851,
+        "reranker_rank": 3,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the password length, complexity, and rotation requirements?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": false,
+        "evidence_score": 0.265316,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [
+          "missing_concept:password_complexity",
+          "missing_concept:password_rotation"
+        ],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.902215,
+        "answerability_score_margin": 0.00654,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.902215,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:password_complexity",
+            "concept:password_rotation",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.80681,
+          "top_base_score": 0.819449,
+          "top_evidence_score": 0.593179,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.00654,
+          "supporting_candidate_count": 3,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3",
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para1_c0",
+            "Policy_Password.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 3,
+          "coherent_chunk_ids": [
+            "Policy_Password.docx_para2_c1",
+            "Policy_Password.docx_para3_c2",
+            "Policy_Password.docx_para5_c3"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 5358.71,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "417451bf8ca58fe2da046c6f46eb07f4d73118948d6ee81d263911233df1d9dd",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "What are the password length, complexity, and rotation requirements?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "What are the password length, complexity, and rotation requirements?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 2,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "EN-045",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+    "language": "EN",
+    "answerable": true,
+    "expected_answer": "A department head approves purchases valued from IDR 10 million to IDR 50 million.",
+    "expected_answer_keywords": [
+      "department head",
+      "IDR 10-50 million"
+    ],
+    "expected_sources": [
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Procurement.pdf\nPage: 1\nEvidence: Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.\n\n[CONTEXT 2]\nDocument: Policy_Procurement_Threshold.docx\nPage: -\nEvidence: Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1"
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Procurement.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "generation_context": true
+      },
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "-",
+        "chunk_id": "Policy_Procurement_Threshold.docx_para3_c2",
+        "content": "Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics SOP - Procurement Thresholds Purchases up to IDR 10,000,000 require manager approval. Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Vendor Onboarding New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+        "document_name": "SOP_Procurement.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Procurement.pdf_p1_c0"
+      },
+      {
+        "text": "Tiers Below IDR 10,000,000: manager. IDR 10-50 million: department head. Above IDR 50,000,000: Director with three quotations.",
+        "document_name": "Policy_Procurement_Threshold.docx",
+        "page": "-",
+        "chunk_id": "Policy_Procurement_Threshold.docx_para3_c2"
+      }
+    ],
+    "context_fingerprint": "c872cb463779748d",
+    "generated_answer": "A department head approves a purchase valued between IDR 10 million and IDR 50 million. For",
+    "citation": [
+      {
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.6372,
+    "backend_response_time_ms": 17360,
+    "client_response_time_ms": 17392.72,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_english_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "SOP_Procurement.pdf_p1_c0",
+        "document": "SOP_Procurement.pdf",
+        "page": 1,
+        "content_sha256": "8b25cd234b1528639427e1981b70efe434366295124e359c5ef142d6e9a6f48f",
+        "score": 0.70521,
+        "base_score": 0.606946,
+        "semantic_score": 0.586347,
+        "keyword_score": 0.650721,
+        "exact_token_coverage": 0.444444,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 9.016447,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": true,
+        "evidence_score": 0.63717,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.820977,
+        "answerability_score_margin": 0.045371,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.820977,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_approval",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.70521,
+          "top_base_score": 0.70086,
+          "top_evidence_score": 0.63717,
+          "top_exact_coverage": 0.444444,
+          "score_margin": 0.045371,
+          "supporting_candidate_count": 2,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "SOP_Procurement.pdf_p1_c0",
+            "Policy_Procurement_Threshold.docx_para3_c2"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "SOP_Procurement.pdf_p1_c0"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 2,
+        "chunk_id": "Policy_Procurement_Threshold.docx_para3_c2",
+        "document": "Policy_Procurement_Threshold.docx",
+        "page": "-",
+        "content_sha256": "5e9e4c0007d644fe3bd7229fc4635e5784067110e75a3125991adabb4179c568",
+        "score": 0.659839,
+        "base_score": 0.70086,
+        "semantic_score": 0.560088,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.444444,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.536777,
+        "reranker_raw_score": -0.011525,
+        "reranker_rank": 2,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+        "reranker_query_variant_count": 1,
+        "evidence_supported": true,
+        "evidence_score": 0.585763,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.820977,
+        "answerability_score_margin": 0.045371,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.820977,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_approval",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.70521,
+          "top_base_score": 0.70086,
+          "top_evidence_score": 0.63717,
+          "top_exact_coverage": 0.444444,
+          "score_margin": 0.045371,
+          "supporting_candidate_count": 2,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "SOP_Procurement.pdf_p1_c0",
+            "Policy_Procurement_Threshold.docx_para3_c2"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "SOP_Procurement.pdf_p1_c0"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 5723.35,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "767b71f4d3f03f136420793ebe9340240ea15e749b23cd8038938f307c7b4eef",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Who approves a purchase valued between IDR 10 million and IDR 50 million?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 2,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
     "id": "EN-046",
     "model": "gemini",
     "model_name": "gemini-3.5-flash",
@@ -7097,6 +8159,1156 @@
     "generation_error": ""
   },
   {
+    "id": "ID-001",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Ajukan tiket ke IT Helpdesk melalui portal. Reset diproses dalam waktu 1x24 jam.",
+    "expected_answer_keywords": [
+      "IT Helpdesk",
+      "portal",
+      "1x24 jam"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_IT_Support.txt\nPage: -\nEvidence: Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": "-",
+        "chunk_id": "FAQ_IT_Support.txt_para1_c0",
+        "content": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+        "document_name": "FAQ_IT_Support.txt",
+        "page": "-",
+        "chunk_id": "FAQ_IT_Support.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "e71e7b350ab8b0df",
+    "generated_answer": "Cara mereset kata sandi adalah dengan membuat tiket ke IT Helpdesk melalui portal. Proses reset tersebut akan diproses dalam waktu",
+    "citation": [
+      {
+        "document": "FAQ_IT_Support.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.796,
+    "backend_response_time_ms": 28979,
+    "client_response_time_ms": 29007.34,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_IT_Support.txt_para1_c0",
+        "document": "FAQ_IT_Support.txt",
+        "page": "-",
+        "content_sha256": "cf0ebd8d05fb99e4c660aa33eb447c9286b9afe3d07ec695d834daef01dc5f9d",
+        "score": 0.795992,
+        "base_score": 0.718274,
+        "semantic_score": 0.585697,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 1.745195,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "How long does an IT password reset take?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.817855,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.836602,
+        "answerability_score_margin": 0.164674,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.836602,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_duration",
+            "concept:password_reset",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.795992,
+          "top_base_score": 0.718274,
+          "top_evidence_score": 0.817855,
+          "top_exact_coverage": 0.0,
+          "score_margin": 0.164674,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_IT_Support.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_IT_Support.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 7024.7,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "250efa27869e43f29380bcf8cafc56ac706bd635b9989ac5bfdb16807a8d5ca9",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-004",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Pada jam berapa pekerja remote wajib tersedia selama core hours?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Pekerja remote wajib tersedia pada pukul 10.00 sampai 16.00 WIB.",
+    "expected_answer_keywords": [
+      "10.00",
+      "16.00",
+      "WIB"
+    ],
+    "expected_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Policy_WFH.docx\nPage: -\nEvidence: Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+    "retrieved_sources": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": "-",
+        "chunk_id": "Policy_WFH.docx_para7_c4",
+        "content": "Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Core Hours Remote workers must be available during core hours of 10:00-16:00 WIB.",
+        "document_name": "Policy_WFH.docx",
+        "page": "-",
+        "chunk_id": "Policy_WFH.docx_para7_c4"
+      }
+    ],
+    "context_fingerprint": "7a890c38baf9592c",
+    "generated_answer": "Pekerja remote wajib tersedia selama core hours pada jam 10:00-16:00 WIB.",
+    "citation": [
+      {
+        "document": "Policy_WFH.docx",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.9038,
+    "backend_response_time_ms": 6987,
+    "client_response_time_ms": 7018.79,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Policy_WFH.docx_para7_c4",
+        "document": "Policy_WFH.docx",
+        "page": "-",
+        "content_sha256": "8791d64be0810a74b6a412c1201685b6b2362064ea8699071ccf49883e266d5f",
+        "score": 0.928077,
+        "base_score": 0.904103,
+        "semantic_score": 0.858975,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.375,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 10.922063,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Pada jam berapa pekerja remote wajib tersedia selama core hours?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.903846,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.916832,
+        "answerability_score_margin": 0.409543,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.916832,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_date_or_time",
+            "concept:core_hours",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.928077,
+          "top_base_score": 0.904103,
+          "top_evidence_score": 0.903846,
+          "top_exact_coverage": 0.375,
+          "score_margin": 0.409543,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Policy_WFH.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Policy_WFH.docx_para7_c4"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 7745.61,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "546f19a532415ab6116a08b15cdab000865de6d34bf0a577012b9ca58c8375ab",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Pada jam berapa pekerja remote wajib tersedia selama core hours?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Pada jam berapa pekerja remote wajib tersedia selama core hours?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-005",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Pendapatan tahun 2025 adalah IDR 158 miliar dengan margin laba bersih 14%.",
+    "expected_answer_keywords": [
+      "IDR 158 miliar",
+      "14%",
+      "margin laba bersih"
+    ],
+    "expected_sources": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Financial_FY2025.pdf\nPage: 1\nEvidence: Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1",
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+        "content": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Financial Summary FY2025 Revenue Full-year 2025 revenue was IDR 158 billion. Net profit margin was 14%.",
+        "document_name": "Report_Financial_FY2025.pdf",
+        "page": 1,
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0"
+      }
+    ],
+    "context_fingerprint": "3b5fafbea60f76b6",
+    "generated_answer": "Pendapatan Nusantara Dynamics untuk tahun penuh 2025 adalah sebesar IDR 158 miliar",
+    "citation": [
+      {
+        "document": "Report_Financial_FY2025.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8741,
+    "backend_response_time_ms": 6666,
+    "client_response_time_ms": 6691.9,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Report_Financial_FY2025.pdf_p1_c0",
+        "document": "Report_Financial_FY2025.pdf",
+        "page": 1,
+        "content_sha256": "c81a027aa57f140bc524b3098b2197637947db87cfea551e1c9395a3edd1d33c",
+        "score": 0.874116,
+        "base_score": 0.828568,
+        "semantic_score": 0.747893,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.285714,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 3.48009,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.882184,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.885571,
+        "answerability_score_margin": 0.284425,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.885571,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_monetary_value",
+            "explicit_percentage",
+            "year:2025",
+            "concept:profit_margin",
+            "concept:revenue",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.874116,
+          "top_base_score": 0.828568,
+          "top_evidence_score": 0.882184,
+          "top_exact_coverage": 0.285714,
+          "score_margin": 0.284425,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 3,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Report_Financial_FY2025.pdf_p1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Report_Financial_FY2025.pdf_p1_c0"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 6293.97,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "831966c0bff38be8737277c18f951855d107347fbba423814f90ac1fe8cae249",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa pendapatan tahun 2025 dan margin laba bersih perusahaan?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-006",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Penyebab utamanya adalah sertifikat TLS yang kedaluwarsa pada API gateway.",
+    "expected_answer_keywords": [
+      "sertifikat TLS kedaluwarsa",
+      "API Gateway"
+    ],
+    "expected_sources": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: Report_Incident_Postmortem.pdf\nPage: 1\nEvidence: Nusantara Dynamics Incident Postmortem - October 2025 Outage Duration The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. Root Cause The root cause was an expired TLS certificate on the API gateway. Action A certificate auto-renewal job was implemented as a corrective action.",
+    "retrieved_sources": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1",
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+        "content": "Nusantara Dynamics Incident Postmortem - October 2025 Outage Duration The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. Root Cause The root cause was an expired TLS certificate on the API gateway. Action A certificate auto-renewal job was implemented as a corrective action.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Incident Postmortem - October 2025 Outage Duration The 14 October 2025 outage lasted 3 hours 20 minutes, affecting the customer portal. Root Cause The root cause was an expired TLS certificate on the API gateway. Action A certificate auto-renewal job was implemented as a corrective action.",
+        "document_name": "Report_Incident_Postmortem.pdf",
+        "page": 1,
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0"
+      }
+    ],
+    "context_fingerprint": "f696eb004287d0fd",
+    "generated_answer": "Penyebab utama gangguan portal pelanggan pada 14 Oktober 2025 adalah sertifikat TLS yang kedalu",
+    "citation": [
+      {
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8365,
+    "backend_response_time_ms": 6855,
+    "client_response_time_ms": 6873.19,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "Report_Incident_Postmortem.pdf_p1_c0",
+        "document": "Report_Incident_Postmortem.pdf",
+        "page": 1,
+        "content_sha256": "9f73de832230417880884e5e4f58e2984294f136a74ee8577ac927f9563e787f",
+        "score": 0.836458,
+        "base_score": 0.769912,
+        "semantic_score": 0.661636,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.285714,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 7.412019,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What was the root cause of the customer-portal outage?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.863531,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.874166,
+        "answerability_score_margin": 0.202897,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.874166,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "year:2025",
+            "concept:customer_portal",
+            "concept:outage_root_cause",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.836458,
+          "top_base_score": 0.843314,
+          "top_evidence_score": 0.863531,
+          "top_exact_coverage": 0.285714,
+          "score_margin": 0.202897,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "Report_Incident_Postmortem.pdf_p1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Report_Incident_Postmortem.pdf_p1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 6731.8,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "a9b7cd61a757d3f9ed718dc28f803d109eeed2f0e7415872f0a262109e203e89",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Apa penyebab utama gangguan portal pelanggan pada 14 Oktober 2025?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-008",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "IT harus mencabut seluruh akses sistem dalam waktu dua jam sejak waktu keluar karyawan.",
+    "expected_answer_keywords": [
+      "2 jam",
+      "seluruh akses sistem"
+    ],
+    "expected_sources": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: SOP_Offboarding.pdf\nPage: 1\nEvidence: Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+    "retrieved_sources": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1",
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "content": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics SOP - Employee Offboarding Asset Return Departing employees must return all company assets (laptop, access card, phone) on their last working day. Access Revocation IT revokes all system access within 2 hours of the employee's exit time.",
+        "document_name": "SOP_Offboarding.pdf",
+        "page": 1,
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0"
+      }
+    ],
+    "context_fingerprint": "4ced6a62b184a52d",
+    "generated_answer": "Batas waktu bagi IT untuk mencabut seluruh akses sistem karyawan yang keluar adalah dalam waktu 2 jam dari waktu keluar",
+    "citation": [
+      {
+        "document": "SOP_Offboarding.pdf",
+        "page": "1"
+      }
+    ],
+    "system_confidence": 0.8306,
+    "backend_response_time_ms": 10753,
+    "client_response_time_ms": 10779.86,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "SOP_Offboarding.pdf_p1_c0",
+        "document": "SOP_Offboarding.pdf",
+        "page": 1,
+        "content_sha256": "2d86b005688ae92aa323802443365cefd3cc57c80ac43b2602fe08340d190bc5",
+        "score": 0.831908,
+        "base_score": 0.775877,
+        "semantic_score": 0.670407,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.1,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 9.020281,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "How quickly must IT revoke all system access for a departing employee?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.830561,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.882304,
+        "answerability_score_margin": 0.137275,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.882304,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_duration",
+            "concept:access_revocation",
+            "concept:offboarding",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.831908,
+          "top_base_score": 0.925299,
+          "top_evidence_score": 0.830561,
+          "top_exact_coverage": 0.1,
+          "score_margin": 0.137275,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "SOP_Offboarding.pdf_p1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "SOP_Offboarding.pdf_p1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 9072.96,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "119edebfeecaa10e4760bd923a7f08d0bb1876223fa52339c39ba475717d8eef",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa lama batas waktu IT untuk mencabut seluruh akses sistem karyawan yang keluar?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-009",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa nilai RTO dan RPO pada rencana pemulihan bencana?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "RTO adalah empat jam dan RPO adalah satu jam.",
+    "expected_answer_keywords": [
+      "RTO",
+      "4 jam",
+      "RPO",
+      "1 jam"
+    ],
+    "expected_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_Disaster_Recovery.txt\nPage: -\nEvidence: Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "-",
+        "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0",
+        "content": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Disaster Recovery Plan ====================== ## RTO_RPO The recovery time objective (RTO) is 4 hours and the recovery point objective (RPO) is 1 hour. ## DR Site The disaster recovery site is in a separate availability zone.",
+        "document_name": "TECH_Disaster_Recovery.txt",
+        "page": "-",
+        "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "cf982f6703d73605",
+    "generated_answer": "Nilai recovery time objective (RTO) pada rencana pemulihan bencana adalah 4 jam, sedangkan nilai recovery point",
+    "citation": [
+      {
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.895,
+    "backend_response_time_ms": 10183,
+    "client_response_time_ms": 10200.65,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "TECH_Disaster_Recovery.txt_para1_c0",
+        "document": "TECH_Disaster_Recovery.txt",
+        "page": "-",
+        "content_sha256": "ab42cfc45a685d730df3521cac9bc8f0d62f4bad340628fb14e80bce880a1187",
+        "score": 0.915068,
+        "base_score": 0.886757,
+        "semantic_score": 0.833467,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.333333,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 8.324432,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What are the recovery time objective (RTO) and recovery point objective (RPO)?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.89502,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.909044,
+        "answerability_score_margin": 0.479341,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.909044,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_duration",
+            "concept:rpo",
+            "concept:rto",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.915068,
+          "top_base_score": 0.886757,
+          "top_evidence_score": 0.89502,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.479341,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "TECH_Disaster_Recovery.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "TECH_Disaster_Recovery.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 8266.22,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "4d3b74cb39a0462347a3296b64499d5effc72439b3e8e834e567b1a37e2488b9",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa nilai RTO dan RPO pada rencana pemulihan bencana?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa nilai RTO dan RPO pada rencana pemulihan bencana?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-010",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Aplikasi apa yang digunakan untuk koneksi VPN dan apakah MFA diwajibkan?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Karyawan menggunakan klien WireGuard, dan akses VPN wajib memakai autentikasi multifaktor.",
+    "expected_answer_keywords": [
+      "WireGuard",
+      "autentikasi multifaktor",
+      "VPN"
+    ],
+    "expected_sources": [
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: TECH_VPN_Setup.txt\nPage: -\nEvidence: Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.\n\n[CONTEXT 2]\nDocument: Policy_Password.docx\nPage: -\nEvidence: MFA Multi-factor authentication is mandatory for all email and VPN access.",
+    "retrieved_sources": [
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "-"
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": "-",
+        "chunk_id": "TECH_VPN_Setup.txt_para1_c0",
+        "content": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+        "generation_context": true
+      },
+      {
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para7_c4",
+        "content": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics VPN Setup Guide =============== ## Client Employees connect using the WireGuard client. Configuration files are issued by IT. ## MFA VPN access requires multi-factor authentication.",
+        "document_name": "TECH_VPN_Setup.txt",
+        "page": "-",
+        "chunk_id": "TECH_VPN_Setup.txt_para1_c0"
+      },
+      {
+        "text": "MFA Multi-factor authentication is mandatory for all email and VPN access.",
+        "document_name": "Policy_Password.docx",
+        "page": "-",
+        "chunk_id": "Policy_Password.docx_para7_c4"
+      }
+    ],
+    "context_fingerprint": "1e9b3e83274abf9b",
+    "generated_answer": "Aplikasi yang digunakan untuk koneksi VPN adalah klien WireGuard, dan MFA (multi-factor authentication) diwajibkan untuk",
+    "citation": [
+      {
+        "document": "TECH_VPN_Setup.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8617,
+    "backend_response_time_ms": 20332,
+    "client_response_time_ms": 20350.45,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "TECH_VPN_Setup.txt_para1_c0",
+        "document": "TECH_VPN_Setup.txt",
+        "page": "-",
+        "content_sha256": "b431a12332407258c939bff0c8e181a9ff3522d6f198b07a4ef5e30729b88259",
+        "score": 0.861661,
+        "base_score": 0.808404,
+        "semantic_score": 0.718242,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.333333,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 7.952831,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Which VPN client is used and is multi-factor authentication required?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.877736,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.9187,
+        "answerability_score_margin": 0.010463,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.9187,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:mfa",
+            "concept:vpn_access",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.861661,
+          "top_base_score": 0.843626,
+          "top_evidence_score": 0.877736,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.010463,
+          "supporting_candidate_count": 2,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "TECH_VPN_Setup.txt_para1_c0",
+            "Policy_Password.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Policy_Password.docx_para7_c4"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      },
+      {
+        "rank": 2,
+        "chunk_id": "Policy_Password.docx_para7_c4",
+        "document": "Policy_Password.docx",
+        "page": "-",
+        "content_sha256": "9a4d1ed85e4605c2775ae85672f4c05fe1ce074e436cd63c825fec964e4a4986",
+        "score": 0.851198,
+        "base_score": 0.843626,
+        "semantic_score": 0.770038,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.333333,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.828169,
+        "reranker_raw_score": 4.791477,
+        "reranker_rank": 2,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Which VPN client is used and is multi-factor authentication required?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.885506,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.9187,
+        "answerability_score_margin": 0.010463,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": false,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.9187,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:mfa",
+            "concept:vpn_access",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "bundle_coherence_allowed",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.861661,
+          "top_base_score": 0.843626,
+          "top_evidence_score": 0.877736,
+          "top_exact_coverage": 0.333333,
+          "score_margin": 0.010463,
+          "supporting_candidate_count": 2,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "TECH_VPN_Setup.txt_para1_c0",
+            "Policy_Password.docx_para7_c4"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "Policy_Password.docx_para7_c4"
+          ],
+          "requires_coherent_evidence": false,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 7438.72,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "22b08458efb0473bb3013ce4ef83a69b4697b918ffa1b2e7ddda7f79abd9b55f",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Aplikasi apa yang digunakan untuk koneksi VPN dan apakah MFA diwajibkan?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Aplikasi apa yang digunakan untuk koneksi VPN dan apakah MFA diwajibkan?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 2,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
     "id": "ID-011",
     "model": "gemini",
     "model_name": "gemini-3.5-flash",
@@ -7320,6 +9532,755 @@
     "rejected_native_answer": null,
     "citation_validation": null,
     "context_count_before_failure": 0,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-016",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa banyak tanggungan yang dicakup oleh asuransi kesehatan perusahaan?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Asuransi kesehatan perusahaan mencakup karyawan dan hingga 3 orang tanggungan.",
+    "expected_answer_keywords": [
+      "3 tanggungan",
+      "asuransi kesehatan"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Benefits.txt\nPage: -\nEvidence: Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Benefits.txt_para1_c0",
+        "content": "Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+        "document_name": "FAQ_Benefits.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Benefits.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "d4ccf4601b0e7dcc",
+    "generated_answer": "Rencana asuransi kesehatan perusahaan mencakup karyawan dan hingga 3 orang tanggungan.",
+    "citation": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.7845,
+    "backend_response_time_ms": 12437,
+    "client_response_time_ms": 12455.77,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_Benefits.txt_para1_c0",
+        "document": "FAQ_Benefits.txt",
+        "page": "-",
+        "content_sha256": "88d8e143be06a8a7c4c009637e5569b815f8900fe3ffa9f5656943e9cec661f2",
+        "score": 0.784482,
+        "base_score": 0.699637,
+        "semantic_score": 0.558289,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 4.394008,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "How many dependents are covered by the company health insurance plan?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.813743,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.829585,
+        "answerability_score_margin": 0.3329,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.829585,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_count",
+            "concept:dependents",
+            "concept:health_insurance",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.784482,
+          "top_base_score": 0.699637,
+          "top_evidence_score": 0.813743,
+          "top_exact_coverage": 0.0,
+          "score_margin": 0.3329,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_Benefits.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_Benefits.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 7680.69,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "e6e050024642205d1ddc33c9515c2d68447a3dadc2f0ead1f6252e3c650e2cb0",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa banyak tanggungan yang dicakup oleh asuransi kesehatan perusahaan?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa banyak tanggungan yang dicakup oleh asuransi kesehatan perusahaan?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-017",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Ya, perusahaan memberikan kontribusi ke BPJS Ketenagakerjaan untuk seluruh karyawan.",
+    "expected_answer_keywords": [
+      "BPJS Ketenagakerjaan",
+      "seluruh karyawan"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Benefits.txt\nPage: -\nEvidence: Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Benefits.txt_para1_c0",
+        "content": "Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Benefits FAQ ============ ## Health Q: What health coverage is provided? A: Employees and up to 3 dependents are covered by the company health insurance plan. ## Pension Q: Is there a pension benefit? A: The company contributes to BPJS Ketenagakerjaan for all employees.",
+        "document_name": "FAQ_Benefits.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Benefits.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "d4ccf4601b0e7dcc",
+    "generated_answer": "Ya, perusahaan memberikan manfaat pensiun bagi karyawan. Perusahaan memberikan kontribusi ke BPJS Ketenagakerjaan untuk semua karyawan.",
+    "citation": [
+      {
+        "document": "FAQ_Benefits.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8044,
+    "backend_response_time_ms": 13255,
+    "client_response_time_ms": 13293.32,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_Benefits.txt_para1_c0",
+        "document": "FAQ_Benefits.txt",
+        "page": "-",
+        "content_sha256": "88d8e143be06a8a7c4c009637e5569b815f8900fe3ffa9f5656943e9cec661f2",
+        "score": 0.804434,
+        "base_score": 0.719797,
+        "semantic_score": 0.587937,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 2.158154,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Does the company provide a pension benefit to employees?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.848191,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.842756,
+        "answerability_score_margin": 0.397079,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.842756,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:retirement_benefit",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.804434,
+          "top_base_score": 0.719797,
+          "top_evidence_score": 0.848191,
+          "top_exact_coverage": 0.0,
+          "score_margin": 0.397079,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_Benefits.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_Benefits.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 7628.27,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "a805c643f1656192a697d15d2c9a2d014b9a4b6b718cc2c608621e366b8cbc48",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Apakah perusahaan memberikan manfaat pensiun bagi karyawan?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-018",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa kuota ukuran mailbox standar untuk karyawan?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Kuota mailbox standar untuk karyawan adalah 50 GB.",
+    "expected_answer_keywords": [
+      "50 GB",
+      "kuota mailbox"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Email_Calendar.txt\nPage: -\nEvidence: Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+        "content": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "document_name": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "7e991d0d6368726b",
+    "generated_answer": "Kuota ukuran mailbox standar untuk karyawan adalah 50 GB.",
+    "citation": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.8181,
+    "backend_response_time_ms": 7779,
+    "client_response_time_ms": 7799.44,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "content_sha256": "7a537dba822450f6d379ebe2da4f88dc2399ac87c36539b1a5a651b779ad3d54",
+        "score": 0.818064,
+        "base_score": 0.729722,
+        "semantic_score": 0.602533,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.2,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": 1.467575,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Berapa kuota ukuran mailbox standar untuk karyawan?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.88038,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.852073,
+        "answerability_score_margin": 0.367066,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.852073,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_storage_quantity",
+            "concept:mailbox_quota",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.818064,
+          "top_base_score": 0.729722,
+          "top_evidence_score": 0.88038,
+          "top_exact_coverage": 0.2,
+          "score_margin": 0.367066,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_Email_Calendar.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_Email_Calendar.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 8457.61,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "e4441e5505f3197bde1cdf4879ad32c47143f74ece9ac7795993329f78208941",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa kuota ukuran mailbox standar untuk karyawan?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa kuota ukuran mailbox standar untuk karyawan?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-019",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Bagaimana cara membagikan kalender kepada rekan kerja?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Gunakan opsi calendar sharing dan berikan akses lihat (view access) kepada rekan kerja terkait.",
+    "expected_answer_keywords": [
+      "calendar sharing",
+      "akses lihat"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Email_Calendar.txt\nPage: -\nEvidence: Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+        "content": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Email and Calendar FAQ ====================== ## Mailbox Size Q: What is my mailbox size limit? A: The standard mailbox quota is 50 GB. ## Shared Calendar Q: How do I share my calendar? A: Use the calendar sharing option and grant the relevant colleague view access.",
+        "document_name": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "7e991d0d6368726b",
+    "generated_answer": "Gunakan opsi berbagi kalender dan berikan akses melihat (view access) kepada rekan kerja yang bersangkutan.",
+    "citation": [
+      {
+        "document": "FAQ_Email_Calendar.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.7489,
+    "backend_response_time_ms": 9505,
+    "client_response_time_ms": 9522.95,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_Email_Calendar.txt_para1_c0",
+        "document": "FAQ_Email_Calendar.txt",
+        "page": "-",
+        "content_sha256": "7a537dba822450f6d379ebe2da4f88dc2399ac87c36539b1a5a651b779ad3d54",
+        "score": 0.748947,
+        "base_score": 0.653865,
+        "semantic_score": 0.490978,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 0.96126,
+        "reranker_raw_score": -3.101781,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "Bagaimana cara membagikan kalender kepada rekan kerja?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.803647,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.810084,
+        "answerability_score_margin": 0.273497,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.810084,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "concept:calendar_sharing",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.748947,
+          "top_base_score": 0.653865,
+          "top_evidence_score": 0.803647,
+          "top_exact_coverage": 0.0,
+          "score_margin": 0.273497,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 0,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_Email_Calendar.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_Email_Calendar.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 8064.56,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "8f0b18b440961382932f9e5b5a722a44936170e3dadb9cf50c4e136e82c1cadc",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Bagaimana cara membagikan kalender kepada rekan kerja?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Bagaimana cara membagikan kalender kepada rekan kerja?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
+    "pipeline_error": null,
+    "pipeline_failed": false,
+    "failure_category": null,
+    "generation_failed": false,
+    "generation_error": ""
+  },
+  {
+    "id": "ID-020",
+    "model": "gemini",
+    "model_name": "gemini-3.5-flash",
+    "backend_model": "gemini-rag",
+    "generation_mode": "native_model",
+    "question": "Berapa biaya penggantian kartu akses karyawan yang hilang?",
+    "language": "ID",
+    "answerable": true,
+    "expected_answer": "Biaya penggantian kartu akses adalah IDR 50.000, diajukan di meja resepsionis.",
+    "expected_answer_keywords": [
+      "IDR 50.000",
+      "penggantian kartu akses"
+    ],
+    "expected_sources": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": "",
+        "acceptable_alternative": false
+      }
+    ],
+    "retrieved_context": "[CONTEXT 1]\nDocument: FAQ_Facilities.txt\nPage: -\nEvidence: Nusantara Dynamics Facilities FAQ ============== ## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies. ## Parking Q: Is parking available? A: Yes, employee parking is available in Basement 2.",
+    "retrieved_sources": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": "-"
+      }
+    ],
+    "retrieved_chunks": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Facilities.txt_para1_c0",
+        "content": "Nusantara Dynamics Facilities FAQ ============== ## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies. ## Parking Q: Is parking available? A: Yes, employee parking is available in Basement 2.",
+        "generation_context": true
+      }
+    ],
+    "generation_contexts": [
+      {
+        "text": "Nusantara Dynamics Facilities FAQ ============== ## Access Card Q: How do I get a replacement access card? A: Request one at the front desk; a replacement fee of IDR 50,000 applies. ## Parking Q: Is parking available? A: Yes, employee parking is available in Basement 2.",
+        "document_name": "FAQ_Facilities.txt",
+        "page": "-",
+        "chunk_id": "FAQ_Facilities.txt_para1_c0"
+      }
+    ],
+    "context_fingerprint": "00fcbd1201ceae71",
+    "generated_answer": "Biaya penggantian kartu akses yang hilang adalah sebesar IDR 50.000. Untuk mendapatkan kartu pengganti tersebut, karyawan dapat mengajukan permintaan di *front desk*.",
+    "citation": [
+      {
+        "document": "FAQ_Facilities.txt",
+        "page": ""
+      }
+    ],
+    "system_confidence": 0.7833,
+    "backend_response_time_ms": 8391,
+    "client_response_time_ms": 8407.35,
+    "evaluation_context_mode": "source_locked_snapshot_native_model_v8",
+    "source_dataset": "qna_indonesia_user.csv",
+    "retrieval_top_k": 5,
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "FAQ_Facilities.txt_para1_c0",
+        "document": "FAQ_Facilities.txt",
+        "page": "-",
+        "content_sha256": "0fb092ed3b6c6be36669da681cb03b25a2441042fae2a463e57ff290d2102db4",
+        "score": 0.78326,
+        "base_score": 0.697659,
+        "semantic_score": 0.55538,
+        "keyword_score": 1.0,
+        "exact_token_coverage": 0.0,
+        "inventory_field_score": 0.0,
+        "reranker_applied": true,
+        "reranker_score": 1.0,
+        "reranker_raw_score": -0.02409,
+        "reranker_rank": 1,
+        "semantic_query_variant": null,
+        "keyword_query_variant": null,
+        "reranker_query_variant": "What is the replacement fee for a lost employee access card?",
+        "reranker_query_variant_count": 2,
+        "evidence_supported": true,
+        "evidence_score": 0.813307,
+        "evidence_hard_failures": [],
+        "evidence_hard_contradictions": [],
+        "evidence_contradictions": [],
+        "evidence_missing_requirements": [],
+        "answerability_accepted": true,
+        "answerability_strictly_supported": true,
+        "answerability_evidence_selected": true,
+        "answerability_score": 0.82884,
+        "answerability_score_margin": 0.243536,
+        "answerability_requirement_coverage": 1.0,
+        "answerability_concept_coverage": 1.0,
+        "answerability_requires_coherent_evidence": true,
+        "answerability_coherent_evidence": true,
+        "answerability_diagnostics": {
+          "answerable": true,
+          "score": 0.82884,
+          "reason": "The evidence bundle satisfies the requested subject, answer type, and constraints.",
+          "failed_checks": [],
+          "passed_checks": [
+            "explicit_monetary_value",
+            "concept:access_card_replacement",
+            "minimum_top_score",
+            "minimum_base_hybrid_score",
+            "supported_evidence",
+            "coherent_single_chunk_evidence",
+            "top_margin_or_bundle_support"
+          ],
+          "top_score": 0.78326,
+          "top_base_score": 0.697659,
+          "top_evidence_score": 0.813307,
+          "top_exact_coverage": 0.0,
+          "score_margin": 0.243536,
+          "supporting_candidate_count": 1,
+          "precision_requirement_count": 1,
+          "requirement_coverage": 1.0,
+          "concept_coverage": 1.0,
+          "evidence_chunk_ids": [
+            "FAQ_Facilities.txt_para1_c0"
+          ],
+          "coherent_candidate_count": 1,
+          "coherent_chunk_ids": [
+            "FAQ_Facilities.txt_para1_c0"
+          ],
+          "requires_coherent_evidence": true,
+          "strictly_supported": true
+        }
+      }
+    ],
+    "retrieval_time_ms": 8479.72,
+    "retrieval_snapshot_build": "rag-bilingual-eval-v19-20260802",
+    "retrieval_snapshot_fingerprint": "d8a52c6aabe2643ddc515addbe13c3099a2c58c5a8fff97f2134b0c42ac85baf",
+    "retrieval_latency_measurement_mode": "single_strict_retrieval_without_debug_baseline",
+    "snapshot_retrieval_mode": "original",
+    "snapshot_retrieval_query": "Berapa biaya penggantian kartu akses karyawan yang hilang?",
+    "backend_build_version": "rag-bilingual-eval-v19-20260802",
+    "retrieval_mode": "evaluation_snapshot",
+    "retrieval_query": "Berapa biaya penggantian kartu akses karyawan yang hilang?",
+    "failure_stage": null,
+    "failure_reason": null,
+    "rejected_native_answer": null,
+    "citation_validation": null,
+    "context_count_before_failure": 1,
     "pipeline_error": null,
     "pipeline_failed": false,
     "failure_category": null,

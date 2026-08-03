@@ -30,10 +30,10 @@ Setelah instalasi, restart backend lalu cek build:
 (Invoke-RestMethod http://127.0.0.1:8000/health).buildVersion
 ```
 
-Nilai yang benar adalah:
+Nilai yang benar setelah patch grounding guard adalah:
 
 ```text
-rag-bilingual-eval-v19-20260802
+rag-grounding-guard-v21-20260804
 ```
 
 Jalankan public regression ke folder baru agar latency v18 tidak tercampur:
@@ -128,6 +128,30 @@ Untuk Ollama saja:
 ```powershell
 python .\evaluation\run_final_evaluation.py --models ollama
 ```
+
+Untuk judge lokal yang lambat, gunakan batas waktu dan retry eksplisit:
+
+```powershell
+$env:EVAL_JUDGE_REQUEST_TIMEOUT_SECONDS="240"
+$env:EVAL_JUDGE_MAX_RETRIES="5"
+$env:EVAL_JUDGE_MAX_FORMAT_RETRIES="2"
+$env:EVAL_JUDGE_MAX_TOKENS="256"
+```
+
+Jika run terputus atau sebagian panggilan judge gagal, lanjutkan folder output
+yang sama. Baris yang lengkap hanya dipakai kembali jika model, judge,
+pertanyaan, jawaban, dan fingerprint konteks masih identik:
+
+```powershell
+python .\evaluation\run_final_evaluation.py `
+  --models ollama `
+  --resume `
+  --output-dir .\evaluation\generation\results\final_<timestamp>
+```
+
+Untuk memperbaiki run evaluator langsung yang sudah memiliki CSV parsial,
+tambahkan `--resume-judge` dan gunakan `--output-dir` serta `--output-prefix`
+yang sama. Hanya baris judge yang gagal atau tidak lengkap yang dipanggil ulang.
 
 Untuk tiga provider dengan retrieval snapshot yang sama:
 

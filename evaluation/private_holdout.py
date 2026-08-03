@@ -20,6 +20,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+try:
+    from .generation.atomic_io import replace_file_with_retry
+except ImportError:  # Direct script execution.
+    from generation.atomic_io import replace_file_with_retry
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_DIR = PROJECT_ROOT / "backend"
@@ -309,7 +314,7 @@ def write_holdout_csvs(
             writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
             writer.writeheader()
             writer.writerows(rows(language))
-        os.replace(temporary, path)
+        replace_file_with_retry(temporary, path)
     return english_path, indonesian_path
 
 
@@ -320,7 +325,7 @@ def write_json_atomic(path: Path, payload: Any) -> None:
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    os.replace(temporary, path)
+    replace_file_with_retry(temporary, path)
 
 
 def package_manifest(

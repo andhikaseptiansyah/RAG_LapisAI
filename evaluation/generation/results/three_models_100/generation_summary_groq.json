@@ -75,8 +75,8 @@
     ]
   },
   "reproducibility": {
-    "generated_at_utc": "2026-08-02T18:47:10.928614+00:00",
-    "git_commit": "dd23fa2e5343e060729f249ad764642e179ba16d",
+    "generated_at_utc": "2026-08-03T11:44:41.636853+00:00",
+    "git_commit": "3d7f9e7cf41b4778cb523acacd1854914935d84b",
     "python_version": "3.13.5",
     "platform": "Windows-11-10.0.26200-SP0",
     "dependency_versions": {
@@ -124,8 +124,8 @@
       },
       {
         "path": "evaluation\\generation\\evaluate_generation.py",
-        "sha256": "c8175f003b69488376955beee0305008ef91b04a589e32d917d84910cf922e46",
-        "bytes": 61466
+        "sha256": "f94d16830f83c3f30a2f0d499f95bbd83918aaec213f5e85b3f23b764795d5d6",
+        "bytes": 64099
       }
     ],
     "model_name": "llama-3.3-70b-versatile",

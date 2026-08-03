@@ -1,0 +1,964 @@
+{
+  "benchmark_role": "development",
+  "total_items": 100,
+  "overlap_item_count": 56,
+  "question_overlap_count": 53,
+  "expected_answer_overlap_count": 16,
+  "production_overlap_count": 8,
+  "test_overlap_count": 51,
+  "production_question_overlap_count": 8,
+  "production_expected_answer_overlap_count": 0,
+  "test_question_overlap_count": 47,
+  "test_expected_answer_overlap_count": 16,
+  "question_overlap_ids": [
+    "EN-002",
+    "EN-003",
+    "EN-006",
+    "EN-011",
+    "EN-022",
+    "EN-031",
+    "EN-032",
+    "EN-034",
+    "EN-035",
+    "EN-036",
+    "EN-037",
+    "EN-038",
+    "EN-040",
+    "EN-043",
+    "EN-044",
+    "EN-045",
+    "EN-050",
+    "ID-001",
+    "ID-002",
+    "ID-003",
+    "ID-005",
+    "ID-006",
+    "ID-007",
+    "ID-008",
+    "ID-009",
+    "ID-010",
+    "ID-016",
+    "ID-017",
+    "ID-018",
+    "ID-019",
+    "ID-020",
+    "ID-021",
+    "ID-022",
+    "ID-023",
+    "ID-025",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-030",
+    "ID-031",
+    "ID-032",
+    "ID-033",
+    "ID-034",
+    "ID-035",
+    "ID-036",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-043",
+    "ID-044",
+    "ID-045",
+    "ID-047",
+    "ID-048"
+  ],
+  "expected_answer_overlap_ids": [
+    "EN-007",
+    "EN-014",
+    "EN-026",
+    "EN-032",
+    "ID-003",
+    "ID-016",
+    "ID-019",
+    "ID-022",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-035",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-045"
+  ],
+  "production_overlap_ids": [
+    "EN-002",
+    "EN-031",
+    "EN-032",
+    "EN-034",
+    "EN-035",
+    "EN-037",
+    "EN-040",
+    "EN-044"
+  ],
+  "test_overlap_ids": [
+    "EN-002",
+    "EN-003",
+    "EN-006",
+    "EN-007",
+    "EN-011",
+    "EN-014",
+    "EN-022",
+    "EN-026",
+    "EN-032",
+    "EN-035",
+    "EN-036",
+    "EN-038",
+    "EN-043",
+    "EN-045",
+    "EN-050",
+    "ID-001",
+    "ID-002",
+    "ID-003",
+    "ID-005",
+    "ID-006",
+    "ID-007",
+    "ID-008",
+    "ID-009",
+    "ID-010",
+    "ID-016",
+    "ID-017",
+    "ID-018",
+    "ID-019",
+    "ID-020",
+    "ID-021",
+    "ID-022",
+    "ID-023",
+    "ID-025",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-030",
+    "ID-031",
+    "ID-032",
+    "ID-033",
+    "ID-034",
+    "ID-035",
+    "ID-036",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-043",
+    "ID-044",
+    "ID-045",
+    "ID-047",
+    "ID-048"
+  ],
+  "production_question_overlap_ids": [
+    "EN-002",
+    "EN-031",
+    "EN-032",
+    "EN-034",
+    "EN-035",
+    "EN-037",
+    "EN-040",
+    "EN-044"
+  ],
+  "production_expected_answer_overlap_ids": [],
+  "test_question_overlap_ids": [
+    "EN-002",
+    "EN-003",
+    "EN-006",
+    "EN-011",
+    "EN-022",
+    "EN-035",
+    "EN-036",
+    "EN-038",
+    "EN-043",
+    "EN-045",
+    "EN-050",
+    "ID-001",
+    "ID-002",
+    "ID-003",
+    "ID-005",
+    "ID-006",
+    "ID-007",
+    "ID-008",
+    "ID-009",
+    "ID-010",
+    "ID-016",
+    "ID-017",
+    "ID-018",
+    "ID-019",
+    "ID-020",
+    "ID-021",
+    "ID-022",
+    "ID-023",
+    "ID-025",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-030",
+    "ID-031",
+    "ID-032",
+    "ID-033",
+    "ID-034",
+    "ID-035",
+    "ID-036",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-043",
+    "ID-044",
+    "ID-045",
+    "ID-047",
+    "ID-048"
+  ],
+  "test_expected_answer_overlap_ids": [
+    "EN-007",
+    "EN-014",
+    "EN-026",
+    "EN-032",
+    "ID-003",
+    "ID-016",
+    "ID-019",
+    "ID-022",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-035",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-045"
+  ],
+  "overlap_item_ids": [
+    "EN-002",
+    "EN-003",
+    "EN-006",
+    "EN-007",
+    "EN-011",
+    "EN-014",
+    "EN-022",
+    "EN-026",
+    "EN-031",
+    "EN-032",
+    "EN-034",
+    "EN-035",
+    "EN-036",
+    "EN-037",
+    "EN-038",
+    "EN-040",
+    "EN-043",
+    "EN-044",
+    "EN-045",
+    "EN-050",
+    "ID-001",
+    "ID-002",
+    "ID-003",
+    "ID-005",
+    "ID-006",
+    "ID-007",
+    "ID-008",
+    "ID-009",
+    "ID-010",
+    "ID-016",
+    "ID-017",
+    "ID-018",
+    "ID-019",
+    "ID-020",
+    "ID-021",
+    "ID-022",
+    "ID-023",
+    "ID-025",
+    "ID-027",
+    "ID-028",
+    "ID-029",
+    "ID-030",
+    "ID-031",
+    "ID-032",
+    "ID-033",
+    "ID-034",
+    "ID-035",
+    "ID-036",
+    "ID-037",
+    "ID-041",
+    "ID-042",
+    "ID-043",
+    "ID-044",
+    "ID-045",
+    "ID-047",
+    "ID-048"
+  ],
+  "findings": [
+    {
+      "id": "EN-002",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-002",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_language_bridge_fallback_v5.py",
+        "backend\\tests\\test_natural_bridge_fallback_v4.py",
+        "backend\\tests\\test_v7_indonesian_runtime_regression.py"
+      ]
+    },
+    {
+      "id": "EN-003",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "EN-006",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_grounding_guard_v20.py",
+        "backend\\tests\\test_grounding_guard_v21.py"
+      ]
+    },
+    {
+      "id": "EN-007",
+      "language": "EN",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "EN-011",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_context_selector_v15.py"
+      ]
+    },
+    {
+      "id": "EN-014",
+      "language": "EN",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_customer_portal_root_cause_fix.py"
+      ]
+    },
+    {
+      "id": "EN-022",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "EN-026",
+      "language": "EN",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py",
+        "backend\\tests\\test_language.py",
+        "backend\\tests\\test_multilingual_retrieval.py"
+      ]
+    },
+    {
+      "id": "EN-031",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-032",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-032",
+      "language": "EN",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "EN-034",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-035",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-035",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "EN-036",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "EN-037",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-038",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_grounding_guard_v21.py"
+      ]
+    },
+    {
+      "id": "EN-040",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-043",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "EN-044",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "production",
+      "files": [
+        "backend\\retrieval\\query_expansion.py"
+      ]
+    },
+    {
+      "id": "EN-045",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "EN-050",
+      "language": "EN",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_customer_portal_root_cause_fix.py"
+      ]
+    },
+    {
+      "id": "ID-001",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_grounding_guard_v20.py",
+        "backend\\tests\\test_grounding_guard_v21.py"
+      ]
+    },
+    {
+      "id": "ID-002",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-003",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-003",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-005",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_financial_metric_grounding_fix.py",
+        "backend\\tests\\test_single_source_long_financial_answer.py"
+      ]
+    },
+    {
+      "id": "ID-006",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_customer_portal_root_cause_fix.py"
+      ]
+    },
+    {
+      "id": "ID-007",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-008",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-009",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_long_grounded_answers.py"
+      ]
+    },
+    {
+      "id": "ID-010",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-016",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-016",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-017",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_general_false_refusal_and_citations.py",
+        "backend\\tests\\test_pension_benefit_indonesian_fix.py"
+      ]
+    },
+    {
+      "id": "ID-018",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-019",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-019",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-020",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-021",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-022",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py"
+      ]
+    },
+    {
+      "id": "ID-022",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-023",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-025",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-027",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-027",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-028",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_overtime_payment_indonesian_fix.py"
+      ]
+    },
+    {
+      "id": "ID-028",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-029",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py"
+      ]
+    },
+    {
+      "id": "ID-029",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-030",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-031",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-032",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-033",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-034",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_context_selector_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-035",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-035",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-036",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py"
+      ]
+    },
+    {
+      "id": "ID-037",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-037",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-041",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    },
+    {
+      "id": "ID-041",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-042",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py",
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-042",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-043",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-044",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_evaluation_v11.py"
+      ]
+    },
+    {
+      "id": "ID-045",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-045",
+      "language": "ID",
+      "value_type": "expected_answer",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py"
+      ]
+    },
+    {
+      "id": "ID-047",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v15.py"
+      ]
+    },
+    {
+      "id": "ID-048",
+      "language": "ID",
+      "value_type": "question",
+      "scope": "tests",
+      "files": [
+        "backend\\tests\\test_bilingual_grounding_v14.py",
+        "backend\\tests\\test_bilingual_grounding_v15.py",
+        "backend\\tests\\test_industry_hardening_regressions.py"
+      ]
+    }
+  ],
+  "status": "development_overlap_detected",
+  "final_eligible": false
+}

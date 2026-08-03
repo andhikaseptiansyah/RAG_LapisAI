@@ -34,6 +34,9 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "password_reset": (
         "password reset",
         "reset password",
+        "reset my password",
+        "reset a password",
+        "reset the password",
         "forgot password",
         "forgotten password",
         "lupa password",

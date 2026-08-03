@@ -461,6 +461,20 @@ GROUNDING_EQUIVALENT_TERMS: dict[str, tuple[str, ...]] = {
         "each", "every", "per", "setiap", "tiap", "per bulan", "per month",
     ),
     "approved": ("approved", "authorized", "disetujui", "telah disetujui"),
+    "password_reset": tuple(dict.fromkeys((
+        *CONCEPT_ALIASES.get("password_reset", ()),
+        "password resets",
+        "resets are processed",
+        "reset process",
+        "password-reset process",
+        "proses reset kata sandi",
+        "proses pengaturan ulang kata sandi",
+        "reset kata sandi diproses",
+    ))),
+    "processed": (
+        "processed", "is processed", "are processed", "processed within",
+        "processing", "diproses", "diproses dalam", "pemrosesan",
+    ),
     "business": (
         "business", "business tool", "business tools", "work purpose",
         "bisnis", "keperluan kerja",
@@ -1433,6 +1447,53 @@ def _approval_relation_is_coherent(
     return False
 
 
+_FULL_BACKUP_PATTERN = re.compile(
+    r"\b(?:full\s+(?:database\s+)?backups?|backup\s+penuh|"
+    r"cadangan\s+penuh|pencadangan\s+penuh)\b",
+    flags=re.I,
+)
+_INCREMENTAL_BACKUP_PATTERN = re.compile(
+    r"\b(?:(?:incremental|inkremental)\s+backups?|"
+    r"backup\s+(?:incremental|inkremental)|"
+    r"cadangan\s+(?:incremental|inkremental))\b",
+    flags=re.I,
+)
+
+
+def _backup_type(value: str) -> str | None:
+    if _FULL_BACKUP_PATTERN.search(value):
+        return "full"
+    if _INCREMENTAL_BACKUP_PATTERN.search(value):
+        return "incremental"
+    return None
+
+
+def _backup_relation_is_coherent(claim: str, unit: str) -> bool:
+    """Bind a backup type to its schedule in one local evidence sentence.
+
+    A flattened backup policy can contain both an incremental cadence and a
+    full-backup cadence. Shared words and numbers must not allow the model to
+    attach the incremental interval to full backups.
+    """
+    claim_type = _backup_type(claim)
+    claim_facts = {key for key, _, _ in _fact_entries(claim)}
+    if claim_type is None or not claim_facts:
+        return True
+
+    segments = [
+        _clean(part)
+        for part in re.split(r"(?<=[.!?])\s+|\n+|;", unit)
+        if _clean(part)
+    ]
+    for segment in segments:
+        segment_facts = {key for key, _, _ in _fact_entries(segment)}
+        if not claim_facts.issubset(segment_facts):
+            continue
+        if _backup_type(segment) == claim_type:
+            return True
+    return False
+
+
 def _claim_reference_units(
     claim: str,
     evidence_units: list[str],
@@ -1456,6 +1517,7 @@ def _claim_reference_units(
         if claim_fact_keys.issubset({key for key, _, _ in _fact_entries(unit)})
         and _incident_relation_is_coherent(claim, unit)
         and _approval_relation_is_coherent(claim, unit, question=question)
+        and _backup_relation_is_coherent(claim, unit)
     ]
     if not matched:
         return []

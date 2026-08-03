@@ -1375,6 +1375,10 @@ def _duration_intent_anchors(question: str) -> tuple[str, ...]:
         return ("reported", "report", "dilaporkan", "melaporkan")
     if any(term in normalized for term in ("diproses", "proses", "processed", "processing")):
         return ("processed", "processing", "diproses", "proses")
+    if "password_reset" in set(concepts_in_text(question)):
+        # Password-reset FAQ questions often say "how long does it take?"
+        # rather than repeating the source verb "processed".
+        return ("processed", "processing", "diproses", "proses")
     if any(term in normalized for term in ("dicabut", "mencabut", "revoked", "revoke")):
         return ("revoked", "revoke", "dicabut", "mencabut")
     return ()
@@ -1742,8 +1746,10 @@ def _duration_subject_phrase(question: str, target: str) -> str:
 
     if priority_code and any(term in normalized for term in ("incident", "insiden")):
         return f"insiden IT prioritas {priority_code}"
-    if "password" in normalized and any(term in normalized for term in ("reset", "mereset")):
-        return "proses reset password"
+    if any(term in normalized for term in ("password", "kata sandi")) and any(
+        term in normalized for term in ("reset", "mereset", "mengatur ulang")
+    ):
+        return "proses reset kata sandi"
     return "proses yang ditanyakan"
 
 
@@ -1782,7 +1788,7 @@ def _build_contextual_duration_answer(
             )
         if anchors.intersection({"processed", "processing", "diproses", "proses"}):
             return (
-                f"According to the indexed document, {subject} must be processed "
+                f"According to the indexed document, {subject} is processed "
                 f"within {scalar}. This is the processing time limit stated in the document."
             )
         if anchors.intersection({"revoked", "revoke", "dicabut", "mencabut"}):
@@ -1815,7 +1821,7 @@ def _build_contextual_duration_answer(
         )
     if anchors.intersection({"processed", "processing", "diproses", "proses"}):
         return (
-            f"Berdasarkan ketentuan pada dokumen, {subject} harus diproses "
+            f"Berdasarkan ketentuan pada dokumen, {subject} diproses "
             f"dalam waktu {scalar}. Jangka waktu tersebut merupakan batas "
             f"pemrosesan yang ditetapkan dalam dokumen."
         )
@@ -1829,6 +1835,47 @@ def _build_contextual_duration_answer(
         f"Berdasarkan ketentuan pada dokumen, batas waktu yang ditetapkan "
         f"adalah {scalar}. Artinya, proses yang ditanyakan harus diselesaikan "
         "dalam jangka waktu tersebut."
+    )
+
+
+def _build_password_reset_duration_answer(
+    question: str,
+    evidence: str,
+    match: re.Match[str],
+    value: str,
+    unit: str,
+    target: str,
+) -> str:
+    """Return a complete password-reset answer from one bounded FAQ unit.
+
+    The procedural clause is emitted only when the same local evidence window
+    contains an explicit ticket action, an IT desk, and a portal. The duration
+    is the already verified scalar selected for the requested reset action.
+    This keeps the fallback generic while preventing details from a neighbouring
+    FAQ entry from being combined with the reset deadline.
+    """
+    if "password_reset" not in set(concepts_in_text(question)):
+        return ""
+
+    local = _sentence_window(evidence, match.start(), match.end())
+    if not re.search(r"\b(?:raise|submit|open|create)\s+(?:a\s+)?ticket\b", local, re.I):
+        return ""
+    if not re.search(r"\bportal\b", local, re.I):
+        return ""
+    desk_match = re.search(r"\bIT\s+(?:Helpdesk|Service\s+Desk)\b", local, re.I)
+    if desk_match is None:
+        return ""
+
+    desk = re.sub(r"\s+", " ", desk_match.group(0)).strip()
+    scalar = f"{value} {unit}"
+    if target == "EN":
+        return (
+            f"Raise a ticket to the {desk} via the portal; password resets "
+            f"are processed within {scalar}."
+        )
+    return (
+        f"Ajukan tiket ke {desk} melalui portal; reset kata sandi diproses "
+        f"dalam {scalar}."
     )
 
 
@@ -2023,7 +2070,14 @@ def build_verified_scalar_answer(
         if not requirement_satisfied(requirements[0], [scalar_answer]):
             continue
 
-        answer = _build_contextual_duration_answer(
+        answer = _build_password_reset_duration_answer(
+            question,
+            raw,
+            match,
+            value,
+            unit,
+            target,
+        ) or _build_contextual_duration_answer(
             question,
             value,
             unit,
@@ -2050,11 +2104,10 @@ def build_verified_scalar_answer(
         if canonical != top_canonical and top_score - score < 0.08:
             return ""
 
-    return _contextualize_verified_scalar(
-        question,
-        top_answer,
-        target,
-    )
+    # ``top_answer`` is already contextualized by
+    # ``_build_contextual_duration_answer``. Wrapping it again turns the whole
+    # sentence into a scalar value and produces malformed duplicated text.
+    return top_answer
 
 
 def _clean_extractive_text(value: str) -> str:
@@ -2499,6 +2552,18 @@ def build_sources(
             _atomic_claims,
             validate_grounded_answer,
         )
+
+        # A citation must support the complete answer, not merely one fluent
+        # clause. Previously, any partially supported source was enough for the
+        # chat pipeline to return the full answer, allowing an unsupported tail
+        # to be displayed beside a valid citation.
+        full_answer_decision = validate_grounded_answer(
+            question,
+            clean_answer,
+            source_chunks,
+        )
+        if not full_answer_decision.supported:
+            return []
 
         answer_claims = _atomic_claims(clean_answer)
         total_claim_chars = sum(len(claim) for claim in answer_claims) or 1

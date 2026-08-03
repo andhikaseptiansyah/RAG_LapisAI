@@ -142,6 +142,8 @@ def main() -> None:
             evaluate_command.append("--skip-llm-judge")
         if args.allow_self_judge:
             evaluate_command.append("--allow-self-judge")
+        if args.resume and not args.skip_llm_judge:
+            evaluate_command.append("--resume-judge")
         run(evaluate_command)
         summary_paths.append(output_dir / f"generation_summary_{model}.json")
 

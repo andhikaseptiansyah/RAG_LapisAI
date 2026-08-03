@@ -5,8 +5,15 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-BUILD_VERSION = "rag-bilingual-eval-v19-20260802"
+BUILD_VERSION = "rag-grounding-guard-v21-20260804"
 BUILD_FEATURES = (
+    "approval-inflection-grounding-without-false-refusal",
+    "bilingual-password-reset-verified-duration-fallback",
+    "evaluation-visible-deterministic-scalar-repair",
+    "full-answer-grounding-required-before-citation",
+    "unsupported-claim-pruning-before-safe-extractive-fallback",
+    "backup-type-and-schedule-relation-binding",
+    "grounding-repair-and-rejection-audit-metadata",
     "single-pass-evaluation-retrieval-latency-measurement",
     "batched-multilingual-semantic-query-variants",
     "compact-two-view-bilingual-cross-encoder-reranking",

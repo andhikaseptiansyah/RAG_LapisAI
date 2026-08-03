@@ -1,5 +1,748 @@
 [
   {
+    "id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How often are full database backups taken?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "ce3f77bc-109c-42d2-8e5d-16c2345f7a4e",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "How often are full database backups taken?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "58c10d25-2a2e-4996-a77e-00709e9e9b55",
+          "queryId": "58c10d25-2a2e-4996-a77e-00709e9e9b55"
+        },
+        "created_at": "2026-08-03T14:11:26.008797+00:00"
+      },
+      {
+        "id": "f0579b95-a9e4-4138-939d-f632d71ba617",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Full database backups are taken nightly at 01:00 WIB. Full backups are also run every 6 hours.",
+        "attachments": [],
+        "confidence": 0.7279,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "58c10d25-2a2e-4996-a77e-00709e9e9b55",
+          "queryId": "58c10d25-2a2e-4996-a77e-00709e9e9b55",
+          "sources": [
+            {
+              "document_name": "SOP_Data_Backup.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8441,
+              "relevance_score": 0.8441,
+              "excerpt": "Full backups run nightly at 01:00 WIB. Daily backups are retained for 30 days; monthly backups for 12 months.",
+              "citation_validated": true,
+              "citation_support_score": 0.8441,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 0.5699
+            }
+          ],
+          "source": "SOP_Data_Backup.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:11:26.008797+00:00"
+      },
+      {
+        "id": "76a313f7-59c4-488c-9b68-20142c8f7c27",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "When must IT reoke a departing employee's access?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "6209fee5-2d3c-40eb-8e89-071c7abf6017",
+          "queryId": "6209fee5-2d3c-40eb-8e89-071c7abf6017"
+        },
+        "created_at": "2026-08-03T14:13:47.032426+00:00"
+      },
+      {
+        "id": "92946a51-befc-445b-af55-67c400763e7b",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "IT must revoke a departing employee's access within 2 hours of the employee's exit time. The exact time depends on when the employee's last working day ends.",
+        "attachments": [],
+        "confidence": 0.8653,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "6209fee5-2d3c-40eb-8e89-071c7abf6017",
+          "queryId": "6209fee5-2d3c-40eb-8e89-071c7abf6017",
+          "sources": [
+            {
+              "document_name": "SOP_Offboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8653,
+              "relevance_score": 0.8653,
+              "excerpt": "Departing employees must return all company assets (laptop, access card, phone) on their last working day. IT revokes all system access within 2 hours of the employee's exit time.",
+              "citation_validated": true,
+              "citation_support_score": 0.9082,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Offboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:13:47.032426+00:00"
+      },
+      {
+        "id": "3c826038-6df4-4906-b0fe-58c4e8575b3f",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "How quickly must a suspekted data breach be reported, and to whic address?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b10bf4e8-ac97-4421-be78-2edbcae8d124",
+          "queryId": "b10bf4e8-ac97-4421-be78-2edbcae8d124"
+        },
+        "created_at": "2026-08-03T14:15:26.649343+00:00"
+      },
+      {
+        "id": "300a14da-0fee-4895-ae22-c556bc4ef1ed",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "A suspected data breach must be reported within 1 hour to security@nusantaradynamics.co.id.",
+        "attachments": [],
+        "confidence": 0.91,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b10bf4e8-ac97-4421-be78-2edbcae8d124",
+          "queryId": "b10bf4e8-ac97-4421-be78-2edbcae8d124",
+          "sources": [
+            {
+              "document_name": "Policy_Data_Security.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9127,
+              "relevance_score": 0.9127,
+              "excerpt": "Suspected data breaches must be reported to security@nusantaradynamics.co.id within 1 hour.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "chapter": "Reporting",
+              "section": "Reporting",
+              "paragraph_start": 7,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_Data_Security.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:15:26.649343+00:00"
+      },
+      {
+        "id": "7cb659ed-f2c2-4291-9436-aa4fc69dd34f",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "halo",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "e189a7d6-1b0a-46ef-9f22-f8735dc59381",
+          "queryId": "e189a7d6-1b0a-46ef-9f22-f8735dc59381"
+        },
+        "created_at": "2026-08-03T14:15:58.022377+00:00"
+      },
+      {
+        "id": "4084b405-c6d4-48a7-b296-3fa893de2e01",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "e189a7d6-1b0a-46ef-9f22-f8735dc59381",
+          "queryId": "e189a7d6-1b0a-46ef-9f22-f8735dc59381",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:15:58.022377+00:00"
+      },
+      {
+        "id": "87824e41-84d4-4f71-b633-ccac8a002e6e",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "hi",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7a906561-93fa-4d4a-b462-de35e8fa1a22",
+          "queryId": "7a906561-93fa-4d4a-b462-de35e8fa1a22"
+        },
+        "created_at": "2026-08-03T14:16:01.210992+00:00"
+      },
+      {
+        "id": "f572d956-bfc8-4c35-9eb6-a8d1902a0cf4",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7a906561-93fa-4d4a-b462-de35e8fa1a22",
+          "queryId": "7a906561-93fa-4d4a-b462-de35e8fa1a22",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:01.210992+00:00"
+      },
+      {
+        "id": "3eb4e32b-282f-4c6c-8e77-36bd8b76b941",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "h",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7d90fdd1-ea83-43c3-8d4d-89e205be45ce",
+          "queryId": "7d90fdd1-ea83-43c3-8d4d-89e205be45ce"
+        },
+        "created_at": "2026-08-03T14:16:05.442421+00:00"
+      },
+      {
+        "id": "21bc086b-4f82-4220-ace8-f9e0d790c87b",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7d90fdd1-ea83-43c3-8d4d-89e205be45ce",
+          "queryId": "7d90fdd1-ea83-43c3-8d4d-89e205be45ce",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:05.442421+00:00"
+      },
+      {
+        "id": "f58a9144-e658-4d49-8b8f-ac7bff874f17",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "hei",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "60b27873-03e3-48fb-b072-d566bce43337",
+          "queryId": "60b27873-03e3-48fb-b072-d566bce43337"
+        },
+        "created_at": "2026-08-03T14:16:10.561346+00:00"
+      },
+      {
+        "id": "147d2f2c-3e62-480c-887a-3f86cab2ba11",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "60b27873-03e3-48fb-b072-d566bce43337",
+          "queryId": "60b27873-03e3-48fb-b072-d566bce43337",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:10.561346+00:00"
+      },
+      {
+        "id": "46b61f0c-d6f7-4b0c-9eff-5f90dae49e4d",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "hui",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a35e6a4b-2ff2-4760-aed8-c99168d33835",
+          "queryId": "a35e6a4b-2ff2-4760-aed8-c99168d33835"
+        },
+        "created_at": "2026-08-03T14:16:15.714531+00:00"
+      },
+      {
+        "id": "6c35e3e9-7259-4e25-99f7-b30c6a5dc6ae",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a35e6a4b-2ff2-4760-aed8-c99168d33835",
+          "queryId": "a35e6a4b-2ff2-4760-aed8-c99168d33835",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:15.714531+00:00"
+      },
+      {
+        "id": "9ce27a51-0c31-4a60-a3c5-56ca322d80fc",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "hi",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "007fe8e2-f0c7-461f-b567-a434a0be2c83",
+          "queryId": "007fe8e2-f0c7-461f-b567-a434a0be2c83"
+        },
+        "created_at": "2026-08-03T14:16:18.132439+00:00"
+      },
+      {
+        "id": "c05aa6e8-0e53-4ab1-9e63-ff29227f7c3a",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "007fe8e2-f0c7-461f-b567-a434a0be2c83",
+          "queryId": "007fe8e2-f0c7-461f-b567-a434a0be2c83",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:18.132439+00:00"
+      },
+      {
+        "id": "63ab9648-1ca8-4409-a3fd-571b97501ea9",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "hello",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "523631bd-49e8-4d26-af64-f459593425b0",
+          "queryId": "523631bd-49e8-4d26-af64-f459593425b0"
+        },
+        "created_at": "2026-08-03T14:16:22.391282+00:00"
+      },
+      {
+        "id": "6d87debd-d8cf-4de5-b703-b6123bbe4cf7",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Hi! I am ready to help answer questions based on the documents you have uploaded and indexed.",
+        "attachments": [],
+        "confidence": 1.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "523631bd-49e8-4d26-af64-f459593425b0",
+          "queryId": "523631bd-49e8-4d26-af64-f459593425b0",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:16:22.391282+00:00"
+      },
+      {
+        "id": "4a03f26c-bfd5-4694-9267-6d4a4f05948d",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "coba rangkumkan semua pertanyaan yg telah saya tanyakan",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "38894db4-04a5-45ac-80c9-25e87feec673",
+          "queryId": "38894db4-04a5-45ac-80c9-25e87feec673"
+        },
+        "created_at": "2026-08-03T14:17:10.601703+00:00"
+      },
+      {
+        "id": "dd6eb2ff-469d-41ea-b9e9-bf924423a22a",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "38894db4-04a5-45ac-80c9-25e87feec673",
+          "queryId": "38894db4-04a5-45ac-80c9-25e87feec673",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:17:10.601703+00:00"
+      },
+      {
+        "id": "75691fd1-8523-48d6-a89f-8c33961c0c68",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "What is SOP?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "e257f76f-056f-41c6-bc5a-e68d6f9f22a6",
+          "queryId": "e257f76f-056f-41c6-bc5a-e68d6f9f22a6"
+        },
+        "created_at": "2026-08-03T14:17:37.933825+00:00"
+      },
+      {
+        "id": "1edb5772-dbd6-4b5e-b8f2-56c590511917",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "e257f76f-056f-41c6-bc5a-e68d6f9f22a6",
+          "queryId": "e257f76f-056f-41c6-bc5a-e68d6f9f22a6",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:17:37.933825+00:00"
+      },
+      {
+        "id": "5f102100-73b8-4e65-9c85-dcc5bf772167",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "What is SOP?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a98b139a-5489-4092-aa72-57dde963f033",
+          "queryId": "a98b139a-5489-4092-aa72-57dde963f033"
+        },
+        "created_at": "2026-08-03T14:18:12.530723+00:00"
+      },
+      {
+        "id": "f04512fb-23b9-429a-906d-df26e25726f0",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "The requested information was not found with sufficient evidence in the indexed documents.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a98b139a-5489-4092-aa72-57dde963f033",
+          "queryId": "a98b139a-5489-4092-aa72-57dde963f033",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:18:12.530723+00:00"
+      },
+      {
+        "id": "839e10b5-d9c2-4f3e-ac73-36da20550999",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "Berapa hari maksimal karyawan diperbolehkan bekerja dari rumah dalam seminggu.",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "24a2f6e7-f972-4a59-b681-8b2c0ce5bb84",
+          "queryId": "24a2f6e7-f972-4a59-b681-8b2c0ce5bb84"
+        },
+        "created_at": "2026-08-03T14:19:38.568840+00:00"
+      },
+      {
+        "id": "3029de33-9dc0-45f7-bbb3-53dd9c0fb86b",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Karyawan diperbolehkan bekerja dari rumah maksimal 2 hari dalam seminggu. Keputusan ini memerlukan persetujuan dari atasan.",
+        "attachments": [],
+        "confidence": 0.8572,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "24a2f6e7-f972-4a59-b681-8b2c0ce5bb84",
+          "queryId": "24a2f6e7-f972-4a59-b681-8b2c0ce5bb84",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9226,
+              "relevance_score": 0.9226,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "citation_validated": true,
+              "citation_support_score": 0.9226,
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:19:38.568840+00:00"
+      },
+      {
+        "id": "2d02331b-6efc-4af1-b954-b549e7fcaaaa",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "siapakah mem deffa",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "4edf8162-a3fa-4127-9931-3d01bf2d01fc",
+          "queryId": "4edf8162-a3fa-4127-9931-3d01bf2d01fc"
+        },
+        "created_at": "2026-08-03T14:20:07.061809+00:00"
+      },
+      {
+        "id": "07f6b39d-1f25-4182-ab91-69bf2110b586",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Informasi tersebut tidak ditemukan dengan bukti yang cukup pada dokumen yang telah diindeks.",
+        "attachments": [],
+        "confidence": 0.0,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "4edf8162-a3fa-4127-9931-3d01bf2d01fc",
+          "queryId": "4edf8162-a3fa-4127-9931-3d01bf2d01fc",
+          "sources": [],
+          "source": null,
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:20:07.061809+00:00"
+      },
+      {
+        "id": "ad294d97-662d-4385-b8f3-b7b12a198da8",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "How many days at most are employees allowed to work from home in a week.",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "83d3ed56-a88a-482e-bfae-817fbd82af10",
+          "queryId": "83d3ed56-a88a-482e-bfae-817fbd82af10"
+        },
+        "created_at": "2026-08-03T14:20:52.597330+00:00"
+      },
+      {
+        "id": "d4ffcd93-3952-4253-917c-e929be20d672",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Karyawan diperbolehkan bekerja dari rumah maksimal 2 hari dalam seminggu. Keputusan ini memerlukan persetujuan atasan.",
+        "attachments": [],
+        "confidence": 0.9062,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "83d3ed56-a88a-482e-bfae-817fbd82af10",
+          "queryId": "83d3ed56-a88a-482e-bfae-817fbd82af10",
+          "sources": [
+            {
+              "document_name": "Policy_WFH.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.9062,
+              "relevance_score": 0.9062,
+              "excerpt": "Employees may work from home a maximum of 2 days per week, with manager approval.",
+              "citation_validated": true,
+              "citation_support_score": 0.9353,
+              "chapter": "Limit",
+              "section": "Limit",
+              "paragraph_start": 5,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_WFH.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:20:52.597330+00:00"
+      },
+      {
+        "id": "2ad98471-d0b9-435d-b9ef-689a9358cd38",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "user",
+        "content": "Apa syarat yang harus dipenuhi sebelum perangkat pribadi digunakan untuk email kantor?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b2d307e2-d60b-4a9f-97cf-0775cf8b64a0",
+          "queryId": "b2d307e2-d60b-4a9f-97cf-0775cf8b64a0"
+        },
+        "created_at": "2026-08-03T14:21:32.955755+00:00"
+      },
+      {
+        "id": "54357214-1050-4725-b394-ba965dfeb1b0",
+        "conversation_id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
+        "role": "assistant",
+        "content": "Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b2d307e2-d60b-4a9f-97cf-0775cf8b64a0",
+          "queryId": "b2d307e2-d60b-4a9f-97cf-0775cf8b64a0",
+          "sources": [
+            {
+              "document_name": "Policy_BYOD.docx",
+              "document_type": "docx",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.8422,
+              "relevance_score": 0.8422,
+              "excerpt": "Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "chapter": "Enrollment",
+              "section": "Enrollment",
+              "paragraph_start": 3,
+              "paragraph_end": 4,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "Policy_BYOD.docx",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-03T14:21:32.955755+00:00"
+      }
+    ],
+    "created_at": "2026-08-03T14:11:26.008797+00:00",
+    "updated_at": "2026-08-03T14:21:32.955755+00:00",
+    "last_message": "Personal devices used for work email must be enrolled in the mobile device management (MDM) system.",
+    "last_user_message": "Apa syarat yang harus dipenuhi sebelum perangkat pribadi digunakan untuk email kantor?",
+    "last_message_at": "2026-08-03T14:21:32.955755+00:00"
+  },
+  {
     "id": "76b7c3e6-9606-4d80-a35b-3f6ca386085a",
     "user_id": "dev-admin",
     "user_name": "Administrator",

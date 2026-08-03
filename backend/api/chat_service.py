@@ -22,7 +22,7 @@ from api.answer_formatter import (
 from api.build_info import BUILD_VERSION
 from api.cancellation import raise_if_cancelled
 from api.follow_up_service import build_dataset_follow_up_question
-from api.grounding_validator import validate_grounded_answer
+from api.grounding_validator import prune_unsupported_claims, validate_grounded_answer
 from api.language import answer_matches_requested_language, resolve_response_language
 from api.model_router import build_grounded_answer, resolve_provider
 from api.progress import emit_progress, progress_scope
@@ -1048,31 +1048,36 @@ def _run_chat_impl(
         f"contexts={len(generation_contexts)} confidence={confidence:.3f}"
     )
 
-    verified_scalar_answer = ""
-    if not evaluation_mode:
-        raw_verified_scalar_answer = answer_text_only(
-            build_verified_scalar_answer(
-                question,
-                chunks,
-                language=normalized_language,
-            )
+    # Compute the deterministic scalar candidate in both normal and evaluation
+    # mode. It is used only after a native answer fails grounding and its own
+    # complete answer is revalidated against the same strict evidence.
+    raw_verified_scalar_answer = answer_text_only(
+        build_verified_scalar_answer(
+            question,
+            chunks,
+            language=normalized_language,
         )
-        verified_scalar_answer = _sanitize_verified_scalar_answer(
-            raw_verified_scalar_answer
+    )
+    verified_scalar_answer = _sanitize_verified_scalar_answer(
+        raw_verified_scalar_answer
+    )
+    if (
+        raw_verified_scalar_answer
+        and verified_scalar_answer != raw_verified_scalar_answer
+    ):
+        print(
+            "[CHAT] cleaned duplicated verified scalar fallback: "
+            f"{verified_scalar_answer}"
         )
-        if (
-            raw_verified_scalar_answer
-            and verified_scalar_answer != raw_verified_scalar_answer
-        ):
-            print(
-                "[CHAT] cleaned duplicated verified scalar fallback: "
-                f"{verified_scalar_answer}"
-            )
 
     used_extractive_fallback = False
     used_language_retry = False
     used_verified_scalar_fallback = False
+    used_grounding_prune = False
     wrong_output_language_rejected = False
+    grounding_repair_failed = False
+    grounding_rejected_answer = ""
+    grounding_validation: dict[str, Any] | None = None
 
     raise_if_cancelled(cancel_event)
     emit_progress(
@@ -1164,7 +1169,88 @@ def _run_chat_impl(
         used_extractive_fallback = False
         used_verified_scalar_fallback = False
 
-    if used_language_retry:
+    # Validate the complete answer before a citation can make it appear
+    # trustworthy. When possible, keep only supported model clauses. In normal
+    # chat mode, fall back to deterministic evidence text; evaluation mode
+    # records a grounding failure instead of hiding it behind a fabricated
+    # citation.
+    if answer and not is_refusal_answer(answer):
+        decision = validate_grounded_answer(question, answer, chunks)
+        if not decision.supported:
+            grounding_validation = decision.to_dict()
+            grounding_rejected_answer = answer
+            repaired_answer = answer_text_only(
+                prune_unsupported_claims(question, answer, chunks)
+            )
+            repaired_decision = (
+                validate_grounded_answer(question, repaired_answer, chunks)
+                if repaired_answer
+                and answer_matches_requested_language(
+                    repaired_answer,
+                    normalized_language,
+                )
+                else None
+            )
+            if repaired_decision is not None and repaired_decision.supported:
+                answer = repaired_answer
+                used_grounding_prune = True
+                grounding_validation = repaired_decision.to_dict()
+            else:
+                fallback_candidates: list[tuple[str, str]] = []
+                if verified_scalar_answer:
+                    fallback_candidates.append(
+                        ("verified_scalar", verified_scalar_answer)
+                    )
+                if not evaluation_mode:
+                    fallback_candidates.append(
+                        (
+                            "extractive",
+                            answer_text_only(
+                                build_safe_extractive_answer(
+                                    question,
+                                    chunks,
+                                    language=normalized_language,
+                                )
+                            ),
+                        )
+                    )
+                answer = ""
+                for fallback_kind, fallback_answer in fallback_candidates:
+                    if (
+                        not fallback_answer
+                        or is_refusal_answer(fallback_answer)
+                        or not answer_matches_requested_language(
+                            fallback_answer,
+                            normalized_language,
+                        )
+                    ):
+                        continue
+                    fallback_decision = validate_grounded_answer(
+                        question,
+                        fallback_answer,
+                        chunks,
+                    )
+                    if not fallback_decision.supported:
+                        continue
+                    answer = fallback_answer
+                    grounding_validation = fallback_decision.to_dict()
+                    used_verified_scalar_fallback = (
+                        fallback_kind == "verified_scalar"
+                    )
+                    used_extractive_fallback = fallback_kind == "extractive"
+                    break
+
+            if not answer:
+                grounding_repair_failed = True
+                used_extractive_fallback = False
+                used_verified_scalar_fallback = False
+                used_language_retry = False
+
+    if grounding_repair_failed:
+        generation_mode = "grounding_validation_failed"
+    elif used_grounding_prune:
+        generation_mode = "grounding_pruned"
+    elif used_language_retry:
         generation_mode = "language_repair_retry"
     elif used_extractive_fallback:
         generation_mode = "extractive_fallback"
@@ -1173,7 +1259,11 @@ def _run_chat_impl(
     else:
         generation_mode = "native_model"
 
-    if used_extractive_fallback or used_verified_scalar_fallback:
+    if (
+        used_extractive_fallback
+        or used_verified_scalar_fallback
+        or used_grounding_prune
+    ):
         emit_progress(
             "grounding",
             "completed",
@@ -1268,6 +1358,11 @@ def _run_chat_impl(
             failure_stage = "wrong_output_language"
             failure_reason = "generated_answer_used_wrong_output_language"
             failure_generation_mode = "wrong_output_language"
+        elif grounding_repair_failed:
+            failure_stage = "grounding_validation_failed"
+            failure_reason = "generated_answer_contains_unsupported_claims"
+            failure_generation_mode = "grounding_validation_failed"
+            citation_validation = grounding_validation
         elif not answer:
             failure_stage = "native_answer_empty"
             failure_reason = "native_model_returned_empty_answer"
@@ -1297,7 +1392,9 @@ def _run_chat_impl(
             preserve_generation_contexts=evaluation_mode,
             failure_reason=failure_reason,
             rejected_native_answer=(
-                answer
+                grounding_rejected_answer
+                if failure_stage == "grounding_validation_failed"
+                else answer
                 if failure_stage == "citation_validation_failed"
                 else ""
             ),
@@ -1327,6 +1424,12 @@ def _run_chat_impl(
         "retrieval_mode": retrieval_mode,
         "retrieval_query": retrieval_query,
         "failure_stage": None,
+        "grounding_validation": grounding_validation,
+        "grounding_repaired": bool(
+            used_grounding_prune
+            or used_extractive_fallback
+            or used_verified_scalar_fallback
+        ),
     }
 
 
