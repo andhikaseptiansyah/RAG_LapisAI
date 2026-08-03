@@ -593,6 +593,11 @@ def _materialize_locked_candidates(
             or compact.get("keyword_query_variant"),
             "rerankerQueryVariant": compact.get("rerankerQueryVariant")
             or compact.get("reranker_query_variant"),
+            "rerankerQueryVariantCount": int(number(
+                "rerankerQueryVariantCount",
+                "reranker_query_variant_count",
+                default=0.0,
+            )),
             "evidenceSupported": flag(
                 "evidenceSupported",
                 "evidence_supported",

@@ -13,3 +13,7 @@ env/
 query_logs.json
 users_store.json
 .auth_secret
+# Private holdouts must never be committed or copied into the project.
+LapisAI_Private_Holdout/
+evaluation/private_holdout/
+**/holdout_draft.json

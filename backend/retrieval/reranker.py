@@ -19,7 +19,11 @@ import math
 from functools import lru_cache
 from typing import Any, Iterable
 
-from retrieval.query_expansion import build_query_variants, requires_language_bridge
+from retrieval.query_expansion import (
+    build_natural_bridge_query,
+    normalize_text,
+    requires_language_bridge,
+)
 from uploads.config import ENABLE_RERANKER, RERANKER_MODEL, RERANKER_WEIGHT
 
 _LOAD_ERROR_REPORTED = False
@@ -92,6 +96,33 @@ def warmup_reranker() -> bool:
         return False
 
 
+def build_reranker_query_variants(query: str) -> list[str]:
+    """Keep one literal and one compact bridge query for cross-encoder scoring.
+
+    Semantic and BM25 retrieval already search every expanded variant. Sending
+    all four variants through every candidate repeats expensive cross-encoder
+    work without adding a new retrieval candidate. The natural bridge contains
+    the strongest English intent translation and is sufficient as the second
+    reranking view.
+    """
+    original = str(query or "").strip()
+    if not original:
+        return []
+    candidates = [original]
+    if requires_language_bridge(original):
+        candidates.append(build_natural_bridge_query(original))
+
+    variants: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        clean = str(candidate or "").strip()
+        key = normalize_text(clean)
+        if clean and key not in seen:
+            seen.add(key)
+            variants.append(clean)
+    return variants
+
+
 def rerank_candidates(
     query: str,
     candidates: list[dict[str, Any]],
@@ -120,11 +151,7 @@ def rerank_candidates(
 
     try:
         model = get_reranker()
-        query_variants = (
-            build_query_variants(query)
-            if requires_language_bridge(query)
-            else [str(query or "")]
-        ) or [str(query or "")]
+        query_variants = build_reranker_query_variants(query) or [str(query or "")]
         pairs = [
             [variant, str(candidate.get("content") or "")]
             for candidate in candidates
@@ -206,6 +233,7 @@ def rerank_candidates(
                 "rerankerRawScore": round(raw_value, 6),
                 "rerankerRawRank": raw_rank_by_index[index],
                 "rerankerQueryVariant": best_variant_by_candidate[index],
+                "rerankerQueryVariantCount": variant_count,
                 "rerankerVariantRawScores": variant_raw_scores[index],
                 "rerankerScore": round(reranker_score, 6),
                 "score": round(max(0.0, min(blended_score, 1.0)), 6),

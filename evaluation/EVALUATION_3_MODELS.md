@@ -34,6 +34,8 @@ Jawaban dan grounding:
   generation failure rate.
 - Average, median, dan P95 latency, termasuk estimasi sequential retrieval plus
   generation. Nilai ini bukan pengukuran wall-clock request tunggal.
+- Rasio latency Indonesia terhadap English dan peringatan deskriptif bila
+  rasionya mencapai 1,5x.
 - Interval kepercayaan Wilson 95% untuk metrik biner seperti false refusal,
   safety, Hit@K, Top-1, dan pipeline failure.
 
@@ -52,6 +54,10 @@ Overall = 35% Answer Quality
 Tanpa judge, pipeline tetap menghasilkan deterministic score dan menandai skor
 komposit sebagai belum lengkap. Deterministic score adalah diagnostik dan tidak
 boleh diberi label overall score.
+
+Token F1, exact match, dan keyword coverage membandingkan bentuk teks. Metrik
+tersebut dapat meremehkan jawaban berupa parafrasa atau terjemahan yang faktual.
+Jangan menafsirkannya sebagai faithfulness atau factuality tanpa judge semantik.
 
 ## Persiapan `.env`
 
@@ -134,6 +140,12 @@ Runner akan login, memeriksa health endpoint, lalu memastikan setiap dokumen
 yang dirujuk 90 pertanyaan answerable benar-benar ada di Chroma collection
 aktif. Proses berhenti dengan daftar dokumen yang kurang bila readiness gagal.
 
+Build v19 memakai snapshot schema v4. Retrieval benchmark melakukan satu strict
+retrieval per pertanyaan, batching seluruh semantic query variants dalam satu
+panggilan model embedding dan satu query Chroma, serta membatasi cross-encoder
+ke literal query dan satu natural bridge. Restart backend setelah memasang patch
+dan pakai output directory baru untuk pengukuran latency pertama.
+
 Lanjutkan checkpoint dengan output directory yang sama:
 
 ```powershell
@@ -152,16 +164,18 @@ python .\evaluation\run_user_100_evaluation.py `
   --output-dir .\evaluation\generation\results\three_models_100
 ```
 
-Untuk report yang akan dipakai sebagai hasil final, gunakan dataset holdout
-bersih, model/judge yang dipin, lalu aktifkan quality gate ketat:
+Untuk report yang akan dipakai sebagai hasil final, jangan mengubah dataset
+publik menjadi holdout lewat flag. Buat private holdout dari corpus aktif,
+review seluruh pasangan, lalu jalankan runner final:
 
 ```powershell
-python .\evaluation\run_user_100_evaluation.py `
-  --models ollama gemini groq `
-  --benchmark-role holdout `
-  --require-final-report `
-  --output-dir .\evaluation\generation\results\three_models_holdout
+python .\evaluation\create_private_holdout.py
+python .\evaluation\review_private_holdout.py --reviewer-name "Andika"
+python .\evaluation\run_final_evaluation.py --models ollama gemini groq
 ```
+
+Lihat `evaluation/FINAL_EVALUATION.md` untuk konfigurasi empat model independen,
+lokasi private holdout, approval manusia, dan arti status `FINAL_ELIGIBLE`.
 
 ## Fairness
 
@@ -169,11 +183,12 @@ python .\evaluation\run_user_100_evaluation.py `
 - Setiap provider menerima ranked candidates dan generation contexts yang sama.
 - Context fingerprint dicatat untuk mendeteksi perbedaan bukti antar-model.
 - Provider yang gagal tidak diam-diam diganti provider lain.
-- `--resume` memakai checkpoint yang sama dan tidak mengulang baris selesai.
+- `--resume` hanya memakai baris yang model dan fingerprint snapshot lengkapnya
+  sama. Baris lama atau stale otomatis dihitung ulang.
 - Hash dataset dan raw answer, git commit, versi build, context mode, serta
   status model tag mutable dicatat pada reproducibility manifest.
-- Dataset 100 pertanyaan saat ini adalah development/regression set. Gunakan
-  dataset terpisah dengan `--benchmark-role holdout` untuk estimasi final.
+- Dataset 100 pertanyaan saat ini adalah development/regression set. Evaluasi
+  final hanya dijalankan lewat `evaluation/run_final_evaluation.py`.
 
 ## Output
 

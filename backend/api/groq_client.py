@@ -16,11 +16,13 @@ from api.llm_shared import (
     clean_model_answer,
     is_incomplete_answer,
 )
+from api.provider_errors import ProviderAPIError
 from uploads.config import (
     ENABLE_GENERATION_GROUNDING_VALIDATION,
     GROQ_API_KEY,
     GROQ_BASE_URL,
     GROQ_MAX_RETRIES,
+    GROQ_MAX_RATE_LIMIT_WAIT_SECONDS,
     GROQ_MODEL,
     GROQ_TIMEOUT_SECONDS,
 )
@@ -58,24 +60,38 @@ def _groq_chat(system_prompt: str, user_prompt: str) -> str:
                 timeout=GROQ_TIMEOUT_SECONDS,
             )
             raise_if_cancelled()
-            if response.status_code == 429 or response.status_code >= 500:
-                if attempt < GROQ_MAX_RETRIES:
-                    retry_after = response.headers.get("retry-after")
-                    try:
-                        delay = float(retry_after) if retry_after else min(2**attempt, 8)
-                    except ValueError:
-                        delay = min(2**attempt, 8)
+            if response.status_code >= 400:
+                provider_error = ProviderAPIError.from_http_response("groq", response)
+                delay = (
+                    provider_error.retry_after_seconds
+                    if provider_error.retry_after_seconds is not None
+                    else min(2**attempt, 8)
+                )
+                if (
+                    provider_error.retryable
+                    and provider_error.quota_scope != "daily"
+                    and attempt < GROQ_MAX_RETRIES
+                    and delay <= GROQ_MAX_RATE_LIMIT_WAIT_SECONDS
+                ):
                     time.sleep(max(0.0, delay))
                     continue
+                raise provider_error
 
-            response.raise_for_status()
             data = response.json()
             answer = str(data["choices"][0]["message"].get("content") or "").strip()
             response_model = str(data.get("model") or GROQ_MODEL)
             request_id = response.headers.get("x-request-id") or response.headers.get("x-groq-request-id") or "-"
             print(f"[GROQ] status={response.status_code} model={response_model} request_id={request_id}")
             return answer
-        except (requests.RequestException, KeyError, TypeError, ValueError) as exc:
+        except ProviderAPIError:
+            raise
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt < GROQ_MAX_RETRIES:
+                time.sleep(min(2**attempt, 8))
+                continue
+            raise ProviderAPIError.from_exception("groq", exc) from exc
+        except (KeyError, TypeError, ValueError) as exc:
             last_error = exc
             if attempt < GROQ_MAX_RETRIES:
                 time.sleep(min(2**attempt, 8))
@@ -148,6 +164,11 @@ def build_groq_grounded_answer(
                 print("[GROQ] native answer rejected by grounding validator")
                 return ""
         return llm_answer
+    except ProviderAPIError as exc:
+        if evaluation_mode:
+            raise
+        print(f"[GROQ] native generation failed: {exc}")
+        return ""
     except Exception as exc:
         if evaluation_mode:
             raise RuntimeError("Groq native generation failed: " + str(exc)) from exc

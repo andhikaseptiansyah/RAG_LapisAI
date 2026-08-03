@@ -1,5 +1,209 @@
 [
   {
+    "id": "76b7c3e6-9606-4d80-a35b-3f6ca386085a",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "928d09f3-c688-4c2f-b09a-1ae6c2a09347",
+        "conversation_id": "76b7c3e6-9606-4d80-a35b-3f6ca386085a",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "79450013-06a1-4bde-9ca7-3be08a5f084e",
+          "queryId": "79450013-06a1-4bde-9ca7-3be08a5f084e"
+        },
+        "created_at": "2026-08-02T19:23:25.519169+00:00"
+      },
+      {
+        "id": "97b9b8cd-3b89-449a-bce7-10e6fb0f78bf",
+        "conversation_id": "76b7c3e6-9606-4d80-a35b-3f6ca386085a",
+        "role": "assistant",
+        "content": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "79450013-06a1-4bde-9ca7-3be08a5f084e",
+          "queryId": "79450013-06a1-4bde-9ca7-3be08a5f084e",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-02T19:23:25.519169+00:00"
+      }
+    ],
+    "created_at": "2026-08-02T19:23:25.519169+00:00",
+    "updated_at": "2026-08-02T19:23:25.519169+00:00",
+    "last_message": "Insiden IT P1 harus diakui dalam 15 menit. diselesaikan dalam 4 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-08-02T19:23:25.519169+00:00"
+  },
+  {
+    "id": "c41e7522-3e16-4393-9b5e-c79c7973df05",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "7d5a21fa-cef7-4f97-8a88-c19662eafa47",
+        "conversation_id": "c41e7522-3e16-4393-9b5e-c79c7973df05",
+        "role": "user",
+        "content": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "5554d316-4fe9-4bb4-b1da-024d7f32139c",
+          "queryId": "5554d316-4fe9-4bb4-b1da-024d7f32139c"
+        },
+        "created_at": "2026-08-02T18:08:54.659095+00:00"
+      },
+      {
+        "id": "9929786a-6418-4d22-b7b4-55c49f4fff56",
+        "conversation_id": "c41e7522-3e16-4393-9b5e-c79c7973df05",
+        "role": "assistant",
+        "content": "Insiden IT P1 harus diselesaikan dalam waktu 4 jam. harus diakui dalam waktu 15 menit. untuk P2 adalah dalam 1 jam.",
+        "attachments": [],
+        "confidence": 0.8422,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "5554d316-4fe9-4bb4-b1da-024d7f32139c",
+          "queryId": "5554d316-4fe9-4bb4-b1da-024d7f32139c",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8716,
+              "relevance_score": 0.8716,
+              "excerpt": "Incidents are classified as P1 (critical), P2 (high), P3 (medium), P4 (low). P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. P2 within 1 hour and 8 business hours respectively. If a P1 is not resolved within 2 hours, it is escalated to the Head of Infrastructure.",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-02T18:08:54.659095+00:00"
+      }
+    ],
+    "created_at": "2026-08-02T18:08:54.659095+00:00",
+    "updated_at": "2026-08-02T18:08:54.659095+00:00",
+    "last_message": "Insiden IT P1 harus diselesaikan dalam waktu 4 jam. harus diakui dalam waktu 15 menit. untuk P2 adalah dalam 1 jam.",
+    "last_user_message": "Seberapa cepat insiden IT P1 harus diselesaikan?",
+    "last_message_at": "2026-08-02T18:08:54.659095+00:00"
+  },
+  {
+    "id": "7baac5cd-6bd2-427f-a935-1932638cf68f",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "Berapa lama masa percobaan untuk karyawan baru?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "c8d2837c-a02a-4157-bc40-df3f8b8def5c",
+        "conversation_id": "7baac5cd-6bd2-427f-a935-1932638cf68f",
+        "role": "user",
+        "content": "Berapa lama masa percobaan untuk karyawan baru?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "1eb1244e-e28a-48b9-95b0-07b3262f846f",
+          "queryId": "1eb1244e-e28a-48b9-95b0-07b3262f846f"
+        },
+        "created_at": "2026-08-02T18:08:29.879171+00:00"
+      },
+      {
+        "id": "500e5e72-62eb-47da-9c63-56e9e63acfaf",
+        "conversation_id": "7baac5cd-6bd2-427f-a935-1932638cf68f",
+        "role": "assistant",
+        "content": "Masa percobaan untuk karyawan baru adalah selama 3 bulan. Evaluasi kinerja formal akan dilakukan pada minggu ke-12 sebelum adanya konfirmasi.",
+        "attachments": [],
+        "confidence": 0.7246,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "1eb1244e-e28a-48b9-95b0-07b3262f846f",
+          "queryId": "1eb1244e-e28a-48b9-95b0-07b3262f846f",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7246,
+              "relevance_score": 0.7246,
+              "excerpt": "This SOP defines the onboarding process for new employees at Nusantara Dynamics, from offer acceptance to the end of probation. New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation. IT issues a laptop and access credentials on day one. Requests must be raised by the hiring manager at…",
+              "citation_validated": true,
+              "citation_support_score": 1.0,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 0.4071
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-02T18:08:29.879171+00:00"
+      }
+    ],
+    "created_at": "2026-08-02T18:08:29.879171+00:00",
+    "updated_at": "2026-08-02T18:08:29.879171+00:00",
+    "last_message": "Masa percobaan untuk karyawan baru adalah selama 3 bulan. Evaluasi kinerja formal akan dilakukan pada minggu ke-12 sebelum adanya konfirmasi.",
+    "last_user_message": "Berapa lama masa percobaan untuk karyawan baru?",
+    "last_message_at": "2026-08-02T18:08:29.879171+00:00"
+  },
+  {
     "id": "6708adf7-baa2-48d0-adca-60d602ee7f50",
     "user_id": "dev-admin",
     "user_name": "Administrator",

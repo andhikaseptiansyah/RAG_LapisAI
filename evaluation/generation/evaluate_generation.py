@@ -17,6 +17,7 @@ import platform
 import re
 import statistics
 import subprocess
+import time
 from collections import Counter
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version
@@ -48,7 +49,18 @@ DEFAULT_DATASETS = [
 ]
 LLM_BASE_URL = os.getenv("EVAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LLM_API_KEY = os.getenv("EVAL_LLM_API_KEY", "ollama")
-LLM_MODEL = os.getenv("EVAL_LLM_MODEL", "qwen3-custom:latest")
+LLM_MODEL = os.getenv("EVAL_LLM_MODEL", "").strip()
+JUDGE_MAX_RETRIES = max(0, int(os.getenv("EVAL_JUDGE_MAX_RETRIES", "5")))
+JUDGE_MIN_INTERVAL_SECONDS = max(
+    0.0,
+    float(os.getenv("EVAL_JUDGE_MIN_INTERVAL_SECONDS", "0")),
+)
+JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS = max(
+    0.0,
+    float(os.getenv("EVAL_JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS", "120")),
+)
+_LAST_JUDGE_REQUEST_AT = 0.0
+_JUDGE_CIRCUIT_ERROR = ""
 
 REFUSAL_PREFIXES = (
     # Canonical backend refusals and direct first-person refusals.
@@ -112,7 +124,17 @@ CONTRAST_MARKERS = (
 def model_reference_is_mutable(model_name: str) -> bool:
     """Conservatively identify explicitly mutable local model references."""
     normalized = str(model_name or "").strip().casefold()
-    return normalized.endswith(":latest") or normalized in {"latest", "default"}
+    if (
+        not normalized
+        or normalized.endswith(":latest")
+        or normalized in {"latest", "default"}
+    ):
+        return True
+    if "@sha256:" in normalized:
+        return False
+    if ":" in normalized and normalized.rsplit(":", 1)[-1] not in {"", "latest"}:
+        return False
+    return re.search(r"(?:^|[-_.])v?\d+(?:[.-]\d+)*", normalized) is None
 
 
 def validate_answer_records(
@@ -526,6 +548,53 @@ def parse_json_object(text: str) -> dict[str, Any]:
         return json.loads(match.group(0))
 
 
+def _judge_retry_after(response: Any) -> float | None:
+    value = str(response.headers.get("retry-after") or "").strip()
+    try:
+        return max(0.0, float(value)) if value else None
+    except ValueError:
+        return None
+
+
+def _post_judge_request(
+    endpoint: str,
+    headers: dict[str, str],
+    request: dict[str, Any],
+) -> Any:
+    """Send one judge request with pacing and provider-aware transient retries."""
+    global _LAST_JUDGE_REQUEST_AT
+
+    for attempt in range(JUDGE_MAX_RETRIES + 1):
+        since_last = time.monotonic() - _LAST_JUDGE_REQUEST_AT
+        pacing_delay = max(0.0, JUDGE_MIN_INTERVAL_SECONDS - since_last)
+        if pacing_delay:
+            time.sleep(pacing_delay)
+
+        _LAST_JUDGE_REQUEST_AT = time.monotonic()
+        response = requests.post(
+            endpoint,
+            headers=headers,
+            json=request,
+            timeout=120,
+        )
+        if response.status_code != 429 and response.status_code < 500:
+            return response
+        if attempt >= JUDGE_MAX_RETRIES:
+            return response
+
+        retry_delay = _judge_retry_after(response)
+        delay = retry_delay if retry_delay is not None else min(2**attempt, 8)
+        if delay > JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS:
+            return response
+        print(
+            f"[JUDGE RATE LIMIT] wait {delay:.1f}s before retry "
+            f"{attempt + 1}/{JUDGE_MAX_RETRIES}"
+        )
+        time.sleep(delay)
+
+    raise RuntimeError("Unreachable judge retry state")
+
+
 def llm_judge(
     *,
     question: str,
@@ -534,6 +603,8 @@ def llm_judge(
     answer: str,
     answerable: bool,
 ) -> dict[str, Any]:
+    global _JUDGE_CIRCUIT_ERROR
+
     if requests is None:
         return {
             "faithfulness": None,
@@ -543,6 +614,14 @@ def llm_judge(
             "judge_error": (
                 "Dependency 'requests' is required when the LLM judge is enabled."
             ),
+        }
+    if _JUDGE_CIRCUIT_ERROR:
+        return {
+            "faithfulness": None,
+            "answer_relevance": None,
+            "is_hallucination": None,
+            "reason": "",
+            "judge_error": _JUDGE_CIRCUIT_ERROR,
         }
 
     task_rule = (
@@ -598,10 +677,12 @@ Return JSON only:
             ],
             "response_format": {"type": "json_object"},
         }
-        response = requests.post(endpoint, headers=headers, json=request, timeout=120)
-        if response.status_code >= 400:
+        response = _post_judge_request(endpoint, headers, request)
+        # Some OpenAI-compatible servers do not implement response_format.
+        # Retry without it only for request-schema errors, never for 429/5xx.
+        if response.status_code in {400, 422}:
             request.pop("response_format", None)
-            response = requests.post(endpoint, headers=headers, json=request, timeout=120)
+            response = _post_judge_request(endpoint, headers, request)
         response.raise_for_status()
         payload = response.json()
         content = payload["choices"][0]["message"].get("content") or ""
@@ -619,6 +700,12 @@ Return JSON only:
             "judge_error": "",
         }
     except Exception as error:
+        response = getattr(error, "response", None)
+        if response is not None and getattr(response, "status_code", None) == 429:
+            _JUDGE_CIRCUIT_ERROR = (
+                "LLM judge rate limit remains active; remaining judge calls were "
+                "stopped to protect quota. Re-run evaluation after the quota resets."
+            )
         print(f"[ERROR JUDGE] {error}")
         return {
             "faithfulness": None,
@@ -747,6 +834,14 @@ def reproducibility_manifest(
         *requirement_files,
         Path(__file__).resolve(),
     ]
+    private_manifest_value = os.getenv("LAPISAI_HOLDOUT_MANIFEST", "").strip()
+    private_manifest = Path(private_manifest_value).resolve() if private_manifest_value else None
+    if private_manifest is not None:
+        if not private_manifest.is_file():
+            raise FileNotFoundError(
+                f"Configured private holdout manifest is missing: {private_manifest}"
+            )
+        files.append(private_manifest)
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": _git_commit(),
@@ -768,6 +863,9 @@ def reproducibility_manifest(
             judge_model
             and judge_model.strip().casefold() != model_name.strip().casefold()
         ),
+        "private_holdout_manifest": (
+            _manifest_path(private_manifest) if private_manifest else None
+        ),
         "backend_build_versions": sorted({
             str(item.get("backend_build_version") or "")
             for item in answers
@@ -777,6 +875,11 @@ def reproducibility_manifest(
             str(item.get("retrieval_snapshot_build") or "")
             for item in answers
             if item.get("retrieval_snapshot_build")
+        }),
+        "retrieval_latency_measurement_modes": sorted({
+            str(item.get("retrieval_latency_measurement_mode") or "")
+            for item in answers
+            if item.get("retrieval_latency_measurement_mode")
         }),
         "evaluation_context_modes": sorted({
             str(item.get("evaluation_context_mode") or "")
@@ -810,19 +913,25 @@ def bilingual_pairing_diagnostics(
     )
     same_source_pairs = 0
     for key in paired_keys:
+        english_item = by_language["EN"][key]
+        indonesian_item = by_language["ID"][key]
         english_sources = {
             document
             for document, _ in source_set(
-                by_language["EN"][key].get("references") or []
+                english_item.get("references") or []
             )
         }
         indonesian_sources = {
             document
             for document, _ in source_set(
-                by_language["ID"][key].get("references") or []
+                indonesian_item.get("references") or []
             )
         }
-        if english_sources and english_sources == indonesian_sources:
+        if (
+            bool(english_item.get("answerable"))
+            == bool(indonesian_item.get("answerable"))
+            and english_sources == indonesian_sources
+        ):
             same_source_pairs += 1
 
     paired_count = len(paired_keys)
@@ -996,6 +1105,71 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def language_latency_diagnostics(
+    by_language: dict[str, dict[str, Any]],
+    *,
+    alert_ratio: float = 1.5,
+) -> dict[str, Any]:
+    """Expose descriptive ID/EN latency ratios without treating them as quality."""
+    english = by_language.get("EN") or {}
+    indonesian = by_language.get("ID") or {}
+    definitions = (
+        ("retrieval", "average_retrieval_time_ms", "retrieval"),
+        ("generation_call", "average_response_time_ms", "generation-call"),
+        (
+            "estimated_sequential_e2e",
+            "average_estimated_sequential_e2e_ms",
+            "estimated sequential E2E",
+        ),
+    )
+    metrics: dict[str, Any] = {}
+    alerts: list[str] = []
+    valid_ratio_count = 0
+    for output_key, metric_key, label in definitions:
+        english_value = english.get(metric_key)
+        indonesian_value = indonesian.get(metric_key)
+        try:
+            english_ms = float(english_value)
+            indonesian_ms = float(indonesian_value)
+            if english_ms <= 0 or indonesian_ms < 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            metrics[output_key] = {
+                "english_ms": english_value,
+                "indonesian_ms": indonesian_value,
+                "indonesian_over_english_ratio": None,
+            }
+            continue
+
+        valid_ratio_count += 1
+        ratio = indonesian_ms / english_ms
+        metrics[output_key] = {
+            "english_ms": round(english_ms, 2),
+            "indonesian_ms": round(indonesian_ms, 2),
+            "indonesian_over_english_ratio": round(ratio, 4),
+            "difference_ms": round(indonesian_ms - english_ms, 2),
+        }
+        if ratio >= alert_ratio:
+            alerts.append(
+                "Descriptive Indonesian/English "
+                f"{label} latency ratio is {ratio:.2f}x "
+                f"(alert threshold {alert_ratio:.2f}x)."
+            )
+
+    return {
+        "status": (
+            "DESCRIPTIVE_IMBALANCE"
+            if alerts
+            else "NO_RATIO_ABOVE_THRESHOLD"
+            if valid_ratio_count
+            else "INSUFFICIENT_DATA"
+        ),
+        "alert_ratio": alert_ratio,
+        "metrics": metrics,
+        "alerts": alerts,
+    }
+
+
 def build_evaluation_status(
     *,
     benchmark_role: str,
@@ -1004,6 +1178,7 @@ def build_evaluation_status(
     judge_model: str | None,
     judge_independent: bool,
     pairing: dict[str, Any],
+    performance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """State whether a run is suitable for a final model-quality claim."""
     blockers: list[str] = []
@@ -1012,6 +1187,10 @@ def build_evaluation_status(
     if benchmark_role != "holdout":
         blockers.append(
             "Benchmark is a development/regression set, not a blind holdout."
+        )
+    elif not os.getenv("LAPISAI_HOLDOUT_MANIFEST", "").strip():
+        blockers.append(
+            "A reviewed private-holdout manifest was not attached to this run."
         )
     judge_coverage = overall.get("judge_coverage")
     if judge_coverage is None or float(judge_coverage) < 1.0:
@@ -1040,6 +1219,10 @@ def build_evaluation_status(
             "English and Indonesian subsets have non-equivalent targets; "
             "their score gap is descriptive only."
         )
+    warnings.extend(
+        str(message)
+        for message in (performance or {}).get("alerts") or []
+    )
     warnings.append(
         "Sequential E2E latency is retrieval time plus the generation API call, "
         "not one directly instrumented wall-clock request."
@@ -1098,6 +1281,27 @@ def main() -> None:
     if len(resolved_names) != 1:
         raise ValueError(f"Input contains multiple concrete model names: {sorted(resolved_names)}")
     model_name = next(iter(resolved_names))
+    if not args.skip_llm_judge and not LLM_MODEL:
+        raise RuntimeError(
+            "EVAL_LLM_MODEL is not configured. Set an explicit independent "
+            "judge model, or use --skip-llm-judge only for a development run."
+        )
+    if args.benchmark_role == "holdout":
+        if args.skip_llm_judge:
+            raise RuntimeError(
+                "A holdout evaluation requires complete independent LLM-judge "
+                "coverage; --skip-llm-judge is not allowed."
+            )
+        if args.allow_self_judge:
+            raise RuntimeError("--allow-self-judge is not allowed for a holdout evaluation.")
+        if model_reference_is_mutable(model_name):
+            raise RuntimeError(
+                "A holdout evaluation requires an immutable evaluated-model tag or digest."
+            )
+        if model_reference_is_mutable(LLM_MODEL):
+            raise RuntimeError(
+                "A holdout evaluation requires an immutable judge-model tag or digest."
+            )
     if (
         not args.skip_llm_judge
         and not args.allow_self_judge
@@ -1397,6 +1601,13 @@ def main() -> None:
 
     pairing = bilingual_pairing_diagnostics(gt_items)
     overall = summarize_rows(rows)
+    by_language = {
+        language: summarize_rows(
+            [row for row in rows if row["Language"] == language]
+        )
+        for language in ("EN", "ID")
+    }
+    performance = language_latency_diagnostics(by_language)
     judge_model = None if args.skip_llm_judge else LLM_MODEL
     judge_independent = bool(
         judge_model
@@ -1416,6 +1627,7 @@ def main() -> None:
         judge_model=judge_model,
         judge_independent=judge_independent,
         pairing=pairing,
+        performance=performance,
     )
     summary = {
         "report_schema_version": 2,
@@ -1432,12 +1644,10 @@ def main() -> None:
         "dataset": dataset_summary(gt_items),
         "language_pairing": pairing,
         "evaluation_status": evaluation_status,
+        "performance_diagnostics": performance,
         "reproducibility": reproducibility,
         "overall": overall,
-        "by_language": {
-            language: summarize_rows([row for row in rows if row["Language"] == language])
-            for language in ("EN", "ID")
-        },
+        "by_language": by_language,
         "notes": [
             "Precision@K, Recall@K, Hit@K, MRR, Top-1 Accuracy, and NDCG@K are evaluated at document level because the CSV has no page labels.",
             "Precision@K remains a standard ranking metric; with one relevant document its maximum at K=5 is 0.2. Use Hit@K, MRR, Top-1 Accuracy, or NDCG@K for easier interpretation.",
@@ -1449,6 +1659,13 @@ def main() -> None:
             "The same configured judge model must be used for every compared model.",
             "A final-eligible report requires a clean holdout, complete independent judge coverage, and an immutable evaluated-model reference.",
             "Keyword Coverage is answer-only. Question Keyword Coverage and Question+Answer Keyword Coverage are diagnostics for annotation leakage and historical comparability.",
+            "Token F1, exact match, and keyword coverage are lexical diagnostics; valid paraphrases and translations can score lower, so they are not substitutes for an independent semantic judge.",
+            (
+                "Snapshot schema v4 measures one strict retrieval request with the standalone debug baseline disabled; older snapshot latency is not directly comparable."
+                if reproducibility["retrieval_latency_measurement_modes"]
+                == ["single_strict_retrieval_without_debug_baseline"]
+                else "Retrieval latency measurement metadata is legacy, missing, or mixed; do not compare it directly with schema-v4 single-pass latency."
+            ),
             "Estimated Sequential E2E is retrieval time plus client generation-call time, not a directly instrumented wall-clock request latency.",
             "Wilson 95% confidence intervals are reported for binary rates; small unanswerable sets can therefore have wide intervals.",
             (

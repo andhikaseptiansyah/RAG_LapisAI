@@ -88,13 +88,19 @@ HEALTH_URL = os.getenv("LAPISAI_HEALTH_URL", "http://localhost:8000/health")
 LOGIN_URL = os.getenv("LAPISAI_LOGIN_URL", "http://localhost:8000/api/auth/login")
 TIMEOUT_SECONDS = int(os.getenv("LAPISAI_EVAL_TIMEOUT", "240"))
 CONTEXT_MODE = "source_locked_snapshot_native_model_v8"
-SNAPSHOT_SCHEMA_VERSION = 3
+SNAPSHOT_SCHEMA_VERSION = 4
+LATENCY_MEASUREMENT_MODE = "single_strict_retrieval_without_debug_baseline"
 VALID_MODELS = ("ollama", "gemini", "groq")
 MODEL_ENV = {
     "ollama": ("OLLAMA_MODEL", "qwen3-custom:latest"),
     "gemini": ("GEMINI_MODEL", "gemini-3.5-flash"),
     "groq": ("GROQ_MODEL", "llama-3.3-70b-versatile"),
 }
+TEMPORARY_PROVIDER_EXIT_CODE = 75
+MAX_RATE_LIMIT_WAIT_SECONDS = max(
+    0.0,
+    float(os.getenv("EVAL_MAX_RATE_LIMIT_WAIT_SECONDS", "90")),
+)
 
 
 class NonRetryableEvaluationError(RuntimeError):
@@ -103,6 +109,36 @@ class NonRetryableEvaluationError(RuntimeError):
     def __init__(self, message: str, *, category: str):
         super().__init__(message)
         self.category = category
+
+
+class ProviderRateLimitError(RuntimeError):
+    """A structured HTTP 429 returned by the evaluation backend."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        provider: str = "provider",
+        quota_scope: str = "unknown",
+        retry_after_seconds: float | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.provider = str(provider or "provider").strip().casefold()
+        self.quota_scope = (
+            quota_scope if quota_scope in {"daily", "minute"} else "unknown"
+        )
+        self.retry_after_seconds = retry_after_seconds
+
+
+class ProviderEvaluationPaused(RuntimeError):
+    """Stop one provider without converting its remaining rows into failures."""
+
+    def __init__(self, error: ProviderRateLimitError, output: Path) -> None:
+        super().__init__(str(error))
+        self.provider = error.provider
+        self.quota_scope = error.quota_scope
+        self.retry_after_seconds = error.retry_after_seconds
+        self.output = output
 
 
 def classify_chat_failure(response: dict[str, Any]) -> str:
@@ -193,6 +229,11 @@ def snapshot_candidate_payload(
             candidate,
             "reranker_query_variant",
             "rerankerQueryVariant",
+        ),
+        "rerankerQueryVariantCount": candidate_value(
+            candidate,
+            "reranker_query_variant_count",
+            "rerankerQueryVariantCount",
         ),
         "evidenceSupported": candidate_value(
             candidate,
@@ -367,6 +408,38 @@ def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
         headers={"Authorization": f"Bearer {resolve_evaluation_token()}"},
         timeout=TIMEOUT_SECONDS,
     )
+    if response.status_code == 429:
+        try:
+            error_payload = response.json()
+        except (TypeError, ValueError):
+            error_payload = {}
+        detail = (
+            error_payload.get("detail", error_payload)
+            if isinstance(error_payload, dict)
+            else {}
+        )
+        if not isinstance(detail, dict):
+            detail = {}
+
+        retry_after: float | None = None
+        raw_retry_after = (
+            detail.get("retry_after_seconds")
+            or response.headers.get("retry-after")
+        )
+        try:
+            if raw_retry_after is not None:
+                retry_after = max(0.0, float(raw_retry_after))
+        except (TypeError, ValueError):
+            retry_after = None
+
+        message = str(detail.get("message") or "Provider API rate limit reached.")
+        raise ProviderRateLimitError(
+            message,
+            provider=str(detail.get("provider") or payload.get("model") or "provider"),
+            quota_scope=str(detail.get("quota_scope") or "unknown"),
+            retry_after_seconds=retry_after,
+        )
+
     response.raise_for_status()
     data = response.json()
     if not isinstance(data, dict):
@@ -569,6 +642,14 @@ def validate_snapshot_contract(
                 f"Retrieval snapshot answerability label changed for {qid}. "
                 "Rebuild the snapshot."
             )
+        if (
+            snapshot_item.get("latency_measurement_mode")
+            != LATENCY_MEASUREMENT_MODE
+        ):
+            raise ValueError(
+                f"Retrieval snapshot latency contract is invalid for {qid}. "
+                "Rebuild the snapshot."
+            )
 
         for candidate in snapshot_item.get("ranked_candidates") or []:
             chunk_id = str(
@@ -654,6 +735,7 @@ def load_retrieval_snapshot(
     if (
         not isinstance(payload, dict)
         or payload.get("snapshot_schema_version") != SNAPSHOT_SCHEMA_VERSION
+        or payload.get("latency_measurement_mode") != LATENCY_MEASUREMENT_MODE
     ):
         raise ValueError(
             "Retrieval snapshot uses an obsolete contract. Rebuild it with "
@@ -696,6 +778,31 @@ def _existing_results(output: Path, model: str) -> dict[str, dict[str, Any]]:
     }
 
 
+def retrieval_snapshot_fingerprint(item: dict[str, Any]) -> str:
+    """Bind a generated answer to the exact retrieval snapshot row it used."""
+    canonical = json.dumps(
+        item,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def previous_result_matches_snapshot(
+    previous: dict[str, Any],
+    retrieval_item: dict[str, Any],
+    *,
+    model: str,
+) -> bool:
+    """Reject stale resume rows after any model or snapshot change."""
+    return bool(
+        previous.get("model_name") == resolved_model_name(model)
+        and previous.get("retrieval_snapshot_fingerprint")
+        == retrieval_snapshot_fingerprint(retrieval_item)
+    )
+
+
 def build_dataset(
     ground_truth: list[dict[str, Any]],
     output: Path,
@@ -722,17 +829,55 @@ def build_dataset(
     if snapshot_locked:
         validate_snapshot_contract(ground_truth, retrieval_snapshot)
 
+    def save_checkpoint() -> None:
+        """Persist new rows without dropping valid later rows from a resume file."""
+        current = {str(row.get("id")): row for row in results if row.get("id")}
+        checkpoint: list[dict[str, Any]] = []
+        for expected in ground_truth:
+            expected_id = str(expected.get("id") or "")
+            if expected_id in current:
+                checkpoint.append(current[expected_id])
+                continue
+            previous_row = previous.get(expected_id)
+            retrieval_row = retrieval_snapshot.get(expected_id, {})
+            if previous_row is not None and (
+                not snapshot_locked
+                or previous_result_matches_snapshot(
+                    previous_row,
+                    retrieval_row,
+                    model=model,
+                )
+            ):
+                checkpoint.append(previous_row)
+
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(
+            json.dumps(checkpoint, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
     for index, item in enumerate(ground_truth, start=1):
         qid = str(item["id"])
-        if qid in previous:
+        retrieval_item = retrieval_snapshot.get(qid, {})
+        if qid in previous and (
+            not snapshot_locked
+            or previous_result_matches_snapshot(
+                previous[qid],
+                retrieval_item,
+                model=model,
+            )
+        ):
             print(f"[{index}/{len(ground_truth)}] {qid} resume")
             results.append(previous[qid])
             continue
+        if qid in previous:
+            print(
+                f"[{index}/{len(ground_truth)}] {qid} stale resume row; regenerate"
+            )
 
         question = str(item["question"])
         language = str(item.get("language") or "EN").upper()
         print(f"[{index}/{len(ground_truth)}] {qid} ({language}, {model})")
-        retrieval_item = retrieval_snapshot.get(qid, {})
         ranked_candidates = list(retrieval_item.get("ranked_candidates") or [])
 
         last_error: Exception | None = None
@@ -859,6 +1004,12 @@ def build_dataset(
                         "ranked_candidates": ranked_candidates,
                         "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
                         "retrieval_snapshot_build": retrieval_item.get("build_version"),
+                        "retrieval_snapshot_fingerprint": retrieval_snapshot_fingerprint(
+                            retrieval_item
+                        ),
+                        "retrieval_latency_measurement_mode": retrieval_item.get(
+                            "latency_measurement_mode"
+                        ),
                         "snapshot_retrieval_mode": retrieval_item.get("retrieval_mode"),
                         "snapshot_retrieval_query": retrieval_item.get("retrieval_query"),
                         "backend_build_version": chat_response.get("buildVersion"),
@@ -889,6 +1040,23 @@ def build_dataset(
                 last_error = error
                 last_failure_category = error.category
                 break
+            except ProviderRateLimitError as error:
+                if error.quota_scope != "daily" and attempt <= retries:
+                    delay = (
+                        error.retry_after_seconds
+                        if error.retry_after_seconds is not None
+                        else min(2 ** (attempt - 1), 8)
+                    )
+                    if delay <= MAX_RATE_LIMIT_WAIT_SECONDS:
+                        print(
+                            f"  provider rate limit; wait {delay:.1f}s "
+                            f"before retry {attempt}/{retries}: {error}"
+                        )
+                        time.sleep(delay)
+                        continue
+
+                save_checkpoint()
+                raise ProviderEvaluationPaused(error, output) from error
             except Exception as error:
                 last_error = error
                 last_failure_category = "generation_or_provider"
@@ -938,6 +1106,12 @@ def build_dataset(
                     "ranked_candidates": ranked_candidates,
                     "retrieval_time_ms": retrieval_item.get("retrieval_time_ms"),
                     "retrieval_snapshot_build": retrieval_item.get("build_version"),
+                    "retrieval_snapshot_fingerprint": retrieval_snapshot_fingerprint(
+                        retrieval_item
+                    ),
+                    "retrieval_latency_measurement_mode": retrieval_item.get(
+                        "latency_measurement_mode"
+                    ),
                     "snapshot_retrieval_mode": retrieval_item.get("retrieval_mode"),
                     "snapshot_retrieval_query": retrieval_item.get("retrieval_query"),
                     "backend_build_version": (
@@ -997,8 +1171,7 @@ def build_dataset(
             )
 
         # Save progress after every completed item so a long 100-question run can resume.
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+        save_checkpoint()
 
     # Always rewrite the complete ordered result set at the end. During --resume,
     # resumed rows use ``continue`` and therefore skip the per-item checkpoint write.
@@ -1051,15 +1224,28 @@ def main() -> None:
     output = args.output or (
         Path(__file__).resolve().parent / f"input_answers_{args.model}.json"
     )
-    build_dataset(
-        ground_truth,
-        output.resolve(),
-        model=args.model,
-        top_k=max(1, args.top_k),
-        resume=args.resume,
-        retries=max(0, args.retries),
-        retrieval_snapshot=load_retrieval_snapshot(args.retrieval_snapshot),
-    )
+    resolved_output = output.resolve()
+    try:
+        build_dataset(
+            ground_truth,
+            resolved_output,
+            model=args.model,
+            top_k=max(1, args.top_k),
+            resume=args.resume,
+            retries=max(0, args.retries),
+            retrieval_snapshot=load_retrieval_snapshot(args.retrieval_snapshot),
+        )
+    except ProviderEvaluationPaused as error:
+        scope = (
+            "kuota harian habis"
+            if error.quota_scope == "daily"
+            else "batas permintaan belum pulih"
+        )
+        print(f"\n[PAUSED] {error.provider.title()}: {scope}.")
+        print(f"Penyebab     : {error}")
+        print(f"Progress aman: {error.output}")
+        print("Jalankan lagi perintah yang sama dengan --resume setelah kuota tersedia.")
+        raise SystemExit(TEMPORARY_PROVIDER_EXIT_CODE) from None
 
 
 if __name__ == "__main__":

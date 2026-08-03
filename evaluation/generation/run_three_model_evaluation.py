@@ -14,11 +14,19 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_ENGLISH = EVALUATION_DIR / "datasets" / "qna_english_user.csv"
 DEFAULT_INDONESIAN = EVALUATION_DIR / "datasets" / "qna_indonesia_user.csv"
 VALID_MODELS = ("ollama", "gemini", "groq")
+TEMPORARY_PROVIDER_EXIT_CODE = 75
 
 
-def run(command: list[str]) -> None:
+def run(
+    command: list[str],
+    *,
+    allowed_return_codes: tuple[int, ...] = (0,),
+) -> int:
     print("\n> " + " ".join(command))
-    subprocess.run(command, cwd=PROJECT_ROOT, check=True)
+    completed = subprocess.run(command, cwd=PROJECT_ROOT, check=False)
+    if completed.returncode not in allowed_return_codes:
+        raise subprocess.CalledProcessError(completed.returncode, command)
+    return completed.returncode
 
 
 def main() -> None:
@@ -94,6 +102,7 @@ def main() -> None:
     run(retrieval_command)
 
     summary_paths: list[Path] = []
+    paused_models: list[str] = []
     for model in args.models:
         raw_output = raw_dir / f"input_answers_{model}.json"
         build_command = [
@@ -108,7 +117,17 @@ def main() -> None:
         ]
         if args.resume:
             build_command.append("--resume")
-        run(build_command)
+        build_status = run(
+            build_command,
+            allowed_return_codes=(0, TEMPORARY_PROVIDER_EXIT_CODE),
+        )
+        if build_status == TEMPORARY_PROVIDER_EXIT_CODE:
+            paused_models.append(model)
+            print(
+                f"\n[PAUSED] provider={model}. Provider lain tetap dilanjutkan; "
+                "progress provider ini tidak dinilai sebagai jawaban gagal."
+            )
+            continue
 
         evaluate_command = [
             sys.executable,
@@ -127,6 +146,11 @@ def main() -> None:
         summary_paths.append(output_dir / f"generation_summary_{model}.json")
 
     model_count = len(summary_paths)
+    if not summary_paths:
+        print("\nTidak ada provider yang selesai sehingga perbandingan belum dibuat.")
+        print(f"Results directory: {output_dir}")
+        raise SystemExit(TEMPORARY_PROVIDER_EXIT_CODE)
+
     comparison_stem = (
         f"comparison_{model_count}_model"
         if model_count == 1
@@ -158,6 +182,13 @@ def main() -> None:
     print(f"Main comparison : {output_dir / f'{comparison_stem}.csv'}")
     print(f"Charts          : {charts_dir}")
     print(f"HTML dashboard  : {charts_dir / 'evaluation_dashboard.html'}")
+    if paused_models:
+        print("\n[PARTIAL] Provider tertunda: " + ", ".join(paused_models))
+        print(
+            "Setelah kuota tersedia, jalankan perintah yang sama dengan --resume. "
+            "Jawaban yang sudah sukses akan dipakai kembali."
+        )
+        raise SystemExit(TEMPORARY_PROVIDER_EXIT_CODE)
 
 
 if __name__ == "__main__":

@@ -257,6 +257,10 @@ GROQ_BASE_URL = _env_str("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
 GROQ_MODEL = _env_str("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_TIMEOUT_SECONDS = _env_float("GROQ_TIMEOUT_SECONDS", 120.0)
 GROQ_MAX_RETRIES = max(0, _env_int("GROQ_MAX_RETRIES", 2))
+GROQ_MAX_RATE_LIMIT_WAIT_SECONDS = max(
+    0.0,
+    _env_float("GROQ_MAX_RATE_LIMIT_WAIT_SECONDS", 90.0),
+)
 
 
 def public_rag_config() -> dict[str, str | float | bool | int]:

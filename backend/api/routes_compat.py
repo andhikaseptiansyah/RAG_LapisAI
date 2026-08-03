@@ -53,6 +53,7 @@ from api.logger import (
     resolve_query_log_status,
     save_log,
 )
+from api.provider_errors import ProviderAPIError
 from api.user_store import (
     UserStoreError,
     authenticate_user,
@@ -140,6 +141,7 @@ class QueryFailurePayload(BaseModel):
 class RetrievalDebugPayload(BaseModel):
     question: str
     topK: int = 5
+    includeBaselineDiagnostics: bool = True
 
 
 class EvaluationChatPayload(BaseModel):
@@ -670,16 +672,21 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
         raise HTTPException(status_code=400, detail="Question is required.")
 
     top_k = max(1, min(int(payload.topK or 5), 20))
-    base_candidates = _base_hybrid_candidates(
-        question,
-        candidate_k=max(20, top_k),
-    )
-    baseline_verified = _apply_evidence_verification(
-        question,
-        [dict(candidate) for candidate in base_candidates],
-        min_score=MIN_RESULT_SCORE,
-    )
-    baseline_decision = assess_answerability(question, baseline_verified)
+    include_baseline = bool(payload.includeBaselineDiagnostics)
+    base_candidates: list[dict[str, Any]] = []
+    baseline_verified: list[dict[str, Any]] = []
+    baseline_decision = None
+    if include_baseline:
+        base_candidates = _base_hybrid_candidates(
+            question,
+            candidate_k=max(20, top_k),
+        )
+        baseline_verified = _apply_evidence_verification(
+            question,
+            [dict(candidate) for candidate in base_candidates],
+            min_score=MIN_RESULT_SCORE,
+        )
+        baseline_decision = assess_answerability(question, baseline_verified)
     final_candidates, retrieval_mode, retrieval_query = retrieve_verified_chunks(
         question,
         top_k=top_k,
@@ -705,6 +712,9 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
             "semanticQueryVariant": candidate.get("semanticQueryVariant"),
             "keywordQueryVariant": candidate.get("keywordQueryVariant"),
             "rerankerQueryVariant": candidate.get("rerankerQueryVariant"),
+            "rerankerQueryVariantCount": candidate.get(
+                "rerankerQueryVariantCount"
+            ),
             "evidenceSupported": candidate.get("evidenceSupported"),
             "evidenceScore": candidate.get("evidenceScore"),
             "evidenceHardFailures": candidate.get("evidenceHardFailures") or [],
@@ -732,6 +742,7 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
         **public_build_info(),
         "question": question,
         "queryVariants": build_query_variants(question),
+        "baselineDiagnosticsIncluded": include_baseline,
         "thresholds": {
             "minimumResultScore": MIN_RESULT_SCORE,
             **{
@@ -740,7 +751,9 @@ def compat_retrieval_debug(payload: RetrievalDebugPayload, request: Request):
                 if key.startswith("answerability") or key.startswith("minimumEvidence")
             },
         },
-        "baselineDecision": baseline_decision.to_dict(),
+        "baselineDecision": (
+            baseline_decision.to_dict() if baseline_decision is not None else {}
+        ),
         "retrievalMode": retrieval_mode,
         "retrievalQuery": retrieval_query,
         "baseCandidates": [compact(item) for item in base_candidates[:10]],
@@ -771,14 +784,24 @@ def compat_evaluation_chat(payload: EvaluationChatPayload, request: Request):
         raise HTTPException(status_code=400, detail="Question is required.")
 
     top_k = max(1, min(int(payload.topK or 5), 20))
-    return run_chat(
-        question,
-        top_k=top_k,
-        language=str(payload.language or "AUTO"),
-        model=payload.model,
-        evaluation_mode=True,
-        locked_candidates=payload.retrievalCandidates,
-    )
+    try:
+        return run_chat(
+            question,
+            top_k=top_k,
+            language=str(payload.language or "AUTO"),
+            model=payload.model,
+            evaluation_mode=True,
+            locked_candidates=payload.retrievalCandidates,
+        )
+    except ProviderAPIError as error:
+        headers = None
+        if error.retry_after_seconds is not None:
+            headers = {"Retry-After": str(max(0, round(error.retry_after_seconds)))}
+        raise HTTPException(
+            status_code=error.http_status,
+            detail=error.as_detail(),
+            headers=headers,
+        ) from error
 
 
 async def _watch_chat_disconnect(request: Request, cancel_event) -> None:

@@ -38,19 +38,34 @@ EVALUATION_READINESS_URL = os.getenv(
     "LAPISAI_EVALUATION_READINESS_URL",
     "http://localhost:8000/api/admin/evaluation/readiness",
 )
-SNAPSHOT_SCHEMA_VERSION = 3
+SNAPSHOT_SCHEMA_VERSION = 4
+LATENCY_MEASUREMENT_MODE = "single_strict_retrieval_without_debug_baseline"
 
 
-def load_existing(path: Path) -> dict[str, dict[str, Any]]:
+def load_existing(
+    path: Path,
+    *,
+    top_k: int,
+) -> dict[str, dict[str, Any]]:
     if not path.exists():
         return {}
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return {}
+    try:
+        existing_top_k = (
+            int(payload.get("top_k") or 0)
+            if isinstance(payload, dict)
+            else 0
+        )
+    except (TypeError, ValueError):
+        existing_top_k = 0
     if (
         not isinstance(payload, dict)
         or payload.get("snapshot_schema_version") != SNAPSHOT_SCHEMA_VERSION
+        or payload.get("latency_measurement_mode") != LATENCY_MEASUREMENT_MODE
+        or existing_top_k != top_k
     ):
         print(
             "[SNAPSHOT] Existing snapshot uses an older contract; "
@@ -65,6 +80,29 @@ def load_existing(path: Path) -> dict[str, dict[str, Any]]:
         for item in items
         if isinstance(item, dict) and item.get("id")
     }
+
+
+def snapshot_item_matches_question(
+    item: dict[str, Any],
+    question: dict[str, Any],
+    *,
+    top_k: int,
+) -> bool:
+    question_text = str(question.get("question") or "")
+    try:
+        item_top_k = int(item.get("top_k") or 0)
+    except (TypeError, ValueError):
+        return False
+    return bool(
+        item.get("question") == question_text
+        and item.get("question_sha256")
+        == hashlib.sha256(question_text.encode("utf-8")).hexdigest()
+        and str(item.get("language") or "").upper()
+        == str(question.get("language") or "").upper()
+        and bool(item.get("answerable")) == bool(question.get("answerable"))
+        and item_top_k == top_k
+        and item.get("latency_measurement_mode") == LATENCY_MEASUREMENT_MODE
+    )
 
 
 def compact_candidate(candidate: Any, rank: int) -> dict[str, Any]:
@@ -88,6 +126,7 @@ def compact_candidate(candidate: Any, rank: int) -> dict[str, Any]:
         "semantic_query_variant": item.get("semanticQueryVariant"),
         "keyword_query_variant": item.get("keywordQueryVariant"),
         "reranker_query_variant": item.get("rerankerQueryVariant"),
+        "reranker_query_variant_count": item.get("rerankerQueryVariantCount"),
         "evidence_supported": item.get("evidenceSupported"),
         "evidence_score": item.get("evidenceScore"),
         "evidence_hard_failures": item.get("evidenceHardFailures") or [],
@@ -166,23 +205,37 @@ def main() -> None:
     questions = load_ground_truth_files(datasets)
     top_k = max(1, min(int(args.top_k), 20))
     output = args.output.resolve()
-    previous = load_existing(output) if args.resume else {}
+    previous = load_existing(output, top_k=top_k) if args.resume else {}
 
     preflight()
     assert_corpus_ready(questions)
     items: list[dict[str, Any]] = []
     for index, question in enumerate(questions, start=1):
         qid = str(question["id"])
-        if qid in previous:
+        if qid in previous and snapshot_item_matches_question(
+            previous[qid],
+            question,
+            top_k=top_k,
+        ):
             print(f"[{index}/{len(questions)}] {qid} resume")
             items.append(previous[qid])
             continue
+        if qid in previous:
+            print(f"[{index}/{len(questions)}] {qid} stale snapshot row; recapture")
 
         print(f"[{index}/{len(questions)}] {qid} retrieval")
         started = time.perf_counter()
         response = post_json(
             RETRIEVAL_DEBUG_URL,
-            {"question": question["question"], "topK": top_k},
+            {
+                "question": question["question"],
+                "topK": top_k,
+                # The strict production retrieval path already performs its
+                # own pre-rerank answerability check. Repeating the standalone
+                # debug baseline would run semantic/BM25 retrieval twice and
+                # inflate the benchmark latency measurement.
+                "includeBaselineDiagnostics": False,
+            },
         )
         elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
         final_candidates = [
@@ -202,6 +255,10 @@ def main() -> None:
             "ranked_candidates": final_candidates,
             "query_variants": response.get("queryVariants") or {},
             "baseline_decision": response.get("baselineDecision") or {},
+            "baseline_diagnostics_included": bool(
+                response.get("baselineDiagnosticsIncluded")
+            ),
+            "latency_measurement_mode": LATENCY_MEASUREMENT_MODE,
             "retrieval_mode": response.get("retrievalMode") or "original",
             "retrieval_query": response.get("retrievalQuery") or question["question"],
             "retrieval_time_ms": elapsed_ms,
@@ -212,6 +269,7 @@ def main() -> None:
             json.dumps(
                 {
                     "snapshot_schema_version": SNAPSHOT_SCHEMA_VERSION,
+                    "latency_measurement_mode": LATENCY_MEASUREMENT_MODE,
                     "dataset": dataset_summary(questions),
                     "top_k": top_k,
                     "items": items,
@@ -227,6 +285,7 @@ def main() -> None:
         json.dumps(
             {
                 "snapshot_schema_version": SNAPSHOT_SCHEMA_VERSION,
+                "latency_measurement_mode": LATENCY_MEASUREMENT_MODE,
                 "dataset": dataset_summary(questions),
                 "top_k": top_k,
                 "items": items,

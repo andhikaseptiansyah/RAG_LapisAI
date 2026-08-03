@@ -5,6 +5,11 @@ from collections import defaultdict
 from typing import Any
 
 from ingestion.indexer import embed_query, get_collection
+
+try:
+    from ingestion.indexer import embed_texts as _native_embed_texts
+except ImportError:  # pragma: no cover - dependency-free unit-test stubs.
+    _native_embed_texts = None
 from api.progress import emit_progress
 from retrieval.answerability import apply_answerability_gate, assess_answerability
 from retrieval.evidence_verifier import verify_chunks
@@ -125,6 +130,24 @@ def _get_all_records() -> dict:
     return collection.get(include=["documents", "metadatas"])
 
 
+def embed_query_batch(queries: list[str]) -> list[list[float]]:
+    """Embed query variants in one model call when the runtime supports it."""
+    if not queries:
+        return []
+    if _native_embed_texts is not None:
+        return _native_embed_texts(queries)
+    return [embed_query(query) for query in queries]
+
+
+def _query_result_group(payload: dict, field: str, index: int) -> list[Any]:
+    values = payload.get(field) or []
+    if not isinstance(values, list) or not values:
+        return []
+    if isinstance(values[0], list):
+        return values[index] if index < len(values) else []
+    return values if index == 0 else []
+
+
 def semantic_search(query: str, top_k: int = 20) -> list[dict]:
     """Search every independent language variant and merge by best cosine score."""
     collection = get_collection()
@@ -138,24 +161,28 @@ def semantic_search(query: str, top_k: int = 20) -> list[dict]:
         return []
 
     variants = build_query_variants(query) or [str(query or "").strip()]
+    embeddings = embed_query_batch(variants)
+    valid_pairs = [
+        (variant, embedding)
+        for variant, embedding in zip(variants, embeddings)
+        if embedding
+    ]
+    if not valid_pairs:
+        return []
+
+    result = collection.query(
+        query_embeddings=[embedding for _, embedding in valid_pairs],
+        n_results=min(top_k, total_records),
+        include=["documents", "metadatas", "distances"],
+    )
     merged: dict[str, dict[str, Any]] = {}
     per_variant_scores: dict[str, dict[str, float]] = defaultdict(dict)
 
-    for variant_index, search_query in enumerate(variants):
-        query_embedding = embed_query(search_query)
-        if not query_embedding:
-            continue
-
-        result = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=min(top_k, total_records),
-            include=["documents", "metadatas", "distances"],
-        )
-
-        ids = result.get("ids", [[]])[0] or []
-        documents = result.get("documents", [[]])[0] or []
-        metadatas = result.get("metadatas", [[]])[0] or []
-        distances = result.get("distances", [[]])[0] or []
+    for variant_index, (search_query, _) in enumerate(valid_pairs):
+        ids = _query_result_group(result, "ids", variant_index)
+        documents = _query_result_group(result, "documents", variant_index)
+        metadatas = _query_result_group(result, "metadatas", variant_index)
+        distances = _query_result_group(result, "distances", variant_index)
 
         for rank, chunk_id in enumerate(ids):
             distance = _safe_float(

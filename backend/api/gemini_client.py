@@ -21,6 +21,7 @@ from api.llm_shared import (
     clean_model_answer,
     is_incomplete_answer,
 )
+from api.provider_errors import ProviderAPIError
 from uploads.config import (
     ENABLE_GENERATION_GROUNDING_VALIDATION,
     GEMINI_API_KEY,
@@ -35,18 +36,23 @@ def _gemini_chat(system_prompt: str, user_prompt: str) -> str:
     from google import genai
     from google.genai import types
 
-    raise_if_cancelled()
-    with genai.Client(api_key=GEMINI_API_KEY) as client:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=0.0,
-                top_p=0.80,
-                max_output_tokens=640,
-            ),
-        )
+    try:
+        raise_if_cancelled()
+        with genai.Client(api_key=GEMINI_API_KEY) as client:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.0,
+                    top_p=0.80,
+                    max_output_tokens=640,
+                ),
+            )
+    except ProviderAPIError:
+        raise
+    except Exception as exc:
+        raise ProviderAPIError.from_exception("gemini", exc) from exc
 
     raise_if_cancelled()
     print(f"[GEMINI] model={GEMINI_MODEL} status=success")
@@ -304,6 +310,11 @@ def build_gemini_grounded_answer(
 
         return llm_answer
 
+    except ProviderAPIError as exc:
+        if evaluation_mode:
+            raise
+        print(f"[GEMINI] native generation failed: {exc}")
+        return ""
     except Exception as exc:
         if evaluation_mode:
             raise RuntimeError("Gemini native generation failed: " + str(exc)) from exc

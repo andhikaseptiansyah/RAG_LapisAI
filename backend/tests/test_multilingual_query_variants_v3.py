@@ -21,10 +21,13 @@ def test_bridge_query_is_independent_english_variant() -> None:
     assert "seberapa" not in bridge.casefold()
     assert variants[0] == QUESTION_ID
     assert bridge in variants
-    assert BUILD_VERSION == "rag-bilingual-eval-v18-20260802"
+    assert BUILD_VERSION == "rag-bilingual-eval-v19-20260802"
 
 
 class _FakeCollection:
+    def __init__(self) -> None:
+        self.query_call_count = 0
+
     def count(self) -> int:
         return 2
 
@@ -39,38 +42,45 @@ class _FakeCollection:
         }
 
     def query(self, *, query_embeddings, n_results, include):
-        marker = query_embeddings[0][0]
-        if marker == 2.0:  # English bridge query
-            return {
-                "ids": [["p1", "p2"]],
-                "documents": [[P1_TEXT, P2_TEXT]],
-                "metadatas": [[
-                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
-                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
-                ]],
-                "distances": [[0.13, 0.42]],
-            }
-        return {
-            "ids": [["p2", "p1"]],
-            "documents": [[P2_TEXT, P1_TEXT]],
-            "metadatas": [[
-                {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
-                {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
-            ]],
-            "distances": [[0.55, 0.72]],
+        self.query_call_count += 1
+        payload = {
+            "ids": [],
+            "documents": [],
+            "metadatas": [],
+            "distances": [],
         }
+        for embedding in query_embeddings:
+            marker = embedding[0]
+            if marker == 2.0:  # English bridge query
+                payload["ids"].append(["p1", "p2"])
+                payload["documents"].append([P1_TEXT, P2_TEXT])
+                payload["metadatas"].append([
+                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
+                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
+                ])
+                payload["distances"].append([0.13, 0.42])
+            else:
+                payload["ids"].append(["p2", "p1"])
+                payload["documents"].append([P2_TEXT, P1_TEXT])
+                payload["metadatas"].append([
+                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
+                    {"filename": "SOP_IT_Incident_Handling.pdf", "page": 1},
+                ])
+                payload["distances"].append([0.55, 0.72])
+        return payload
 
 
 def test_semantic_search_keeps_best_score_across_language_variants() -> None:
     bridge = build_bridge_query(QUESTION_ID)
 
-    def fake_embed(text: str):
-        return [2.0] if text == bridge else [1.0]
+    def fake_embed_batch(texts: list[str]):
+        return [[2.0] if text == bridge else [1.0] for text in texts]
 
     from retrieval import hybrid_search as hybrid_module
 
-    with patch.object(hybrid_module, "get_collection", return_value=_FakeCollection()), patch.object(
-        hybrid_module, "embed_query", side_effect=fake_embed
+    collection = _FakeCollection()
+    with patch.object(hybrid_module, "get_collection", return_value=collection), patch.object(
+        hybrid_module, "embed_query_batch", side_effect=fake_embed_batch
     ):
         rows = hybrid_module.semantic_search(QUESTION_ID, top_k=2)
 
@@ -78,6 +88,7 @@ def test_semantic_search_keeps_best_score_across_language_variants() -> None:
     assert rows[0]["semanticScore"] == 0.87
     assert rows[0]["semanticQueryVariant"] == bridge
     assert rows[0]["semanticVariantScores"][bridge] == 0.87
+    assert collection.query_call_count == 1
 
 
 def test_bm25_uses_english_bridge_without_lowering_threshold() -> None:
@@ -126,6 +137,7 @@ def test_reranker_uses_strongest_query_variant() -> None:
 
     assert rows[0]["chunkId"] == "p1"
     assert "P1 IT incident" in rows[0]["rerankerQueryVariant"]
+    assert rows[0]["rerankerQueryVariantCount"] == 2
 
 
 def test_full_strict_pipeline_accepts_p1_bridge_and_rejects_p2() -> None:
@@ -139,14 +151,14 @@ def test_full_strict_pipeline_accepts_p1_bridge_and_rejects_p2() -> None:
 
     bridge = build_bridge_query(QUESTION_ID)
 
-    def fake_embed(text: str):
-        return [2.0] if text == bridge else [1.0]
+    def fake_embed_batch(texts: list[str]):
+        return [[2.0] if text == bridge else [1.0] for text in texts]
 
     def identity_reranker(query, candidates, **kwargs):
         return [{**candidate, "rerankerApplied": False} for candidate in candidates]
 
     with patch.object(hybrid_module, "get_collection", return_value=_FakeCollection()), patch.object(
-        hybrid_module, "embed_query", side_effect=fake_embed
+        hybrid_module, "embed_query_batch", side_effect=fake_embed_batch
     ), patch.object(hybrid_module, "rerank_candidates", side_effect=identity_reranker):
         rows = hybrid_module.hybrid_search(
             QUESTION_ID,
