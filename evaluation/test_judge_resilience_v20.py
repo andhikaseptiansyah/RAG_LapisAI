@@ -134,6 +134,115 @@ class JudgeResilienceTests(unittest.TestCase):
             evaluate_generation.JUDGE_MAX_FORMAT_RETRIES = original_format_retries
             evaluate_generation._JUDGE_CIRCUIT_ERROR = original_circuit
 
+    def test_qwen3_judge_disables_thinking_with_schema_fallback(self) -> None:
+        valid = {
+            "choices": [
+                {
+                    "message": {
+                        "content": (
+                            '{"faithfulness":5,"answer_relevance":4,'
+                            '"is_hallucination":false,"reason":"grounded"}'
+                        )
+                    }
+                }
+            ]
+        }
+
+        class FakeRequests:
+            request_keys: list[set[str]] = []
+            system_messages: list[str] = []
+
+            @classmethod
+            def post(cls, *_args: Any, **kwargs: Any) -> FakeResponse:
+                request = kwargs["json"]
+                cls.request_keys.append(set(request))
+                cls.system_messages.append(request["messages"][0]["content"])
+                if len(cls.request_keys) == 1:
+                    return FakeResponse({}, status_code=400)
+                return FakeResponse(valid)
+
+        original_requests = evaluate_generation.requests
+        original_model = evaluate_generation.LLM_MODEL
+        original_mode = evaluate_generation.JUDGE_DISABLE_THINKING_MODE
+        original_http_retries = evaluate_generation.JUDGE_MAX_RETRIES
+        original_format_retries = evaluate_generation.JUDGE_MAX_FORMAT_RETRIES
+        original_circuit = evaluate_generation._JUDGE_CIRCUIT_ERROR
+        try:
+            evaluate_generation.requests = FakeRequests
+            evaluate_generation.LLM_MODEL = "qwen3:8b"
+            evaluate_generation.JUDGE_DISABLE_THINKING_MODE = "auto"
+            evaluate_generation.JUDGE_MAX_RETRIES = 0
+            evaluate_generation.JUDGE_MAX_FORMAT_RETRIES = 0
+            evaluate_generation._JUDGE_CIRCUIT_ERROR = ""
+            result = evaluate_generation.llm_judge(
+                question="Question",
+                expected_answer="Expected",
+                context="Context",
+                answer="Answer",
+                answerable=True,
+            )
+            self.assertEqual(result["judge_error"], "")
+            self.assertIn("reasoning_effort", FakeRequests.request_keys[0])
+            self.assertIn("response_format", FakeRequests.request_keys[0])
+            self.assertNotIn("reasoning_effort", FakeRequests.request_keys[1])
+            self.assertNotIn("response_format", FakeRequests.request_keys[1])
+            self.assertTrue(
+                all("/no_think" in text for text in FakeRequests.system_messages)
+            )
+        finally:
+            evaluate_generation.requests = original_requests
+            evaluate_generation.LLM_MODEL = original_model
+            evaluate_generation.JUDGE_DISABLE_THINKING_MODE = original_mode
+            evaluate_generation.JUDGE_MAX_RETRIES = original_http_retries
+            evaluate_generation.JUDGE_MAX_FORMAT_RETRIES = original_format_retries
+            evaluate_generation._JUDGE_CIRCUIT_ERROR = original_circuit
+
+    def test_empty_judge_content_has_actionable_error(self) -> None:
+        empty = {
+            "choices": [
+                {
+                    "finish_reason": "length",
+                    "message": {"content": "", "reasoning": "thinking"},
+                }
+            ]
+        }
+
+        class FakeRequests:
+            @classmethod
+            def post(cls, *_args: Any, **_kwargs: Any) -> FakeResponse:
+                return FakeResponse(empty)
+
+        original_requests = evaluate_generation.requests
+        original_model = evaluate_generation.LLM_MODEL
+        original_mode = evaluate_generation.JUDGE_DISABLE_THINKING_MODE
+        original_http_retries = evaluate_generation.JUDGE_MAX_RETRIES
+        original_format_retries = evaluate_generation.JUDGE_MAX_FORMAT_RETRIES
+        original_circuit = evaluate_generation._JUDGE_CIRCUIT_ERROR
+        try:
+            evaluate_generation.requests = FakeRequests
+            evaluate_generation.LLM_MODEL = "qwen3:8b"
+            evaluate_generation.JUDGE_DISABLE_THINKING_MODE = "auto"
+            evaluate_generation.JUDGE_MAX_RETRIES = 0
+            evaluate_generation.JUDGE_MAX_FORMAT_RETRIES = 0
+            evaluate_generation._JUDGE_CIRCUIT_ERROR = ""
+            result = evaluate_generation.llm_judge(
+                question="Question",
+                expected_answer="Expected",
+                context="Context",
+                answer="Answer",
+                answerable=True,
+            )
+            self.assertIn("empty assistant content", result["judge_error"])
+            self.assertIn("finish_reason=length", result["judge_error"])
+            self.assertIn("reasoning_chars=8", result["judge_error"])
+        finally:
+            evaluate_generation.requests = original_requests
+            evaluate_generation.LLM_MODEL = original_model
+            evaluate_generation.JUDGE_DISABLE_THINKING_MODE = original_mode
+            evaluate_generation.JUDGE_MAX_RETRIES = original_http_retries
+            evaluate_generation.JUDGE_MAX_FORMAT_RETRIES = original_format_retries
+            evaluate_generation._JUDGE_CIRCUIT_ERROR = original_circuit
+
     def test_incomplete_row_does_not_count_as_success(self) -> None:
         complete = {
             "Judge Error": "",

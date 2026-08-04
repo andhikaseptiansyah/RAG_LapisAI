@@ -65,6 +65,10 @@ JUDGE_MAX_TOKENS = max(
     64,
     int(os.getenv("EVAL_JUDGE_MAX_TOKENS", "256")),
 )
+JUDGE_DISABLE_THINKING_MODE = os.getenv(
+    "EVAL_JUDGE_DISABLE_THINKING",
+    "auto",
+).strip().casefold()
 JUDGE_MIN_INTERVAL_SECONDS = max(
     0.0,
     float(os.getenv("EVAL_JUDGE_MIN_INTERVAL_SECONDS", "0")),
@@ -616,6 +620,69 @@ def parse_json_object(text: str) -> dict[str, Any]:
         return json.loads(match.group(0))
 
 
+def judge_thinking_disabled(model_name: str | None = None) -> bool:
+    """Resolve whether semantic judging should suppress model reasoning output."""
+    mode = JUDGE_DISABLE_THINKING_MODE
+    if mode == "auto":
+        reference = LLM_MODEL if model_name is None else str(model_name or "")
+        return "qwen3" in reference.casefold()
+    if mode in {"1", "true", "yes", "on"}:
+        return True
+    if mode in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(
+        "EVAL_JUDGE_DISABLE_THINKING must be auto, true, or false."
+    )
+
+
+def judge_system_instruction(model_name: str | None = None) -> str:
+    """Return the structured-output instruction for the configured judge."""
+    instruction = "Return one valid JSON object only."
+    if judge_thinking_disabled(model_name):
+        # Qwen3 supports this soft switch in user or system messages. It keeps
+        # the token budget available for the JSON answer instead of reasoning.
+        return f"{instruction} /no_think"
+    return instruction
+
+
+def judge_message_content(payload: Any) -> str:
+    """Extract non-empty assistant content with actionable empty-output errors."""
+    if not isinstance(payload, dict):
+        raise JudgePayloadError("Judge API response must be one JSON object.")
+    choices = payload.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise JudgePayloadError("Judge API response has no choices.")
+    choice = choices[0]
+    if not isinstance(choice, dict):
+        raise JudgePayloadError("Judge API response contains an invalid choice.")
+    message = choice.get("message")
+    if not isinstance(message, dict):
+        raise JudgePayloadError("Judge API response has no assistant message.")
+
+    content = message.get("content")
+    if isinstance(content, str) and content.strip():
+        return content
+    if isinstance(content, list):
+        text_parts = [
+            str(part.get("text") or "")
+            for part in content
+            if isinstance(part, dict) and part.get("type") in {None, "text"}
+        ]
+        joined = "".join(text_parts).strip()
+        if joined:
+            return joined
+
+    reasoning_chars = sum(
+        len(str(message.get(field) or ""))
+        for field in ("reasoning", "reasoning_content", "thinking")
+    )
+    finish_reason = str(choice.get("finish_reason") or "unknown")
+    raise JudgePayloadError(
+        "Judge returned empty assistant content "
+        f"(finish_reason={finish_reason}, reasoning_chars={reasoning_chars})."
+    )
+
+
 def _judge_retry_after(response: Any) -> float | None:
     value = str(response.headers.get("retry-after") or "").strip()
     try:
@@ -767,26 +834,35 @@ Return JSON only:
         }
         last_payload_error: Exception | None = None
         for format_attempt in range(JUDGE_MAX_FORMAT_RETRIES + 1):
+            disable_thinking = judge_thinking_disabled(LLM_MODEL)
             request = {
                 "model": LLM_MODEL,
                 "temperature": 0,
                 "max_tokens": JUDGE_MAX_TOKENS,
                 "messages": [
-                    {"role": "system", "content": "Return one valid JSON object only."},
+                    {
+                        "role": "system",
+                        "content": judge_system_instruction(LLM_MODEL),
+                    },
                     {"role": "user", "content": prompt},
                 ],
                 "response_format": {"type": "json_object"},
             }
+            if disable_thinking:
+                # Ollama's OpenAI-compatible endpoint maps this to think=false.
+                # The /no_think prompt remains as a compatible fallback.
+                request["reasoning_effort"] = "none"
             response = _post_judge_request(endpoint, headers, request)
-            # Some OpenAI-compatible servers do not implement response_format.
-            # Retry without it only for request-schema errors, never for 429/5xx.
+            # Some OpenAI-compatible servers do not implement response_format
+            # or reasoning_effort. Retry schema errors without optional fields.
             if response.status_code in {400, 422}:
                 request.pop("response_format", None)
+                request.pop("reasoning_effort", None)
                 response = _post_judge_request(endpoint, headers, request)
             response.raise_for_status()
             try:
                 payload = response.json()
-                content = payload["choices"][0]["message"].get("content") or ""
+                content = judge_message_content(payload)
                 validated = validate_judge_payload(parse_json_object(content))
             except (IndexError, KeyError, TypeError, ValueError) as error:
                 last_payload_error = error
@@ -972,6 +1048,8 @@ def reproducibility_manifest(
                 "request_timeout_seconds": JUDGE_REQUEST_TIMEOUT_SECONDS,
                 "max_format_retries": JUDGE_MAX_FORMAT_RETRIES,
                 "max_tokens": JUDGE_MAX_TOKENS,
+                "disable_thinking_mode": JUDGE_DISABLE_THINKING_MODE,
+                "thinking_disabled": judge_thinking_disabled(judge_model),
                 "minimum_interval_seconds": JUDGE_MIN_INTERVAL_SECONDS,
                 "max_rate_limit_wait_seconds": JUDGE_MAX_RATE_LIMIT_WAIT_SECONDS,
             }
@@ -1979,7 +2057,13 @@ def main() -> None:
     write_csv_rows_atomic(csv_path, rows)
     write_json_lf(json_path, summary)
 
-    print("\n[SUCCESS]")
+    judge_error_rate = overall.get("judge_error_rate")
+    completion_label = (
+        "COMPLETED WITH JUDGE ERRORS"
+        if not args.skip_llm_judge and judge_error_rate not in {None, 0, 0.0}
+        else "SUCCESS"
+    )
+    print(f"\n[{completion_label}]")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     print(f"Details: {csv_path}")
     print(f"Summary: {json_path}")
