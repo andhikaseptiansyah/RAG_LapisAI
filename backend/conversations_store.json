@@ -1,5 +1,821 @@
 [
   {
+    "id": "31b6b414-a73c-4d59-874d-ea7b6e454e7f",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "what approval is needed for purchase above 25 million",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5a2db23e-0130-4510-a609-e6f512d5f365",
+        "conversation_id": "31b6b414-a73c-4d59-874d-ea7b6e454e7f",
+        "role": "user",
+        "content": "what approval is needed for purchase above 25 million",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b44a11f2-4939-400a-a9ca-745fed87d528",
+          "queryId": "b44a11f2-4939-400a-a9ca-745fed87d528"
+        },
+        "created_at": "2026-08-04T04:58:28.452429+00:00"
+      },
+      {
+        "id": "6ac1ee03-4486-49ba-afe8-d51f30aa864e",
+        "conversation_id": "31b6b414-a73c-4d59-874d-ea7b6e454e7f",
+        "role": "assistant",
+        "content": "Director approval is not explicitly required. three vendor quotations. including three vendor quotations.",
+        "attachments": [],
+        "confidence": 0.6427,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "b44a11f2-4939-400a-a9ca-745fed87d528",
+          "queryId": "b44a11f2-4939-400a-a9ca-745fed87d528",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "citation_validated": true,
+              "citation_support_score": 0.7838,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:58:28.452429+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:58:28.452429+00:00",
+    "updated_at": "2026-08-04T04:58:28.452429+00:00",
+    "last_message": "Director approval is not explicitly required. three vendor quotations. including three vendor quotations.",
+    "last_user_message": "what approval is needed for purchase above 25 million",
+    "last_message_at": "2026-08-04T04:58:28.452429+00:00"
+  },
+  {
+    "id": "89e2636a-f9f8-4f6f-90fc-2fd5c17371ec",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "what approval is needed for purchase above 25 million",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "7507091a-ad17-40f4-a533-3e72ba28dbf6",
+        "conversation_id": "89e2636a-f9f8-4f6f-90fc-2fd5c17371ec",
+        "role": "user",
+        "content": "what approval is needed for purchase above 25 million",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "fd6e4cd9-ae79-4cf6-b832-d299fc281713",
+          "queryId": "fd6e4cd9-ae79-4cf6-b832-d299fc281713"
+        },
+        "created_at": "2026-08-04T04:57:49.173469+00:00"
+      },
+      {
+        "id": "f545fc96-2dda-453c-9def-13aaf735232e",
+        "conversation_id": "89e2636a-f9f8-4f6f-90fc-2fd5c17371ec",
+        "role": "assistant",
+        "content": "dapat dilihat bahwa pembelian hingga IDR 10.000.000 memerlukan persetujuan manajer. pembelian di atas IDR 50.000.000 memerlukan persetujuan Direktur. tiga kutipan dari vendor. Oleh. itu.",
+        "attachments": [],
+        "confidence": 0.6427,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "fd6e4cd9-ae79-4cf6-b832-d299fc281713",
+          "queryId": "fd6e4cd9-ae79-4cf6-b832-d299fc281713",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "citation_validated": true,
+              "citation_support_score": 0.7838,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 0.8626
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:57:49.173469+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:57:49.173469+00:00",
+    "updated_at": "2026-08-04T04:57:49.173469+00:00",
+    "last_message": "dapat dilihat bahwa pembelian hingga IDR 10.000.000 memerlukan persetujuan manajer. pembelian di atas IDR 50.000.000 memerlukan persetujuan Direktur. tiga kutipan dari vendor. Oleh. itu.",
+    "last_user_message": "what approval is needed for purchase above 25 million",
+    "last_message_at": "2026-08-04T04:57:49.173469+00:00"
+  },
+  {
+    "id": "bb406d59-3c8f-48e7-a31a-50bb7b3777e3",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "what approval is needed for purchase above 25 million",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "c883109e-e540-4535-b929-bd754c0bf63b",
+        "conversation_id": "bb406d59-3c8f-48e7-a31a-50bb7b3777e3",
+        "role": "user",
+        "content": "what approval is needed for purchase above 25 million",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7d580f57-22fb-492d-bd01-b23c27ef0103",
+          "queryId": "7d580f57-22fb-492d-bd01-b23c27ef0103"
+        },
+        "created_at": "2026-08-04T04:55:22.236063+00:00"
+      },
+      {
+        "id": "dda7bd9d-b2ed-4c7d-a277-182439c27d37",
+        "conversation_id": "bb406d59-3c8f-48e7-a31a-50bb7b3777e3",
+        "role": "assistant",
+        "content": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Purchases up to IDR 10,000,000 require manager approval.",
+        "attachments": [],
+        "confidence": 0.6427,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "7d580f57-22fb-492d-bd01-b23c27ef0103",
+          "queryId": "7d580f57-22fb-492d-bd01-b23c27ef0103",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.7838,
+              "relevance_score": 0.7838,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "citation_validated": true,
+              "citation_support_score": 0.9167,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:55:22.236063+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:55:22.236063+00:00",
+    "updated_at": "2026-08-04T04:55:22.236063+00:00",
+    "last_message": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. Purchases up to IDR 10,000,000 require manager approval.",
+    "last_user_message": "what approval is needed for purchase above 25 million",
+    "last_message_at": "2026-08-04T04:55:22.236063+00:00"
+  },
+  {
+    "id": "bb21d81a-1daa-45f5-a91f-fc51f9c07b8d",
+    "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+    "user_name": "wilson manik",
+    "title": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+    "language": "ID",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "5f776134-fb1c-4378-9743-6179988c4d06",
+        "conversation_id": "bb21d81a-1daa-45f5-a91f-fc51f9c07b8d",
+        "role": "user",
+        "content": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+          "user_name": "wilson manik",
+          "query_id": "fa0399ba-297d-4491-a8b2-b4d2e141c5bf",
+          "queryId": "fa0399ba-297d-4491-a8b2-b4d2e141c5bf"
+        },
+        "created_at": "2026-08-04T04:49:40.060043+00:00"
+      },
+      {
+        "id": "43aa03e6-dc27-4b37-99c5-a61bc7d55fcf",
+        "conversation_id": "bb21d81a-1daa-45f5-a91f-fc51f9c07b8d",
+        "role": "assistant",
+        "content": "Cara mereset kata sandi adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset kata sandi diproses dalam waktu 1x24 jam.",
+        "attachments": [],
+        "confidence": 0.796,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+          "user_name": "wilson manik",
+          "query_id": "fa0399ba-297d-4491-a8b2-b4d2e141c5bf",
+          "queryId": "fa0399ba-297d-4491-a8b2-b4d2e141c5bf",
+          "sources": [
+            {
+              "document_name": "FAQ_IT_Support.txt",
+              "document_type": "txt",
+              "page": null,
+              "page_is_reliable": false,
+              "score": 0.796,
+              "relevance_score": 0.796,
+              "excerpt": "Nusantara Dynamics IT Support FAQ ============== ## Password Reset Q: How do I reset my password? A: Raise a ticket to the IT Helpdesk via the portal; resets are processed within 1x24 hours. ## New Laptop Q: How do I request a new laptop? A: Submit a request through the IT Service Desk with manager approval.",
+              "citation_validated": true,
+              "citation_support_score": 0.8179,
+              "paragraph_start": 1,
+              "paragraph_end": 3,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "FAQ_IT_Support.txt",
+          "page": null,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:49:40.060043+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:49:40.060043+00:00",
+    "updated_at": "2026-08-04T04:49:40.060043+00:00",
+    "last_message": "Cara mereset kata sandi adalah dengan mengajukan tiket ke IT Helpdesk melalui portal. Proses reset kata sandi diproses dalam waktu 1x24 jam.",
+    "last_user_message": "Bagaimana cara mereset kata sandi dan berapa lama prosesnya?",
+    "last_message_at": "2026-08-04T04:49:40.060043+00:00"
+  },
+  {
+    "id": "3c355f4b-d013-4067-8208-5af933f31497",
+    "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+    "user_name": "wilson manik",
+    "title": "What approval is needed for a purchase above IDR 50 million?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "2f751b52-23bb-4b92-87f3-1aa1b2780d40",
+        "conversation_id": "3c355f4b-d013-4067-8208-5af933f31497",
+        "role": "user",
+        "content": "What approval is needed for a purchase above IDR 50 million?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+          "user_name": "wilson manik",
+          "query_id": "2e490e79-c064-468b-a3a9-56cf9f82b69e",
+          "queryId": "2e490e79-c064-468b-a3a9-56cf9f82b69e"
+        },
+        "created_at": "2026-08-04T04:48:02.966961+00:00"
+      },
+      {
+        "id": "6289805f-e9ba-4c47-8624-cab158dec04a",
+        "conversation_id": "3c355f4b-d013-4067-8208-5af933f31497",
+        "role": "assistant",
+        "content": "Director approval is needed for a purchase above IDR 50 million. Purchases above this amount also require three vendor quotations. The requirement for Director approval. for any purchase. vendors must be properly onboarded. bank details before the first purchase order is issued.",
+        "attachments": [],
+        "confidence": 0.8292,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "staff-8b4c2a4acd564f9cb1a48115d139e314",
+          "user_name": "wilson manik",
+          "query_id": "2e490e79-c064-468b-a3a9-56cf9f82b69e",
+          "queryId": "2e490e79-c064-468b-a3a9-56cf9f82b69e",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8292,
+              "relevance_score": 0.8292,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "citation_validated": true,
+              "citation_support_score": 0.9094,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 0.8723
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:48:02.966961+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:48:02.966961+00:00",
+    "updated_at": "2026-08-04T04:48:02.966961+00:00",
+    "last_message": "Director approval is needed for a purchase above IDR 50 million. Purchases above this amount also require three vendor quotations. The requirement for Director approval. for any purchase. vendors must be properly onboarded. bank details before the first purchase order is issued.",
+    "last_user_message": "What approval is needed for a purchase above IDR 50 million?",
+    "last_message_at": "2026-08-04T04:48:02.966961+00:00"
+  },
+  {
+    "id": "d23e7877-2122-43a9-874b-ea48993952f6",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How long is the probation period for new employees?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "093219b8-be02-4dca-9d0f-8823377c9a20",
+        "conversation_id": "d23e7877-2122-43a9-874b-ea48993952f6",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "ba3be7ce-26e3-4ddb-bcc8-670215d0dc99",
+          "queryId": "ba3be7ce-26e3-4ddb-bcc8-670215d0dc99"
+        },
+        "created_at": "2026-08-04T04:46:00.990264+00:00"
+      },
+      {
+        "id": "8d452e30-3879-4800-8a56-8ab6004636a6",
+        "conversation_id": "d23e7877-2122-43a9-874b-ea48993952f6",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "attachments": [],
+        "confidence": 0.8572,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "ba3be7ce-26e3-4ddb-bcc8-670215d0dc99",
+          "queryId": "ba3be7ce-26e3-4ddb-bcc8-670215d0dc99",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8572,
+              "relevance_score": 0.8572,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "citation_validated": true,
+              "citation_support_score": 0.9237,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:46:00.990264+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:46:00.990264+00:00",
+    "updated_at": "2026-08-04T04:46:00.990264+00:00",
+    "last_message": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+    "last_user_message": "How long is the probation period for new employees?",
+    "last_message_at": "2026-08-04T04:46:00.990264+00:00"
+  },
+  {
+    "id": "499c0a18-271e-44a2-ace6-298e1793ee15",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How long is the probation period for new employees?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "50f158c9-25a3-465e-b7f1-d8727e176956",
+        "conversation_id": "499c0a18-271e-44a2-ace6-298e1793ee15",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "9a08bd39-1e14-4b26-847a-1c32473bd248",
+          "queryId": "9a08bd39-1e14-4b26-847a-1c32473bd248"
+        },
+        "created_at": "2026-08-04T04:08:24.668726+00:00"
+      },
+      {
+        "id": "b707a8c6-ca09-4f5f-87d9-609a3c3f3cba",
+        "conversation_id": "499c0a18-271e-44a2-ace6-298e1793ee15",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12, before confirmation. to assess the employee's performance during this period. New employees are also assigned an onboarding buddy for the first 30 days to support their integration into the company. they are issued a laptop. access credentials on their first day. provided the hiring manager has raised a request at least 3 working days in advance.",
+        "attachments": [],
+        "confidence": 0.8572,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "9a08bd39-1e14-4b26-847a-1c32473bd248",
+          "queryId": "9a08bd39-1e14-4b26-847a-1c32473bd248",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8572,
+              "relevance_score": 0.8572,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "citation_validated": true,
+              "citation_support_score": 0.9237,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 0.7339
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:08:24.668726+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:08:24.668726+00:00",
+    "updated_at": "2026-08-04T04:08:24.668726+00:00",
+    "last_message": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12, before confirmation. to assess the employee's performance during this period. New employees are also assigned an onboarding buddy for the first 30 days to support their integration into the company. they are issued a laptop. access credentials on their first day. provided the hiring manager has raised a request at least 3 working days in advance.",
+    "last_user_message": "How long is the probation period for new employees?",
+    "last_message_at": "2026-08-04T04:08:24.668726+00:00"
+  },
+  {
+    "id": "80d9bafd-80b2-4f75-9bdc-ed4abe0452c2",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How long is the probation period for new employees?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "292ff1d4-300d-42ee-b619-c85c3c7b708b",
+        "conversation_id": "80d9bafd-80b2-4f75-9bdc-ed4abe0452c2",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "76b296a9-0ba5-4466-ad5d-9507ae18fae8",
+          "queryId": "76b296a9-0ba5-4466-ad5d-9507ae18fae8"
+        },
+        "created_at": "2026-08-04T04:07:11.434579+00:00"
+      },
+      {
+        "id": "aa21ba58-ad96-42cf-9f37-35352e800ee6",
+        "conversation_id": "80d9bafd-80b2-4f75-9bdc-ed4abe0452c2",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "attachments": [],
+        "confidence": 0.8572,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "76b296a9-0ba5-4466-ad5d-9507ae18fae8",
+          "queryId": "76b296a9-0ba5-4466-ad5d-9507ae18fae8",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8572,
+              "relevance_score": 0.8572,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "citation_validated": true,
+              "citation_support_score": 0.9237,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T04:07:11.434579+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T04:07:11.434579+00:00",
+    "updated_at": "2026-08-04T04:07:11.434579+00:00",
+    "last_message": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+    "last_user_message": "How long is the probation period for new employees?",
+    "last_message_at": "2026-08-04T04:07:11.434579+00:00"
+  },
+  {
+    "id": "6e25dbe7-c27a-4d25-9c5b-b9e2b6918e02",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How quickly must a P1 IT incident be resolved?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "b4478064-7bfe-4be3-b534-20ce7c8e7bd7",
+        "conversation_id": "6e25dbe7-c27a-4d25-9c5b-b9e2b6918e02",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "0d8a38c3-8dbc-43e5-b08f-de357feea336",
+          "queryId": "0d8a38c3-8dbc-43e5-b08f-de357feea336"
+        },
+        "created_at": "2026-08-04T03:53:34.960045+00:00"
+      },
+      {
+        "id": "4071e05a-f62b-474c-ab4a-700bfc2c7c5d",
+        "conversation_id": "6e25dbe7-c27a-4d25-9c5b-b9e2b6918e02",
+        "role": "assistant",
+        "content": "A P1 IT incident must be resolved within 4 hours. P1 incidents are considered critical and have specific response targets, which include acknowledgement within 15 minutes. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure. The escalation procedure is in place to ensure timely resolution of critical incidents.",
+        "attachments": [],
+        "confidence": 0.8868,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "0d8a38c3-8dbc-43e5-b08f-de357feea336",
+          "queryId": "0d8a38c3-8dbc-43e5-b08f-de357feea336",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8868,
+              "relevance_score": 0.8868,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "citation_validated": true,
+              "citation_support_score": 0.9322,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 0.6105
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T03:53:34.960045+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T03:53:34.960045+00:00",
+    "updated_at": "2026-08-04T03:53:34.960045+00:00",
+    "last_message": "A P1 IT incident must be resolved within 4 hours. P1 incidents are considered critical and have specific response targets, which include acknowledgement within 15 minutes. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure. The escalation procedure is in place to ensure timely resolution of critical incidents.",
+    "last_user_message": "How quickly must a P1 IT incident be resolved?",
+    "last_message_at": "2026-08-04T03:53:34.960045+00:00"
+  },
+  {
+    "id": "eaf587a3-2655-4f4e-8d1e-d2bcd122cf11",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "What approval is needed for a purchase above IDR 50 million?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "521d96af-23a3-4a3e-8267-ab8363d01379",
+        "conversation_id": "eaf587a3-2655-4f4e-8d1e-d2bcd122cf11",
+        "role": "user",
+        "content": "What approval is needed for a purchase above IDR 50 million?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "0b3fd547-bc6e-4f03-a71f-770e0daebe43",
+          "queryId": "0b3fd547-bc6e-4f03-a71f-770e0daebe43"
+        },
+        "created_at": "2026-08-04T03:16:05.743023+00:00"
+      },
+      {
+        "id": "dd1b67f2-e3ad-4efd-a5ae-908b33fcc048",
+        "conversation_id": "eaf587a3-2655-4f4e-8d1e-d2bcd122cf11",
+        "role": "assistant",
+        "content": "Purchases above IDR 50 million require Director approval and three vendor quotations.",
+        "attachments": [],
+        "confidence": 0.8292,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "0b3fd547-bc6e-4f03-a71f-770e0daebe43",
+          "queryId": "0b3fd547-bc6e-4f03-a71f-770e0daebe43",
+          "sources": [
+            {
+              "document_name": "SOP_Procurement.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8292,
+              "relevance_score": 0.8292,
+              "excerpt": "Purchases above IDR 50,000,000 require Director approval and three vendor quotations. New vendors must submit a tax ID (NPWP) and bank details before the first purchase order is issued.",
+              "citation_validated": true,
+              "citation_support_score": 0.9094,
+              "paragraph_start": 1,
+              "paragraph_end": 6,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Procurement.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T03:16:05.743023+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T03:16:05.743023+00:00",
+    "updated_at": "2026-08-04T03:16:05.743023+00:00",
+    "last_message": "Purchases above IDR 50 million require Director approval and three vendor quotations.",
+    "last_user_message": "What approval is needed for a purchase above IDR 50 million?",
+    "last_message_at": "2026-08-04T03:16:05.743023+00:00"
+  },
+  {
+    "id": "902afc18-d0f2-4d05-80b7-aef6120d87e3",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How quickly must a P1 IT incident be resolved?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "bbf3b3aa-4856-4319-ab80-a976303abfe9",
+        "conversation_id": "902afc18-d0f2-4d05-80b7-aef6120d87e3",
+        "role": "user",
+        "content": "How quickly must a P1 IT incident be resolved?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a34767d2-a32b-4b6f-8cb7-a0603eb6c4e4",
+          "queryId": "a34767d2-a32b-4b6f-8cb7-a0603eb6c4e4"
+        },
+        "created_at": "2026-08-04T02:40:57.590657+00:00"
+      },
+      {
+        "id": "adb1fbd4-003f-4380-8a3f-c05eceb4f612",
+        "conversation_id": "902afc18-d0f2-4d05-80b7-aef6120d87e3",
+        "role": "assistant",
+        "content": "A P1 IT incident must be resolved within 4 hours. P1 incidents are considered critical. have specific response targets. which include acknowledgement within 15 minutes. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure, indicating the severity. urgency of such incidents.",
+        "attachments": [],
+        "confidence": 0.8868,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "a34767d2-a32b-4b6f-8cb7-a0603eb6c4e4",
+          "queryId": "a34767d2-a32b-4b6f-8cb7-a0603eb6c4e4",
+          "sources": [
+            {
+              "document_name": "SOP_IT_Incident_Handling.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8868,
+              "relevance_score": 0.8868,
+              "excerpt": "P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours.",
+              "citation_validated": true,
+              "citation_support_score": 0.9322,
+              "paragraph_start": 1,
+              "paragraph_end": 8,
+              "citation_answer_coverage": 0.7621
+            }
+          ],
+          "source": "SOP_IT_Incident_Handling.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T02:40:57.590657+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T02:40:57.590657+00:00",
+    "updated_at": "2026-08-04T02:40:57.590657+00:00",
+    "last_message": "A P1 IT incident must be resolved within 4 hours. P1 incidents are considered critical. have specific response targets. which include acknowledgement within 15 minutes. If a P1 incident is not resolved within 2 hours, it is escalated to the Head of Infrastructure, indicating the severity. urgency of such incidents.",
+    "last_user_message": "How quickly must a P1 IT incident be resolved?",
+    "last_message_at": "2026-08-04T02:40:57.590657+00:00"
+  },
+  {
+    "id": "4fef0b7d-479f-472a-a238-849bffcca6bc",
+    "user_id": "dev-admin",
+    "user_name": "Administrator",
+    "title": "How long is the probation period for new employees?",
+    "language": "EN",
+    "is_pinned": false,
+    "pinned": false,
+    "messages": [
+      {
+        "id": "d9fc1795-668a-4da5-9f26-9a82a6bb1d42",
+        "conversation_id": "4fef0b7d-479f-472a-a238-849bffcca6bc",
+        "role": "user",
+        "content": "How long is the probation period for new employees?",
+        "attachments": [],
+        "confidence": null,
+        "model_name": null,
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "2173f150-c3a0-44c3-9004-0e069ddd37a8",
+          "queryId": "2173f150-c3a0-44c3-9004-0e069ddd37a8"
+        },
+        "created_at": "2026-08-04T02:40:31.879774+00:00"
+      },
+      {
+        "id": "f70c072f-4668-4fe6-a937-2421bebcd717",
+        "conversation_id": "4fef0b7d-479f-472a-a238-849bffcca6bc",
+        "role": "assistant",
+        "content": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+        "attachments": [],
+        "confidence": 0.8572,
+        "model_name": "python-rag-ollama",
+        "metadata": {
+          "user_id": "dev-admin",
+          "user_name": "Administrator",
+          "query_id": "2173f150-c3a0-44c3-9004-0e069ddd37a8",
+          "queryId": "2173f150-c3a0-44c3-9004-0e069ddd37a8",
+          "sources": [
+            {
+              "document_name": "SOP_Onboarding.pdf",
+              "document_type": "pdf",
+              "page": 1,
+              "page_is_reliable": true,
+              "score": 0.8572,
+              "relevance_score": 0.8572,
+              "excerpt": "New employees serve a probation period of 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+              "citation_validated": true,
+              "citation_support_score": 0.9237,
+              "paragraph_start": 1,
+              "paragraph_end": 10,
+              "citation_answer_coverage": 1.0
+            }
+          ],
+          "source": "SOP_Onboarding.pdf",
+          "page": 1,
+          "follow_up_question": null,
+          "followUpQuestion": null
+        },
+        "created_at": "2026-08-04T02:40:31.879774+00:00"
+      }
+    ],
+    "created_at": "2026-08-04T02:40:31.879774+00:00",
+    "updated_at": "2026-08-04T02:40:31.879774+00:00",
+    "last_message": "The probation period for new employees is 3 months. A formal performance evaluation is conducted in week 12 before confirmation.",
+    "last_user_message": "How long is the probation period for new employees?",
+    "last_message_at": "2026-08-04T02:40:31.879774+00:00"
+  },
+  {
     "id": "e54d139e-f5e3-403a-8fed-3dc5158080a5",
     "user_id": "dev-admin",
     "user_name": "Administrator",
